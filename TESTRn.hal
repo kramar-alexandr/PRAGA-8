@@ -1,0 +1,450 @@
+external inner procedure ExtractObj(string,var Integer,var string);
+
+
+global procedure TESTRn(record RcVc RepSpec)
+begin
+	record INVc INr;
+	record PRVc PRr,PR2r;
+	record TBBUVc TBBUr;
+	row TBBUVc TBBUrw;
+	date sd,ed;
+	string 20 mainobj;
+	array string 20 project,name,prjobj;
+	integer i,k;
+	record ObjVc Objr;
+	record BudRepVc BRr;
+	row BudRepVc BRrw,BR2rw;
+	integer mtrw,j;
+	record ITVc ITr;
+	boolean TrHs,testf;
+	integer repmtrw,repi;
+	record MainVc Mainr;
+	record TRVc TRr;
+	row TRVc TRrw;
+	array val totalrowbud,totalrowsped;
+	val totalbubyrow,totalspendbyrow;
+	string 100 mainobjname;
+	boolean foundf;
+	record CUVc CUr;
+	string 20 vendobj,tstr;
+	integer pos;
+	
+	sd = RepSpec.sStartDate;
+	ed = RepSpec.sEndDate;
+	mainobj = RepSpec.f1;
+	
+	
+	
+	recordnew(BRr);
+	Objr.Code = mainobj;
+	readfirstmain(Objr,1,true);
+	mainobjname = Objr.Comment;
+	startreportnoheaderjob("TEST");
+		k = 0;
+		
+		  
+		while(loopmain(ITr,1,true))begin
+			clearrow(BRr,BRrw,1);
+			BRrw.Code = ITr.Code;
+			BRrw.CatName = ITr.Comment;
+			matrowput(BRr,k,BRrw);
+			k=k+1;
+			resetloop(INr);
+			INr.Group = ITr.Code;
+			TrHs = true;
+			while(loopkey("Group",INr,1,TrHs))begin
+				testf = true;
+				if(INr.Group!=ITr.Code)then begin testf = false; TrHs = false; end;
+				if(blank(INr.Objects))then begin testf = false; end;
+				
+				if(testf)then begin
+					clearrow(BRr,BRrw,1);
+					BRrw.Code = INr.Objects;
+					Objr.Code = INr.Objects;
+					if(readfirstmain(Objr,1,true))then begin
+						BRrw.Name = Objr.Comment;
+					end;
+					
+					BRrw.CostAcc = INr.CostAcc;
+					
+					repmtrw = matrowcnt(BRr);
+					foundf = false;
+					For(i=0;i<repmtrw;i=i+1) begin
+	  				matrowget(BRr,i,BR2rw);
+	  				if(BR2rw.Code==BRrw.Code)then begin
+							foundf = true;
+	  				end;
+					end; 
+					
+					if(!foundf)then begin
+						CUr.Code = "";
+						while(loopkey("VEActCode",CUr,1,true))begin
+							if(nonblank(CUr.VEObjects))then begin
+								BRrw.VECode = CUr.VEObjects;
+								matrowput(BRr,k,BRrw);
+								k=k+1;
+							end;
+						end;
+						resetloop(CUr);
+					end;
+					
+					repmtrw = matrowcnt(BRr);
+					foundf = false;
+					For(i=0;i<repmtrw;i=i+1) begin
+	  				matrowget(BRr,i,BR2rw);
+	  				if(BR2rw.Code==BRrw.Code and BR2rw.VECode=="")then begin
+							foundf = true;
+	  				end;
+					end; 
+					if(!foundf)then begin
+						BRrw.VECode = "";
+						matrowput(BRr,k,BRrw);
+						k=k+1;
+					end;
+					
+				end;
+			end;
+		end;
+		
+		repmtrw = matrowcnt(BRr);
+		k=0;
+		while(loopmain(PRr,1,true))begin
+			if(PRr.StartDate>=sd and PRr.StartDate<=ed)then begin
+				if(blank(PRr.MotherCode))then begin
+					project[k] = PRr.Code;
+					name[k] = PRr.Name;
+					prjobj[k] = PRr.Objects;
+					k = k+1;
+					
+					TBBUr.PRCode = PRr.Code;
+					if(readfirstmain(TBBUr,1,true))then begin
+						mtrw = matrowcnt(TBBUr);
+						For(i=0;i<mtrw;i=i+1) begin
+							matrowget(TBBUr,i,TBBUrw);
+							if(TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))then begin
+								For(repi=0;repi<repmtrw;repi=repi+1) begin
+									matrowget(BRr,repi,BRrw);
+									if(setinset(BRrw.Code,TBBUrw.Objects) and (((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode)))) and (setinset(mainobj,TBBUrw.Objects) or blank(mainobj)))then begin
+										//messagebox(0,BRrw.VECode & " " & TBBUrw.VECode);
+										switch(k)begin
+											case 1:	BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
+									 		case 2:	BRrw.Bud2 = BRrw.Bud2 + TBBUrw.Sum;
+									 		case 3:	BRrw.Bud3 = BRrw.Bud3 + TBBUrw.Sum;
+									 		case 4:	BRrw.Bud4 = BRrw.Bud4 + TBBUrw.Sum;
+									 		case 5:	BRrw.Bud5 = BRrw.Bud5 + TBBUrw.Sum;
+									 		case 6:	BRrw.Bud6 = BRrw.Bud6 + TBBUrw.Sum;
+									 		case 7:	BRrw.Bud7 = BRrw.Bud7 + TBBUrw.Sum;
+									 		case 8:	BRrw.Bud8 = BRrw.Bud8 + TBBUrw.Sum;
+									 		case 9:	BRrw.Bud9 = BRrw.Bud9 + TBBUrw.Sum;
+									 		case 10:	BRrw.Bud10 = BRrw.Bud10 + TBBUrw.Sum;
+									 		case 11:	BRrw.Bud11 = BRrw.Bud11 + TBBUrw.Sum;
+									 		case 12:	BRrw.Bud12 = BRrw.Bud12 + TBBUrw.Sum;
+									 		case 13:	BRrw.Bud13 = BRrw.Bud13 + TBBUrw.Sum;
+									 		case 14:	BRrw.Bud14 = BRrw.Bud14 + TBBUrw.Sum;
+									 		case 15:	BRrw.Bud15 = BRrw.Bud15 + TBBUrw.Sum;
+									 		case 16:	BRrw.Bud16 = BRrw.Bud16 + TBBUrw.Sum;
+									 		case 17:	BRrw.Bud17 = BRrw.Bud17 + TBBUrw.Sum;
+									 		case 18:	BRrw.Bud18 = BRrw.Bud18 + TBBUrw.Sum;
+									 		case 19:	BRrw.Bud19 = BRrw.Bud19 + TBBUrw.Sum;
+									 		case 20:	BRrw.Bud20 = BRrw.Bud20 + TBBUrw.Sum;					 
+										end;
+										matrowput(BRr,repi,BRrw);
+									end;
+								end; 
+							end;
+						end; 
+					end;
+					
+					PR2r.MotherCode = PRr.Code;
+					TrHs = true;
+					while(loopkey("MotherCode",PR2r,1,TrHs))begin
+						
+						testf = true;
+						if(PR2r.MotherCode!=PRr.Code)then begin TrHs = false; testf = false; end;
+						if(PR2r.StartDate<sd and PR2r.StartDate>ed)then begin testf = false; end;
+
+						if(testf)then begin
+							j=0;
+							For(i=0;i<k;i=i+1) begin
+								if(PR2r.MotherCode==project[i])then begin j=i+1; end;
+							end; 
+							TBBUr.PRCode = PR2r.Code;
+							if(readfirstmain(TBBUr,1,true))then begin
+								mtrw = matrowcnt(TBBUr);
+								For(i=0;i<mtrw;i=i+1) begin
+									matrowget(TBBUr,i,TBBUrw);
+									if(TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))then begin
+										For(repi=0;repi<repmtrw;repi=repi+1) begin
+											matrowget(BRr,repi,BRrw);
+											//messagebox(0,mainobj & " " & TBBUrw.Objects);
+											if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(mainobj,TBBUrw.Objects) or blank(mainobj)))then begin
+												switch(j)begin
+													case 1:	BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
+													case 2:	BRrw.Bud2 = BRrw.Bud2 + TBBUrw.Sum;
+													case 3:	BRrw.Bud3= BRrw.Bud3 + TBBUrw.Sum;
+													case 4:	BRrw.Bud4 = BRrw.Bud4 + TBBUrw.Sum;
+													case 5:	BRrw.Bud5 = BRrw.Bud5 + TBBUrw.Sum;
+													case 6:	BRrw.Bud6 = BRrw.Bud6 + TBBUrw.Sum;
+													case 7:	BRrw.Bud7 = BRrw.Bud7 + TBBUrw.Sum;
+													case 8:	BRrw.Bud8 = BRrw.Bud8 + TBBUrw.Sum;
+													case 9:	BRrw.Bud9 = BRrw.Bud9 + TBBUrw.Sum;
+													case 10:	BRrw.Bud10 = BRrw.Bud10 + TBBUrw.Sum;
+													case 11:	BRrw.Bud11 = BRrw.Bud11 + TBBUrw.Sum;
+													case 12:	BRrw.Bud12 = BRrw.Bud12 + TBBUrw.Sum;
+													case 13:	BRrw.Bud13 = BRrw.Bud13 + TBBUrw.Sum;
+													case 14:	BRrw.Bud14 = BRrw.Bud14 + TBBUrw.Sum;
+													case 15:	BRrw.Bud15 = BRrw.Bud15 + TBBUrw.Sum;
+													case 16:	BRrw.Bud16 = BRrw.Bud16 + TBBUrw.Sum;
+													case 17:	BRrw.Bud17 = BRrw.Bud17 + TBBUrw.Sum;
+													case 18:	BRrw.Bud18 = BRrw.Bud18 + TBBUrw.Sum;
+													case 19:	BRrw.Bud19 = BRrw.Bud19 + TBBUrw.Sum;
+													case 20:	BRrw.Bud20 = BRrw.Bud20 + TBBUrw.Sum;					 
+												end;
+												matrowput(BRr,repi,BRrw);
+											end;
+										end; 
+									end;
+								end; 
+							end;
+						end;
+					end;
+					resetloop(PR2r);
+				end;
+			end;
+		end;
+		
+		For(repi=0;repi<repmtrw;repi=repi+1) begin
+	  	matrowget(BRr,repi,BRrw);
+	  	if(nonblank(BRrw.CostAcc))then begin
+	  		resetloop(Mainr);
+	  		Mainr.AccNumber = BRrw.CostAcc;
+	  		Mainr.TransDate = sd;
+	  		TrHs = true;
+	  		While(loopmain(Mainr,2,TrHs))begin
+	  			testf = true;
+	  			if(Mainr.AccNumber!=BRrw.CostAcc)then begin TrHs = false; testf = false; end;
+	  			if(Mainr.TransDate>ed)then begin TrHs = false; testf = false; end;
+	  			
+	  			if(testf)then begin
+	  				TRr.Number = Mainr.TransNr;
+	  				TRr.IntYc = Mainr.IntYc;
+	  				if(readfirstmain(TRr,2,true))then begin
+	  					mtrw = matrowcnt(TRr);
+	  					For(i=0;i<mtrw;i=i+1) begin
+	  						matrowget(TRr,i,TRrw);
+	  						if(TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber)then begin
+	  							if(setinset(mainobj,TRrw.Objects) or blank(mainobj))then begin
+	  									vendobj = "";
+	  									tstr = "";
+	  									pos = 0;
+										ExtractObj(TRrw.Objects,pos,tstr);
+										while(nonblank(tstr))begin
+											if(nonblank(tstr))then begin
+												Objr.Code = tstr;
+												if(readfirstmain(Objr,1,true))then begin
+													if(Objr.OTCode=="SUPPL")then begin
+														vendobj = Objr.Code;
+													end;
+												end;
+											end;
+											ExtractObj(TRrw.Objects,pos,tstr);
+										end;
+										if(setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))then begin
+											For(j=0;j<k;j=j+1)begin
+	  										if(setinset(prjobj[j],TRrw.Objects))then begin
+	  											switch(j)begin
+														case 0:	BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
+														case 1:	BRrw.Spend2 = BRrw.Spend2 - TRrw.CredVal + TRrw.DebVal;
+														case 2:	BRrw.Spend3= BRrw.Spend3 - TRrw.CredVal + TRrw.DebVal;
+														case 3:	BRrw.Spend4 = BRrw.Spend4 - TRrw.CredVal + TRrw.DebVal;
+														case 4:	BRrw.Spend5 = BRrw.Spend5 - TRrw.CredVal + TRrw.DebVal;
+														case 5:	BRrw.Spend6 = BRrw.Spend6 - TRrw.CredVal + TRrw.DebVal;
+														case 6:	BRrw.Spend7 = BRrw.Spend7 - TRrw.CredVal + TRrw.DebVal;
+														case 7:	BRrw.Spend8 = BRrw.Spend8 - TRrw.CredVal + TRrw.DebVal;
+														case 8:	BRrw.Spend9 = BRrw.Spend9 - TRrw.CredVal + TRrw.DebVal;
+														case 9:	BRrw.Spend10 = BRrw.Spend10 - TRrw.CredVal + TRrw.DebVal;
+														case 10:	BRrw.Spend11 = BRrw.Spend11 - TRrw.CredVal + TRrw.DebVal;
+														case 11:	BRrw.Spend12 = BRrw.Spend12 - TRrw.CredVal + TRrw.DebVal;
+														case 12:	BRrw.Spend13 = BRrw.Spend13 - TRrw.CredVal + TRrw.DebVal;
+														case 13:	BRrw.Spend14 = BRrw.Spend14 - TRrw.CredVal + TRrw.DebVal;
+														case 14:	BRrw.Spend15 = BRrw.Spend15 - TRrw.CredVal + TRrw.DebVal;
+														case 15:	BRrw.Spend16 = BRrw.Spend16 - TRrw.CredVal + TRrw.DebVal;
+														case 16:	BRrw.Spend17 = BRrw.Spend17 - TRrw.CredVal + TRrw.DebVal;
+														case 17:	BRrw.Spend18 = BRrw.Spend18 - TRrw.CredVal + TRrw.DebVal;
+														case 18:	BRrw.Spend19 = BRrw.Spend19 - TRrw.CredVal + TRrw.DebVal;
+														case 19:	BRrw.Spend20 = BRrw.Spend20 - TRrw.CredVal + TRrw.DebVal;				 
+													end;
+													matrowput(BRr,repi,BRrw);
+	  										end;
+											end; 
+										end;
+	  							end;
+	  						end;
+							end; 
+	  				end;
+	  			end;
+	  		end;
+	  	end;
+		end; 
+		
+		
+	
+		startformat(15);
+	  	Outstring(0,0,"",false);
+	  	Outstring(0,0,"",false);
+	  	Outstring(0,0,"",false);
+	  	Outstring(0,0,"",false);
+			For(i=0;i<k;i=i+1) begin	
+				Outstring(100+i*50,0,name[i],false);
+				Outstring(0,0,"",false);
+			end; 
+			Outstring(0,0,"Total",false);
+			Outstring(0,0,"",false);
+	  endformat;
+	  
+	  startformat(15);
+	  	Outstring(0,0,"",false);
+	  	Outstring(50,0,"",false);
+	  	Outstring(100,0,"",false);
+	  	Outstring(120,0,"",false);
+			For(i=0;i<k;i=i+1) begin	
+				Outstring(100+i*50,0,project[i],false);
+				Outstring(100+i*50,0,"",false);
+			end; 
+	  endformat;
+	  
+	  startformat(15);
+	  	Outstring(0,0,"",false);
+	  	Outstring(50,0,mainobjname,false);
+	  	Outstring(100,0,"",false);
+	  	Outstring(120,0,"Vendor",false);
+			For(i=0;i<k;i=i+1) begin	
+				Outstring(100+i*50,0,"Budjet",false);
+				Outstring(100+i*50,0,"Spending",false);
+			end; 
+			Outstring(100+i*50,0,"Budjet",false);
+			Outstring(100+i*50,0,"Spending",false);
+	  endformat;
+		
+		mtrw = matrowcnt(BRr);
+		For(i=0;i<mtrw;i=i+1) begin
+			matrowget(BRr,i,BRrw);
+			For(j=1;j<k+1;j=j+1) begin	
+	  		totalbubyrow = BRrw.Bud1+BRrw.Bud2+BRrw.Bud3+BRrw.Bud4+BRrw.Bud5+BRrw.Bud6+BRrw.Bud7+BRrw.Bud8+BRrw.Bud9+BRrw.Bud10+BRrw.Bud11+BRrw.Bud12+BRrw.Bud13+BRrw.Bud14+BRrw.Bud15+BRrw.Bud16+BRrw.Bud17+BRrw.Bud18+BRrw.Bud19+BRrw.Bud20;
+	  		totalspendbyrow = BRrw.Spend1+BRrw.Spend2+BRrw.Spend3+BRrw.Spend4+BRrw.Spend5+BRrw.Spend6+BRrw.Spend7+BRrw.Spend8+BRrw.Spend9+BRrw.Spend10+BRrw.Spend11+BRrw.Spend12+BRrw.Spend13+BRrw.Spend14+BRrw.Spend15+BRrw.Spend16+BRrw.Spend17+BRrw.Spend18+BRrw.Spend19+BRrw.Spend20;
+	  	end;
+			
+			if(totalbubyrow!=0 or totalspendbyrow!=0 or nonblank(BRrw.CatName))then begin
+				startformat(15);
+				Outstring(0,0,BRrw.Code,false);
+				Outstring(50,0,BRrw.CatName,false);
+				Outstring(100,0,BRrw.Name,false);
+				Outstring(100,0,BRrw.VECode,false);
+				For(j=1;j<k+1;j=j+1) begin	
+					totalbubyrow = BRrw.Bud1+BRrw.Bud2+BRrw.Bud3+BRrw.Bud4+BRrw.Bud5+BRrw.Bud6+BRrw.Bud7+BRrw.Bud8+BRrw.Bud9+BRrw.Bud10+BRrw.Bud11+BRrw.Bud12+BRrw.Bud13+BRrw.Bud14+BRrw.Bud15+BRrw.Bud16+BRrw.Bud17+BRrw.Bud18+BRrw.Bud19+BRrw.Bud20;
+					totalspendbyrow = BRrw.Spend1+BRrw.Spend2+BRrw.Spend3+BRrw.Spend4+BRrw.Spend5+BRrw.Spend6+BRrw.Spend7+BRrw.Spend8+BRrw.Spend9+BRrw.Spend10+BRrw.Spend11+BRrw.Spend12+BRrw.Spend13+BRrw.Spend14+BRrw.Spend15+BRrw.Spend16+BRrw.Spend17+BRrw.Spend18+BRrw.Spend19+BRrw.Spend20;
+					switch(j)begin
+						case 1:	Outstring(200+j*50,0,BRrw.Bud1,false);
+										Outstring(200+j*50,0,BRrw.Spend1,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud1;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend1;
+						case 2:	Outstring(200+j*50,0,BRrw.Bud2,false);
+										Outstring(200+j*50,0,BRrw.Spend2,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud2;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend2;
+						case 3:	Outstring(200+j*50,0,BRrw.Bud3,false);
+										Outstring(200+j*50,0,BRrw.Spend3,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud3;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend3;
+						case 4:	Outstring(200+j*50,0,BRrw.Bud4,false);
+										Outstring(200+j*50,0,BRrw.Spend4,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud4;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend4;
+						case 5:	Outstring(200+j*50,0,BRrw.Bud5,false);
+										Outstring(200+j*50,0,BRrw.Spend5,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud5;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend5;
+						case 6:	Outstring(200+j*50,0,BRrw.Bud6,false);
+										Outstring(200+j*50,0,BRrw.Spend6,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud6;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend6;
+						case 7:	Outstring(200+j*50,0,BRrw.Bud7,false);
+										Outstring(200+j*50,0,BRrw.Spend7,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud7;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend7;
+						case 8:	Outstring(200+j*50,0,BRrw.Bud8,false);
+										Outstring(200+j*50,0,BRrw.Spend8,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud8;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend8;
+						case 9:	Outstring(200+j*50,0,BRrw.Bud9,false);
+										Outstring(200+j*50,0,BRrw.Spend9,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud9;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend9;
+						case 10:	Outstring(200+j*50,0,BRrw.Bud10,false);
+										Outstring(200+j*50,0,BRrw.Spend10,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud10;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend10;
+						case 11:	Outstring(200+j*50,0,BRrw.Bud11,false);
+										Outstring(200+j*50,0,BRrw.Spend11,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud11;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend11;
+						case 12:	Outstring(200+j*50,0,BRrw.Bud12,false);
+										Outstring(200+j*50,0,BRrw.Spend12,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud12;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend12;
+						case 13:	Outstring(200+j*50,0,BRrw.Bud13,false);
+										Outstring(200+j*50,0,BRrw.Spend13,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud13;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend13;
+						case 14:	Outstring(200+j*50,0,BRrw.Bud14,false);
+										Outstring(200+j*50,0,BRrw.Spend14,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud14;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend14;
+						case 15:	Outstring(200+j*50,0,BRrw.Bud15,false);
+										Outstring(200+j*50,0,BRrw.Spend15,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud15;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend15;
+						case 16:	Outstring(200+j*50,0,BRrw.Bud16,false);
+										Outstring(200+j*50,0,BRrw.Spend16,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud16;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend16;
+						case 17:	Outstring(200+j*50,0,BRrw.Bud17,false);
+										Outstring(200+j*50,0,BRrw.Spend17,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud17;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend17;
+						case 18:	Outstring(200+j*50,0,BRrw.Bud18,false);
+										Outstring(200+j*50,0,BRrw.Spend18,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud18;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend18;
+						case 19:	Outstring(200+j*50,0,BRrw.Bud19,false);
+										Outstring(200+j*50,0,BRrw.Spend19,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud19;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend19;
+						case 20:	Outstring(200+j*50,0,BRrw.Bud20,false);
+										Outstring(200+j*50,0,BRrw.Spend20,false);
+										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud20;
+										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend20;
+				
+					end;
+				end; 
+				outstring(0,0,totalbubyrow,false);
+				outstring(0,0,totalspendbyrow,false);
+				endformat;
+	  	end;
+		end; 
+		
+		startformat(15);
+	  	Outstring(0,0,"",false);
+	  	Outstring(50,0,"",false);
+	  	Outstring(100,0,"",false);
+	  	Outstring(100,0,"Total",false);
+			For(i=0;i<k;i=i+1) begin	
+				Outstring(100+i*50,0,totalrowbud[i],false);
+				Outstring(100+i*50,0,totalrowsped[i],false);
+			end; 
+	  endformat;
+	
+	endjob;
+
+return;
+end;

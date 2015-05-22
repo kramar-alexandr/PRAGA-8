@@ -1,0 +1,12 @@
+event startup
+begin
+
+	SetLangMode(LangEnglish,"ENG",0);
+	
+	
+  Report("TEST",TESTRClass,TESTRn,0,modTS);
+  	
+
+	  
+ return;
+end;  

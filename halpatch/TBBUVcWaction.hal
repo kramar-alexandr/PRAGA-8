@@ -1,0 +1,55 @@
+external function Integer TestAcceptanceStatus(Integer);
+remote updating function LongInt RecordAction_raPasteTBBUInSeparatePO(record TBBUVc); //Edit***************************Sasha2,9:55 14.10.2014
+
+global //Edit***************************Sasha2,17:38 13.10.2014 {
+updating procedure SeparatePOFromTBBUDsm()
+BEGIN
+  record TBBUVc TBBUr;
+  record POVc PO2r;
+  LongInt r;
+  Integer wn,nwn,err;
+  Boolean testf;  
+  
+  wn = CurWindow;
+  if (WindowState(wn)==0) then begin//Rs_normal
+    GetWindowRecord(wn,TBBUr);
+    testf = true;
+    err = TestAcceptanceStatus(TBBUr.AcceptanceStatus);
+    if (err!=0) then begin
+      MessageBox(err,"");
+      testf = false;
+    end;
+    if (testf) then begin
+      if (UserCanAction("TBBUToPO",true)) then begin
+        r = RecordAction_raPasteTBBUInSeparatePO(TBBUr);
+        switch (r) begin
+          case -1: Beep;
+          case -2: MessageBox(1281,"");
+          otherwise
+          	PO2r.SerNr = r;
+          	if (ReadFirstMain(PO2r,1,true)) then begin
+          		nwn = OpenWindow("PODClass",1,0,"","",PO2r);
+          	end;
+        end;
+        UpdateBrowses("POVc");
+      end else begin
+        MessageBox(1274,StringFromStringSet(3,"TBBUToPO"));
+      end;
+    end;
+  end else begin
+    Beep;
+  end;
+  RETURN;
+END; //Edit***************************Sasha2,17:38 13.10.2014 }
+
+
+global
+Function Boolean Obj3SClassOnOpenWindow(Integer wn)
+begin
+  
+	SetWindowSubset(wn,"FOUND");
+  
+  
+  Obj3SClassOnOpenWindow = false;
+  return;
+end;

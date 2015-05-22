@@ -1,0 +1,89 @@
+SourceFile("halcust\\halpatch",0);
+
+begin
+
+	RecordBegin(BudRepVc,-,"");
+  RecordField(Math,M4Matrix,0,0);
+  RecordField(Code,M4Code,10,0);
+  ArrayBegin(Math,-,1);
+  ArrayField(Code,M4Str,200,0);
+  ArrayField(CatName,M4Str,200,0);
+  ArrayField(Name,M4Str,200,0);
+  ArrayField(CostAcc,M4Code,10,0);
+  ArrayField(VECode,M4Code,20,0);
+	ArrayField(Bud1,M4Val,0,0);
+	ArrayField(Spend1,M4Val,0,0);
+	
+	ArrayField(Bud1,M4Val,0,0);
+	ArrayField(Spend1,M4Val,0,0);
+	
+	ArrayField(Bud2,M4Val,0,0);
+	ArrayField(Spend2,M4Val,0,0);
+	
+	ArrayField(Bud3,M4Val,0,0);
+	ArrayField(Spend3,M4Val,0,0);
+	
+	ArrayField(Bud4,M4Val,0,0);
+	ArrayField(Spend4,M4Val,0,0);
+	
+	ArrayField(Bud5,M4Val,0,0);
+	ArrayField(Spend5,M4Val,0,0);
+	
+	ArrayField(Bud6,M4Val,0,0);
+	ArrayField(Spend6,M4Val,0,0);
+	
+	ArrayField(Bud7,M4Val,0,0);
+	ArrayField(Spend7,M4Val,0,0);
+	
+	ArrayField(Bud8,M4Val,0,0);
+	ArrayField(Spend8,M4Val,0,0);
+	
+	ArrayField(Bud9,M4Val,0,0);
+	ArrayField(Spend9,M4Val,0,0);
+	
+	ArrayField(Bud10,M4Val,0,0);
+	ArrayField(Spend10,M4Val,0,0);
+	
+	ArrayField(Bud11,M4Val,0,0);
+	ArrayField(Spend11,M4Val,0,0);
+	
+	ArrayField(Bud12,M4Val,0,0);
+	ArrayField(Spend12,M4Val,0,0);
+	
+	ArrayField(Bud13,M4Val,0,0);
+	ArrayField(Spend13,M4Val,0,0);
+	
+	ArrayField(Bud14,M4Val,0,0);
+	ArrayField(Spend14,M4Val,0,0);
+	
+	ArrayField(Bud15,M4Val,0,0);
+	ArrayField(Spend15,M4Val,0,0);
+	
+	ArrayField(Bud16,M4Val,0,0);
+	ArrayField(Spend16,M4Val,0,0);
+	
+	ArrayField(Bud17,M4Val,0,0);
+	ArrayField(Spend17,M4Val,0,0);
+	
+	ArrayField(Bud18,M4Val,0,0);
+	ArrayField(Spend18,M4Val,0,0);
+	
+	ArrayField(Bud19,M4Val,0,0);
+	ArrayField(Spend19,M4Val,0,0);
+	
+	ArrayField(Bud20,M4Val,0,0);
+	ArrayField(Spend20,M4Val,0,0);
+	
+  EndArray;
+  MainKeyBegin(Code,0);
+  KeySegment(Code);
+  EndRecord;
+	
+	
+	RecordAddBegin(TBBUVc,"Mytbbu");
+		ArrayField(VECode,M4Code,20,CUVc);
+		ArrayField(ExtraObj,M4Code,20,ObjVc);
+	EndRecordAdd;
+	
+return;  
+end;

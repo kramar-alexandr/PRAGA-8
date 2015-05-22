@@ -1,0 +1,174 @@
+external procedure RowCalculateTaxMatrix_POVc(var record POVc,Integer,row POVc);
+external procedure RowCalculateTaxMatrix_ORVc(var record ORVc,Integer,row ORVc);
+external procedure ORDchsum(var record ORVc,Integer);
+external function Boolean ORDchrsum(var record ORVc,Integer);
+external function string 255 FillupTaxMatrix(Integer,string,string,string,string,string,var record TaxMatrixVc);
+external function Boolean POVc_PasteArtCode(var record POVc,Integer,Boolean);
+external procedure TBBUVc_ChangeQuantityRecepy(string,val,Integer,var record TBBUVc);
+external procedure GetDatePriceBasedOn(string,Date,Date,string,var Date);
+external function Boolean GetItemPriceDiscount3(string,val,var record INVc,string,val,val,val,val,val,string,string,string,string,
+                                                var val,var string,var val,var string,var val,var string,Integer,var Boolean,Date,Time,
+                                                string,Boolean,var Boolean,string,var string,var val,string,string,var string);
+external function string 20 GetTax2Acc(string);
+external procedure GetTaxesDiscounts(string,Date,string,string,var val,var val);
+external function Boolean GetTimeClassPrice(string,string,var val,var val);
+external function val MulRateToBase1(var string,val,val,val,val,val,val,roundmode);
+external function Integer TypeOfCurncy(var string,var Integer);
+external function Boolean HasSalesmanChanged(string,string);
+external function string 60 AddObjectToObjectList(string,string);
+external procedure ExtractObj(string,var Integer,var string);
+external function val DivRateToBase1(string,val,val,val,val,val,val,roundmode);
+external function val DivWithRateToBase1(string,Date,val,roundmode);
+external procedure TBBUDchrsum(var record TBBUVc,Integer,Boolean,Integer);
+external procedure TBBUSumup(var record TBBUVc);
+external procedure GetFullCurncyRate (var string,Date,var val,var val,var val,var val,var val);
+external function Boolean OtherExchangeRate(val,val,val,val,val,val,val,val,val,val);
+external procedure SaveExchangeRate(val,val,val,val,val,var val,var val,var val,var val,var val);
+external function Boolean TBBUVc_ExplodeRecepy(record INVc,val,record TBBUVc,string,Integer);
+external function string 255 FindINObjects(string,string);
+external function Boolean GetItemNameStr(Integer,var string,string,string,string);
+external procedure GetProjectPrice(string,string,string,string,string,val,var val,var val,var string,var val,var string);
+external function Boolean GetFirstItem(var string,var record INVc);
+external procedure GetItemSalesAcc(string,Integer,var string);
+external function Boolean PasteCustInOR(var record ORVc);
+external procedure CalcSum(val,val,val,val,var val,Integer);
+external procedure GetItemVATCode(string,Integer,var string,Boolean);
+external procedure RoundRowSum(string,string,string,var val);
+external procedure POSumup(var record POVc);
+external function Boolean SetInSet2(string,string); //Edit***************************Sasha2,10:55 14.10.2014
+external function Boolean POVc_PasteVECode(var record POVc,Boolean); //Edit***************************Sasha2,13:33 14.10.2014
+external function val FindVAT(string,val,Integer,Integer); //Edit***************************Sasha2,10:10 21.10.2014
+external procedure CalcTBBUVcCurrencyPriceAndSum(record TBBUVc,var row TBBUVc,val,val,val,Boolean); //Edit***************************Sasha2,17:16 27.02.2015
+
+
+procedure PutOnPORow(var record POVc POp,row POVc POrwp,var Integer porownr,row TBBUVc TBBUrwp,record TBBUVc TBBUp,record INVc INp,string vevatcode,Integer exportflag)
+BEGIN
+  string 255 tstr;
+  val t;
+  Integer oldstyle;
+  record TaxMatrixVc TMr;
+  
+  ClearRow(POp,POrwp,1);
+  POrwp.ArtCode = TBBUrwp.ArtCode;
+  MatRowPut(POp,porownr,POrwp);
+  POVc_PasteArtCode(POp,porownr,false);
+  MatRowGet(POp,porownr,POrwp);
+
+  POrwp.ArtCode = TBBUrwp.ArtCode;
+  POrwp.Spec = TBBUrwp.Comment;
+  POrwp.Objects = TBBUrwp.Objects;
+  POrwp.PRCode = TBBUp.PRCode;
+  POrwp.Quant = TBBUrwp.Qty;
+  POrwp.VEQuant = TBBUrwp.Qty;
+  POrwp.Price = TBBUrwp.Price;
+  POrwp.vRebate = blankval;
+  POrwp.Sum = TBBUrwp.Sum;
+  POrwp.PriceFactor = INp.PriceFactor;
+  POrwp.VATCode = vevatcode;
+  if (blank(POrwp.VATCode)) then begin
+    GetItemVATCode(POrwp.ArtCode,exportflag,tstr,false);
+    POrwp.VATCode = tstr;
+  end;    
+  MatRowPut(POp,porownr,POrwp);
+  MatRowGet(POp,porownr,POrwp);
+  CalcSum(POrwp.Quant,POrwp.Price,POrwp.PriceFactor,POrwp.vRebate,POrwp.Sum,0);
+  RoundRowSum(POp.CurncyCode,POp.PayDeal,"POVc",POrwp.Sum);
+  RowCalculateTaxMatrix_POVc(POp,porownr,POrwp);
+  MatRowPut(POp,porownr,POrwp);
+  porownr = porownr + 1;
+  RETURN;
+END;
+
+
+global //Edit***************************Sasha2,9:50 14.10.2014 {
+updating function LongInt RecordAction_raPasteTBBUInSeparatePO(record TBBUVc TBBUp)
+BEGIN
+  LongInt res;
+  record PRVc PRr;
+  vector record POVc vectPOr;
+  record PRITHandleBlock PRITRec;
+  record CUVc VEr;
+  record INVc INr;
+  record POVc POr;
+  row POVc POrw;
+  row TBBUVc TBBUrw;
+  integer i,rwcnt,rownr;
+  vector Integer porownr;
+  string 50 subcontrname;
+  string 255 subcontrlist;
+  Integer pos;
+  
+  if (ReadFirstMain(TBBUp,0,true)) then begin end;  
+  PRr.Code = TBBUp.PRCode;
+  if (ReadFirstMain(PRr,1,true)==false) then begin goto LRecordAction_raPasteTBBUInSeparatePO; end;
+  if (PRr.Terminated!=0) then begin goto LRecordAction_raPasteTBBUInSeparatePO; end;
+  
+  BlockLoad(PRITRec);  
+  rwcnt = MatRowCnt(TBBUp);
+  for (i=0;i<rwcnt;i=i+1) begin
+  	MatRowGet(TBBUp,i,TBBUrw);
+  	if (NonBlank(TBBUrw.ArtCode) and TBBUrw.stp==1) then begin
+		INr.Code = TBBUrw.ArtCode;
+		if (ReadFirstMain(INr,1,true)) then begin
+		    if (INr.ItemType==kItemTypePlain or INr.ItemType==kItemTypeStocked/*CheckPOPRITHandle(INr,TBBUrw.ItemType,PRITRec)*/) then begin
+			    if (NonBlank(TBBUrw.VECode)) then begin
+	  				subcontrname = TBBUrw.VECode;
+			  	end else begin
+			  		subcontrname = "nosubcontr";
+			  	end;
+			  	if (!SetInSet2(subcontrname,subcontrlist)) then begin
+			  		RecordNew(POr);
+			  		POr.SerNr = -1;	
+			  		POr.VECode = TBBUrw.VECode;
+			  		
+			  		if (subcontrname!="nosubcontr") then begin
+			  			POVc_PasteVECode(POr,false);
+			  		end;
+			  		vectPOr[subcontrname] = POr;
+			  		porownr[subcontrname] = 0;
+			  		if (blank(subcontrlist)) then begin
+			  			subcontrlist = subcontrname;
+			  		end else begin
+			  			subcontrlist = subcontrlist & "," & subcontrname;
+			  		end;
+			  	end;
+  				POr = vectPOr[subcontrname];
+  				rownr = porownr[subcontrname];
+					PutOnPORow(POr,POrw,rownr,TBBUrw,TBBUp,INr,VEr.VEVATCode,POr.ExportFlag);
+					porownr[subcontrname] = rownr;
+					vectPOr[subcontrname] = POr;
+		    end;
+	    end;
+	end;
+  end;
+  
+  pos = 0; 
+  ExtractObj(subcontrlist,pos,subcontrname);
+  while (nonblank(subcontrname)) begin
+  	POr = vectPOr[subcontrname];
+	  POr.PRCode = TBBUp.PRCode;
+	  POr.Comment = TBBUp.Comment; 
+	  
+	  if (POr.SerNr<=0) then begin
+	    POr.SerNr = NextSerNr("POVc",POr.TransDate,-1,false,"");
+	  end;  
+	  if (POr.SerNr<=0) then begin goto LRecordAction_raPasteTBBUInSeparatePO; end;  
+	  if (MatRowCnt(POr)>0) then begin
+	    POSumup(POr);
+	    if (RecordStore(POr,false)) then begin
+	      CreateRecordLink(TBBUp,CurrentCompany,POr,CurrentCompany);  
+	      CreateRecordLink(POr,CurrentCompany,TBBUp,CurrentCompany); 
+	      if (res==-1) then begin
+	      	res = POr.SerNr;
+	      end; 
+	    end;
+	  end;
+	
+  	ExtractObj(subcontrlist,pos,subcontrname);
+  end;
+ 
+  
+LRecordAction_raPasteTBBUInSeparatePO:;
+  RecordAction_raPasteTBBUInSeparatePO = res;
+  RETURN;
+END; //Edit***************************Sasha2,9:50 14.10.2014 }
