@@ -1,0 +1,82 @@
+procedure AddTBBULineType18(Integer t,Boolean firstf)
+begin
+  record TBBUVc TBBUr;
+  row TBBUVc TBBUrw;
+  Integer wn,rownr,mtrw,i;
+  boolean testf;
+  
+	wn = CurWindow;
+	GetWindowRecord(wn,TBBUr);
+	testf = true;
+	mtrw = matrowcnt(TBBUr);
+	For(i=0;i<mtrw;i=i+1) begin
+		matrowget(TBBUr,i,TBBUrw);
+		if(TBBUrw.stp==18)then begin
+			switch(t)begin
+				case 1:if(TBBUrw.Spec=="I")then begin testf = false; WindowFieldGoto(wn,TBBUr,i,"Spec",false); end;
+				case 2:if(TBBUrw.Spec=="II")then begin testf = false; WindowFieldGoto(wn,TBBUr,i,"Spec",false); end;
+				case 3:if(TBBUrw.Spec=="III")then begin testf = false; WindowFieldGoto(wn,TBBUr,i,"Spec",false); end;
+				case 4:if(TBBUrw.Spec=="IV")then begin testf = false; WindowFieldGoto(wn,TBBUr,i,"Spec",false); end;
+			end;
+		end;  
+	end; 
+	if(testf)then begin
+		rownr = WindowActiveRow(wn);
+		DeselectWindow(wn,false);
+		if (rownr<0) then begin 
+			if (firstf) then begin
+				rownr = 0;
+			end else begin
+				rownr = MatRowCnt(TBBUr);
+			end;
+		end;
+		ClearRow(TBBUr,TBBUrw,18);
+		switch(t)begin
+			case 1: TBBUrw.Spec = "I";
+			case 2: TBBUrw.Spec = "II";
+			case 3: TBBUrw.Spec = "III";
+			case 4: TBBUrw.Spec = "IV";
+		end;
+		TBBUrw.stp = 18;
+		MatRowInsert(TBBUr,rownr,TBBUrw);
+		PutWindowRecord(wn,TBBUr);
+		WindowFieldGoto(wn,TBBUr,rownr,"Spec",false);
+	end;
+	
+  return;
+end;
+
+global
+procedure HeaderLine0TBBUDsm()
+BEGIN
+
+  RETURN;
+END;
+
+global
+procedure HeaderLine1TBBUDsm()
+BEGIN
+  AddTBBULineType18(1,false);
+  RETURN;
+END;
+
+global
+procedure HeaderLine2TBBUDsm()
+BEGIN
+  AddTBBULineType18(2,false);
+  RETURN;
+END;
+
+global
+procedure HeaderLine3TBBUDsm()
+BEGIN
+  AddTBBULineType18(3,false);
+  RETURN;
+END;
+
+global
+procedure HeaderLine4TBBUDsm()
+BEGIN
+  AddTBBULineType18(4,false);
+  RETURN;
+END;

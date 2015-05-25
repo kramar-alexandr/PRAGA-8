@@ -1,0 +1,23 @@
+
+global
+function Boolean TBBUDClassActiveEditField(Integer wn,string fieldname,Integer fn,Integer wnst,Integer rownr,Integer changed)
+BEGIN
+  Boolean res;
+  record TBBUVc TBBUr;
+  row TBBUVc TBBUrw;
+  Integer nwn;
+  
+  res = inner.TBBUDClassActiveEditField(wn,fieldname,fn,wnst,rownr,changed);
+  switch(fieldname)begin
+    case "Spec": 
+    	getwindowrecord(wn,TBBUr);
+      MatRowGet(TBBUr,rownr,TBBUrw);
+      switch (TBBUrw.stp) begin
+        case 18:
+          res = false;
+      end;
+  end;
+LTBBUDClassActiveEditField:;
+  TBBUDClassActiveEditField = res;
+  RETURN;
+END;

@@ -27,7 +27,7 @@ begin
 	boolean foundf;
 	record CUVc CUr;
 	string 20 vendobj,tstr;
-	integer pos;
+	integer pos,qi;
 	
 	sd = RepSpec.sStartDate;
 	ed = RepSpec.sEndDate;
@@ -319,8 +319,23 @@ begin
 	  	Outstring(100,0,"",false);
 	  	Outstring(120,0,"Vendor",false);
 			For(i=0;i<k;i=i+1) begin	
-				Outstring(100+i*50,0,"Budjet",false);
-				Outstring(100+i*50,0,"Spending",false);
+				For(qi=0;qi<4;qi=qi+1) begin
+					switch(qi)begin
+						case 0:
+						Outstring(100+i*50,0,"Budjet I",false);
+						Outstring(100+i*50,0,"Spending I",false);
+						case 1:
+						Outstring(100+i*50,0,"Budjet II",false);
+						Outstring(100+i*50,0,"Spending II",false);
+						case 2:
+						Outstring(100+i*50,0,"Budjet III",false);
+						Outstring(100+i*50,0,"Spending III",false);
+						case 3:
+						Outstring(100+i*50,0,"Budjet IV",false);
+						Outstring(100+i*50,0,"Spending IV",false);
+					end;
+				end; 
+				
 			end; 
 			Outstring(100+i*50,0,"Budjet",false);
 			Outstring(100+i*50,0,"Spending",false);
