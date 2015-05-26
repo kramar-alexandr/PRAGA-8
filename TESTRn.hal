@@ -460,6 +460,12 @@ begin
 	  endformat;
 	
 	endjob;
-
+	
+	if(WindowsMode==0)then begin
+		runprogram("/usr/bin/open","1.xlsx");
+	end else begin
+		runprogram("excel","1.xlsx");
+	end;
+	
 return;
 end;
