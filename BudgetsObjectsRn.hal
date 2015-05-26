@@ -12,6 +12,30 @@ begin
 end;
 
 
+function integer GetQuartal(date trDate)
+begin
+	integer res,i;
+	i = GetMonth(trDate);
+	switch (i) begin
+		case 1 : res = 1;
+		case 2 : res = 1;
+		case 3 : res = 1;
+		case 4 : res = 2;
+		case 5 : res = 2;
+		case 6 : res = 2;
+		case 7 : res = 3;
+		case 8 : res = 3;
+		case 9 : res = 3;
+		case 10 : res = 4;
+		case 11 : res = 4;
+		case 12 : res = 4;															
+	end;
+	
+	GetQuartal = res;
+return;	
+end;
+
+
 global procedure BudgetsObjectsRn(record RcVc RepSpec)
 begin
 	record INVc INr;
@@ -23,7 +47,7 @@ begin
 	string 20 prjobj;
 	integer i,k;
 	record ObjVc Objr;
-	record BudRepVc BRr,BRr1,BRr2,BRr3,BRr4;
+	record BudRepVc BRr;
 	row BudRepVc BRrw,BR2rw;
 	integer mtrw,j;
 	record ITVc ITr;
@@ -33,19 +57,22 @@ begin
 	record TRVc TRr;
 	row TRVc TRrw;
 	array val totalrowbud,totalrowsped;
-	val totalbubyrow,totalspendbyrow;
+	val totalbubyrow,totalspendbyrow,totalBudget,totalSpend;
 	string 100 mainobjname;
 	boolean foundf;
 	record CUVc CUr;
 	string 20 vendobj,tstr;
-	integer pos,qi;
-
+	integer pos;
+	record BaseCurBlock BCb;
+	
+	BlockLoad(BCb);
 	
 	sd = RepSpec.sStartDate;
 	ed = RepSpec.sEndDate;
 	mainobj = RepSpec.f1;
 	
-	
+	totalBudget = 0;
+	totalSpend = 0;
 	
 	recordnew(BRr);
 	Objr.Code = mainobj;
@@ -121,19 +148,9 @@ begin
 			end;
 		end;
 		
-//AddRecordToArea(BRr,"BudRepVc",a);
- //WriteAreaToFile(a,"BRr1.txt",0);		
+
 		repmtrw = matrowcnt(BRr);
-		
-//for(i=0;i<repmtrw;i=i+1) begin
-//MatRowGet(BRr,i,BRrw);
-//BRrw.Bud1 = 0;
-//BRrw.Bud2 =0;
-///BRrw.Bud3 = 0;
-//BRrw.Bud4 =0;
-//MatRowPut(BRr,i,BRrw);
-//LogText(0,BRrw.Code & "  Name:" & BRrw.Name & "  Ve:" & BRrw.VECode);
-//end;		
+
 		
 		k=0;
 
@@ -240,6 +257,8 @@ begin
 	  				TRr.IntYc = Mainr.IntYc;
 	  				if(readfirstmain(TRr,2,true))then begin
 	  					mtrw = matrowcnt(TRr);
+	  					k = GetQuartal(TRr.TransDate);
+	  					
 	  					For(i=0;i<mtrw;i=i+1) begin
 	  						matrowget(TRr,i,TRrw);
 	  						if(TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber)then begin
@@ -260,15 +279,19 @@ begin
 											ExtractObj(TRrw.Objects,pos,tstr);
 										end;
 										if(setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))then begin
-											For(j=0;j<k;j=j+1)begin
-	  										if(setinset(prjobj,TRrw.Objects))then begin
-	  											switch(j)begin
-														case 0:	BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
-		 
-													end;
+											//For(j=0;j<k;j=j+1) begin
+											LogText(0,TRr.Number & "   Prj:" & prjobj & "      Obj:" & TRrw.Objects); //Edit----------------------Dima  26.05.2015
+	  										if(setinset(prjobj,TRrw.Objects))then begin													
+														switch(k) begin
+															case 1:	BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
+															case 2:	BRrw.Spend2 = BRrw.Spend2 - TRrw.CredVal + TRrw.DebVal;
+															case 3:	BRrw.Spend3 = BRrw.Spend3 - TRrw.CredVal + TRrw.DebVal;
+															case 4:	BRrw.Spend4 = BRrw.Spend4 - TRrw.CredVal + TRrw.DebVal;
+				 										otherwise
+				 															BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;	//I Quartal as default
+														end;													
 													matrowput(BRr,repi,BRrw);
 	  										end;
-											end; 
 										end;
 	  							end;
 	  						end;
@@ -287,21 +310,16 @@ begin
 	  	Outstring(0,0,"",false);
 	  	Outstring(0,0,"",false);
 	  	Outstring(0,0,"",false);
-			Outstring(100+i*50,0,PRr.Name,false);
-			for(i=0;i<7;i=i+1) begin
-				Outstring(0,0,"",false);
-			end;
-			Outstring(0,0,"Total",false);
-			Outstring(0,0,"",false);
+			Outstring(100+i*50,0,PRr.Name & "," & GetYear(sd),false);
 	  endformat;
-	  
-	  startformat(15);
-	  	Outstring(0,0,"",false);
-	  	Outstring(50,0,"",false);
-	  	Outstring(100,0,"",false);
-	  	Outstring(120,0,"",false);	
-			Outstring(100+i*50,0,PRr.Code,false);
-
+	  endformat;
+	  	Outstring(0,0,"period",false);
+	  	Outstring(0,0,sd & "-" & ed,false);
+	  endformat;
+	  	Outstring(0,0,"currency",false);
+	  	Outstring(0,0,BCb.BaseCur1,false);
+	  endformat;
+	  endformat;
 	  endformat;
 	  
 	  startformat(15);
@@ -310,21 +328,17 @@ begin
 	  	Outstring(100,0,"",false);
 	  	Outstring(120,0,"Vendor",false);
 
-						Outstring(100,0,"QI",false);
-						Outstring(100,0,"QI-Fact",false);
-
-						Outstring(100,0,"QII",false);
-						Outstring(100,0,"QII-Fact",false);
-
-						Outstring(100,0,"QIII",false);
-						Outstring(100,0,"QIII-Fact",false);
-
-						Outstring(100,0,"QIV",false);
-						Outstring(100,0,"QIV-Fact",false);
- 
+			Outstring(100,0,"QI",false);
+			Outstring(100,0,"QI-Fact",false);
+			Outstring(100,0,"QII",false);
+			Outstring(100,0,"QII-Fact",false);
+			Outstring(100,0,"QIII",false);
+			Outstring(100,0,"QIII-Fact",false);
+			Outstring(100,0,"QIV",false);
+			Outstring(100,0,"QIV-Fact",false);
 				
-			Outstring(100,0,"Total",false);
-			Outstring(100,0,"Total-Fact",false);
+			Outstring(100,0,"total",false);
+			Outstring(100,0,"total-Fact",false);
 	  endformat;
 		
 		mtrw = matrowcnt(BRr);
@@ -357,8 +371,8 @@ begin
 				totalrowbud[3] = totalrowbud[3] + BRrw.Bud4;
 				totalrowsped[3] = totalrowsped[3] + BRrw.Spend4;																						
 
-				outstring(0,0,totalbubyrow,false);
-				outstring(0,0,totalspendbyrow,false);
+				OutStringExcel(0,0,totalbubyrow,false);
+				OutStringExcel(0,0,totalspendbyrow,false);
 				endformat;
 	  	end;
 		end; 
@@ -371,7 +385,11 @@ begin
 			For(i=0;i<4;i=i+1) begin	
 				Outstring(100,0,totalrowbud[i],false);				
 				Outstring(100,0,totalrowsped[i],false);
-			end; 
+				totalBudget = totalBudget + totalrowbud[i];
+				totalSpend = totalSpend + totalrowsped[i];
+			end;
+			OutStringExcel(0,0,totalBudget,false);
+			OutStringExcel(0,0,totalSpend,false); 
 	  endformat;
 	
 	endjob;
