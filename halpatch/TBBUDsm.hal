@@ -33,9 +33,14 @@ begin
 		ClearRow(TBBUr,TBBUrw,18);
 		switch(t)begin
 			case 1: TBBUrw.Spec = "I";
+							TBBUrw.ItemType = 1;	//Edit----------------------Dima  26.05.2015
 			case 2: TBBUrw.Spec = "II";
+							TBBUrw.ItemType = 2;
 			case 3: TBBUrw.Spec = "III";
+							TBBUrw.ItemType = 3;
 			case 4: TBBUrw.Spec = "IV";
+							TBBUrw.ItemType = 4;
+							
 		end;
 		TBBUrw.stp = 18;
 		MatRowInsert(TBBUr,rownr,TBBUrw);
