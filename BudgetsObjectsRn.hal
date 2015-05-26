@@ -1,0 +1,380 @@
+external inner procedure ExtractObj(string,var Integer,var string);
+
+
+
+procedure OutStringExcel(Integer position,String func,String printstring,Boolean alignment)
+begin
+	if (nonblank(printstring)) then begin
+  		Outstring(position,func,printstring,alignment);
+  end else begin	
+  		Outstring(position,func,"",alignment);
+  end;	
+end;
+
+
+global procedure BudgetsObjectsRn(record RcVc RepSpec)
+begin
+	record INVc INr;
+	record PRVc PRr,PR2r;
+	record TBBUVc TBBUr;
+	row TBBUVc TBBUrw;
+	date sd,ed;
+	string 20 mainobj;
+	string 20 prjobj;
+	integer i,k;
+	record ObjVc Objr;
+	record BudRepVc BRr,BRr1,BRr2,BRr3,BRr4;
+	row BudRepVc BRrw,BR2rw;
+	integer mtrw,j;
+	record ITVc ITr;
+	boolean TrHs,testf,testf2;
+	integer repmtrw,repi;
+	record MainVc Mainr;
+	record TRVc TRr;
+	row TRVc TRrw;
+	array val totalrowbud,totalrowsped;
+	val totalbubyrow,totalspendbyrow;
+	string 100 mainobjname;
+	boolean foundf;
+	record CUVc CUr;
+	string 20 vendobj,tstr;
+	integer pos,qi;
+
+	
+	sd = RepSpec.sStartDate;
+	ed = RepSpec.sEndDate;
+	mainobj = RepSpec.f1;
+	
+	
+	
+	recordnew(BRr);
+	Objr.Code = mainobj;
+	readfirstmain(Objr,1,true);
+	mainobjname = Objr.Comment;
+	startreportnoheaderjob("TEST");
+		k = 0;
+		
+		if (blank(RepSpec.f2)) then begin
+			goto LBudgetsObjectsRn;
+		end;		
+		  
+		while(loopmain(ITr,1,true)) begin
+			clearrow(BRr,BRrw,1);
+			BRrw.Code = ITr.Code;
+			BRrw.CatName = ITr.Comment;
+			matrowput(BRr,k,BRrw);
+			k=k+1;
+			resetloop(INr);
+			INr.Group = ITr.Code;
+			TrHs = true;
+			while(loopkey("Group",INr,1,TrHs)) begin
+				testf = true;
+				if(INr.Group!=ITr.Code)then begin testf = false; TrHs = false; end;
+				if(blank(INr.Objects))then begin testf = false; end;
+				
+				if(testf)then begin
+					clearrow(BRr,BRrw,1);
+					BRrw.Code = INr.Objects;
+					Objr.Code = INr.Objects;
+					if(readfirstmain(Objr,1,true))then begin
+						BRrw.Name = Objr.Comment;
+					end;
+					
+					BRrw.CostAcc = INr.CostAcc;
+					
+					repmtrw = matrowcnt(BRr);
+					foundf = false;
+					For(i=0;i<repmtrw;i=i+1) begin
+	  				matrowget(BRr,i,BR2rw);
+	  				if(BR2rw.Code==BRrw.Code)then begin
+							foundf = true;
+	  				end;
+					end; 
+					
+					if(!foundf)then begin
+						CUr.Code = "";
+						while(loopkey("VEActCode",CUr,1,true)) begin
+							if(nonblank(CUr.VEObjects))then begin
+								BRrw.VECode = CUr.VEObjects;
+								matrowput(BRr,k,BRrw);
+								k=k+1;
+							end;
+						end;
+						resetloop(CUr);
+					end;
+					
+					repmtrw = matrowcnt(BRr);
+					foundf = false;
+					For(i=0;i<repmtrw;i=i+1) begin
+	  				matrowget(BRr,i,BR2rw);
+	  				if(BR2rw.Code==BRrw.Code and BR2rw.VECode=="")then begin
+							foundf = true;
+	  				end;
+					end; 
+					if(!foundf)then begin
+						BRrw.VECode = "";
+						matrowput(BRr,k,BRrw);
+						k=k+1;
+					end;
+					
+				end;
+			end;
+		end;
+		
+//AddRecordToArea(BRr,"BudRepVc",a);
+ //WriteAreaToFile(a,"BRr1.txt",0);		
+		repmtrw = matrowcnt(BRr);
+		
+//for(i=0;i<repmtrw;i=i+1) begin
+//MatRowGet(BRr,i,BRrw);
+//BRrw.Bud1 = 0;
+//BRrw.Bud2 =0;
+///BRrw.Bud3 = 0;
+//BRrw.Bud4 =0;
+//MatRowPut(BRr,i,BRrw);
+//LogText(0,BRrw.Code & "  Name:" & BRrw.Name & "  Ve:" & BRrw.VECode);
+//end;		
+		
+		k=0;
+
+			
+	PRr.Code = RepSpec.f2;
+	If (ReadFirstMain(PRr,1,true)) then begin
+					
+			if(PRr.StartDate>=sd and PRr.StartDate<=ed)then begin
+
+
+					prjobj = PRr.Objects;
+
+					
+					TBBUr.PRCode = PRr.Code;
+					if(readfirstmain(TBBUr,1,true))then begin
+						mtrw = matrowcnt(TBBUr);
+						k=0;
+						For(i=0;i<mtrw;i=i+1) begin
+							matrowget(TBBUr,i,TBBUrw);
+							
+							if(TBBUrw.stp==18) then begin k=TBBUrw.ItemType; end;		//I,II,III,IV Quartal
+							
+							if(TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))then begin
+								For(repi=0;repi<repmtrw;repi=repi+1) begin
+									matrowget(BRr,repi,BRrw);
+									if(setinset(BRrw.Code,TBBUrw.Objects) and (((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode)))) and (setinset(mainobj,TBBUrw.Objects) or blank(mainobj)))then begin
+										//messagebox(0,BRrw.VECode & " " & TBBUrw.VECode);
+										switch(k) begin
+											case 1:	BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
+											case 2:	BRrw.Bud2 = BRrw.Bud2 + TBBUrw.Sum;
+											case 3:	BRrw.Bud3 = BRrw.Bud3 + TBBUrw.Sum;
+											case 4:	BRrw.Bud4 = BRrw.Bud4 + TBBUrw.Sum;
+				 						otherwise
+				 											BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;	//I Quartal as default
+										end;
+										matrowput(BRr,repi,BRrw);
+									end;
+								end; 
+							end;
+						end; 
+					end;
+					
+					
+					PR2r.MotherCode = PRr.Code;
+					TrHs = true;
+					
+					while(loopkey("MotherCode",PR2r,1,TrHs)) begin
+						
+						testf = true;
+						if(PR2r.MotherCode!=PRr.Code)then begin TrHs = false; testf = false; end;
+						if(PR2r.StartDate<sd and PR2r.StartDate>ed)then begin testf = false; end;
+
+						if(testf)then begin
+
+							TBBUr.PRCode = PR2r.Code;
+							if(readfirstmain(TBBUr,1,true))then begin
+								mtrw = matrowcnt(TBBUr);
+								k = 0;
+								For(i=0;i<mtrw;i=i+1) begin
+									matrowget(TBBUr,i,TBBUrw);
+									
+									if(TBBUrw.stp==18) then begin k=TBBUrw.ItemType; end;		//I,II,III,IV Quartal									
+									if(TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))then begin
+										For(repi=0;repi<repmtrw;repi=repi+1) begin
+											matrowget(BRr,repi,BRrw);
+											//messagebox(0,mainobj & " " & TBBUrw.Objects);
+											if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(mainobj,TBBUrw.Objects) or blank(mainobj)))then begin
+												switch(k) begin
+													case 1:	BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
+													case 2:	BRrw.Bud2 = BRrw.Bud2 + TBBUrw.Sum;
+													case 3:	BRrw.Bud3 = BRrw.Bud3 + TBBUrw.Sum;
+													case 4:	BRrw.Bud4 = BRrw.Bud4 + TBBUrw.Sum;
+				 								otherwise
+				 													BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;	//I Quartal as default
+												end;
+												matrowput(BRr,repi,BRrw);
+											end;
+										end; 
+									end;
+								end; 
+							end;
+						end;
+					end;
+					
+					//resetloop(PR2r);
+				//end;
+			end;
+		end;
+		
+		For(repi=0;repi<repmtrw;repi=repi+1) begin
+	  	matrowget(BRr,repi,BRrw);
+	  	if(nonblank(BRrw.CostAcc))then begin
+	  		resetloop(Mainr);
+	  		Mainr.AccNumber = BRrw.CostAcc;
+	  		Mainr.TransDate = sd;
+	  		TrHs = true;
+	  		While(loopmain(Mainr,2,TrHs))begin
+	  			testf = true;
+	  			if(Mainr.AccNumber!=BRrw.CostAcc)then begin TrHs = false; testf = false; end;
+	  			if(Mainr.TransDate>ed)then begin TrHs = false; testf = false; end;
+	  			
+	  			if(testf)then begin
+	  				TRr.Number = Mainr.TransNr;
+	  				TRr.IntYc = Mainr.IntYc;
+	  				if(readfirstmain(TRr,2,true))then begin
+	  					mtrw = matrowcnt(TRr);
+	  					For(i=0;i<mtrw;i=i+1) begin
+	  						matrowget(TRr,i,TRrw);
+	  						if(TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber)then begin
+	  							if(setinset(mainobj,TRrw.Objects) or blank(mainobj))then begin
+	  									vendobj = "";
+	  									tstr = "";
+	  									pos = 0;
+										ExtractObj(TRrw.Objects,pos,tstr);
+										while(nonblank(tstr))begin
+											if(nonblank(tstr))then begin
+												Objr.Code = tstr;
+												if(readfirstmain(Objr,1,true))then begin
+													if(Objr.OTCode=="SUPPL")then begin
+														vendobj = Objr.Code;
+													end;
+												end;
+											end;
+											ExtractObj(TRrw.Objects,pos,tstr);
+										end;
+										if(setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))then begin
+											For(j=0;j<k;j=j+1)begin
+	  										if(setinset(prjobj,TRrw.Objects))then begin
+	  											switch(j)begin
+														case 0:	BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
+		 
+													end;
+													matrowput(BRr,repi,BRrw);
+	  										end;
+											end; 
+										end;
+	  							end;
+	  						end;
+							end; 
+	  				end;
+	  			end;
+	  		end;
+	  	end;
+		end; 
+		
+//AddRecordToArea(BRr,"BudRepVc",b);
+// WriteAreaToFile(b,"BRr2.txt",0);			
+	
+		startformat(15);
+	  	Outstring(0,0,"",false);
+	  	Outstring(0,0,"",false);
+	  	Outstring(0,0,"",false);
+	  	Outstring(0,0,"",false);
+			Outstring(100+i*50,0,PRr.Name,false);
+			for(i=0;i<7;i=i+1) begin
+				Outstring(0,0,"",false);
+			end;
+			Outstring(0,0,"Total",false);
+			Outstring(0,0,"",false);
+	  endformat;
+	  
+	  startformat(15);
+	  	Outstring(0,0,"",false);
+	  	Outstring(50,0,"",false);
+	  	Outstring(100,0,"",false);
+	  	Outstring(120,0,"",false);	
+			Outstring(100+i*50,0,PRr.Code,false);
+
+	  endformat;
+	  
+	  startformat(15);
+	  	Outstring(0,0,"",false);
+	  	Outstring(50,0,mainobjname,false);
+	  	Outstring(100,0,"",false);
+	  	Outstring(120,0,"Vendor",false);
+
+						Outstring(100,0,"QI",false);
+						Outstring(100,0,"QI-Fact",false);
+
+						Outstring(100,0,"QII",false);
+						Outstring(100,0,"QII-Fact",false);
+
+						Outstring(100,0,"QIII",false);
+						Outstring(100,0,"QIII-Fact",false);
+
+						Outstring(100,0,"QIV",false);
+						Outstring(100,0,"QIV-Fact",false);
+ 
+				
+			Outstring(100,0,"Total",false);
+			Outstring(100,0,"Total-Fact",false);
+	  endformat;
+		
+		mtrw = matrowcnt(BRr);
+		For(i=0;i<mtrw;i=i+1) begin
+			matrowget(BRr,i,BRrw);
+	  		totalbubyrow = BRrw.Bud1+BRrw.Bud2+BRrw.Bud3+BRrw.Bud4;
+	  		totalspendbyrow = BRrw.Spend1+BRrw.Spend2+BRrw.Spend3+BRrw.Spend4;
+			
+			if(totalbubyrow!=0 or totalspendbyrow!=0 or nonblank(BRrw.CatName))then begin
+				startformat(15);
+				Outstring(0,0,BRrw.Code,false);
+				Outstring(50,0,BRrw.CatName,false);
+				Outstring(100,0,BRrw.Name,false);
+				Outstring(100,0,BRrw.VECode,false);
+				
+				OutStringExcel(100,0,BRrw.Bud1,false);
+				OutStringExcel(100,0,BRrw.Spend1,false);
+				OutStringExcel(100,0,BRrw.Bud2,false);
+				OutStringExcel(100,0,BRrw.Spend2,false);
+				OutStringExcel(100,0,BRrw.Bud3,false);
+				OutStringExcel(100,0,BRrw.Spend3,false);
+				OutStringExcel(100,0,BRrw.Bud4,false);
+				OutStringExcel(100,0,BRrw.Spend4,false);																																			
+				totalrowbud[0] = totalrowbud[0] + BRrw.Bud1;
+				totalrowsped[0] = totalrowsped[0] + BRrw.Spend1;
+				totalrowbud[1] = totalrowbud[1] + BRrw.Bud2;
+				totalrowsped[1] = totalrowsped[1] + BRrw.Spend2;
+				totalrowbud[2] = totalrowbud[2] + BRrw.Bud3;
+				totalrowsped[2] = totalrowsped[2] + BRrw.Spend3;
+				totalrowbud[3] = totalrowbud[3] + BRrw.Bud4;
+				totalrowsped[3] = totalrowsped[3] + BRrw.Spend4;																						
+
+				outstring(0,0,totalbubyrow,false);
+				outstring(0,0,totalspendbyrow,false);
+				endformat;
+	  	end;
+		end; 
+		
+		startformat(15);
+	  	Outstring(0,0,"",false);
+	  	Outstring(50,0,"",false);
+	  	Outstring(100,0,"",false);
+	  	Outstring(100,0,"Total",false);
+			For(i=0;i<4;i=i+1) begin	
+				Outstring(100,0,totalrowbud[i],false);				
+				Outstring(100,0,totalrowsped[i],false);
+			end; 
+	  endformat;
+	
+	endjob;
+LBudgetsObjectsRn:;
+return;
+end;

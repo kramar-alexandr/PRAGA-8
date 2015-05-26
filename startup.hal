@@ -5,7 +5,7 @@ begin
 	
 	
   Report("TEST",TESTRClass,TESTRn,0,modTS);
-  	
+  Report("Budgets Objects Report",BudgetObjectsRClass,BudgetsObjectsRn,0,modTS);	
 
 	  
  return;
