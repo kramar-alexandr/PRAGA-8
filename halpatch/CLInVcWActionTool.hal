@@ -1,0 +1,25 @@
+
+global
+procedure CLInVc_PasteCorspCode(var record CLInVc CLInp,Integer rownr)
+BEGIN
+  record CLCorspVc CLCorspr;
+  row CLInVc CLInrw;
+  
+  if (rownr<0) then begin
+    CLCorspr.Code = CLInp.CorspCode;
+    if (ReadFirstMain(CLCorspr,1,true)) then begin
+      CLInp.CorspComment = CLCorspr.Comment;
+      CLInp.Objects = CLCorspr.Objects;// Edit ************************** Tuesday, 26 May 2015 13:29:12
+    end;
+  end else begin
+    MatRowGet(CLInp,rownr,CLInrw);
+    CLCorspr.Code = CLInrw.CorspCode;
+    if (ReadFirstMain(CLCorspr,1,true)) then begin
+      CLInrw.Comment = CLCorspr.Comment;
+      CLInrw.Objects = CLCorspr.Objects;// Edit ************************** Tuesday, 26 May 2015 13:29:15
+    end;
+    MatRowPut(CLInp,rownr,CLInrw);
+  end;
+  
+  RETURN;
+END;

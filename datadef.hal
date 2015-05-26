@@ -85,5 +85,9 @@ begin
 		ArrayField(ExtraObj,M4Code,20,ObjVc);
 	EndRecordAdd;
 	
+	RecordAddBegin(CLCorspVc,"Myclcorsp");
+		RecordField(Objects,M4UStr,60,ObjVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+  EndRecordAdd;
+		
 return;  
 end;
