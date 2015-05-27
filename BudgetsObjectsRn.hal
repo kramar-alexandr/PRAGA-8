@@ -36,6 +36,42 @@ return;
 end;
 
 
+function boolean CollectSubTotals(record BudRepVc BRr,integer rownr,var array val subtotals)
+begin
+	row BudRepVc BRrw;
+	integer rwcnt,i;
+	val totSum;
+	boolean res;
+	
+	ClearArray(subtotals);
+	totSum = 0;
+	res = true;
+	rwcnt = MatRowCnt(BRr);
+	i=rownr+1;
+	MatRowGet(BRr,i,BRrw);
+	while (blank(BRrw.CatName) and (i<rwcnt)) begin
+		MatRowGet(BRr,i,BRrw);
+		subtotals[0] = subtotals[0] + BRrw.Bud1;			//Quartal I
+		subtotals[1] = subtotals[1] + BRrw.Spend1;		//Quartal I - Fact
+		subtotals[2] = subtotals[2] + BRrw.Bud2;
+		subtotals[3] = subtotals[3] + BRrw.Spend2;
+		subtotals[4] = subtotals[4] + BRrw.Bud3;
+		subtotals[5] = subtotals[5] + BRrw.Spend3;
+		subtotals[6] = subtotals[6] + BRrw.Bud4;
+		subtotals[7] = subtotals[7] + BRrw.Spend4;
+		i=i+1;
+	end;
+	
+	for(i=0;i<subtotals.length;i=i+1) begin
+		totSum = totSum+subtotals[i];
+	end;
+	if (totSum==0) then begin res = false; end;
+	
+	CollectSubTotals = res;
+return;
+end;
+
+updating
 global procedure BudgetsObjectsRn(record RcVc RepSpec)
 begin
 	record INVc INr;
@@ -56,7 +92,7 @@ begin
 	record MainVc Mainr;
 	record TRVc TRr;
 	row TRVc TRrw;
-	array val totalrowbud,totalrowsped;
+	array val totalrowbud,totalrowsped,subtotals, totalrow;
 	val totalbubyrow,totalspendbyrow,totalBudget,totalSpend;
 	string 100 mainobjname;
 	boolean foundf;
@@ -64,6 +100,7 @@ begin
 	string 20 vendobj,tstr;
 	integer pos;
 	record BaseCurBlock BCb;
+	
 	
 	BlockLoad(BCb);
 	
@@ -78,13 +115,15 @@ begin
 	Objr.Code = mainobj;
 	readfirstmain(Objr,1,true);
 	mainobjname = Objr.Comment;
-	startreportnoheaderjob("TEST");
+	startreportnoheaderjob("BudgetsObjects");
 		k = 0;
 		
 		if (blank(RepSpec.f2)) then begin
+			Outstring(0,0,"Choose the project, please",false);
 			goto LBudgetsObjectsRn;
 		end;		
-		  
+		
+		//Collect array of all items for every vendor  
 		while(loopmain(ITr,1,true)) begin
 			clearrow(BRr,BRrw,1);
 			BRrw.Code = ITr.Code;
@@ -149,9 +188,7 @@ begin
 		end;
 		
 
-		repmtrw = matrowcnt(BRr);
-
-		
+		repmtrw = matrowcnt(BRr);		
 		k=0;
 
 			
@@ -160,9 +197,7 @@ begin
 					
 			if(PRr.StartDate>=sd and PRr.StartDate<=ed)then begin
 
-
 					prjobj = PRr.Objects;
-
 					
 					TBBUr.PRCode = PRr.Code;
 					if(readfirstmain(TBBUr,1,true))then begin
@@ -196,7 +231,7 @@ begin
 					
 					PR2r.MotherCode = PRr.Code;
 					TrHs = true;
-					
+					//Collect subprojects' budjets
 					while(loopkey("MotherCode",PR2r,1,TrHs)) begin
 						
 						testf = true;
@@ -235,8 +270,6 @@ begin
 						end;
 					end;
 					
-					//resetloop(PR2r);
-				//end;
 			end;
 		end;
 		
@@ -279,8 +312,6 @@ begin
 											ExtractObj(TRrw.Objects,pos,tstr);
 										end;
 										if(setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))then begin
-											//For(j=0;j<k;j=j+1) begin
-											LogText(0,TRr.Number & "   Prj:" & prjobj & "      Obj:" & TRrw.Objects); //Edit----------------------Dima  26.05.2015
 	  										if(setinset(prjobj,TRrw.Objects))then begin													
 														switch(k) begin
 															case 1:	BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
@@ -302,15 +333,13 @@ begin
 	  	end;
 		end; 
 		
-//AddRecordToArea(BRr,"BudRepVc",b);
-// WriteAreaToFile(b,"BRr2.txt",0);			
 	
 		startformat(15);
 	  	Outstring(0,0,"",false);
 	  	Outstring(0,0,"",false);
 	  	Outstring(0,0,"",false);
 	  	Outstring(0,0,"",false);
-			Outstring(100+i*50,0,PRr.Name & "," & GetYear(sd),false);
+			Outstring(100,0,PRr.Name & "," & GetYear(sd),false);
 	  endformat;
 	  endformat;
 	  	Outstring(0,0,"period",false);
@@ -344,55 +373,70 @@ begin
 		mtrw = matrowcnt(BRr);
 		For(i=0;i<mtrw;i=i+1) begin
 			matrowget(BRr,i,BRrw);
-	  		totalbubyrow = BRrw.Bud1+BRrw.Bud2+BRrw.Bud3+BRrw.Bud4;
-	  		totalspendbyrow = BRrw.Spend1+BRrw.Spend2+BRrw.Spend3+BRrw.Spend4;
+	  		
+	  	if (nonblank(BRrw.CatName))	 then begin				
+					if (CollectSubTotals(BRr,i,subtotals)) then begin	//check if item group is empty
+						EndFormat; 														//empty string between different items group
+						Outstring(0,0,BRrw.Code,false);
+						Outstring(50,0,BRrw.CatName,false);	
+						Outstring(100,0,"",false);
+						Outstring(100,0,"",false);	
+						for(j=0;j<8;j=j+1) begin	
+							OutStringExcel(200,0,subtotals[j],false);
+							totalrow[j] = totalrow[j] + subtotals[j];
+						end;
+						totalbubyrow = 	subtotals[0] + subtotals[2] + subtotals[4] + subtotals[6];		//Quartals
+						totalspendbyrow = subtotals[1] + subtotals[3] + subtotals[5] + subtotals[7];	//Quartals-Fact
+						
+						OutStringExcel(0,0,totalbubyrow,false);
+						OutStringExcel(0,0,totalspendbyrow,false);
+						EndFormat;
+					end;					
+			end;
 			
-			if(totalbubyrow!=0 or totalspendbyrow!=0 or nonblank(BRrw.CatName))then begin
-				startformat(15);
-				Outstring(0,0,BRrw.Code,false);
-				Outstring(50,0,BRrw.CatName,false);
-				Outstring(100,0,BRrw.Name,false);
-				Outstring(100,0,BRrw.VECode,false);
+	  	totalbubyrow = BRrw.Bud1+BRrw.Bud2+BRrw.Bud3+BRrw.Bud4;
+	  	totalspendbyrow = BRrw.Spend1+BRrw.Spend2+BRrw.Spend3+BRrw.Spend4;						  		
 				
-				OutStringExcel(100,0,BRrw.Bud1,false);
-				OutStringExcel(100,0,BRrw.Spend1,false);
-				OutStringExcel(100,0,BRrw.Bud2,false);
-				OutStringExcel(100,0,BRrw.Spend2,false);
-				OutStringExcel(100,0,BRrw.Bud3,false);
-				OutStringExcel(100,0,BRrw.Spend3,false);
-				OutStringExcel(100,0,BRrw.Bud4,false);
-				OutStringExcel(100,0,BRrw.Spend4,false);																																			
-				totalrowbud[0] = totalrowbud[0] + BRrw.Bud1;
-				totalrowsped[0] = totalrowsped[0] + BRrw.Spend1;
-				totalrowbud[1] = totalrowbud[1] + BRrw.Bud2;
-				totalrowsped[1] = totalrowsped[1] + BRrw.Spend2;
-				totalrowbud[2] = totalrowbud[2] + BRrw.Bud3;
-				totalrowsped[2] = totalrowsped[2] + BRrw.Spend3;
-				totalrowbud[3] = totalrowbud[3] + BRrw.Bud4;
-				totalrowsped[3] = totalrowsped[3] + BRrw.Spend4;																						
-
-				OutStringExcel(0,0,totalbubyrow,false);
-				OutStringExcel(0,0,totalspendbyrow,false);
-				endformat;
+			if(totalbubyrow!=0 or totalspendbyrow!=0 )then begin
+					startformat(15);
+		    	
+					Outstring(0,0,BRrw.Code,false);
+					Outstring(50,0,BRrw.CatName,false);
+					Outstring(100,0,BRrw.Name,false);
+					Outstring(100,0,BRrw.VECode,false);
+					
+					OutStringExcel(100,0,BRrw.Bud1,false);
+					OutStringExcel(100,0,BRrw.Spend1,false);
+					OutStringExcel(100,0,BRrw.Bud2,false);
+					OutStringExcel(100,0,BRrw.Spend2,false);
+					OutStringExcel(100,0,BRrw.Bud3,false);
+					OutStringExcel(100,0,BRrw.Spend3,false);
+					OutStringExcel(100,0,BRrw.Bud4,false);
+					OutStringExcel(100,0,BRrw.Spend4,false);
+        	
+					OutStringExcel(0,0,totalbubyrow,false);
+					OutStringExcel(0,0,totalspendbyrow,false);
+					endformat;
 	  	end;
 		end; 
 		
 		startformat(15);
-	  	Outstring(0,0,"",false);
+			endformat;
+	  	Outstring(0,0,GetYear(sd),false);
 	  	Outstring(50,0,"",false);
+	  	Outstring(100,0,"total",false);
 	  	Outstring(100,0,"",false);
-	  	Outstring(100,0,"Total",false);
-			For(i=0;i<4;i=i+1) begin	
-				Outstring(100,0,totalrowbud[i],false);				
-				Outstring(100,0,totalrowsped[i],false);
-				totalBudget = totalBudget + totalrowbud[i];
-				totalSpend = totalSpend + totalrowsped[i];
+			For(i=0;i<8;i=i+1) begin	
+				Outstring(100,0,totalrow[i],false);				
 			end;
+			totalBudget = totalrow[0] + totalrow[2] + totalrow[4] + totalrow[6];
+			totalSpend = totalrow[1] + totalrow[3] + totalrow[5] + totalrow[7];			
 			OutStringExcel(0,0,totalBudget,false);
 			OutStringExcel(0,0,totalSpend,false); 
 	  endformat;
-	
+		  
+	LBudgetsObjectsRn:;	
 	endjob;
-LBudgetsObjectsRn:;
+
 return;
 end;
