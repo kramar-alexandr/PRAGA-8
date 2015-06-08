@@ -1,5 +1,5 @@
 external inner procedure ExtractObj(string,var Integer,var string);
-external procedure XmlXlsxWorkBegin(string);
+external procedure XmlXlsxWorkBegin(string,string);
 external procedure CreateSheetsXLSX(integer,array string,string);
 external procedure EndSheet(integer,string);
 external procedure SetSheetsCols(integer,array val,string);
@@ -348,7 +348,9 @@ begin
 	integer qtyOfSheets,sheetnum,rownum,colnum,style,qtyOfEmpStr;
 	array string 100 SharedStrings;
 	integer numOfUniqueSharedStrings,numOfSharedStrings,qtyMergeCell;
+	string 16 reportName;
 	
+	reportName = "BudgetsObjectsRn"	;
 	mainobj = RepSpec.f1;
 	totalBudget = 0;
 	totalSpend = 0;
@@ -398,7 +400,7 @@ begin
 			fileToSave = SaveFileDialog("Budget Objects Report","","xlsx");
 			if (fileToSave!="Budget Objects Report") then begin
 				if (nonblank(fileToSave)) then begin
-					XmlXlsxWorkBegin(fileToSave);
+					XmlXlsxWorkBegin(fileToSave,reportName);
 					CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave);
 					for (k=0;k<qtyOfSheets;k=k+1) begin
 						sheetnum = k + 1;
@@ -571,7 +573,7 @@ begin
 			fileToSave = SaveFileDialog("Budget Objects Report","","xlsx");
 			if (fileToSave!="Budget Objects Report") then begin
 				if (nonblank(fileToSave)) then begin
-					XmlXlsxWorkBegin(fileToSave);
+					XmlXlsxWorkBegin(fileToSave,reportName);
 					CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave);
 					
 					sheetnum = 1;

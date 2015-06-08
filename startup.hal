@@ -3,10 +3,9 @@ begin
 
 	SetLangMode(LangEnglish,"ENG",0);
 	
+	Report("TEST",TESTRClass,TESTRn,0,modTS);
+	Report("Budgets Objects Report",BudgetObjectsRClass,BudgetsObjectsRn,0,modTS);
+	Setting("Uploading a file to MS Excel",ExcelUploadTClass,modTS);
 	
-  Report("TEST",TESTRClass,TESTRn,0,modTS);
-  Report("Budgets Objects Report",BudgetObjectsRClass,BudgetsObjectsRn,0,modTS);	
-
-	  
  return;
 end;  
