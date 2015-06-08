@@ -1,7 +1,7 @@
 global
 procedure ExcelUploadSetting()
 BEGIN
-	RunProgram("tmp" & Chr(92) & "Add JDK to Path.bat","");
+	RunProgram("tmp" & Chr(92) & "AddJDKtoPath.bat","");
 RETURN;
 END;
 
