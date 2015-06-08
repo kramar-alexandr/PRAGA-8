@@ -7,5 +7,7 @@ begin
 	Report("Budgets Objects Report",BudgetObjectsRClass,BudgetsObjectsRn,0,modTS);
 	Setting("Uploading a file to MS Excel",ExcelUploadTClass,modTS);
 	
+	SString(31000,"Object with this name but other type already exists");
+	
  return;
 end;  

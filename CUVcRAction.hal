@@ -1,0 +1,37 @@
+
+
+global updating
+function LongInt CUVcRecordCheck(var record CUVc CUr,record CUVc CU2r,LongInt stat,LongInt long4)
+BEGIN  
+  LongInt res;
+	record ObjVc Objr;
+
+	res = inner.CUVcRecordCheck(CUr,CU2r,stat,long4); 
+	
+	if (res==0)  then begin 
+		if (CUr.VEType>0) then begin
+			Objr.Code = CUr.Code;
+			if(ReadFirstMain(Objr,1,true)) then begin
+				if (Objr.OTCode!="VEND") then begin
+    	      RecordCheckError(31000,"",-1,"Code");      
+    	      res = -1;
+    	      goto LCUVcRecordCheck;
+				end;
+			
+			end else begin
+				RecordNew(OBjr);
+				Objr.Code = CUr.Code;
+				Objr.Comment = CUr.Name;
+				Objr.OTCode = "VEND";
+				RecordStore(Objr,true);
+			end;
+			
+		end;
+	end;
+  
+ 
+LCUVcRecordCheck:;
+  CUVcRecordCheck = res;
+  RETURN;
+END;
+
