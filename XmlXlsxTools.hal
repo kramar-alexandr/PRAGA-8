@@ -320,7 +320,7 @@ BEGIN
 		profolder = ProgramFolder;
 		SetAreaZeroSize(command);
 		AddTextToArea("-cf0M" & chr(10),command);
-		AddTextToArea(profolder & "tmp.xlsx" & chr(10),command);
+		AddTextToArea(fileName & ".xlsx" & chr(10),command);
 		AddTextToArea(fileName & chr(10),command);
 
 		alen = GetAreaLength(command);
