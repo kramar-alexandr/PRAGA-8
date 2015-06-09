@@ -34,3 +34,48 @@ LCLCorspVcRecordCheck:;
   RETURN;
 END;
 
+global
+updating function LongInt CLCorspVcRecordSaveAfter(var record CLCorspVc CLCorspr,record CLCorspVc CLCorsp2r,LongInt stat,LongInt long4)
+BEGIN
+	LongInt res;
+	record INVc INr;
+	record ITVc ITr;
+    
+	INr.Code = CLCorspr.Code;
+	if (!ReadFirstMain(INr,1,true)) then begin
+		RecordNew(INr);
+		INr.Code = CLCorspr.Code;
+		INr.Name = CLCorspr.Comment;
+		INr.Objects = CLCorspr.Objects;
+		ITr.Code = CLCorspr.Code;
+		ReadLastMain(ITr,1,false);
+		INr.Group = ITr.Code;
+		RecordStore(INr,true);
+	end;
+
+  CLCorspVcRecordSaveAfter = res; 
+  RETURN;
+END;
+
+global
+updating function LongInt CLCorspVcRecordUpdateAfter(var record CLCorspVc CLCorspr,record CLCorspVc CLCorsp2r,LongInt stat,LongInt long4)
+BEGIN
+	LongInt res;
+	record INVc INr;
+	record ITVc ITr;
+    
+	INr.Code = CLCorspr.Code;
+	if (!ReadFirstMain(INr,1,true)) then begin
+		RecordNew(INr);
+		INr.Code = CLCorspr.Code;
+		INr.Name = CLCorspr.Comment;
+		INr.Objects = CLCorspr.Objects;
+		ITr.Code = CLCorspr.Code;
+		ReadLastMain(ITr,1,false);
+		INr.Group = ITr.Code;
+		RecordStore(INr,true);
+	end;
+  
+  CLCorspVcRecordUpdateAfter = res; 
+  RETURN;
+END;
