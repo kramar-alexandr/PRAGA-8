@@ -1,4 +1,4 @@
-external remote procedure BudgetsObjectsRn(record RcVc,string, var area);
+external remote procedure BudgetsObjectsRn(record RcVc,var area);
 
 
 global
@@ -322,7 +322,7 @@ BEGIN
 	if(windowsmode==1)then begin
 		RunProgram("tmp" & Chr(92) & "buildXLSX.bat",Chr(34) & path & Chr(34));
 	end else begin
-		profolder = ProgramFolder;
+		/*profolder = ProgramFolder;
 		SetAreaZeroSize(command);
 		AddTextToArea("-cf0M" & chr(10),command);
 		AddTextToArea(fileName & ".xlsx" & chr(10),command);
@@ -337,8 +337,8 @@ BEGIN
 			AddTextToArea(c,newcmd);
 		end; 
 
-		//WriteAreaToFile(newcmd,"/cmd",0);
-		//RunProgram("jar.sh","");
+		WriteAreaToFile(newcmd,"/cmd",0);
+		RunProgram("jar.sh","");*/
 		if(fileexists("/tmpxlsx/.DS_Store"))then begin
 			delete_file("/tmpxlsx/.DS_Store");
 		end;
@@ -360,7 +360,9 @@ global procedure RunBudgetObjectsRn() begin
 	wn = curwindow;
 	getwindowrecord(wn,RepSpec);
 	filename = SaveFileDialog("Budget Objects Report","","xlsx");
-		BudgetsObjectsRn(RepSpec,filename,fileToSave);	
+	if ((filename!="Budget Objects Report") and nonblank(filename)) then begin
+		BudgetsObjectsRn(RepSpec,fileToSave);
+	end;
 	if(fileexists(filename))then begin
 		delete_file(filename);
 	end;
