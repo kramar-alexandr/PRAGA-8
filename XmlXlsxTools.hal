@@ -65,9 +65,28 @@ END;
 global
 procedure CreateSheetsXLSX(integer qtyOfSheets,array string namesArray, string pathToXLSX)
 BEGIN
-	integer i;
+	integer i,j,sameSheetNamesCounter;
 	area tempArea;
 	string 225 path;
+	
+	for (i=0;i<qtyOfSheets;i=i+1) begin
+		if (len(namesArray[i])>31) then begin
+			namesArray[i] = Left(namesArray[i],31);
+		end;
+	end;
+	for (i=0;i<qtyOfSheets;i=i+1) begin
+		sameSheetNamesCounter = 0;
+		for (j=0;j<qtyOfSheets;j=j+1) begin
+			if ((namesArray[i] == namesArray[j]) and (i!=j)) then begin
+				sameSheetNamesCounter = sameSheetNamesCounter + 1;
+				if (len(namesArray[j])>(31 - len("(" & sameSheetNamesCounter & ")"))) then begin
+					namesArray[j] = Left(namesArray[j],(31 - len("(" & sameSheetNamesCounter & ")")));
+				end;
+				namesArray[j] = namesArray[j] & "(" & sameSheetNamesCounter & ")";
+			end;
+		end;
+	end;
+	
 //---/[Content_Types].xml
 	path = PathCorrection(pathToXLSX);
 	AddTextToArea("<?xml version=" & Chr(34) & "1.0" & Chr(34) & " encoding=" & Chr(34) & "UTF-8" & Chr(34) & " standalone=" & Chr(34) & "yes" & Chr(34) & "?><Types xmlns=" & Chr(34) & "http://schemas.openxmlformats.org/package/2006/content-types" & Chr(34) & "><Default Extension=" & Chr(34) & "rels" & Chr(34) & " ContentType=" & Chr(34) & "application/vnd.openxmlformats-package.relationships+xml" & Chr(34) & "/><Default Extension=" & Chr(34) & "xml" & Chr(34) & " ContentType=" & Chr(34) & "application/xml" & Chr(34) & "/><Override PartName=" & Chr(34) & "/xl/workbook.xml" & Chr(34) & " ContentType=" & Chr(34) & "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml" & Chr(34) & "/>",tempArea);

@@ -340,7 +340,7 @@ begin
 	string 100 mainobjname;
 	array string 100 PRCodes,PRNames;
 	boolean TrHs;
-	integer PRCodesCount,sameSheetNamesCounter;
+	integer PRCodesCount;
 	array string 10 sheetNames;
 	array val sheetColls;
 	array string 21 mergeCell;
@@ -367,15 +367,7 @@ begin
 			end;
 		end;
 		qtyOfSheets = PRCodesCount;
-		for (i=0;i<qtyOfSheets;i=i+1) begin
-			sameSheetNamesCounter = 0;
-			for (j=0;j<qtyOfSheets;j=j+1) begin
-				if ((sheetNames[i] == sheetNames[j]) and (i!=j)) then begin
-					sameSheetNamesCounter = sameSheetNamesCounter + 1;
-					sheetNames[j] = sheetNames[j] & "(" & sameSheetNamesCounter & ")";
-				end;
-			end;
-		end;
+		
 		sheetColls[0] = 8.43;
 		sheetColls[1] = 8.43;
 		sheetColls[2] = 31.71;
