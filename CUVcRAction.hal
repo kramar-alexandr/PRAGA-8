@@ -13,11 +13,10 @@ BEGIN
 			Objr.Code = CUr.Code;
 			if(ReadFirstMain(Objr,1,true)) then begin
 				if (Objr.OTCode!="SUPPL") then begin
-    	      RecordCheckError(31000,"",-1,"Code");      
-    	      res = -1;
-    	      goto LCUVcRecordCheck;
+					RecordCheckError(31000,"",-1,"Code");      
+					res = -1;
+					goto LCUVcRecordCheck;
 				end;
-			
 			end else begin
 				RecordNew(OBjr);
 				Objr.Code = CUr.Code;
@@ -25,7 +24,7 @@ BEGIN
 				Objr.OTCode = "SUPPL";
 				RecordStore(Objr,true);
 			end;
-			
+			CUr.VEObjects = Objr.Code;
 		end;
 	end;
   

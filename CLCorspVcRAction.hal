@@ -12,9 +12,9 @@ BEGIN
 			Objr.Code = CLCorspr.Code;
 			if(ReadFirstMain(Objr,1,true)) then begin
 				if (Objr.OTCode!="EXP") then begin
-    	      RecordCheckError(31000,"",-1,"Code");      
-    	      res = -1;
-    	      goto LCLCorspVcRecordCheck;
+					RecordCheckError(31000,"",-1,"Code");      
+					res = -1;
+					goto LCLCorspVcRecordCheck;
 				end;
 			
 			end else begin
@@ -24,7 +24,7 @@ BEGIN
 				Objr.OTCode = "EXP";
 				RecordStore(Objr,true);
 			end;
-			
+			CLCorspr.Objects = Objr.Code;
 
 	end;
   
