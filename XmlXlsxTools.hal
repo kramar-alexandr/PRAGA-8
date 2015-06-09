@@ -339,6 +339,12 @@ BEGIN
 
 		//WriteAreaToFile(newcmd,"/cmd",0);
 		//RunProgram("jar.sh","");
+		if(fileexists("/tmpxlsx/.DS_Store"))then begin
+			delete_file("/tmpxlsx/.DS_Store");
+		end;
+		if(fileexists("/tmpxlsx/xl/.DS_Store"))then begin
+			delete_file("/tmpxlsx/xl/.DS_Store");
+		end;
 		RunProgram("jar","-cf0M /tmpxlsx.xlsx -C /tmpxlsx/ .");
 	end;
 	RETURN;
