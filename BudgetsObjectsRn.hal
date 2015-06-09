@@ -326,7 +326,7 @@ RETURN;
 END;
 
 
-global procedure BudgetsObjectsRn(record RcVc RepSpec)
+global procedure BudgetsObjectsRn(record RcVc RepSpec,string filename, var area areatofile)
 begin
 	record BaseCurBlock BCb;
 	record BudRepVc BRr;
@@ -355,7 +355,7 @@ begin
 	totalBudget = 0;
 	totalSpend = 0;
 	BlockLoad(BCb);
-	if (RepSpec.Media==mtExcel) then begin
+	if (true) then begin
 		if (blank(RepSpec.f2)) then begin
 			TrHs = true;
 			while (loopmain(PRr,1,TrHs)) begin
@@ -397,7 +397,8 @@ begin
 			
 			numOfUniqueSharedStrings = 0;
 			numOfSharedStrings = 0;
-			fileToSave = SaveFileDialog("Budget Objects Report","","xlsx");
+			//fileToSave = SaveFileDialog("Budget Objects Report","","xlsx");
+			fileToSave = "/tmpxlsx.xlsx";
 			if (fileToSave!="Budget Objects Report") then begin
 				if (nonblank(fileToSave)) then begin
 					XmlXlsxWorkBegin(fileToSave,reportName);
@@ -535,7 +536,10 @@ begin
 						EndSheet(sheetnum,fileToSave);
 					end;
 					FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					ConvertToXLSX(fileToSave);
+					//ConvertToXLSX(fileToSave);
+					ConvertToXLSX("/tmpxlsx.xlsx");
+					MilliSleep(200);
+					addfiletoarea("/tmpxlsx.xlsx",areatofile,false);
 				end else begin
 					MessageBox(0,"Input name of Excel file!");
 				end;
@@ -570,7 +574,8 @@ begin
 			
 			numOfUniqueSharedStrings = 0;
 			numOfSharedStrings = 0;
-			fileToSave = SaveFileDialog("Budget Objects Report","","xlsx");
+			//fileToSave = SaveFileDialog("Budget Objects Report","","xlsx");
+			fileToSave = "/tmpxlsx.xlsx";
 			if (fileToSave!="Budget Objects Report") then begin
 				if (nonblank(fileToSave)) then begin
 					XmlXlsxWorkBegin(fileToSave,reportName);
@@ -706,6 +711,8 @@ begin
 					EndSheet(sheetnum,fileToSave);
 					FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					ConvertToXLSX(fileToSave);
+					MilliSleep(200);
+					addfiletoarea("/tmpxlsx.xlsx",areatofile,false);
 				end else begin
 					MessageBox(0,"Input name of Excel file!");
 				end;

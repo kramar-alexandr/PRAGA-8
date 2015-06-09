@@ -1994,7 +1994,22 @@ window BudgetObjectsRClass:1
   wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
 real h,v,vs,h1;
-	WindowBegin("Budgets' Objects",TESTRClass,CGRcW,RcType);
+	WindowBegin("Budgets' Objects",TESTRClass,CGother,RcType);
+		SetWRect(20,80,400,250);
+		v = 6; vs = 20; h = 120;
+		PeriodField(h,v=6,"Period");
+		EditField(h,v+=20,120,"Objects",Normal,f1,false,ObjSClass);
+		EditField(h,v+=20,120,"Projects",Normal,f2,false,PRSClass);
+		HalPushButton(h=50,v+=20,h+110,v+=20,"RunBudgetObjectsRn","Run Budgets' Objects");
+		
+	EndWindow;
+end;
+
+window BudgetObjectsEClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+real h,v,vs,h1;
+	WindowBegin("Budgets' Objects",TESTEClass,CGEc2W,RcType);
 		SetWRect(20,80,400,250);
 		v = 6; vs = 20; h = 120;
 		PeriodField(h,v=6,"Period");

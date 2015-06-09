@@ -1,3 +1,6 @@
+external remote procedure BudgetsObjectsRn(record RcVc,string, var area);
+
+
 global
 procedure ExcelUploadSetting()
 BEGIN
@@ -98,9 +101,11 @@ BEGIN
 	AddTextToArea("</sheets></workbook>",tempArea);
 	WriteAreaToFile(tempArea,path & "/xl/workbook.xml",0);
 //---/xl/worksheets/sheet1 ... n.xml
+	logtext(0,"begin qtyOfSheets" & qtyOfSheets);
 	for (i=0;i<qtyOfSheets;i=i+1) begin
 		SetAreaZeroSize(tempArea);
 		AddTextToArea("<?xml version=" & Chr(34) & "1.0" & Chr(34) & " encoding=" & Chr(34) & "UTF-8" & Chr(34) & " standalone=" & Chr(34) & "yes" & Chr(34) & "?><worksheet xmlns=" & Chr(34) & "http://schemas.openxmlformats.org/spreadsheetml/2006/main" & Chr(34) & " xmlns:r=" & Chr(34) & "http://schemas.openxmlformats.org/officeDocument/2006/relationships" & Chr(34) & " xmlns:mc=" & Chr(34) & "http://schemas.openxmlformats.org/markup-compatibility/2006" & Chr(34) & " mc:Ignorable=" & Chr(34) & "x14ac" & Chr(34) & " xmlns:x14ac=" & Chr(34) & "http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" & Chr(34) & "><dimension ref=" & Chr(34) & "A1:AZ3000" & Chr(34) & "/><sheetViews><sheetView workbookViewId=" & Chr(34) & "0" & Chr(34) & "/></sheetViews><sheetFormatPr defaultRowHeight=" & Chr(34) & "15" & Chr(34) & " x14ac:dyDescent=" & Chr(34) & "0.25" & Chr(34) & "/>",tempArea);
+		logtext(0,path & "/xl/worksheets/sheet" & i+1 & ".xml");
 		WriteAreaToFile(tempArea,path & "/xl/worksheets/sheet" & i+1 & ".xml",0);
 	end;
 	RETURN;
@@ -332,8 +337,28 @@ BEGIN
 			AddTextToArea(c,newcmd);
 		end; 
 
-		WriteAreaToFile(newcmd,"/cmd",0);
-		RunProgram("jar.sh","");
+		//WriteAreaToFile(newcmd,"/cmd",0);
+		//RunProgram("jar.sh","");
+		RunProgram("jar","-cf0M /tmpxlsx.xlsx -C /tmpxlsx/ .");
 	end;
 	RETURN;
 END;
+
+
+global procedure RunBudgetObjectsRn() begin
+	string 250 filename;
+	area fileToSave;
+	record RcVc RepSpec;
+	integer wn;
+	
+	wn = curwindow;
+	getwindowrecord(wn,RepSpec);
+	filename = SaveFileDialog("Budget Objects Report","","xlsx");
+		BudgetsObjectsRn(RepSpec,filename,fileToSave);	
+	if(fileexists(filename))then begin
+		delete_file(filename);
+	end;
+	writeareatofile(fileToSave,filename,0);
+
+return;
+end;
