@@ -12,7 +12,7 @@ BEGIN
 		if (CUr.VEType>0) then begin
 			Objr.Code = CUr.Code;
 			if(ReadFirstMain(Objr,1,true)) then begin
-				if (Objr.OTCode!="VEND") then begin
+				if (Objr.OTCode!="SUPPL") then begin
     	      RecordCheckError(31000,"",-1,"Code");      
     	      res = -1;
     	      goto LCUVcRecordCheck;
@@ -22,7 +22,7 @@ BEGIN
 				RecordNew(OBjr);
 				Objr.Code = CUr.Code;
 				Objr.Comment = CUr.Name;
-				Objr.OTCode = "VEND";
+				Objr.OTCode = "SUPPL";
 				RecordStore(Objr,true);
 			end;
 			
