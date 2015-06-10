@@ -753,6 +753,8 @@ BEGIN
   record UserVc Userr;
 	record ObjVc Objr;// Edit ************************** Thursday, 23 April 2015 13:19:07
 	record PRVc mPRr;
+	string 100 odname, newname;
+	integer lenth,si;
 	
   res = 0;
   switch (ProgramType) begin
@@ -965,6 +967,15 @@ BEGIN
 	if(!readfirstmain(Objr,1,true))then begin
 		recordnew(Objr);
 		Objr.Code = PRr.Code;
+		lenth = len(Objr.Code);
+		For(si=0;si<lenth;si=si+1) begin
+	  	if(mid(Objr.Code,si,1)==".")then begin
+				newname = newname & "_";
+	  	end else begin
+				newname = newname & mid(Objr.Code,si,1);
+	  	end;
+		end; 
+		Objr.Code = newname;
 		Objr.Comment = PRr.Name;
 		Objr.OTCode = "PRJ";
 		PRr.Objects = Objr.Code;
