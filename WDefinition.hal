@@ -2561,7 +2561,8 @@ begin
   MatrixBegin(4,v,-50,-10,-,99);
   Flip(1);
   MatTypedRow(stp);
-  MatCol(t=1,h=34,"Type",0,Type,false,SetSClass);
+  //MatCol(t=1,h=34,"Type",0,Type,false,SetSClass);// Edit ************************** Wednesday, 10 June 2015 10:56:41
+  MatCol(t=1,h=34,"#Supplier#",0,Company,false,VESClass);// Edit ************************** Wednesday, 10 June 2015 10:57:08
   /*if (HasLocalization("POL") and IsStandardProduct) then begin
     MatCol(t,h+=120,"Number",0,TransOfficialSerNr,false,ARSClass);
   end else begin
@@ -2608,10 +2609,11 @@ begin
     Flip(3);
     MatCol(1,80,"Date",0,ExpDate,false,PasteCurDate);
     pos = 155;
-    if (HasModPL) then begin
-      MatCol(1,pos,"#Supplier#",0,Company,false,VESClass);
+    MatCol(1,pos,"Type",0,Type,false,SetSClass);// Edit ************************** Wednesday, 10 June 2015 10:57:28
+    /*if (HasModPL) then begin
+      MatCol(1,pos,"#Supplier#",0,Company,false,VESClass);// Edit ************************** Wednesday, 10 June 2015 10:57:29
       pos = 225;
-    end;
+    end;*/
     MatCol(1,pos,"Identifier",0,Identifier,true,0);
     if (HasModPL) then begin
       MatCol(1,-365,"#Supplier# Name",0,VEName,true,0);
