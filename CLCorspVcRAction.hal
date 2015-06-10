@@ -45,6 +45,7 @@ BEGIN
 	if (!ReadFirstMain(INr,1,true)) then begin
 		RecordNew(INr);
 		INr.Code = CLCorspr.Code;
+		INr.ItemType = kItemTypeService;
 		INr.Name = CLCorspr.Comment;
 		INr.Objects = CLCorspr.Objects;
 		ITr.Code = CLCorspr.Code;
@@ -68,6 +69,7 @@ BEGIN
 	if (!ReadFirstMain(INr,1,true)) then begin
 		RecordNew(INr);
 		INr.Code = CLCorspr.Code;
+		INr.ItemType = kItemTypeService;
 		INr.Name = CLCorspr.Comment;
 		INr.Objects = CLCorspr.Objects;
 		ITr.Code = CLCorspr.Code;

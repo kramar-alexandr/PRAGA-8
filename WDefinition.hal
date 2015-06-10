@@ -2096,7 +2096,7 @@ begin
   MatCol(t,100,"",0,Spec,false,0);// Edit ************************** Friday, 22 May 2015 10:13:17
   
   MatCol(1,30,"Item",0,ArtCode,false,INSClass);
-  MatCol(1,100,"Vendor",0,VECode,false,VESClass);
+  MatCol(1,100,"Suppl",0,VECode,false,VESClass);
   MatCol(1,155,"Qty",0,Qty,true,0);
   MatCol(1,200,"Foundation",0,ExtraObj,true,Obj3SClass);
   MatCol(1,255,"Description",0,Comment,false,0);
