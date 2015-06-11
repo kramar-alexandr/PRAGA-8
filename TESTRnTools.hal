@@ -5,6 +5,7 @@ procedure DblExpAccTEST(string dblstr,string l,Integer currepwn)
 begin
 	string 20 str;
 	record RcVc RepSpec,RepSpec2;
+	string 200 f1,f2;
 	
 	if nonblank(dblstr) then begin
 		str = dblstr;
@@ -14,12 +15,15 @@ begin
 	end;
 
 	getwindowrecord(currepwn,RepSpec);
-	RepSpec2 = RepSpec;
-	RepSpec2.f1 = RepSpec.f2;
-	RepSpec2.f2 = RepSpec.f1;
-	RepSpec2.f3 = l;
-	RepSpec2.repname = "TEST2Rn";
-	RunReport(RepSpec2,0);
+	//RepSpec2 = RepSpec;
+	f1 = RepSpec.f2;
+	f2 = RepSpec.f1;
+		
+	RepSpec.f1 = f1;
+	RepSpec.f2 = f2;
+	RepSpec.f3 = l;
+	RepSpec.repname = "TEST2Rn";
+	RunReport(RepSpec,0);
 	
 	return;
 end;

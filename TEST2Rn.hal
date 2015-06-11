@@ -76,6 +76,7 @@ BEGIN
 	record CLCorspVc CLCorspr;
 	record PRVc PRr;
 	record IVVc IVr;
+	record VIVc VIr;
 	record IPVc IPr;
 	record CLInVc CLInr;
 	record ExpVc Expr;
@@ -97,7 +98,7 @@ BEGIN
 			OutString(tab2,0,"Date",false);
 			OutString(tab3,0,"Sum",false);
 		EndFormat;
-		PRr.Code = RepSpec.f3;
+		PRr.Code = RepSpec.f1;
 		ReadFirstMain(PRr,1,true);
 		PRObj = PRr.Objects;
 		CLCorspr.Code = RepSpec.f3;
@@ -108,12 +109,13 @@ BEGIN
 		TrHs = true;
 		tot = 0;
 		while (loopmain(mainr,2,TrHs)) begin
-			if ((mainr.AccNumber != CLCorspr.AccNumber) or (mainr.TransDate > RepSpec.sEndDate))  then begin
+			if ((mainr.AccNumber!=CLCorspr.AccNumber) or (mainr.TransDate > RepSpec.sEndDate))  then begin
 				TrHs = false;	
 			end;
 			if (TrHs) then begin
 				TRr.Number = mainr.TransNr;
 				TRr.IntYc = mainr.IntYc;
+				
 				if (ReadFirstMain(TRr,2,true)) then begin
 					rwcnt = MatRowCnt(TRr);
 					for (i=0;i<rwcnt;i=i+1) begin
@@ -126,6 +128,11 @@ BEGIN
 									IVr.SerNr = TRr.Number;
 									if (ReadFirstMain(IVr,1,true)) then begin
 										OutStringID(tab1,"DblIVVc",USetStr(35027) & IVr.SerNr,false,FirstTransInRange(USetStr(35027) & IVr.SerNr));
+									end;
+								case VIYc:
+									VIr.SerNr = TRr.Number;
+									if (ReadFirstMain(VIr,1,true)) then begin
+										OutStringID(tab1,"DblVIVc","P/Inv" & VIr.SerNr,false,FirstTransInRange(USetStr(35027) & VIr.SerNr));
 									end;
 								case IPYc:
 									IPr.SerNr = TRr.Number;
@@ -142,12 +149,12 @@ BEGIN
 									if (ReadFirstMain(CLOutr,1,true)) then begin
 										OutStringID(tab1,"DblCLOutID",USetStr(35030) & CLOutr.SerNr,false,FirstTransInRange(USetStr(35030) & CLOutr.SerNr));
 									end;
-								/*case ExpYc:
+								case ExpYc:
 									Expr.SerNr = TRr.Number;
 									if (ReadFirstMain(Expr,1,true)) then begin
 										YcToStr(TRr.IntYc,tempStr);
-										OutStringID(tab1,"DblExpVc",tempStr & Expr.SerNr,false,FirstTransInRange(tempStr & Expr.SerNr));
-									end;*/
+										OutStringID(tab1,"DblExpVc",tempStr & Expr.SerNr,false,Expr.SerNr);
+									end;
 								otherwise
 									YcToStr(TRr.IntYc,tempStr);
 									//MessageBox(0,TRr.IntYc);
