@@ -377,6 +377,7 @@ global procedure RunBudgetObjectsRn() begin
 	integer wn;
 	
 	wn = curwindow;
+	deselectwindow(wn,true);
 	getwindowrecord(wn,RepSpec);
 	filename = SaveFileDialog("Budget Objects Report","","xlsx");
 	if ((filename!="Budget Objects Report") and nonblank(filename)) then begin

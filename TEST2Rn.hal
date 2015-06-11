@@ -120,7 +120,7 @@ BEGIN
 					rwcnt = MatRowCnt(TRr);
 					for (i=0;i<rwcnt;i=i+1) begin
 						MatRowGet(TRr,i,TRrw);
-						if ((SetInSet(RepSpec.f2,TRrw.Objects) or blank(RepSpec.f2)) and (SetInSet(PRObj,TRrw.Objects) or blank(PRObj)) and (SetInSet(CLCorspObj,TRrw.Objects) or blank(CLCorspObj))) then begin
+						if ((TRRw.ovst==0) and (TRrw.AccNumber==mainr.AccNumber) and (SetInSet(RepSpec.f2,TRrw.Objects) or blank(RepSpec.f2)) and (SetInSet(PRObj,TRrw.Objects) or blank(PRObj)) and (SetInSet(CLCorspObj,TRrw.Objects) or blank(CLCorspObj))) then begin
 							Gray_Divider(0,1);
 							StartFormat(15);
 							switch (TRr.IntYc) begin
@@ -132,7 +132,7 @@ BEGIN
 								case VIYc:
 									VIr.SerNr = TRr.Number;
 									if (ReadFirstMain(VIr,1,true)) then begin
-										OutStringID(tab1,"DblVIVc","P/Inv" & VIr.SerNr,false,FirstTransInRange(USetStr(35027) & VIr.SerNr));
+										OutStringID(tab1,"DblVIVc","P/Inv:" & VIr.SerNr,false,FirstTransInRange(USetStr(35027) & VIr.SerNr));
 									end;
 								case IPYc:
 									IPr.SerNr = TRr.Number;
@@ -142,12 +142,12 @@ BEGIN
 								case CLInYc:
 									CLInr.SerNr = TRr.Number;
 									if (ReadFirstMain(CLInr,1,true)) then begin
-										OutStringID(tab1,"DblCLInID",USetStr(35029) & CLInr.SerNr,false,FirstTransInRange(USetStr(35029) & CLInr.SerNr));
+										OutStringID(tab1,"DblCLInID","CashIn:" & CLInr.SerNr,false,CLInr.SerNr);
 									end;
 								case CLOutYc:
 									CLOutr.SerNr = TRr.Number;
 									if (ReadFirstMain(CLOutr,1,true)) then begin
-										OutStringID(tab1,"DblCLOutID",USetStr(35030) & CLOutr.SerNr,false,FirstTransInRange(USetStr(35030) & CLOutr.SerNr));
+										OutStringID(tab1,"DblCLOutID","CashOut:" & CLOutr.SerNr,false,CLOutr.SerNr);
 									end;
 								case ExpYc:
 									Expr.SerNr = TRr.Number;
@@ -166,7 +166,7 @@ BEGIN
 								tot = tot + TRrw.DebVal;
 							end;
 							if nonblank(TRrw.CredVal)then begin
-								OutString(tab2,0,"-" & TRrw.CredVal,false);
+								OutString(tab3,0,"-" & TRrw.CredVal,false);
 								tot = tot - TRrw.CredVal;
 							end;
 							EndFormat;

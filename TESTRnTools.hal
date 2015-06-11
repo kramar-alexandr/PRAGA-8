@@ -27,3 +27,17 @@ begin
 	
 	return;
 end;
+
+
+global
+procedure DblCLOutID(string dblstr,string l,Integer currepwn)
+begin
+  Integer wn;
+  record CLOutVc CLOutr;
+   
+  CLOutr.SerNr = FirstInRange(l,10);
+  if (ReadFirstMain(CLOutr,1,true)) then begin
+    wn = OpenWindow("CLOutDClass",1,0,"","",CLOutr);
+  end;     
+  return;
+end;
