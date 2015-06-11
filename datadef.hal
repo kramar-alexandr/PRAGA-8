@@ -7,6 +7,7 @@ begin
   RecordField(Code,M4Code,10,0);
   ArrayBegin(Math,-,1);
   ArrayField(Code,M4Str,200,0);
+  ArrayField(VcName,M4Str,200,0);
   ArrayField(CatName,M4Str,200,0);
   ArrayField(Name,M4Str,200,0);
   ArrayField(CostAcc,M4Code,10,0);

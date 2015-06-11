@@ -1,0 +1,25 @@
+external remote procedure TEST2Rn(record RcVc);
+
+global
+procedure DblExpAccTEST(string dblstr,string l,Integer currepwn)
+begin
+	string 20 str;
+	record RcVc RepSpec,RepSpec2;
+	
+	if nonblank(dblstr) then begin
+		str = dblstr;
+	end;
+	if (blank(str) and nonblank(l)) then begin
+		str = l;
+	end;
+
+	getwindowrecord(currepwn,RepSpec);
+	RepSpec2 = RepSpec;
+	RepSpec2.f1 = RepSpec.f2;
+	RepSpec2.f2 = RepSpec.f1;
+	RepSpec2.f3 = l;
+	RepSpec2.repname = "TEST2Rn";
+	RunReport(RepSpec2,0);
+	
+	return;
+end;

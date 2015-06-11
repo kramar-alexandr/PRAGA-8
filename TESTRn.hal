@@ -8,7 +8,7 @@ begin
 	record TBBUVc TBBUr;
 	row TBBUVc TBBUrw;
 	date sd,ed;
-	string 20 mainobj;
+	string 20 mainobj,PRCode;
 	array string 20 project,name,prjobj;
 	integer i,k;
 	record ObjVc Objr;
@@ -28,24 +28,32 @@ begin
 	record CUVc CUr;
 	string 20 vendobj,tstr;
 	integer pos,qi;
-	
+	integer tab1, tab2, tab3,
+			tab4, tab5, tab6,
+			step;
+			
 	sd = RepSpec.sStartDate;
 	ed = RepSpec.sEndDate;
 	mainobj = RepSpec.f1;
+	PRCode = RepSpec.f2;
 	
-	
+	tab1 = 0;	 tab2 = 40;	  tab3 = 80;
+	tab4 = 200;  tab5 = 250;  tab6 = 300;
+	step = 100;
 	
 	recordnew(BRr);
 	Objr.Code = mainobj;
 	readfirstmain(Objr,1,true);
 	mainobjname = Objr.Comment;
 	startreportnoheaderjob("TEST");
+	if nonblank(PRCode) then begin
 		k = 0;
 		
 		  
 		while(loopmain(ITr,1,true))begin
 			clearrow(BRr,BRrw,1);
 			BRrw.Code = ITr.Code;
+			BRrw.VcName = "ITVc";
 			BRrw.CatName = ITr.Comment;
 			matrowput(BRr,k,BRrw);
 			k=k+1;
@@ -60,6 +68,7 @@ begin
 				if(testf)then begin
 					clearrow(BRr,BRrw,1);
 					BRrw.Code = INr.Objects;
+					BRrw.VcName = "INVc";
 					Objr.Code = INr.Objects;
 					if(readfirstmain(Objr,1,true))then begin
 						BRrw.Name = Objr.Comment;
@@ -108,7 +117,10 @@ begin
 		
 		repmtrw = matrowcnt(BRr);
 		k=0;
-		while(loopmain(PRr,1,true))begin
+		//Edit---------------Vitalii 11:14 11.06.2015
+		PRr.Code = PRCode;
+		if (ReadFirstMain(PRr,1,true)) then begin
+		//while(loopmain(PRr,1,true))begin
 			if(PRr.StartDate>=sd and PRr.StartDate<=ed)then begin
 				if(blank(PRr.MotherCode))then begin
 					project[k] = PRr.Code;
@@ -290,55 +302,58 @@ begin
 		
 	
 		startformat(15);
-	  	Outstring(0,0,"",false);
-	  	Outstring(0,0,"",false);
-	  	Outstring(0,0,"",false);
-	  	Outstring(0,0,"",false);
+	  	Outstring(tab1,0,"",false);
+	  	Outstring(tab2,0,"",false);
+	  	Outstring(tab3,0,"",false);
+	  	Outstring(tab4,0,"",false);
 			For(i=0;i<k;i=i+1) begin	
-				Outstring(100+i*50,0,name[i],false);
-				Outstring(0,0,"",false);
+				Outstring(tab5+i*step,0,name[i],false);
+				Outstring(tab6+i*step,0,"",false);
 			end; 
-			Outstring(0,0,"Total",false);
-			Outstring(0,0,"",false);
+			Outstring(tab5+k*step,0,"Total",false);
+			Outstring(tab6+k*step,0,"",false);
 	  endformat;
 	  
 	  startformat(15);
-	  	Outstring(0,0,"",false);
-	  	Outstring(50,0,"",false);
-	  	Outstring(100,0,"",false);
-	  	Outstring(120,0,"",false);
+	  	Outstring(tab1,0,"",false);
+	  	Outstring(tab2,0,"",false);
+	  	Outstring(tab3,0,"",false);
+	  	Outstring(tab4,0,"",false);
 			For(i=0;i<k;i=i+1) begin	
-				Outstring(100+i*50,0,project[i],false);
-				Outstring(100+i*50,0,"",false);
+				Outstring(tab5+i*step,0,project[i],false);
+				Outstring(tab6+i*step,0,"",false);
 			end; 
 	  endformat;
 	  
 	  startformat(15);
-	  	Outstring(0,0,"",false);
-	  	Outstring(50,0,mainobjname,false);
-	  	Outstring(100,0,"",false);
-	  	Outstring(120,0,"Vendor",false);
-			For(i=0;i<k;i=i+1) begin	
-				For(qi=0;qi<4;qi=qi+1) begin
-					switch(qi)begin
+	  	Outstring(tab1,0,"",false);
+	  	Outstring(tab2,0,mainobjname,false);
+	  	Outstring(tab3,0,"",false);
+	  	Outstring(tab4,0,"Vendor",false);
+			/*For(i=0;i<k;i=i+1) begin	
+				//For(qi=0;qi<4;qi=qi+1) begin
+					switch(i)begin
 						case 0:
-						Outstring(100+i*50,0,"Budjet I",false);
-						Outstring(100+i*50,0,"Spending I",false);
+						Outstring(tab5+i*step,0,"Budjet I",false);
+						Outstring(tab6+i*step,0,"Spending I",false);
 						case 1:
-						Outstring(100+i*50,0,"Budjet II",false);
-						Outstring(100+i*50,0,"Spending II",false);
+						Outstring(tab5+i*step,0,"Budjet II",false);
+						Outstring(tab6+i*step,0,"Spending II",false);
 						case 2:
-						Outstring(100+i*50,0,"Budjet III",false);
-						Outstring(100+i*50,0,"Spending III",false);
+						Outstring(tab5+i*step,0,"Budjet III",false);
+						Outstring(tab6+i*step,0,"Spending III",false);
 						case 3:
-						Outstring(100+i*50,0,"Budjet IV",false);
-						Outstring(100+i*50,0,"Spending IV",false);
+						Outstring(tab5+i*step,0,"Budjet IV",false);
+						Outstring(tab6+i*step,0,"Spending IV",false);
 					end;
-				end; 
+				//end; 
 				
-			end; 
-			Outstring(100+i*50,0,"Budjet",false);
-			Outstring(100+i*50,0,"Spending",false);
+			end;*/
+			i=0;
+			Outstring(tab5+i*step,0,"Budjet",false);
+			Outstring(tab6+i*step,0,"Spending",false);
+			Outstring(tab5+k*step,0,"Budjet",false);
+			Outstring(tab6+k*step,0,"Spending",false);
 	  endformat;
 		
 		mtrw = matrowcnt(BRr);
@@ -350,116 +365,145 @@ begin
 	  	end;
 			
 			if(totalbubyrow!=0 or totalspendbyrow!=0 or nonblank(BRrw.CatName))then begin
+				Gray_Divider(0,1);
 				startformat(15);
-				Outstring(0,0,BRrw.Code,false);
-				Outstring(50,0,BRrw.CatName,false);
-				Outstring(100,0,BRrw.Name,false);
-				Outstring(100,0,BRrw.VECode,false);
+				switch (BRrw.VcName) begin
+					case "ITVc":
+						Outstring(tab1,0,BRrw.Code,false);
+					case "INVc":
+						OutStringID(tab1,"DblExpAccTEST",BRrw.Code,false,BRrw.Code);
+						//Outstring(tab1,0,BRrw.Code & "ol",false);
+				end;
+				Outstring(tab2,0,BRrw.CatName,false);
+				Outstring(tab3,0,BRrw.Name,false);
+				Outstring(tab4,0,BRrw.VECode,false);
 				For(j=1;j<k+1;j=j+1) begin	
 					totalbubyrow = BRrw.Bud1+BRrw.Bud2+BRrw.Bud3+BRrw.Bud4+BRrw.Bud5+BRrw.Bud6+BRrw.Bud7+BRrw.Bud8+BRrw.Bud9+BRrw.Bud10+BRrw.Bud11+BRrw.Bud12+BRrw.Bud13+BRrw.Bud14+BRrw.Bud15+BRrw.Bud16+BRrw.Bud17+BRrw.Bud18+BRrw.Bud19+BRrw.Bud20;
 					totalspendbyrow = BRrw.Spend1+BRrw.Spend2+BRrw.Spend3+BRrw.Spend4+BRrw.Spend5+BRrw.Spend6+BRrw.Spend7+BRrw.Spend8+BRrw.Spend9+BRrw.Spend10+BRrw.Spend11+BRrw.Spend12+BRrw.Spend13+BRrw.Spend14+BRrw.Spend15+BRrw.Spend16+BRrw.Spend17+BRrw.Spend18+BRrw.Spend19+BRrw.Spend20;
 					switch(j)begin
-						case 1:	Outstring(200+j*50,0,BRrw.Bud1,false);
-										Outstring(200+j*50,0,BRrw.Spend1,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud1;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend1;
-						case 2:	Outstring(200+j*50,0,BRrw.Bud2,false);
-										Outstring(200+j*50,0,BRrw.Spend2,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud2;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend2;
-						case 3:	Outstring(200+j*50,0,BRrw.Bud3,false);
-										Outstring(200+j*50,0,BRrw.Spend3,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud3;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend3;
-						case 4:	Outstring(200+j*50,0,BRrw.Bud4,false);
-										Outstring(200+j*50,0,BRrw.Spend4,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud4;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend4;
-						case 5:	Outstring(200+j*50,0,BRrw.Bud5,false);
-										Outstring(200+j*50,0,BRrw.Spend5,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud5;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend5;
-						case 6:	Outstring(200+j*50,0,BRrw.Bud6,false);
-										Outstring(200+j*50,0,BRrw.Spend6,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud6;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend6;
-						case 7:	Outstring(200+j*50,0,BRrw.Bud7,false);
-										Outstring(200+j*50,0,BRrw.Spend7,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud7;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend7;
-						case 8:	Outstring(200+j*50,0,BRrw.Bud8,false);
-										Outstring(200+j*50,0,BRrw.Spend8,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud8;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend8;
-						case 9:	Outstring(200+j*50,0,BRrw.Bud9,false);
-										Outstring(200+j*50,0,BRrw.Spend9,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud9;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend9;
-						case 10:	Outstring(200+j*50,0,BRrw.Bud10,false);
-										Outstring(200+j*50,0,BRrw.Spend10,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud10;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend10;
-						case 11:	Outstring(200+j*50,0,BRrw.Bud11,false);
-										Outstring(200+j*50,0,BRrw.Spend11,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud11;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend11;
-						case 12:	Outstring(200+j*50,0,BRrw.Bud12,false);
-										Outstring(200+j*50,0,BRrw.Spend12,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud12;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend12;
-						case 13:	Outstring(200+j*50,0,BRrw.Bud13,false);
-										Outstring(200+j*50,0,BRrw.Spend13,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud13;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend13;
-						case 14:	Outstring(200+j*50,0,BRrw.Bud14,false);
-										Outstring(200+j*50,0,BRrw.Spend14,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud14;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend14;
-						case 15:	Outstring(200+j*50,0,BRrw.Bud15,false);
-										Outstring(200+j*50,0,BRrw.Spend15,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud15;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend15;
-						case 16:	Outstring(200+j*50,0,BRrw.Bud16,false);
-										Outstring(200+j*50,0,BRrw.Spend16,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud16;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend16;
-						case 17:	Outstring(200+j*50,0,BRrw.Bud17,false);
-										Outstring(200+j*50,0,BRrw.Spend17,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud17;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend17;
-						case 18:	Outstring(200+j*50,0,BRrw.Bud18,false);
-										Outstring(200+j*50,0,BRrw.Spend18,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud18;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend18;
-						case 19:	Outstring(200+j*50,0,BRrw.Bud19,false);
-										Outstring(200+j*50,0,BRrw.Spend19,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud19;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend19;
-						case 20:	Outstring(200+j*50,0,BRrw.Bud20,false);
-										Outstring(200+j*50,0,BRrw.Spend20,false);
-										totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud20;
-										totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend20;
-				
+						case 1:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud1,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend1,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud1;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend1;
+						case 2:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud2,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend2,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud2;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend2;
+						case 3:
+						Outstring(tab5+(j-1)*step,0,BRrw.Bud3,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend3,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud3;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend3;
+						case 4:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud4,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend4,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud4;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend4;
+						case 5:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud5,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend5,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud5;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend5;
+						case 6:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud6,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend6,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud6;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend6;
+						case 7:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud7,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend7,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud7;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend7;
+						case 8:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud8,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend8,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud8;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend8;
+						case 9:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud9,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend9,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud9;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend9;
+						case 10:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud10,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend10,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud10;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend10;
+						case 11:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud11,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend11,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud11;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend11;
+						case 12:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud12,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend12,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud12;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend12;
+						case 13:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud13,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend13,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud13;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend13;
+						case 14:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud14,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend14,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud14;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend14;
+						case 15:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud15,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend15,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud15;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend15;
+						case 16:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud16,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend16,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud16;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend16;
+						case 17:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud17,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend17,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud17;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend17;
+						case 18:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud18,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend18,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud18;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend18;
+						case 19:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud19,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend19,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud19;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend19;
+						case 20:
+							Outstring(tab5+(j-1)*step,0,BRrw.Bud20,false);
+							Outstring(tab6+(j-1)*step,0,BRrw.Spend20,false);
+							totalrowbud[j-1] = totalrowbud[j-1] + BRrw.Bud20;
+							totalrowsped[j-1] = totalrowsped[j-1] + BRrw.Spend20;
+		
 					end;
 				end; 
-				outstring(0,0,totalbubyrow,false);
-				outstring(0,0,totalspendbyrow,false);
+				outstring(tab5+k*step,0,totalbubyrow,false);
+				outstring(tab6+k*step,0,totalspendbyrow,false);
 				endformat;
 	  	end;
 		end; 
-		
+		Black_Divider(0,1);
 		startformat(15);
-	  	Outstring(0,0,"",false);
-	  	Outstring(50,0,"",false);
-	  	Outstring(100,0,"",false);
-	  	Outstring(100,0,"Total",false);
+	  	Outstring(tab1,0,"",false);
+	  	Outstring(tab2,0,"",false);
+	  	Outstring(tab3,0,"",false);
+	  	Outstring(tab4,0,"Total",false);
 			For(i=0;i<k;i=i+1) begin	
-				Outstring(100+i*50,0,totalrowbud[i],false);
-				Outstring(100+i*50,0,totalrowsped[i],false);
+				Outstring(tab5+i*step,0,totalrowbud[i],false);
+				Outstring(tab6+i*step,0,totalrowsped[i],false);
 			end; 
 	  endformat;
 	
+	end else begin
+		OutString(0,0,"Choose the project, please",false);
+	end;
 	endjob;
-		
 return;
 end;

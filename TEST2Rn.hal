@@ -1,0 +1,183 @@
+external inner procedure ExtractObj(string,var Integer,var string);
+
+
+global
+procedure YcToStr(Integer intyc,var string ycstr)
+BEGIN
+  record YearBlock YearRec;
+  row YearBlock Yearrw;
+  Integer i,rwcnt;
+ 
+  ycstr = "";
+  switch (intyc) begin
+    case IVYc: ycstr = USetStr(1150);
+    case IPYc: ycstr = USetStr(1151);
+    case VIYc: ycstr = USetStr(1152);
+    case OPYc: ycstr = USetStr(1153);
+    case PUYc: ycstr = USetStr(1157);
+    case VariancePUYc: ycstr = USetStr(1449);
+    case SHYc: ycstr = USetStr(1158);
+    case DropSHYc: ycstr = USetStr(1639);
+    case SDYc: ycstr = USetStr(1195);
+    case ExpYc: ycstr = USetStr(1170);
+    case PPYc: ycstr = USetStr(1171);
+    case STMovYc: ycstr = USetStr(1172);
+    case SentSTMovYc: ycstr = USetStr(1448);
+    case PVYc: ycstr = USetStr(1174);
+    case CLInYc: ycstr = USetStr(1193);
+    case CLOutYc: ycstr = USetStr(1194);
+    case STRYc: ycstr = USetStr(1344);
+    case OPOYc: ycstr = USetStr(1416);
+    case OPBYc: ycstr = USetStr(1417);
+    case IPOYc: ycstr = USetStr(1418);
+    case IPBYc: ycstr = USetStr(1419);
+    case ProdYc: ycstr = USetStr(1420);
+    case RetYc: ycstr = USetStr(1421);
+    case WSYc: ycstr = USetStr(1422);
+    case CheckYc: ycstr = USetStr(1423);
+    case Check0Yc: ycstr = USetStr(1424);
+    case Check2Yc: ycstr = USetStr(1427);
+    case OwnCheck0Yc: ycstr = USetStr(1428);
+    case OwnCheckYc: ycstr = USetStr(1429);
+    case AT2WrofYc: ycstr = USetStr(1430);
+    case IVCashYc: ycstr = USetStr(1431);
+    case INTransferYc: ycstr = USetStr(1443);
+    case LateCostYc: ycstr = USetStr(1444);
+    case RetPUYc: ycstr = USetStr(1446);
+    case IntIVYc: ycstr = USetStr(1447);
+    case VATIVYc: ycstr = USetStr(1441);
+    case VATVIYc: ycstr = USetStr(1442);
+    case RestAccYc: ycstr = USetStr(1436);
+    case ProdOperationYc: ycstr = USetStr(1633);
+    case CredManYc: ycstr = USetStr(1635);
+    case SRYc: ycstr = USetStr(1636);
+    case BuyBackReconYc: ycstr = USetStr(1638);
+    case ChqDepYc: ycstr = USetStr(1437);
+    case ForexTRYc: ycstr = USetStr(1640);
+  end;
+  BlockLoad(YearRec);
+  rwcnt = MatRowCnt(YearRec);
+  for (i=0; i<rwcnt; i=i+1) begin
+    MatRowGet(YearRec,i,Yearrw);
+    if (intyc==Yearrw.IntYc) then begin
+      ycstr = Yearrw.YearCode;
+      goto LYcToStr;
+    end;
+  end;
+LYcToStr:;
+  RETURN;
+END;
+
+global procedure TEST2Rn(record RcVc RepSpec)
+BEGIN
+	record MainVc mainr;
+	record TRVc TRr;
+	row TRVc TRrw;
+	record CLCorspVc CLCorspr;
+	record PRVc PRr;
+	record IVVc IVr;
+	record IPVc IPr;
+	record CLInVc CLInr;
+	record ExpVc Expr;
+	row CLInVc CLInrw;
+	record CLOutVc CLOutr;
+	row CLOutVc CLOutrw;
+	boolean TrHs;
+	integer i,rwcnt;
+	string 20 PRObj,CLCorspObj;
+	string 5 tempStr;
+	integer tab1,tab2,tab3;
+	val tot;
+	
+	tab1 = 0; tab2 = 60; tab3 = 120;
+	startreportnoheaderjob("TEST");
+	if nonblank(RepSpec.f3) then begin
+		StartFormat(15);
+			OutString(tab1,0,"Document",false);
+			OutString(tab2,0,"Date",false);
+			OutString(tab3,0,"Sum",false);
+		EndFormat;
+		PRr.Code = RepSpec.f3;
+		ReadFirstMain(PRr,1,true);
+		PRObj = PRr.Objects;
+		CLCorspr.Code = RepSpec.f3;
+		ReadFirstMain(CLCorspr,1,true);
+		CLCorspObj = CLCorspr.Objects;
+		Mainr.AccNumber = CLCorspr.AccNumber;
+		Mainr.TransDate = RepSpec.sStartDate;
+		TrHs = true;
+		tot = 0;
+		while (loopmain(mainr,2,TrHs)) begin
+			if ((mainr.AccNumber != CLCorspr.AccNumber) or (mainr.TransDate > RepSpec.sEndDate))  then begin
+				TrHs = false;	
+			end;
+			if (TrHs) then begin
+				TRr.Number = mainr.TransNr;
+				TRr.IntYc = mainr.IntYc;
+				if (ReadFirstMain(TRr,2,true)) then begin
+					rwcnt = MatRowCnt(TRr);
+					for (i=0;i<rwcnt;i=i+1) begin
+						MatRowGet(TRr,i,TRrw);
+						if ((SetInSet(RepSpec.f2,TRrw.Objects) or blank(RepSpec.f2)) and (SetInSet(PRObj,TRrw.Objects) or blank(PRObj)) and (SetInSet(CLCorspObj,TRrw.Objects) or blank(CLCorspObj))) then begin
+							Gray_Divider(0,1);
+							StartFormat(15);
+							switch (TRr.IntYc) begin
+								case IVYc:
+									IVr.SerNr = TRr.Number;
+									if (ReadFirstMain(IVr,1,true)) then begin
+										OutStringID(tab1,"DblIVVc",USetStr(35027) & IVr.SerNr,false,FirstTransInRange(USetStr(35027) & IVr.SerNr));
+									end;
+								case IPYc:
+									IPr.SerNr = TRr.Number;
+									if (ReadFirstMain(IPr,1,true)) then begin
+										OutStringID(tab1,"DblIPVcID",USetStr(35028) & IPr.SerNr,false,FirstTransInRange(USetStr(35028) & IPr.SerNr));
+									end;
+								case CLInYc:
+									CLInr.SerNr = TRr.Number;
+									if (ReadFirstMain(CLInr,1,true)) then begin
+										OutStringID(tab1,"DblCLInID",USetStr(35029) & CLInr.SerNr,false,FirstTransInRange(USetStr(35029) & CLInr.SerNr));
+									end;
+								case CLOutYc:
+									CLOutr.SerNr = TRr.Number;
+									if (ReadFirstMain(CLOutr,1,true)) then begin
+										OutStringID(tab1,"DblCLOutID",USetStr(35030) & CLOutr.SerNr,false,FirstTransInRange(USetStr(35030) & CLOutr.SerNr));
+									end;
+								/*case ExpYc:
+									Expr.SerNr = TRr.Number;
+									if (ReadFirstMain(Expr,1,true)) then begin
+										YcToStr(TRr.IntYc,tempStr);
+										OutStringID(tab1,"DblExpVc",tempStr & Expr.SerNr,false,FirstTransInRange(tempStr & Expr.SerNr));
+									end;*/
+								otherwise
+									YcToStr(TRr.IntYc,tempStr);
+									//MessageBox(0,TRr.IntYc);
+									OutStringID(tab1,"DblTrans",tempStr & "." & TRr.Number,false,CurrentCompany);
+							end;
+							OutString(tab2,0,mainr.TransDate,false);
+							if nonblank(TRrw.DebVal)then begin
+								OutString(tab3,0,TRrw.DebVal,false);
+								tot = tot + TRrw.DebVal;
+							end;
+							if nonblank(TRrw.CredVal)then begin
+								OutString(tab2,0,"-" & TRrw.CredVal,false);
+								tot = tot - TRrw.CredVal;
+							end;
+							EndFormat;
+						end;
+					end;
+				end;
+			end;
+		end;
+		Black_Divider(0,1);
+		StartFormat(15);
+			OutString(tab1,0,"Total",false);
+			OutString(tab2,0,"",false);
+			OutString(tab3,0,tot,false);
+		EndFormat;
+	end else begin
+		OutString(0,0,"Please, fill the specification! At least 'Expense Account'",false);
+	end;
+	endjob;
+
+RETURN;
+END;

@@ -1986,7 +1986,22 @@ real h,v,vs,h1;
 		SetWRect(20,80,400,250);
 		v = 6; vs = 20; h = 120;
 		PeriodField(h,v=6,"Period");
+		EditField(h,v+=20,120,"Projects",Normal,f2,false,PRSClass);
 		EditField(h,v+=20,120,"Objects",Normal,f1,false,ObjSClass);
+	EndWindow;
+end;
+
+window TEST2RClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+real h,v,vs,h1;
+	WindowBegin("TEST2RClass",TEST2RClass,CGRcW,RcType);
+		SetWRect(20,80,400,250);
+		v = 6; vs = 20; h = 120;
+		PeriodField(h,v=6,"Period");
+		EditField(h,v+=20,120,"Projects",Normal,f1,false,PRSClass);
+		EditField(h,v+=20,120,"Objects",Normal,f2,false,ObjSClass);
+		EditField(h,v+=20,120,"Expense Account",Normal,f3,false,CLCorspSClass);
 	EndWindow;
 end;
 
