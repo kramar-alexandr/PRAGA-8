@@ -365,6 +365,8 @@ BEGIN
 			delete_file("/tmpxlsx/xl/.DS_Store");
 		end;
 		RunProgram("jar","-cf0M /tmpxlsx.xlsx -C /tmpxlsx/ .");
+		millisleep(200);
+		//deletefolder("/tmpxlsx");
 	end;
 	RETURN;
 END;

@@ -354,6 +354,9 @@ begin
 	mainobj = RepSpec.f1;
 	totalBudget = 0;
 	totalSpend = 0;
+	
+	deletefolder("/tmpxlsx");
+	
 	BlockLoad(BCb);
 	if (blank(RepSpec.f2)) then begin
 		TrHs = true;
@@ -392,7 +395,10 @@ begin
 			fileToSave = "tmpxlsx.xlsx";
 		end else begin
 			fileToSave = "/tmpxlsx.xlsx";
+			//deletefolder("/tmpxlsx");
 		end;
+		
+		
 		XmlXlsxWorkBegin(fileToSave,reportName);
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave);
 		for (k=0;k<qtyOfSheets;k=k+1) begin
