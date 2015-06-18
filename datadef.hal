@@ -89,6 +89,32 @@ begin
 	RecordAddBegin(CLCorspVc,"Myclcorsp");
 		RecordField(Objects,M4UStr,60,ObjVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
   EndRecordAdd;
+  
+  RecordAddBegin(PRVc,"MyPRVc");
+		RecordField(PRMan,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(PRManName,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		
+		RecordField(Suppl1,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl1Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl2,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl2Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl3,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl3Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl4,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl4Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl5,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl5Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl6,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl6Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl7,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl7Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl8,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl8Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl9,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl9Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl10,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		RecordField(Suppl10Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+  EndRecordAdd;
 		
 return;  
 end;

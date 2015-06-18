@@ -2110,7 +2110,8 @@ begin
   MatText(t=18,30,"Quartal",true);// Edit ************************** Friday, 22 May 2015 10:12:52
   MatCol(t,100,"",0,Spec,false,0);// Edit ************************** Friday, 22 May 2015 10:13:17
   
-  MatCol(1,30,"Item",0,ArtCode,false,INSClass);
+  //MatCol(1,30,"Item",0,ArtCode,false,INSClass);// Edit ************************** Thursday, 18 June 2015 17:57:16
+  MatCol(1,30,"Item",0,ArtCode,false,CLCorspSClass);// Edit ************************** Thursday, 18 June 2015 17:57:24
   MatCol(1,100,"Suppl",0,VECode,false,VESClass);
   MatCol(1,155,"Qty",0,Qty,true,0);
   MatCol(1,200,"Foundation",0,ExtraObj,true,Obj3SClass);
@@ -2672,4 +2673,300 @@ begin
 end;
 
 
+window PRDClass:4
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","*")
+begin
+  real h,h2,v,vs,vm;
+  string 255 label;
+  Integer tilenr;
 
+  WindowBegin("Project",PRDClass,CGview,-);
+  UseView(PRVc);
+//  FormName(ProjectForm);
+  FormName(ProjectInfoForm);
+  Sizeable(-1,-1,0,0);
+//  if (GuiType==kGuiAndroid or GUIType==kGuiiPhone) then begin
+  if (false) then begin
+    SetWRect(0,0,320,418);
+
+    h = 200;  h2=h+240; vs = 38;
+  //Tile(0,70+18,false,"",Person);
+    EditField(h,v=6,120,"Code",St_i,Code,false,0); //
+    EditField(h2,v,-30,"Cust. Code",Normal,CustCode,false,CUSClass);
+    EditField(h,v+=vs,-30,"Cust. Name",Normal,CustName,false,0);
+    EditField(h,v+=vs,-30,"Description",Normal,Name,false,0);
+
+    v = v + vs;
+  end else begin
+  SetWRect(20,80,600,390);
+  Tile(0,74,false,"",Code);
+  EditField(h=80,v=6,120,"Project",St_i,Code,false,TSerSClass);
+  if (IsEnterprise) then begin
+    EditField(300,v,-210,"Mother",Normal,MotherCode,false,PRSClass);
+  end;
+  EditField(-100,v,-40,"Class",Normal,PRClass,false,PRClassSClass);
+  EditField(h,v+=20,-210,"Description",Normal,Name,false,0);
+  /*if (IsEnterprise) then begin// Edit ************************** Thursday, 18 June 2015 14:54:26
+    EditField(-100,v,-40,"Phase",Normal,PRStage,false,PRStageSClass);
+  end;*/
+  tilenr = 1;
+  TileButton(tilenr,"Terms"); tilenr = tilenr + 1;
+  //TileButton(tilenr,"Members"); tilenr = tilenr + 1;// Edit ************************** Thursday, 18 June 2015 14:56:34
+  TileButton(tilenr,"Suppliers"); tilenr = tilenr + 1;// Edit ************************** Thursday, 18 June 2015 14:56:41
+  /*TileButton(tilenr,"Down Payments"); tilenr = tilenr + 1;// Edit ************************** Thursday, 18 June 2015 15:11:04
+  if (IsEnterprise) then begin
+    TileButton(tilenr,"Time & Purchases"); tilenr = tilenr + 1;
+    TileButton(tilenr,"#Stock# & Materials"); tilenr = tilenr + 1;
+  end;*/
+  //TileButton(tilenr,"Invoicing"); tilenr = tilenr + 1;// Edit ************************** Thursday, 18 June 2015 15:11:09
+  TileButton(tilenr,"Text"); tilenr = tilenr + 1;
+  tilenr = 1;
+  Tile(tilenr,260,true,tilenr,CustCode); tilenr = tilenr + 1;
+  h=100; h2=h+140; v=6;
+  EditField(h,v,70,"Customer",Normal ,CustCode,false,CUSClass);
+  EditField(h2,v,-40,"Name",ViewOnly,CustName,false,0);
+  EditField(h,v+=20,300,"Contact",Normal,Contact,false,ContactSClass);
+  if (HasObjects) then begin
+    EditField(h,v+=20,300,"Objects",Normal ,Objects,false,ObjSClass);
+  end;
+  if (HasContactClassification) then begin
+    EditField(h,v+=20,300,"Classification",Normal ,PRClassification,false,PRClSClass);
+  end;
+  EditField(h,v+=20,300,"Text",Normal ,Desc0,false,0);
+  EditField(h,v+=20,300,"",Normal ,Desc1,false,0);
+  EditField(h,v+=20,300,"",Normal ,Desc2,false,0);
+  ButtonFrame(h,vm=(v+=45),150,3,"Status");
+  RadioButton(h,v,0,0,"Active",Terminated);
+  RadioButton(h,v+=16,2,0,"No More Transactions",Terminated);
+  RadioButton(h,v+=16,1,0,"Finished",Terminated);
+  /*ButtonFrame(h=280,v=vm,150,3,"Project Type");
+  RadioButton(h,v,0,0,"Invoiceable",Type);
+  RadioButton(h,v+=16,1,255,"Internal",Type);
+  RadioButton(h,v+=16,2,255,"Other",Type);*/
+  /*if (IsEnterprise) then begin
+    ButtonFrame(h=460,v=vm,220,3,"Usage of Items on Project Budget");
+    RadioButton(h,v,0,0,"No Warning",TBIVItemsUsage);
+    RadioButton(h,v+=16,1,255,"Warning",TBIVItemsUsage);
+    RadioButton(h,v+=16,2,255,"Disallow",TBIVItemsUsage);
+  end;*/
+  EditField(-110,v=26,70,"Start Date",Normal ,StartDate,false,PasteCurDate);
+  EditField(-110,v+=20,70,"End Date",Normal ,EndDate,false,PasteCurDate);
+  EditField(-110,v+=20,70,"Finished Date",ViewOnly,FinishedDate,false,0);
+  if (HasMultiCurrency) then begin
+    EditField(-110,v+=20,70,"Project Currency",Normal,CurncyCode,false,CurncyCodeSClass);
+  end;
+  //nk EditField(-110,v+=20,25,"Payment Terms",Normal,PayDeal,false,PDSClass);
+  //nk EditField(-110,v+=20,70,"Cust. Ord. No.",Normal,CustOrdNr,false,0);
+  
+  
+ /* Tile(tilenr,130,false,tilenr,Members); tilenr = tilenr + 1;
+  h=120; h2=300; v=6;
+  EditField(h,v,-40,"Members",Normal,Members,false,UserSClass);
+  label = UserDefined("PRVc","Leader");
+  if (IsEnterprise) then begin
+    if (blank(label)) then begin label = "Project Manager 1";end;
+  end else begin
+    if (blank(label)) then begin label = "Project Manager";end;
+  end;
+  EditField(h,v+=20,70,label,Normal ,Leader,false,UserSClass);
+  EditField(h2,v,-210,"Name",ViewOnly,LeaderName,false,0);
+  if (IsEnterprise) then begin
+    label = UserDefined("PRVc","Leader2");
+    if (blank(label)) then begin label = "Project Manager 2";end;
+    EditField(h,v+=20,70,label,Normal ,Leader2,false,UserSClass);
+    EditField(h2,v,-210,"Name",ViewOnly,Leader2Name,false,0);
+    label = UserDefined("PRVc","Leader3");
+    if (blank(label)) then begin label = "Project Manager 3";end;
+    EditField(h,v+=20,70,label,Normal ,Leader3,false,UserSClass);
+    EditField(h2,v,-210,"Name",ViewOnly,Leader3Name,false,0);
+    label = UserDefined("PRVc","Leader4");
+    if (blank(label)) then begin label = "Project Manager 4";end;
+    EditField(h,v+=20,70,label,Normal ,Leader4,false,UserSClass);
+    EditField(h2,v,-210,"Name",ViewOnly,Leader4Name,false,0);
+    label = UserDefined("PRVc","Leader5");
+    if (blank(label)) then begin label = "Project Manager 5";end;
+    EditField(h,v+=20,70,label,Normal ,Leader5,false,UserSClass);
+    EditField(h2,v,-210,"Name",ViewOnly,Leader5Name,false,0);
+  end;
+  v = 26;
+  if (HasSalesman) then begin
+    EditField(-100,v=26,-40,"#Salesman#",Normal,PrSalesMan,false,UserSClass);
+  end;
+  if (HasSalesGroup) then begin
+    EditField(-100,v+=20,-40,"Sales Group",Normal,SalesGroup,false,SalesGroupSClass);
+  end;*/
+  
+  Tile(tilenr,130,false,tilenr,Members); tilenr = tilenr + 1;
+  h=120; h2=300; v=6;
+  EditField(h,v,70,"Project Manager",Normal,PRMan,false,VESClass);
+  EditField(h2,v,-210,"Name",ViewOnly,PRManName,false,0);
+  
+  EditField(h,v+=20,70,"Supplier 1",Normal,Suppl1,false,VESClass);
+  EditField(h2,v,-210,"Name",ViewOnly,Suppl1Name,false,0);
+  EditField(h,v+=20,70,"Supplier 2",Normal,Suppl2,false,VESClass);
+  EditField(h2,v,-210,"Name",ViewOnly,Suppl2Name,false,0);
+  EditField(h,v+=20,70,"Supplier 3",Normal,Suppl3,false,VESClass);
+  EditField(h2,v,-210,"Name",ViewOnly,Suppl3Name,false,0);
+  EditField(h,v+=20,70,"Supplier 4",Normal,Suppl4,false,VESClass);
+  EditField(h2,v,-210,"Name",ViewOnly,Suppl4Name,false,0);
+  EditField(h,v+=20,70,"Supplier 5",Normal,Suppl5,false,VESClass);
+  EditField(h2,v,-210,"Name",ViewOnly,Suppl5Name,false,0);
+  EditField(h,v+=20,70,"Supplier 6",Normal,Suppl6,false,VESClass);
+  EditField(h2,v,-210,"Name",ViewOnly,Suppl6Name,false,0);
+  EditField(h,v+=20,70,"Supplier 7",Normal,Suppl7,false,VESClass);
+  EditField(h2,v,-210,"Name",ViewOnly,Suppl7Name,false,0);
+  EditField(h,v+=20,70,"Supplier 8",Normal,Suppl8,false,VESClass);
+  EditField(h2,v,-210,"Name",ViewOnly,Suppl8Name,false,0);
+  EditField(h,v+=20,70,"Supplier 9",Normal,Suppl9,false,VESClass);
+  EditField(h2,v,-210,"Name",ViewOnly,Suppl9Name,false,0);
+  EditField(h,v+=20,70,"Supplier 10",Normal,Suppl10,false,VESClass);
+  EditField(h2,v,-210,"Name",ViewOnly,Suppl10Name,false,0);
+  
+  //Tile(tilenr,121,true,tilenr,Math); tilenr = tilenr + 1;
+  /*if (IsEnterprise) then begin
+    StaticText(36,v=14,"Downpayment Invoices Only",false); // and Retentions
+    MatrixBegin(4,v+=25,-32,-20,PRRowType,299);
+//  StaticText(36,v-5,"Date",false);
+//  StaticText(105,v-5,"Inv.No.",false);
+//  StaticText(165,v-5,"Sum",false);
+//  StaticText(255,v-5,"Sign",false);
+//  StaticText(305,v-5,"Comment",false);
+    MatCol(1,32,"Type",0,RowType,false,SetSClass);
+    MatCol(1,120,"Phase",0,PRStage,false,PRStageSClass);
+
+    MatCol(1,170,"Date",0,PlanDate,false,PasteCurDate);
+    MatColTL(1,250,"Inv. No.",0,-1,ViewOnly,-1,InvNr,false,0);
+    MatCol(1,320,"Sum/Retn %",0,ValStr,false,0);
+    MatCol(1,390,"Sign",0,Person,false,UserSClass);
+    MatCol(1,440,"Comment",0,Comment,false,0);
+    MatCol(1,-120,"Inv. Status",0,InvFlag,false,SetSClass);
+
+  end else begin
+    StaticText(36,v=65,"Downpayment Invoices Only",false); // and Retentions
+    MatrixBegin(4,v+=25,-32,-20,PRRowType,299);
+    MatCol(1,30,"Date",0,PlanDate,false,PasteCurDate);
+    MatColTL(1,100,"Inv. No.",0,-1,ViewOnly,-1,InvNr,false,0);
+    MatCol(1,180,"Sum/Prc",0,ValStr,false,0);
+    MatCol(1,250,"Sign",0,Person,false,UserSClass);
+    MatCol(1,300,"Comment",0,Comment,false,0);
+    MatCol(1,-120,"Inv. Status",0,InvFlag,false,SetSClass);
+  end;
+  InsertRowTest;
+  DeleteRowTest;
+  EndMatrix;*/
+  //if (IsEnterprise) then begin
+  //  Tile(tilenr,110,false,tilenr,InvoiceTime); tilenr = tilenr + 1;
+    /*h=140; v=16;
+    ButtonFrame(h=40,vm=v,180,5,"Invoice Times");
+    RadioButton(h,v    ,0,0,"One Row Total",InvoiceTime);
+    RadioButton(h,v+=16,1,0,"By _Groups",InvoiceTime);
+    RadioButton(h,v+=16,2,0,"By _Items",InvoiceTime);
+    RadioButton(h,v+=16,3,0,"By _Transactions",InvoiceTime);
+    RadioButton(h,v+=16,4,0,"By Items/_Person",InvoiceTime);
+    ButtonFrame(h+=200,v=vm,180,5,"Invoice Purchases");
+    RadioButton(h,v    ,0,0,"One Row Total",InvoicePurch);
+    RadioButton(h,v+=16,1,0,"By _Groups",InvoicePurch);
+    RadioButton(h,v+=16,2,0,"By _Items",InvoicePurch);
+    RadioButton(h,v+=16,3,0,"By _Transactions",InvoicePurch);
+    RadioButton(h,v+=16,4,0,"By Items/_Person",InvoicePurch);
+    Tile(tilenr,110,false,tilenr,InvoiceStock); tilenr = tilenr + 1;
+    h=140; v=16;
+    ButtonFrame(h=40,vm=v,180,4,"Invoice #Stocked# Items");
+    RadioButton(h,v    ,0,0,"One Row _Total",InvoiceStock);
+    RadioButton(h,v+=16,1,0,"By _Groups",InvoiceStock);
+    RadioButton(h,v+=16,2,0,"By _Items",InvoiceStock);
+    RadioButton(h,v+=16,3,0,"By _Transactions",InvoiceStock);
+    ButtonFrame(h+=200,v=vm,180,5,"Invoice Materials");
+    RadioButton(h,v    ,0,0,"One Row Total",InvoiceMaterial);
+    RadioButton(h,v+=16,1,0,"By _Groups",InvoiceMaterial);
+    RadioButton(h,v+=16,2,0,"By _Items",InvoiceMaterial);
+    RadioButton(h,v+=16,3,0,"By _Transactions",InvoiceMaterial);
+    RadioButton(h,v+=16,4,0,"By Items/_Person",InvoiceMaterial);*/
+  //end;
+  //Tile(tilenr,260,false,tilenr,CustOrdNr); tilenr = tilenr + 1;
+  /*h=140; v=6;
+  EditField(h=430,v,25,"Payment Terms",Normal,PayDeal,false,PDSClass);
+  EditField(h,v+=20,-40,"Cust. Ord. No.",Normal,CustOrdNr,false,0);
+  EditField(h,v+=20,-40,"E-mail",Normal,Email,false,0);
+  EditField(h,v+=20,70,"First Invoice Date",Normal ,NoInvBefore,false,PasteCurDate);
+  if (HasLanguages) then begin
+    EditField(h,v+=20,70,"Language",Normal,LangCode,false,LangSClass);
+  end;
+  if (IsEnterprise) then begin
+    EditField(h,v+=20,70,"Max. Retention",Normal,MaxRetSum,false,0);
+  end;
+  if (HasLocalization("FIN")) then begin
+    EditField(h,v+=20,135,"Delivery Site Code",Normal,DeliverySiteCode,false,0);
+    EditField(h,v+=20,135,"Work Site Number",Normal,WorkSiteNumber,false,0);
+  end;
+  CheckBox(h,v+=40,0,"Do Not Invoice",StopInvoicing);
+  if (IsEnterprise) then begin
+    CheckBox(h,v+=16,0,"Use WIP",UseWIP);
+  end;
+  ButtonFrame(h=40,vm=(v=25),275,13,"Put On Invoice");
+  if (IsEnterprise) then begin
+    CheckBox(h,v,0,"#Time Sheets#/Activities: Separate Inv. Row",InvSepTB);
+    v = v + 16;
+    CheckBox(h,v,0,"Purch. Invs/Expenses: Separate Inv. Row",InvSepPB);
+    v = v + 16;
+  end;
+  CheckBox(h,v ,0,"Project Code",PRCodeOnInv);
+  CheckBox(h,v+=16,0,"Project Description",PRNameOnInv);
+  CheckBox(h,v+=16,0,"Project Text",PRTextOnInv);
+  CheckBox(h,v+=16,0,"Project Leader",PRLeaderOnInv);
+  CheckBox(h,v+=16,0,"Contact",PRContOnInv);
+  CheckBox(h,v+=16,0,"Period from First to Last Project Trans. Invoiced",PeriodOnInv);
+  if (IsEnterprise) then begin
+    CheckBox(h,v+=16,0,"Include Average Price on Time",TimeAvgPriOnInv);
+    CheckBox(h,v+=16,0,"Include Quantity on Time",TimeAvgQtyOnInv);
+    CheckBox(h,v+=16,0,"Include Average Price on Purchase",PurcAvgPriOnInv);
+    CheckBox(h,v+=16,0,"Include Quantity on Purchase",PurcAvgQtyOnInv);
+  end else begin
+    CheckBox(h,v+=16,0,"Include Average Price on Time & Materials",PurcAvgPriOnInv);
+    CheckBox(h,v+=16,0,"Include Quantity on Time & Materials",PurcAvgQtyOnInv);
+  end;
+  CheckBox(h,v+=16,0,"Items Per Day",ItemPerDay);
+  EndFrame;
+  if (HasModTS and IsEnterprise==false) then begin
+    ButtonFrame(h,v+=70,275,5,"Invoice");
+    RadioButton(h,v    ,0,0,"One Row Total",InvoicePurch);
+    RadioButton(h,v+=16,1,0,"By _Groups",InvoicePurch);
+    RadioButton(h,v+=16,2,0,"By _Items",InvoicePurch);
+    RadioButton(h,v+=16,3,0,"By _Transactions",InvoicePurch);
+    RadioButton(h,v+=16,4,0,"By Items/_Person",InvoicePurch);
+  end;*/
+  Tile(tilenr,220,false,tilenr,Text0); tilenr = tilenr + 1;
+  EditField(h=80,v=6,-40,"Text",Normal,Text0,false,0);
+  EditField(h,v+=20,-40,"",Normal,Text1,false,0);
+  EditField(h,v+=20,-40,"",Normal,Text2,false,0);
+  EditField(h,v+=20,-40,"",Normal,Text3,false,0);
+  EditField(h,v+=20,-40,"",Normal,Text4,false,0);
+  EditField(h,v+=20,-40,"",Normal,Text5,false,0);
+  EditField(h,v+=20,-40,"",Normal,Text6,false,0);
+  EditField(h,v+=20,-40,"",Normal,Text7,false,0);
+  EditField(h,v+=20,-40,"",Normal,Text8,false,0);
+  EditField(h,v+=20,-40,"",Normal,Text9,false,0);
+  SpecialMenu("Project Info",'I',2,"ProInvPRD");
+  SpecialMenu("Project Status",'r',9,"ProStatRnPRD");
+  SpecialMenu("Open Project Budget",' ',6,"OpenTBBUPRD");
+  if (IsEnterprise) then begin
+    SpecialMenu("Open Project Schedule",' ',8,"OpenPRSchedulePRD");
+  end;
+  SpecMenuGroup("",kSpecMenuGroupTypeExtendedPlusMenu,0);
+  if (HasModSL) then begin
+    SpecialMenu("Downpayment Invoice",' ',0,"PRDownPayDsm");
+  end;
+  if (HasObjects) then begin
+    SpecialMenu("Object",'o',1,"CreateObjPRDsm");
+  end;
+  if (IsEnterprise) then begin
+    SpecialMenu("Project Schedule",' ',7,"CreatePRScheduleFromPRD");
+  end;
+  SpecialMenu("Quotation",'q',3,"DoQTFromPRD");
+  if (HasStandardCRM) then begin
+//    SpecialMenu("Activity",'c',4,"CreateActFromPRD");
+  end;
+  SpecialMenu("Project Budget",' ',5,"DoTBBUFromPRD");
+  end;
+  EndWindow;
+end;

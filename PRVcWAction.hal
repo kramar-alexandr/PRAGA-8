@@ -1,0 +1,269 @@
+
+
+function Boolean PRDClassPRManEFAfter(Integer wn,Boolean changedf)
+BEGIN
+  Boolean res;
+  record PRVc PRr;
+  record CUVc CUr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,PRr);
+    CUr.Code = PRr.PRMan;
+    if(readfirstmain(CUr,1,true))then begin
+    	PRr.PRManName = CUr.Name;
+    end else begin
+    	PRr.PRMan = "";
+    	PRr.PRManName = "";
+    end;
+    PutWindowRecord(wn,PRr);
+  end;
+  PRDClassPRManEFAfter = res;
+  return;
+END;
+
+function Boolean PRDClassSuppl1EFAfter(Integer wn,Boolean changedf)
+BEGIN
+  Boolean res;
+  record PRVc PRr;
+  record CUVc CUr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,PRr);
+    CUr.Code = PRr.Suppl1;
+    if(readfirstmain(CUr,1,true))then begin
+    	PRr.Suppl1Name = CUr.Name;
+    end else begin
+    	PRr.Suppl1 = "";
+    	PRr.Suppl1Name = "";
+    end;
+    PutWindowRecord(wn,PRr);
+  end;
+  PRDClassSuppl1EFAfter = res;
+  return;
+END;
+
+function Boolean PRDClassSuppl2EFAfter(Integer wn,Boolean changedf)
+BEGIN
+  Boolean res;
+  record PRVc PRr;
+  record CUVc CUr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,PRr);
+    CUr.Code = PRr.Suppl2;
+    if(readfirstmain(CUr,1,true))then begin
+    	PRr.Suppl2Name = CUr.Name;
+    end else begin
+    	PRr.Suppl2 = "";
+    	PRr.Suppl2Name = "";
+    end;
+    PutWindowRecord(wn,PRr);
+  end;
+  PRDClassSuppl2EFAfter = res;
+  return;
+END;
+
+function Boolean PRDClassSuppl3EFAfter(Integer wn,Boolean changedf)
+BEGIN
+  Boolean res;
+  record PRVc PRr;
+  record CUVc CUr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,PRr);
+    CUr.Code = PRr.Suppl3;
+    if(readfirstmain(CUr,1,true))then begin
+    	PRr.Suppl3Name = CUr.Name;
+    end else begin
+    	PRr.Suppl3 = "";
+    	PRr.Suppl3Name = "";
+    end;
+    PutWindowRecord(wn,PRr);
+  end;
+  PRDClassSuppl3EFAfter = res;
+  return;
+END;
+
+function Boolean PRDClassSuppl4EFAfter(Integer wn,Boolean changedf)
+BEGIN
+  Boolean res;
+  record PRVc PRr;
+  record CUVc CUr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,PRr);
+    CUr.Code = PRr.Suppl4;
+    if(readfirstmain(CUr,1,true))then begin
+    	PRr.Suppl4Name = CUr.Name;
+    end else begin
+    	PRr.Suppl4 = "";
+    	PRr.Suppl4Name = "";
+    end;
+    PutWindowRecord(wn,PRr);
+  end;
+  PRDClassSuppl4EFAfter = res;
+  return;
+END;
+
+function Boolean PRDClassSuppl5EFAfter(Integer wn,Boolean changedf)
+BEGIN
+  Boolean res;
+  record PRVc PRr;
+  record CUVc CUr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,PRr);
+    CUr.Code = PRr.Suppl5;
+    if(readfirstmain(CUr,1,true))then begin
+    	PRr.Suppl5Name = CUr.Name;
+    end else begin
+    	PRr.Suppl5 = "";
+    	PRr.Suppl5Name = "";
+    end;
+    PutWindowRecord(wn,PRr);
+  end;
+  PRDClassSuppl5EFAfter = res;
+  return;
+END;
+
+function Boolean PRDClassSuppl6EFAfter(Integer wn,Boolean changedf)
+BEGIN
+  Boolean res;
+  record PRVc PRr;
+  record CUVc CUr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,PRr);
+    CUr.Code = PRr.Suppl6;
+    if(readfirstmain(CUr,1,true))then begin
+    	PRr.Suppl6Name = CUr.Name;
+    end else begin
+    	PRr.Suppl6 = "";
+    	PRr.Suppl6Name = "";
+    end;
+    PutWindowRecord(wn,PRr);
+  end;
+  PRDClassSuppl6EFAfter = res;
+  return;
+END;
+
+function Boolean PRDClassSuppl7EFAfter(Integer wn,Boolean changedf)
+BEGIN
+  Boolean res;
+  record PRVc PRr;
+  record CUVc CUr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,PRr);
+    CUr.Code = PRr.Suppl7;
+    if(readfirstmain(CUr,1,true))then begin
+    	PRr.Suppl7Name = CUr.Name;
+    end else begin
+    	PRr.Suppl7 = "";
+    	PRr.Suppl7Name = "";
+    end;
+    PutWindowRecord(wn,PRr);
+  end;
+  PRDClassSuppl7EFAfter = res;
+  return;
+END;
+
+function Boolean PRDClassSuppl8EFAfter(Integer wn,Boolean changedf)
+BEGIN
+  Boolean res;
+  record PRVc PRr;
+  record CUVc CUr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,PRr);
+    CUr.Code = PRr.Suppl8;
+    if(readfirstmain(CUr,1,true))then begin
+    	PRr.Suppl8Name = CUr.Name;
+    end else begin
+    	PRr.Suppl8 = "";
+    	PRr.Suppl8Name = "";
+    end;
+    PutWindowRecord(wn,PRr);
+  end;
+  PRDClassSuppl8EFAfter = res;
+  return;
+END;
+
+function Boolean PRDClassSuppl9EFAfter(Integer wn,Boolean changedf)
+BEGIN
+  Boolean res;
+  record PRVc PRr;
+  record CUVc CUr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,PRr);
+    CUr.Code = PRr.Suppl9;
+    if(readfirstmain(CUr,1,true))then begin
+    	PRr.Suppl9Name = CUr.Name;
+    end else begin
+    	PRr.Suppl9 = "";
+    	PRr.Suppl9Name = "";
+    end;
+    PutWindowRecord(wn,PRr);
+  end;
+  PRDClassSuppl9EFAfter = res;
+  return;
+END;
+
+function Boolean PRDClassSuppl10EFAfter(Integer wn,Boolean changedf)
+BEGIN
+  Boolean res;
+  record PRVc PRr;
+  record CUVc CUr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,PRr);
+    CUr.Code = PRr.Suppl10;
+    if(readfirstmain(CUr,1,true))then begin
+    	PRr.Suppl10Name = CUr.Name;
+    end else begin
+    	PRr.Suppl10 = "";
+    	PRr.Suppl10Name = "";
+    end;
+    PutWindowRecord(wn,PRr);
+  end;
+  PRDClassSuppl10EFAfter = res;
+  return;
+END;
+
+global
+function Boolean PRDClassAfterEditField(Integer wn,string fieldname,Integer fn, Integer rownr,Integer changed)
+BEGIN
+  Boolean res;
+	
+	res = inner.PRDClassAfterEditField(wn,fieldname,fn,rownr,changed);
+	
+	switch (fieldname) begin
+		case "PRMan": res = PRDClassPRManEFAfter(wn,changed!=0);
+		
+		case "Suppl1": res = PRDClassSuppl1EFAfter(wn,changed!=0);
+		case "Suppl2": res = PRDClassSuppl2EFAfter(wn,changed!=0);
+		case "Suppl3": res = PRDClassSuppl3EFAfter(wn,changed!=0);
+		case "Suppl4": res = PRDClassSuppl4EFAfter(wn,changed!=0);
+		case "Suppl5": res = PRDClassSuppl5EFAfter(wn,changed!=0);
+		case "Suppl6": res = PRDClassSuppl6EFAfter(wn,changed!=0);
+		case "Suppl7": res = PRDClassSuppl7EFAfter(wn,changed!=0);
+		case "Suppl8": res = PRDClassSuppl8EFAfter(wn,changed!=0);
+		case "Suppl9": res = PRDClassSuppl9EFAfter(wn,changed!=0);
+		case "Suppl10": res = PRDClassSuppl10EFAfter(wn,changed!=0);
+	end;
+	
+  PRDClassAfterEditField = res;
+  RETURN;
+END;
