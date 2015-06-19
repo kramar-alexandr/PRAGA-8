@@ -329,9 +329,9 @@ END;
 global procedure BudgetsObjectsRn(record RcVc RepSpec,var area areatofile)
 begin
 	record BaseCurBlock BCb;
-	record BudRepVc BRr;
+	record BudRepVc BRr,TotBRr;
 	record PRVc PRr;
-	row BudRepVc BRrw;
+	row BudRepVc BRrw,TotBRrw;
 	integer mtrw,i,j,k;
 	array val totalrowbud,totalrowsped,subtotals, totalrow;
 	val totalbubyrow,totalspendbyrow,totalBudget,totalSpend;
@@ -355,7 +355,12 @@ begin
 	totalBudget = 0;
 	totalSpend = 0;
 	
-	deletefolder("/tmpxlsx");
+	if(windowsmode==1)then begin
+		fileToSave = "tmpxlsx.xlsx";
+	end else begin
+		fileToSave = "/tmpxlsx.xlsx";
+	end;
+	deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
 	
 	BlockLoad(BCb);
 	if (blank(RepSpec.f2)) then begin
@@ -369,7 +374,8 @@ begin
 				end;
 			end;
 		end;
-		qtyOfSheets = PRCodesCount;
+		sheetNames[PRCodesCount] = "Total";
+		qtyOfSheets = PRCodesCount + 1;
 		
 		sheetColls[0] = 8.43;
 		sheetColls[1] = 8.43;
@@ -391,20 +397,38 @@ begin
 		
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
-		if(windowsmode==1)then begin
-			fileToSave = "tmpxlsx.xlsx";
-		end else begin
-			fileToSave = "/tmpxlsx.xlsx";
-			//deletefolder("/tmpxlsx");
-		end;
-		
 		
 		XmlXlsxWorkBegin(fileToSave,reportName);
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave);
 		for (k=0;k<qtyOfSheets;k=k+1) begin
 			sheetnum = k + 1;
-			RepSpec.f2 = PRCodes[k];
-			BRrCollect(RepSpec,mainobj,mainobjname,PRrName,BRr);
+			if (sheetNames[k] <> "Total") then begin
+				RepSpec.f2 = PRCodes[k];
+				BRrCollect(RepSpec,mainobj,mainobjname,PRrName,BRr);
+				if (matrowcnt(TotBRr) == 0) then begin
+					RecordClear(TotBRr);
+					TotBRr = BRr;
+				end else begin
+					mtrw = matrowcnt(BRr);
+					For(i=0;i<mtrw;i=i+1) begin
+						matrowget(BRr,i,BRrw);
+						matrowget(TotBRr,i,TotBRrw);
+						TotBRrw.Bud1 = TotBRrw.Bud1 + BRrw.Bud1;
+						TotBRrw.Bud2 = TotBRrw.Bud2 + BRrw.Bud2;
+						TotBRrw.Bud3 = TotBRrw.Bud3 + BRrw.Bud3;
+						TotBRrw.Bud4 = TotBRrw.Bud4 + BRrw.Bud4;
+						TotBRrw.Spend1 = TotBRrw.Spend1 + BRrw.Spend1;
+						TotBRrw.Spend2 = TotBRrw.Spend2 + BRrw.Spend2;
+						TotBRrw.Spend3 = TotBRrw.Spend3 + BRrw.Spend3;
+						TotBRrw.Spend4 = TotBRrw.Spend4 + BRrw.Spend4;
+						matrowput(TotBRr,i,TotBRrw);
+					end;
+				end;
+			end else begin
+				PRrName = "Total";
+				RecordClear(BRr);
+				BRr = TotBRr;
+			end;
 			SetSheetsCols(sheetnum,sheetColls,fileToSave);
 			BeginSheetData(sheetnum,fileToSave);
 				style = 1;
