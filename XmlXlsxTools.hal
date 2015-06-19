@@ -365,7 +365,7 @@ BEGIN
 			delete_file("/tmpxlsx/xl/.DS_Store");
 		end;
 		RunProgram("jar","-cf0M /tmpxlsx.xlsx -C /tmpxlsx/ .");
-		millisleep(200);
+		millisleep(500);
 		//deletefolder("/tmpxlsx");
 	end;
 	RETURN;
@@ -388,6 +388,7 @@ global procedure RunBudgetObjectsRn() begin
 	if(fileexists(filename))then begin
 		delete_file(filename);
 	end;
+	createfile(filename);
 	writeareatofile(fileToSave,filename,0);
 
 return;
