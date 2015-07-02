@@ -2098,7 +2098,7 @@ begin
   end;*/
   Tile(tnr,120,true,tnr,Math); tnr = tnr + 1;
   v=6; h = 20;
-  MatrixBegin(h,vm=(v+=16),-50,-56,-,199);
+  MatrixBegin(h,vm=(v+=16),-50,-56,-,999);
   MatTypedRow(stp);
   Flip(0);
   MatText(t=9,30,"Subtotal",true);
