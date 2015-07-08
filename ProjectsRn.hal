@@ -1,0 +1,413 @@
+external inner procedure ExtractObj(string,var Integer,var string);
+external procedure XmlXlsxWorkBegin(string,string);
+external procedure CreateSheetsXLSX(integer,array string,string);
+external procedure EndSheet(integer,string);
+external procedure SetSheetsCols(integer,array val,string);
+external procedure BeginSheetData(integer,string);
+external procedure EndSheetData(integer,string);
+external procedure BeginRow(integer,string,integer);
+external procedure EndRow(integer,string,var integer);
+external procedure StringCell(integer,string,var integer,integer,integer,string,var array string,var integer,var integer);
+external procedure NumericCell(integer,string,var integer,integer,integer,val);
+external procedure EmptyCell(integer,string,var integer,integer,integer,integer);
+external procedure MergeCells(integer,string,array string,integer);
+external procedure FillSharedStrings(string,array string,integer,integer);
+external procedure ConvertToXLSX(string);
+external function string 255 PathCorrection(string);
+
+procedure ArraysCollect(var array string ArtArrayWithoutGroups, var array string ProjArray, var array string ArtArrayWithGroups)
+BEGIN
+	record ITVc ITr;
+	record INVc INr;
+	record PRVc PRr;
+	integer i,j,k,kw,kwo;
+	boolean TrHs,testf,foundf;
+	string 100 tstr;
+	
+	kw = 0;
+	while(loopmain(ITr,1,true)) begin
+		//ArtArrayWithoutGroups[kwo] = ITr.Code;
+		ArtArrayWithGroups[kw] = ITr.Code;
+		kw = kw + 1;
+		resetloop(INr);
+		INr.Group = ITr.Code;
+		TrHs = true;
+		while(loopkey("Group",INr,1,TrHs)) begin
+			testf = true;
+			if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
+			if (blank(INr.Objects)) then begin testf = false; end;
+			
+			if (testf) then begin
+				tstr = INr.Objects;
+				foundf = false;
+				for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
+					if (ArtArrayWithoutGroups[i]==tstr) then begin
+						foundf = true;
+					end;
+				end; 
+				if (!foundf) then begin
+					ArtArrayWithoutGroups[kwo] = INr.Objects;
+					kwo = kwo + 1;
+					ArtArrayWithGroups[kw] = INr.Objects;
+					kw = kw + 1;
+				end;
+			end;
+		end;
+	end;
+	
+	k = 0;
+	while(loopmain(PRr,1,true)) begin
+		if blank(PRr.MotherCode) then begin
+			ProjArray[k] = PRr.Code;
+			k = k + 1;
+		end;
+	end;
+	for (j=0;j<ProjArray.length-1;j=j+1) begin
+		for (i=0;i<ProjArray.length-1;i=i+1) begin
+			if (ProjArray[i] > ProjArray[i+1]) then begin
+				tstr = ProjArray[i+1];
+				ProjArray[i+1] = ProjArray[i];
+				ProjArray[i] = tstr;
+			end;
+		end;
+	end;
+	RETURN;
+END;
+
+procedure DataCollect(array string ArtArrayWithoutGroups, array string ProjArray, record RcVc RepSpec,
+					var vector val Quart1Vect, var vector val Quart2Vect,
+					var vector val Quart3Vect, var vector val Quart4Vect,
+					var vector val TOTALVect)
+BEGIN
+	record PRVc PRr,PR2r;
+	record TBBUVc TBBUr;
+	record TRVc TRr;
+	record ITVc ITr;
+	row TBBUVc TBBUrw;
+	integer i,k,j,mtrw,PAi;
+	boolean TrHs,testf;
+	string 20 group;
+	
+	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin 
+		k=0;
+		PRr.Code = ProjArray[PAi];
+		If (ReadFirstMain(PRr,1,true)) then begin
+			if (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) then begin
+				TBBUr.PRCode = PRr.Code;
+				if (readfirstmain(TBBUr,1,true)) then begin
+					mtrw = matrowcnt(TBBUr);
+					k = 0;
+					for (i=0;i<mtrw;i=i+1) begin
+						matrowget(TBBUr,i,TBBUrw);
+						if(TBBUrw.stp==18) then begin
+							k = TBBUrw.ItemType;
+						end;
+						if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode) and TBBUrw.ExtraObj==RepSpec.f1) then begin
+							for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
+								if (setinset(ArtArrayWithoutGroups[j],TBBUrw.Objects)) then begin
+								ITr.Code = ArtArrayWithoutGroups[j];
+								ReadLastMain(ITr,1,false);
+								group = ITr.Code;
+									switch(k) begin
+										case 1:
+											Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+											Quart1Vect[group & ":" & ProjArray[PAi]] = Quart1Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+										case 2:
+											Quart2Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart2Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+											Quart2Vect[group & ":" & ProjArray[PAi]] = Quart2Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+										case 3:
+											Quart3Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart3Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+											Quart3Vect[group & ":" & ProjArray[PAi]] = Quart3Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+										case 4:
+											Quart4Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart4Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+											Quart4Vect[group & ":" & ProjArray[PAi]] = Quart4Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+										otherwise
+											Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+											Quart1Vect[group & ":" & ProjArray[PAi]] = Quart1Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+									end;
+									TOTALVect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = TOTALVect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+									TOTALVect[group & ":" & ProjArray[PAi]] = TOTALVect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+								end;
+							end; 
+						end;
+					end; 
+				end;
+
+				PR2r.MotherCode = PRr.Code;
+				TrHs = true;
+				while(loopkey("MotherCode",PR2r,1,TrHs)) begin
+					testf = true;
+					if (PR2r.MotherCode!=PRr.Code) then begin
+						TrHs = false;messagebox(0,PR2r.MotherCode!=PRr.Code);
+						testf = false;
+					end;
+					if (PR2r.StartDate<RepSpec.sStartDate and PR2r.StartDate>RepSpec.sEndDate) then begin
+						testf = false;
+					end;
+					if (testf) then begin
+						TBBUr.PRCode = PR2r.Code;
+						if (readfirstmain(TBBUr,1,true)) then begin
+							mtrw = matrowcnt(TBBUr);
+							k = 0;
+							for (i=0;i<mtrw;i=i+1) begin
+								matrowget(TBBUr,i,TBBUrw);
+								if (TBBUrw.stp==18) then begin
+									k = TBBUrw.ItemType;
+								end;
+								if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode) and TBBUrw.ExtraObj==RepSpec.f1) then begin
+									for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
+										if (setinset(ArtArrayWithoutGroups[j],TBBUrw.Objects)) then begin
+										ITr.Code = ArtArrayWithoutGroups[j];
+										ReadLastMain(ITr,1,false);
+										group = ITr.Code;
+											switch(k) begin
+												case 1:
+													//на пересечении столбец проект - строка статья
+													Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+													//на пересечении столбец проект - строка группа статей
+													Quart1Vect[group & ":" & ProjArray[PAi]] = Quart1Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+												case 2:
+													Quart2Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart2Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+													Quart2Vect[group & ":" & ProjArray[PAi]] = Quart2Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+												case 3:
+													Quart3Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart3Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+													Quart3Vect[group & ":" & ProjArray[PAi]] = Quart3Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+												case 4:
+													Quart4Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart4Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+													Quart4Vect[group & ":" & ProjArray[PAi]] = Quart4Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+												otherwise
+													Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+													Quart1Vect[group & ":" & ProjArray[PAi]] = Quart1Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+											end;
+											TOTALVect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = TOTALVect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+											TOTALVect[group & ":" & ProjArray[PAi]] = TOTALVect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+										end;
+									end; 
+								end;
+							end; 
+						end;
+					end;
+				end;
+			end;
+		end;
+	end;
+	
+	RETURN;
+END;
+
+global
+procedure ProjectsRn(record RcVc RepSpec)
+BEGIN
+	record ITVc ITr;
+	record ObjVc Objr;
+	array string 255 ArtArrayWithoutGroups,ProjArray,ArtArrayWithGroups;
+	vector val Quart1Vect,Quart2Vect,Quart3Vect,Quart4Vect,TOTALVect,PrjTotVect;
+	integer i,j;
+	string 100 group;
+	val totrow;
+	
+	StartReportNoHeaderJob("Projects");
+	ArraysCollect(ArtArrayWithoutGroups,ProjArray,ArtArrayWithGroups);
+	DataCollect(ArtArrayWithoutGroups,ProjArray,RepSpec,Quart1Vect,Quart2Vect,Quart3Vect,Quart4Vect,TOTALVect);
+		StartFormat(15);
+			OutString(0,0,"Projects",false);
+		EndFormat;
+		StartFormat(15);
+			OutString(0,0,"Currency",false);
+		EndFormat;
+		StartFormat(15);
+			OutString(0,0,"Period",false);
+			OutString(0,0,RepSpec.sStartDate & " - " & RepSpec.sEndDate,false);
+		EndFormat;
+		StartFormat(15);
+			OutString(0,0,"",false);
+			OutString(0,0,"",false);
+			OutString(0,0,"",false);
+			for (j=0;j<=4;j=j+1) begin
+				OutString(0,0,RepSpec.f1 & " - Budget",false);
+				for (i=1;i<ProjArray.length;i=i+1) begin
+					OutString(0,0,"",false);
+				end;
+				OutString(0,0,"",false);
+				OutString(0,0,"",false);
+			end;
+		EndFormat;
+		StartFormat(15);
+			OutString(0,0,"",false);
+			OutString(0,0,"",false);
+			OutString(0,0,"",false);
+			for (j=0;j<=4;j=j+1) begin
+				//OutString(0,0,RepSpec.f1 & " - Budget",false);
+				for (i=0;i<ProjArray.length;i=i+1) begin
+					OutString(0,0,ProjArray[i],false);
+				end;
+				OutString(0,0,"",false);
+				OutString(0,0,"",false);
+			end;
+		EndFormat;
+		StartFormat(15);
+			OutString(0,0,"",false);
+			OutString(0,0,"",false);
+			OutString(0,0,"",false);
+			for (i=0;i<ProjArray.length;i=i+1) begin
+				OutString(0,0,"QI",false);
+			end;
+			OutString(0,0,"TOT",false);
+			OutString(0,0,"",false);
+			for (i=0;i<ProjArray.length;i=i+1) begin
+				OutString(0,0,"QII",false);
+			end;
+			OutString(0,0,"TOT",false);
+			OutString(0,0,"",false);
+			for (i=0;i<ProjArray.length;i=i+1) begin
+				OutString(0,0,"QIII",false);
+			end;
+			OutString(0,0,"TOT",false);
+			OutString(0,0,"",false);
+			for (i=0;i<ProjArray.length;i=i+1) begin
+				OutString(0,0,"QIV",false);
+			end;
+			OutString(0,0,"TOT",false);
+			OutString(0,0,"",false);
+			for (i=0;i<ProjArray.length;i=i+1) begin
+				OutString(0,0,"",false);
+			end;
+			OutString(0,0,"Grand Total",false);
+			OutString(0,0,"",false);
+		EndFormat;
+		for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
+			ITr.Code = ArtArrayWithGroups[i];
+			ReadLastMain(ITr,1,false);
+			group = ITr.Code;
+			if ArtArrayWithGroups[i]==group then begin
+				StartFormat(15);
+				EndFormat;
+				StartFormat(15);
+					OutString(0,0,ArtArrayWithGroups[i],false);
+					OutString(0,0,ITr.Comment,false);
+					OutString(0,0,"",false);
+					totrow = 0;
+					for (j=0;j<ProjArray.length;j=j+1) begin
+						OutString(0,0,Quart1Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]],false);
+						totrow = totrow + Quart1Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+						PrjTotVect["Q1:" & ProjArray[j]] = PrjTotVect["Q1:" & ProjArray[j]] + Quart1Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+					end;
+					OutString(0,0,totrow,false);
+					OutString(0,0,"",false);
+					PrjTotVect["Q1:TOTAL"] = PrjTotVect["Q1:TOTAL"] + totrow;
+					totrow = 0;
+					for (j=0;j<ProjArray.length;j=j+1) begin
+						OutString(0,0,Quart2Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]],false);
+						totrow = totrow + Quart2Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+						PrjTotVect["Q2:" & ProjArray[j]] = PrjTotVect["Q2:" & ProjArray[j]] + Quart2Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+					end;
+					OutString(0,0,totrow,false);
+					OutString(0,0,"",false);
+					PrjTotVect["Q2:TOTAL"] = PrjTotVect["Q2:TOTAL"] + totrow;
+					totrow = 0;
+					for (j=0;j<ProjArray.length;j=j+1) begin
+						OutString(0,0,Quart3Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]],false);
+						totrow = totrow + Quart3Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+						PrjTotVect["Q3:" & ProjArray[j]] = PrjTotVect["Q3:" & ProjArray[j]] + Quart3Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+					end;
+					OutString(0,0,totrow,false);
+					OutString(0,0,"",false);
+					PrjTotVect["Q3:TOTAL"] = PrjTotVect["Q3:TOTAL"] + totrow;
+					totrow = 0;
+					for (j=0;j<ProjArray.length;j=j+1) begin
+						OutString(0,0,Quart4Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]],false);
+						totrow = totrow + Quart4Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+						PrjTotVect["Q4:" & ProjArray[j]] = PrjTotVect["Q4:" & ProjArray[j]] + Quart4Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+					end;
+					OutString(0,0,totrow,false);
+					OutString(0,0,"",false);
+					PrjTotVect["Q4:TOTAL"] = PrjTotVect["Q4:TOTAL"] + totrow;
+					totrow = 0;
+					for (j=0;j<ProjArray.length;j=j+1) begin
+						OutString(0,0,TOTALVect[ArtArrayWithGroups[i] & ":" & ProjArray[j]],false);
+						totrow = totrow + TOTALVect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+						PrjTotVect["TOTAL:" & ProjArray[j]] = PrjTotVect["TOTAL:" & ProjArray[j]] + TOTALVect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+					end;
+					OutString(0,0,totrow,false);
+					OutString(0,0,"",false);
+					PrjTotVect["TOTAL:TOTAL"] = PrjTotVect["TOTAL:TOTAL"] + totrow;
+				EndFormat;
+			end else begin
+				StartFormat(15);
+					OutString(0,0,ArtArrayWithGroups[i],false);
+					OutString(0,0,"",false);
+					Objr.Code = ArtArrayWithGroups[i];
+					readfirstmain(Objr,1,true);
+					OutString(0,0,Objr.Comment,false);
+					totrow = 0;
+					for (j=0;j<ProjArray.length;j=j+1) begin
+						OutString(0,0,Quart1Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]],false);
+						totrow = totrow + Quart1Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+					end;
+					OutString(0,0,totrow,false);
+					OutString(0,0,"",false);
+					totrow = 0;
+					for (j=0;j<ProjArray.length;j=j+1) begin
+						OutString(0,0,Quart2Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]],false);
+						totrow = totrow + Quart2Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+					end;
+					OutString(0,0,totrow,false);
+					OutString(0,0,"",false);
+					totrow = 0;
+					for (j=0;j<ProjArray.length;j=j+1) begin
+						OutString(0,0,Quart3Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]],false);
+						totrow = totrow + Quart3Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+					end;
+					OutString(0,0,totrow,false);
+					OutString(0,0,"",false);
+					totrow = 0;
+					for (j=0;j<ProjArray.length;j=j+1) begin
+						OutString(0,0,Quart4Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]],false);
+						totrow = totrow + Quart4Vect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+					end;
+					OutString(0,0,totrow,false);
+					OutString(0,0,"",false);
+					totrow = 0;
+					for (j=0;j<ProjArray.length;j=j+1) begin
+						OutString(0,0,TOTALVect[ArtArrayWithGroups[i] & ":" & ProjArray[j]],false);
+						totrow = totrow + TOTALVect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
+					end;
+					OutString(0,0,totrow,false);
+					OutString(0,0,"",false);
+				EndFormat;
+			end;
+		end;
+		StartFormat(15);
+		EndFormat;
+		StartFormat(15);
+			OutString(0,0,"",false);
+			OutString(0,0,"total costs",false);
+			OutString(0,0,"",false);
+			for (j=0;j<ProjArray.length;j=j+1) begin
+				OutString(0,0,PrjTotVect["Q1:" & ProjArray[j]],false);
+			end;
+			OutString(0,0,PrjTotVect["Q1:TOTAL"],false);
+			OutString(0,0,"",false);
+			for (j=0;j<ProjArray.length;j=j+1) begin
+				OutString(0,0,PrjTotVect["Q2:" & ProjArray[j]],false);
+			end;
+			OutString(0,0,PrjTotVect["Q2:TOTAL"],false);
+			OutString(0,0,"",false);
+			for (j=0;j<ProjArray.length;j=j+1) begin
+				OutString(0,0,PrjTotVect["Q3:" & ProjArray[j]],false);
+			end;
+			OutString(0,0,PrjTotVect["Q3:TOTAL"],false);
+			OutString(0,0,"",false);
+			for (j=0;j<ProjArray.length;j=j+1) begin
+				OutString(0,0,PrjTotVect["Q4:" & ProjArray[j]],false);
+			end;
+			OutString(0,0,PrjTotVect["Q4:TOTAL"],false);
+			OutString(0,0,"",false);
+			for (j=0;j<ProjArray.length;j=j+1) begin
+				OutString(0,0,PrjTotVect["TOTAL:" & ProjArray[j]],false);
+			end;
+			OutString(0,0,PrjTotVect["TOTAL:TOTAL"],false);
+		EndFormat;
+	EndJob;
+	RETURN;
+END;

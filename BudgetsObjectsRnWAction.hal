@@ -1,0 +1,24 @@
+external remote procedure BudgetsObjectsRn(record RcVc,var area);
+
+global
+procedure RunBudgetObjectsRn() begin
+	string 250 filename;
+	area fileToSave;
+	record RcVc RepSpec;
+	integer wn;
+	
+	wn = curwindow;
+	deselectwindow(wn,true);
+	getwindowrecord(wn,RepSpec);
+	filename = SaveFileDialog("Budget Objects Report","","xlsx");
+	if ((filename!="Budget Objects Report") and nonblank(filename)) then begin
+		BudgetsObjectsRn(RepSpec,fileToSave);
+		if(fileexists(filename))then begin
+			delete_file(filename);
+		end;
+		writeareatofile(fileToSave,filename,0);
+		CloseWindow(wn);
+		Messagebox(0,"Done!");
+	end;
+return;
+end;

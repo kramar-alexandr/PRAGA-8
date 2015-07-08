@@ -1,7 +1,7 @@
 external inner procedure ExtractObj(string,var Integer,var string);
 external procedure XmlXlsxWorkBegin(string,string);
-external procedure CreateSheetsXLSX(integer,array string,string);
-external procedure EndSheet(integer,string);
+external procedure CreateSheetsXLSX(integer,array string,string,integer);
+external procedure EndSheet(integer,string,integer);
 external procedure SetSheetsCols(integer,array val,string);
 external procedure BeginSheetData(integer,string);
 external procedure EndSheetData(integer,string);
@@ -326,7 +326,8 @@ RETURN;
 END;
 
 
-global procedure BudgetsObjectsRn(record RcVc RepSpec,var area areatofile)
+global
+procedure BudgetsObjectsRn(record RcVc RepSpec,var area areatofile)
 begin
 	record BaseCurBlock BCb;
 	record BudRepVc BRr,TotBRr;
@@ -399,7 +400,7 @@ begin
 		numOfSharedStrings = 0;
 		
 		XmlXlsxWorkBegin(fileToSave,reportName);
-		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave);
+		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
 		for (k=0;k<qtyOfSheets;k=k+1) begin
 			sheetnum = k + 1;
 			if (sheetNames[k] <> "Total") then begin
@@ -555,16 +556,14 @@ begin
 				end;		
 			EndSheetData(sheetnum,fileToSave);
 			MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
-			EndSheet(sheetnum,fileToSave);
+			EndSheet(sheetnum,fileToSave,0);
 		end;
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		ConvertToXLSX(fileToSave);
 		
-		MilliSleep(200);
+		MilliSleep(2000);
 		addfiletoarea(fileToSave,areatofile,false);
-		//if(fileexists(fileToSave))then begin
-		//	delete_file(fileToSave);
-		//end;
+		delete_file(fileToSave);
 	end else begin	
 		BRrCollect(RepSpec,mainobj,mainobjname,PRrName,BRr);
 
@@ -601,7 +600,7 @@ begin
 			fileToSave = "/tmpxlsx.xlsx";
 		end;
 		XmlXlsxWorkBegin(fileToSave,reportName);
-		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave);
+		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
 		
 		sheetnum = 1;
 		SetSheetsCols(sheetnum,sheetColls,fileToSave);
@@ -730,11 +729,12 @@ begin
 			end;		
 		EndSheetData(sheetnum,fileToSave);
 		MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
-		EndSheet(sheetnum,fileToSave);
+		EndSheet(sheetnum,fileToSave,0);
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		ConvertToXLSX(fileToSave);
-		MilliSleep(200);
+		MilliSleep(2000);
 		addfiletoarea(fileToSave,areatofile,false);
+		delete_file(fileToSave);
 	end;
 /*	startreportnoheaderjob("BudgetsObjects");
 		if (blank(RepSpec.f2)) then begin
