@@ -1,7 +1,8 @@
 external remote procedure BudgetsObjectsRn(record RcVc,var area);
 
 global
-procedure RunBudgetObjectsRn() begin
+procedure RunBudgetObjectsRn()
+begin
 	string 250 filename;
 	area fileToSave;
 	record RcVc RepSpec;

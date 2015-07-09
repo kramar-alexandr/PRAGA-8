@@ -1,0 +1,38 @@
+external remote procedure ProjectRn(record RcVc,var area,var boolean);
+
+global
+procedure RunProjectRn()
+begin
+	string 250 filename,tstr;
+	area fileToSave;
+	record RcVc RepSpec;
+	integer wn;
+	boolean PrjFoundf;
+	
+	wn = curwindow;
+	deselectwindow(wn,true);
+	getwindowrecord(wn,RepSpec);
+	PrjFoundf = true;
+	if (nonblank(RepSpec.f1)) then begin
+		tstr = RepSpec.f1 & "-Projects-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
+		filename = SaveFileDialog(tstr,"","xlsx");
+		if ((filename!=tstr) and nonblank(filename)) then begin
+		//filename = SaveFileDialog("-Projects-","","xlsx");
+		//if ((filename!="-Projects-") and nonblank(filename)) then begin
+			ProjectRn(RepSpec,fileToSave,PrjFoundf);
+			if (PrjFoundf) then begin
+				if(fileexists(filename))then begin
+					delete_file(filename);
+				end;
+				writeareatofile(fileToSave,filename,0);
+				CloseWindow(wn);
+				MessageBox(0,"Done!");
+			end else begin
+				MessageBox(0,"Projects for specified period not found!");
+			end;
+		end;
+	end else begin
+		MessageBox(0,"Input Foundation!");
+	end;
+return;
+end;

@@ -31,17 +31,69 @@ BEGIN
 RETURN;
 END;
 
+global
 function string 10 GetStringCellNum(integer ColNum,integer RowNum)
 BEGIN
 	string 10 res;
-	integer i;
+	integer i,cn,modcn,tmodcn,divcn,endloop;
+	boolean zf;
+	string 1 ch;
 	
-	if (ColNum<26) then begin
-		res = Chr(ColNum+64);
-	end else begin
-		i = (ColNum-1-mod(ColNum-1,26))/26-1;
-		res = Chr(i+65) & Chr(mod(ColNum,26)+64);
+	cn = ColNum;
+	
+	if (ColNum>702 and ColNum<=16384) then begin
+		// AAA to XFD
+		zf = false;
+		modcn = mod(cn,26);
+		divcn = (cn - modcn)/26;
+		if modcn==0 then begin
+			zf = true;
+			cn = cn - 1;
+			modcn = mod(cn,26);
+			divcn = (cn - modcn)/26;
+		end;
+		if zf then begin
+			modcn = modcn + 1;
+		end;
+		ch = Chr(modcn+64);
+		cn = divcn;
+		zf = false;
+		modcn = mod(cn,26);
+		divcn = (cn - modcn)/26;
+		if modcn==0 then begin
+			zf = true;
+			cn = cn - 1;
+			modcn = mod(cn,26);
+			divcn = (cn - modcn)/26;
+		end;
+		if zf then begin
+			modcn = modcn + 1;
+		end;
+		res = Chr(divcn+64) & Chr(modcn+64) & ch;
 	end;
+	
+	if (ColNum>26 and ColNum<703) then begin
+		// AA to ZZ
+		zf = false;
+		modcn = mod(cn,26);
+		divcn = (cn - modcn)/26;
+		if modcn==0 then begin
+			zf = true;
+			cn = cn - 1;
+			modcn = mod(cn,26);
+			divcn = (cn - modcn)/26;
+		end;
+		if zf then begin
+			modcn = modcn + 1;
+		end;
+		res = Chr(divcn+64) & Chr(modcn+64);
+	end;
+	
+	if ColNum<27 then begin
+		// A to Z
+		res = Chr(cn+64);
+	end;
+	
 	res = res & RowNum;
 	GetStringCellNum = res;
 	return;
@@ -347,16 +399,15 @@ BEGIN
 	string 10 r;
 	integer i;
 	
+	r = GetStringCellNum(ColNum, RowNum);
+	path = PathCorrection(pathToXLSX);
 	if (data==BlankVal) then begin
-		EmptyCell(SheetNum,pathToXLSX,ColNum,RowNum,style,1);
+		AddTextToArea("<c r=" & Chr(34) & r & Chr(34) & " s=" & Chr(34) & style & Chr(34) & "><v>" & 0 & "</v></c>",tempArea);
 	end else begin
-		r = GetStringCellNum(ColNum, RowNum);
-
-		path = PathCorrection(pathToXLSX);
 		AddTextToArea("<c r=" & Chr(34) & r & Chr(34) & " s=" & Chr(34) & style & Chr(34) & "><v>" & data & "</v></c>",tempArea);
-		AppendAreaToFile(path & "/xl/worksheets/sheet" & SheetNum & ".xml",tempArea);
-		ColNum = ColNum + 1;
 	end;
+	AppendAreaToFile(path & "/xl/worksheets/sheet" & SheetNum & ".xml",tempArea);
+	ColNum = ColNum + 1;
 	RETURN;
 END;
 

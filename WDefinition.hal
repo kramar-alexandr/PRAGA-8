@@ -2009,14 +2009,15 @@ window BudgetObjectsRClass:1
   wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
 real h,v,vs,h1;
-	WindowBegin("Budgets' Objects",TESTRClass,CGother,RcType);
+	WindowBegin("Budgets' Objects",BudgetObjectsRClass,CGother,RcType);
 		SetWRect(20,80,400,250);
-		v = 6; vs = 20; h = 120;
-		PeriodField(h,v=6,"Period");
+		v = 20; vs = 20; h = 120;
+		StaticText(h,v,"Period",false);
+		EditField(h,v+=10,120,"Start",Normal,sStartDate,false,PasteCurDate);
+		EditField(h,v+=vs,120,"End",Normal,sEndDate,false,PasteCurDate);
 		EditField(h,v+=20,120,"Objects",Normal,f1,false,ObjSClass);
 		EditField(h,v+=20,120,"Projects",Normal,f2,false,PRSClass);
 		HalPushButton(h=50,v+=20,h+110,v+=20,"RunBudgetObjectsRn","Run Budgets' Objects");
-		
 	EndWindow;
 end;
 
@@ -2971,15 +2972,17 @@ begin
   EndWindow;
 end;
 
-window ProjectsRClass:1
+window ProjectRClass:1
 	wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
 real h,v,vs,h1;
-	WindowBegin("Projects Report",ProjectsRClass,CGRcW,RcType);
+	WindowBegin("Project Report",ProjectRClass,CGother,RcType);
 		SetWRect(20,80,400,250);
-		v = 6; vs = 20; h = 120;
-		PeriodField(h,v=6,"Period");
-		EditField(h,v+=20,120,"Foundation",Normal,f1,false,Obj3SClass);
-		//HalPushButton(h=50,v+=20,h+110,v+=20,"RunBudgetObjectsRn","Run");
+		v = 20; vs = 20; h = 120;
+		StaticText(h,v,"Period",false);
+		EditField(h,v+=10,120,"Start",Normal,sStartDate,false,PasteCurDate);
+		EditField(h,v+=vs,120,"End",Normal,sEndDate,false,PasteCurDate);
+		EditField(h,v+=vs,120,"Foundation",Normal,f1,false,Obj3SClass);
+		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunProjectRn","Run");
 	EndWindow;
 end;

@@ -13,7 +13,6 @@ external procedure EmptyCell(integer,string,var integer,integer,integer,integer)
 external procedure MergeCells(integer,string,array string,integer);
 external procedure FillSharedStrings(string,array string,integer,integer);
 external procedure ConvertToXLSX(string);
-external function string 255 PathCorrection(string);
 
 procedure OutStringExcel(Integer position,String func,String printstring,Boolean alignment)
 begin
