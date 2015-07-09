@@ -86,88 +86,20 @@ end;
 procedure BRrCollect(record RcVc RepSpec, string mainobj, var string mainobjname, var string PRrName, var record BudRepVc BRr)
 BEGIN
 	record ObjVc Objr;
-	record ITVc ITr;
-	record INVc INr;
-	record CUVc CUr;
 	record PRVc PRr,PR2r;
 	record TBBUVc TBBUr;
 	record MainVc Mainr;
 	record TRVc TRr;
 	row TBBUVc TBBUrw;
-	row BudRepVc BRrw,BR2rw;
+	row BudRepVc BRrw;
 	row TRVc TRrw;
 	integer i,k,repi,mtrw,repmtrw,pos;
-	boolean TrHs,testf,foundf;
+	boolean TrHs,testf;
 	string 20 prjobj,vendobj,tstr;
 	
-	RecordClear(BRr);
 	Objr.Code = mainobj;
 	readfirstmain(Objr,1,true);
 	mainobjname = Objr.Comment;
-	k = 0;
-//Collect array of all items for every vendor  
-	while(loopmain(ITr,1,true)) begin
-		clearrow(BRr,BRrw,1);
-		BRrw.Code = ITr.Code;
-		BRrw.CatName = ITr.Comment;
-		matrowput(BRr,k,BRrw);
-		k=k+1;
-		resetloop(INr);
-		INr.Group = ITr.Code;
-		TrHs = true;
-		while(loopkey("Group",INr,1,TrHs)) begin
-			testf = true;
-			if(INr.Group!=ITr.Code)then begin testf = false; TrHs = false; end;
-			if(blank(INr.Objects))then begin testf = false; end;
-			
-			if(testf)then begin
-				clearrow(BRr,BRrw,1);
-				BRrw.Code = INr.Objects;
-				Objr.Code = INr.Objects;
-				if(readfirstmain(Objr,1,true))then begin
-					BRrw.Name = Objr.Comment;
-				end;
-				
-				BRrw.CostAcc = INr.CostAcc;
-				
-				repmtrw = matrowcnt(BRr);
-				foundf = false;
-				For(i=0;i<repmtrw;i=i+1) begin
-					matrowget(BRr,i,BR2rw);
-					if(BR2rw.Code==BRrw.Code)then begin
-						foundf = true;
-					end;
-				end; 
-				
-				if(!foundf)then begin
-					CUr.Code = "";
-					while(loopkey("VEActCode",CUr,1,true)) begin
-						if(nonblank(CUr.VEObjects))then begin
-							BRrw.VECode = CUr.VEObjects;
-							matrowput(BRr,k,BRrw);
-							k=k+1;
-						end;
-					end;
-					resetloop(CUr);
-				end;
-				
-				repmtrw = matrowcnt(BRr);
-				foundf = false;
-				For(i=0;i<repmtrw;i=i+1) begin
-					matrowget(BRr,i,BR2rw);
-					if(BR2rw.Code==BRrw.Code and BR2rw.VECode=="")then begin
-						foundf = true;
-					end;
-				end; 
-				if(!foundf)then begin
-					BRrw.VECode = "";
-					matrowput(BRr,k,BRrw);
-					k=k+1;
-				end;
-				
-			end;
-		end;
-	end;
 	repmtrw = matrowcnt(BRr);		
 	k=0;
 	PRr.Code = RepSpec.f2;
@@ -329,17 +261,21 @@ global
 procedure BudgetsObjectsRn(record RcVc RepSpec,var area areatofile)
 begin
 	record BaseCurBlock BCb;
-	record BudRepVc BRr,TotBRr;
+	record BudRepVc BRr,PatternBRr,TotBRr;
 	record PRVc PRr;
-	row BudRepVc BRrw,TotBRrw;
-	integer mtrw,i,j,k;
+	record ITVc ITr;
+	record INVc INr;
+	record CUVc CUr;
+	record ObjVc Objr;
+	row BudRepVc BRrw,PatternBRrw,PatternBR2rw,TotBRrw;
+	integer i,j,k,repi,mtrw,repmtrw;
 	array val totalrowbud,totalrowsped,subtotals, totalrow;
 	val totalbubyrow,totalspendbyrow,totalBudget,totalSpend;
 	string 20 mainobj;
 	string 30 PRrName;
 	string 100 mainobjname;
 	array string 100 PRCodes,PRNames;
-	boolean TrHs;
+	boolean TrHs,testf,foundf;
 	integer PRCodesCount;
 	array string 10 sheetNames;
 	array val sheetColls;
@@ -363,6 +299,71 @@ begin
 	deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
 	
 	BlockLoad(BCb);
+//Collect array of all items for every vendor  
+	k = 0;
+	while(loopmain(ITr,1,true)) begin
+		clearrow(PatternBRr,PatternBRrw,1);
+		PatternBRrw.Code = ITr.Code;
+		PatternBRrw.CatName = ITr.Comment;
+		matrowput(PatternBRr,k,PatternBRrw);
+		k=k+1;
+		resetloop(INr);
+		INr.Group = ITr.Code;
+		TrHs = true;
+		while(loopkey("Group",INr,1,TrHs)) begin
+			testf = true;
+			if(INr.Group!=ITr.Code)then begin testf = false; TrHs = false; end;
+			if(blank(INr.Objects))then begin testf = false; end;
+			
+			if(testf)then begin
+				clearrow(PatternBRr,PatternBRrw,1);
+				PatternBRrw.Code = INr.Objects;
+				Objr.Code = INr.Objects;
+				if(readfirstmain(Objr,1,true))then begin
+					PatternBRrw.Name = Objr.Comment;
+				end;
+				
+				PatternBRrw.CostAcc = INr.CostAcc;
+				
+				repmtrw = matrowcnt(PatternBRr);
+				foundf = false;
+				For(i=0;i<repmtrw;i=i+1) begin
+					matrowget(PatternBRr,i,PatternBR2rw);
+					if(PatternBR2rw.Code==PatternBRrw.Code)then begin
+						foundf = true;
+					end;
+				end; 
+				
+				if(!foundf)then begin
+					CUr.Code = "";
+					while(loopkey("VEActCode",CUr,1,true)) begin
+						if(nonblank(CUr.VEObjects))then begin
+							PatternBRrw.VECode = CUr.VEObjects;
+							matrowput(PatternBRr,k,PatternBRrw);
+							k=k+1;
+						end;
+					end;
+					resetloop(CUr);
+				end;
+				
+				repmtrw = matrowcnt(PatternBRr);
+				foundf = false;
+				For(i=0;i<repmtrw;i=i+1) begin
+					matrowget(PatternBRr,i,PatternBR2rw);
+					if(PatternBR2rw.Code==PatternBRrw.Code and PatternBR2rw.VECode=="")then begin
+						foundf = true;
+					end;
+				end; 
+				if(!foundf)then begin
+					PatternBRrw.VECode = "";
+					matrowput(PatternBRr,k,PatternBRrw);
+					k=k+1;
+				end;
+				
+			end;
+		end;
+	end;
+
 	if (blank(RepSpec.f2)) then begin
 		TrHs = true;
 		while (loopmain(PRr,1,TrHs)) begin
@@ -404,6 +405,8 @@ begin
 			sheetnum = k + 1;
 			if (sheetNames[k] <> "Total") then begin
 				RepSpec.f2 = PRCodes[k];
+				RecordClear(BRr);
+				BRr = PatternBRr;
 				BRrCollect(RepSpec,mainobj,mainobjname,PRrName,BRr);
 				if (matrowcnt(TotBRr) == 0) then begin
 					RecordClear(TotBRr);
@@ -563,7 +566,9 @@ begin
 		MilliSleep(2000);
 		addfiletoarea(fileToSave,areatofile,false);
 		delete_file(fileToSave);
-	end else begin	
+	end else begin
+		RecordClear(BRr);
+		BRr = PatternBRr;
 		BRrCollect(RepSpec,mainobj,mainobjname,PRrName,BRr);
 
 		sheetNames[0] = PRrName;
@@ -740,8 +745,10 @@ begin
 			Outstring(0,0,"Choose the project, please",false);
 			goto LBudgetsObjectsRn;
 		end;		
-//Edit---------------Vitalii 10:50 29.05.2015	
-		BRrCollect(RepSpec,mainobj,mainobjname,PRrName,BRr);		
+//Edit---------------Vitalii 10:50 29.05.2015
+		RecordClear(BRr);
+		BRr = PatternBRr;
+		BRrCollect(RepSpec,mainobj,mainobjname,PRrName,BRr);
 
 		StartFormat(15);
 			Outstring(0,0,"",false);
