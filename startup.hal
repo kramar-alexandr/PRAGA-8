@@ -6,7 +6,7 @@ begin
 	Report("TEST",TESTRClass,TESTRn,0,modTS);
 	Report("TEST2",TEST2RClass,TEST2Rn,0,modTS);
 	Report("Budgets Objects Report",BudgetObjectsRClass,BudgetsObjectsRn,0,modTS);
-	Report("Project Report",ProjectRClass,ProjectRn,0,modTS);
+	Report("Project Foundation Statistics",ProjectRClass,ProjectRn,0,modTS);
 	Export("Budgets Objects Report",BudgetObjectsEClass,BudgetsObjectsRn,modTS);
 	Setting("Uploading a file to MS Excel",ExcelUploadTClass,modTS);
 	
