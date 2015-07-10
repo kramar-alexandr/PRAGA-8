@@ -3,7 +3,7 @@ external remote procedure BudgetsObjectsRn(record RcVc,var area);
 global
 procedure RunBudgetObjectsRn()
 begin
-	string 250 filename;
+	string 255 filename,tstr;
 	area fileToSave;
 	record RcVc RepSpec;
 	integer wn;
@@ -11,8 +11,16 @@ begin
 	wn = curwindow;
 	deselectwindow(wn,true);
 	getwindowrecord(wn,RepSpec);
-	filename = SaveFileDialog("Budget Objects Report","","xlsx");
-	if ((filename!="Budget Objects Report") and nonblank(filename)) then begin
+	tstr = "Budget Report";
+	if nonblank(RepSpec.f2) then begin
+		tstr = tstr & " for Project #" & RepSpec.f2;
+	end;
+	if nonblank(RepSpec.f1) then begin
+		tstr = tstr & " Object-" & RepSpec.f1;
+	end;
+	tstr = tstr & " filled in on " & DateToString(CurrentDate,"DD MM YYYY");
+	filename = SaveFileDialog(tstr,"","xlsx");
+	if ((filename!=tstr) and nonblank(filename)) then begin
 		BudgetsObjectsRn(RepSpec,fileToSave);
 		if(fileexists(filename))then begin
 			delete_file(filename);

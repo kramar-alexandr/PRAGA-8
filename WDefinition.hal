@@ -2976,7 +2976,7 @@ window ProjectRClass:1
 	wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
 real h,v,vs,h1;
-	WindowBegin("Project Report",ProjectRClass,CGother,RcType);
+	WindowBegin("Project Foundation Statistics",ProjectRClass,CGother,RcType);
 		SetWRect(20,80,400,250);
 		v = 20; vs = 20; h = 120;
 		StaticText(h,v,"Period",false);
