@@ -1,29 +1,29 @@
 remote function Integer TBBUApprovalStatus(record TBBUVc,var record AcceptanceRulesVc);
 remote function Integer TBBUTestApprovalStatus(record TBBUVc);
 remote procedure TBBUDClassOnOpenWindowRemote(var record TBBUVc,var Integer);
-external inner function Boolean ReadFirstItem(string,var record INVc,Boolean,Boolean);
+external function Boolean ReadFirstItem(string,var record INVc,Boolean,Boolean);
 remote procedure TBBUDchrsum(var record TBBUVc,Integer,Boolean,Integer);
 remote function Boolean TBBUVc_PasteTimeClass(var record TBBUVc,Integer);
 remote procedure TBBUVc_PastePRCode(var record TBBUVc);
 remote procedure TBBUVc_PasteSalesMan(var record TBBUVc,string);
-external inner function val DivRateToBase1(string,val,val,val,val,val,val,roundmode);
-external inner function val MulRateToBase1(var string,val,val,val,val,val,val,roundmode);
-external inner function Boolean CheckProjectManager(record PRVc);
+external function val DivRateToBase1(string,val,val,val,val,val,val,roundmode);
+external function val MulRateToBase1(var string,val,val,val,val,val,val,roundmode);
+external function Boolean CheckProjectManager(record PRVc);
 remote procedure TBBUVc_PasteCurncyCode(var record TBBUVc,string,Boolean);
 remote function Boolean TBBUVc_PasteQty(var record TBBUVc,Integer);
 remote procedure TBBUVc_PasteEMCode(var record TBBUVc,Integer);
 remote function Boolean TBBUVc_PasteArtCode(var record TBBUVc,Integer,var string);
-external inner function roundmode SetRoundModeD(Integer);
-external inner function roundmode DefaultRoundMode();
-external inner procedure SendArtStat(string,string,string,val,val,val,Date,Integer);
-external inner procedure CalcProc(val,val,var val);
-external inner procedure RecordActionTBBU_Print(var record TBBUVc,string);
-external inner procedure CalcSum(val,val,val,val,var val,Integer);
-external inner procedure CalcExtra(val,string,var val);
-remote procedure TBBUSumup(var record TBBUVc);// Edit ************************** Friday, 3 July 2015 09:40:09
-external inner function Boolean GetItemNameStr(Integer,var string,string,string,string);
+external function roundmode SetRoundModeD(Integer);
+external function roundmode DefaultRoundMode();
+external procedure SendArtStat(string,string,string,val,val,val,Date,Integer);
+external procedure CalcProc(val,val,var val);
+external procedure RecordActionTBBU_Print(var record TBBUVc,string);
+external procedure CalcSum(val,val,val,val,var val,Integer);
+external procedure CalcExtra(val,string,var val);
+remote procedure TBBUSumup(var record TBBUVc);
+external function Boolean GetItemNameStr(Integer,var string,string,string,string);
 remote updating procedure GenProInvoices(var record RcVc,Boolean);
-external inner function Boolean UserCanChangePendingRecord(Integer);
+external function Boolean UserCanChangePendingRecord(Integer);
  
 function Boolean TBBUDClassBudTypeEFAfter(Integer wn,Integer fn,Integer rownr,Integer changedf)
 begin  
@@ -575,8 +575,6 @@ begin
   return;
 end;
 
-
-
 global
 function Boolean TBBUDClassActiveEditField(Integer wn,string fieldname,Integer fn,Integer wnst,Integer rownr,Integer changed)
 BEGIN
@@ -585,14 +583,52 @@ BEGIN
   row TBBUVc TBBUrw;
   Integer nwn;
   
-  res = inner.TBBUDClassActiveEditField(wn,fieldname,fn,wnst,rownr,changed);
-  switch(fieldname)begin
-    case "Spec": 
+  res = true;
+  nwn = FindWindow("SelectApproverWClass");
+  if (nwn>0) then begin
+    if (MotherWindow(nwn)==wn) then begin
+      res = false;
+      goto LTBBUDClassActiveEditField;
+    end;
+  end;
+  GetWindowRecord(wn,TBBUr);
+  if (TBBUApprovalStarted(TBBUr) and UserCanChangePendingRecord(rownr)==false) then begin res = false; end;
+  switch (fieldname) begin
+  	case "Spec":// Edit ************************** Friday, 3 July 2015 09:52:41 
     	getwindowrecord(wn,TBBUr);
       MatRowGet(TBBUr,rownr,TBBUrw);
       switch (TBBUrw.stp) begin
         case 18:
           res = false;
+      end;// Edit ************************** Friday, 3 July 2015 09:52:40
+    case "Cost": 
+      if (rownr>=0) then begin
+        MatRowGet(TBBUr,rownr,TBBUrw);
+        if (nonblank(TBBUrw.EMCode)) then begin
+          res = false;
+        end;
+      end;
+    case "MotherArtCode": res = false;
+    case "RecipeQuant": res = false;
+    case "Recepy": res = false;
+    case "ArtCode": 
+      MatRowGet(TBBUr,rownr,TBBUrw);
+      switch (TBBUrw.stp) begin
+        case kInvoiceRowTypeStructuredItemComponent:
+          res = false;
+      end;
+    case "Quant": 
+      MatRowGet(TBBUr,rownr,TBBUrw);
+      switch (TBBUrw.stp) begin
+        case kInvoiceRowTypeStructuredItemComponent:
+          res = false;
+      end;
+    case "Comment": 
+      if (HasLocalization("PRT")) then begin
+        MatRowGet(TBBUr,rownr,TBBUrw);
+        if (nonblank(TBBUrw.ArtCode)) then begin
+          res = false;
+        end;
       end;
   end;
 LTBBUDClassActiveEditField:;
