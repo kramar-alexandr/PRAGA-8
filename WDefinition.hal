@@ -3357,7 +3357,8 @@ begin
       MatOverStrike(ovst);
       flipnr = 0;
       Flip(flipnr); flipnr = flipnr + 1;
-      MatCol(t=kInvoiceRowTypeNormal,32,"A/C",0,AccNumber,false,AccSClass);
+      //MatCol(t=kInvoiceRowTypeNormal,32,"A/C",0,AccNumber,false,AccSClass);// Edit ************************** Monday, 13 July 2015 11:01:38
+      MatCol(t=kInvoiceRowTypeNormal,32,"Item",0,Item,false,INSClass);// Edit ************************** Monday, 13 July 2015 11:01:39
       if (HasObjects) then begin
         MatCol(t,90,"Objects",0,Objects,false,ObjSClass);
       end;
@@ -3424,7 +3425,8 @@ begin
           MatCol(t=1,pos,"Description",0,Comment,false,0);
         end;
         MatCol(t,-260,"Amount",0,Sum,true,0);
-        MatCol(t,-190,"Item",0,Item,false,INSClass);
+        MatCol(t,-190,"A/C",0,AccNumber,false,AccSClass);// Edit ************************** Monday, 13 July 2015 11:01:21
+        //MatCol(t,-190,"Item",0,Item,false,INSClass);// Edit ************************** Monday, 13 July 2015 11:01:23
         MatCol(t,-130,"Qty",0,qty,true,0);
         if (HasModTS) then begin
           MatCol(t,-100,"Project",0,PRCode,false,PRSClass);
