@@ -82,6 +82,7 @@ begin
 	
 	
 	RecordAddBegin(TBBUVc,"Mytbbu");
+		RecordField(Version,M4Int,0,0);			//Edit----------------------Dima  13.07.2015
 		ArrayField(VECode,M4Code,20,CUVc);
 		ArrayField(ExtraObj,M4Code,20,ObjVc);
 	EndRecordAdd;
@@ -115,6 +116,86 @@ begin
 		RecordField(Suppl10,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
 		RecordField(Suppl10Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
   EndRecordAdd;
-		
+
+
+ RecordBegin(BudgetsHistVc,-,"BUhist");	//Edit----------------------Dima  13.07.2015
+  RecordField(PRCode,M4Code,20,PRVc);
+  RecordField(Version,M4Int,0,0);
+  RecordField(PRName,M4Str,60,0);
+  RecordField(Math,M4Matrix,0,0);  
+  RecordField(SumTime,M4Val,0,0);
+  RecordField(SumOther,M4Val,0,0);
+  RecordField(Comment,M4Str,60,0);
+  RecordField(CustCode,M4Code,20,CUVc);
+  RecordField(CustName,M4Str,60,0);
+  RecordField(SumStocked,M4Val,0,0);
+  RecordField(SumMaterial,M4Val,0,0);
+  RecordField(PRLeader,M4Code,10,UserVc); /* PR Leader */
+  RecordField(Markup,M4PrcStr,10,0);
+	RecordField(SalesMan,M4UStr,60,UserVc);  
+  RecordField(TransDate,M4Date,0,0);
+  RecordField(TotSum,M4Val,0,0);
+  RecordField(CurncyCode,M4Code,5,CurncyCodeVc);
+  RecordField(FrRate,M4Rate,0,0); 
+  RecordField(ToRateB1,M4Rate,0,0);
+  RecordField(ToRateB2,M4Rate,0,0); 
+  RecordField(BaseRate1,M4Rate,0,0); 
+  RecordField(BaseRate2,M4Rate,0,0); 
+  RecordField(Members,M4UStr,200,0);
+  RecordField(AcceptanceStatus,M4Int,0,0);
+  RecordField(AcceptanceBy,M4List,200,UserVc);
+  RecordField(AcceptanceFYI,M4List,200,UserVc);
+  RecordField(CreateDate,M4Date,0,0);
+  RecordField(CreateTime,M4Str,10,0);
+  RecordField(User,M4Str,50,0);
+  ArrayBegin(Math,-,1);
+  ArrayField(ArtCode,M4Code,20,INVc);
+  ArrayField(Spec,M4Str,100,0);
+  ArrayField(Qty,M4UVal,0,0);
+  ArrayField(Price,M423Val,0,0);
+  ArrayField(Discount,M4Qty,0,0);
+  ArrayField(Sum,M4Val,0,0);
+  ArrayField(EMCode,M4Code,10,UserVc);
+  ArrayField(RowType,M4Set,12,0);
+  ArrayField(BudType,M4Set,13,0);
+  ArrayField(ItemType,M4Int,0,0);
+  ArrayField(Comment,M4Str,60,0);
+  ArrayField(Cost,M423Val,0,0);
+  ArrayField(Objects,M4UStr,60,ObjVc);
+  ArrayField(InvDate,M4Date,0,0);
+  ArrayField(FromTBQT,M4Int,0,0);
+  ArrayField(stp,M4Int,0,0);
+  ArrayField(PRStage,M4Code,10,PRStageVc);
+	ArrayField(PRStageSign,M4Code,10,UserVc);
+  ArrayField(MotherArtCode,M4Code,20,INVc);
+  ArrayField(RecipeQuant,M4Qty,0,0);
+	ArrayField(VECode,M4Code,20,CUVc);
+	ArrayField(ExtraObj,M4Code,20,ObjVc);  
+  EndArray;
+  MainKeyBegin(MainKey,0);
+  KeySegment(PRCode);
+  KeySegment(Version);
+  KeyBegin(PRName);
+  KeySegment(PRName);
+  KeySegment(PRCode);
+  KeySegment(Version);
+  KeyBegin(CustCode);
+  KeySegment(CustCode);
+  KeySegment(PRCode);
+  KeySegment(Version);
+  KeyBegin(CustName);
+  KeySegment(CustName);
+  KeySegment(PRCode);
+  KeySegment(Version);
+  KeyBegin(TransDate);
+  KeySegment(TransDate);
+  KeySegment(PRCode);
+	KeySegment(Version);
+  KeyBegin(CreateDate);
+  KeySegment(CreateDate);
+  KeySegment(PRCode);
+	KeySegment(Version);	  
+ EndRecord;    
+
 return;  
 end;

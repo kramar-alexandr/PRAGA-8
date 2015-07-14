@@ -328,6 +328,18 @@ global
 updating function LongInt TBBUVcRecordSave(var record TBBUVc TBBUr,record TBBUVc TBBU2r,LongInt stat,LongInt long4)
 begin
   LongInt res;
+  record BudgetsHistVc BHistr;
+  
+  BHistr.PRCode = TBBUr.PRCode;		//Edit----------------------Dima  13.07.2015
+  if (nonblank(TBBUr.Version)) then begin
+  	if(ReadLastMain(BHistr,1,true)) then begin
+			TBBUr.Version = BHistr.Version + 1;
+		end else begin	
+			TBBUr.Version = 1;
+		end;
+	end else begin 
+		TBBUr.Version = 1;
+	end;
 
   TBBUVcRecordSave = res; 
   return;
@@ -337,6 +349,18 @@ global
 updating function LongInt TBBUVcRecordUpdate(var record TBBUVc TBBUr,record TBBUVc TBBU2r,LongInt stat,LongInt long4)
 begin
   LongInt res;
+  record BudgetsHistVc BHistr;
+  
+  BHistr.PRCode = TBBUr.PRCode;		//Edit----------------------Dima  13.07.2015
+  if (nonblank(TBBUr.Version)) then begin
+  	if(ReadLastMain(BHistr,1,true)) then begin
+			TBBUr.Version = BHistr.Version + 1;
+		end else begin	
+			TBBUr.Version = 1;
+		end;
+	end else begin 
+		TBBUr.Version = 1;
+	end;
 
   TBBUVcRecordUpdate = res; 
   return;

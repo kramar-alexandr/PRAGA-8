@@ -3,6 +3,8 @@ begin
 
 	SetLangMode(LangEnglish,"ENG",0);
 	
+	Register("Budgets History","Budgets History",BudgetsHistVc,modTS);		//Edit----------------------Dima  13.07.2015
+	
 	Report("TEST",TESTRClass,TESTRn,0,modTS);
 	Report("TEST2",TEST2RClass,TEST2Rn,0,modTS);
 	Report("Budgets Objects Report",BudgetObjectsRClass,BudgetsObjectsRn,0,modTS);
@@ -11,6 +13,13 @@ begin
 	Setting("Uploading a file to MS Excel",ExcelUploadTClass,modTS);
 	
 	SString(31000,"Object with this name but with other type already exists");
+	SString(31001,"Current document should be saved");
+	SString(31002,"You should approve this budget before updating");
+	SString(31003,"You are not allowed to create new budget.");
+	
+  StrSetAdd(3);
+  StrSetText(UpdateBudget,"Allow creation new budget version");
+  EndStrSet;	
 	
  return;
 end;  

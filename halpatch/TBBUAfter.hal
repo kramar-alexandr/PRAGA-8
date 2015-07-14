@@ -24,6 +24,7 @@ remote procedure TBBUSumup(var record TBBUVc);
 external function Boolean GetItemNameStr(Integer,var string,string,string,string);
 remote updating procedure GenProInvoices(var record RcVc,Boolean);
 external function Boolean UserCanChangePendingRecord(Integer);
+remote updating procedure CopyBudgetToHistory(record TBBUVc);
  
 function Boolean TBBUDClassBudTypeEFAfter(Integer wn,Integer fn,Integer rownr,Integer changedf)
 begin  
@@ -635,3 +636,120 @@ LTBBUDClassActiveEditField:;
   TBBUDClassActiveEditField = res;
   RETURN;
 END;
+
+
+
+
+global updating procedure CopyBudgetToHistory(record TBBUVc TBBUr)			//Edit----------------------Dima  13.07.2015
+begin
+  row TBBUVc TBBUrw;
+  record BudgetsHistVc BHistr;
+  row BudgetsHistVc BHistrw;  
+  Integer rwcnt,i;
+  
+  
+  RecordNew(BHistr);
+  BHistr.PRCode = TBBUr.PRCode;
+  BHistr.Version = TBBUr.Version;
+  BHistr.PRName = TBBUr.PRName;  
+  BHistr.SumTime = TBBUr.SumTime;
+  BHistr.SumOther = TBBUr.SumOther;
+	BHistr.Comment = TBBUr.Comment;
+  BHistr.CustCode = TBBUr.CustCode;
+  BHistr.CustName = TBBUr.CustName;
+  BHistr.SumStocked = TBBUr.SumStocked;
+  BHistr.SumMaterial = TBBUr.SumMaterial;
+  BHistr.PRLeader = TBBUr.PRLeader;
+  BHistr.Markup = TBBUr.Markup;
+	BHistr.SalesMan = TBBUr.SalesMan;
+  BHistr.TransDate = TBBUr.TransDate;
+  BHistr.TotSum = TBBUr.TotSum;
+  BHistr.CurncyCode = TBBUr.CurncyCode;
+  BHistr.FrRate = TBBUr.FrRate;
+  BHistr.ToRateB1 = TBBUr.ToRateB1;
+  BHistr.ToRateB2 = TBBUr.ToRateB2;
+  BHistr.BaseRate1 = TBBUr.BaseRate1;
+  BHistr.BaseRate2 = TBBUr.BaseRate2;
+  BHistr.Members = TBBUr.Members;
+  BHistr.AcceptanceStatus = TBBUr.AcceptanceStatus;
+  BHistr.AcceptanceBy = TBBUr.AcceptanceBy;
+  BHistr.AcceptanceFYI = TBBUr.AcceptanceFYI;
+  BHistr.CreateDate = CurrentDate;
+  BHistr.CreateTime = CurrentTime;
+  BHistr.User = CurrentUser; 
+  
+  rwcnt = MatRowCnt(TBBUr);
+  for(i=0;i<rwcnt;i=i+1) begin
+		MatRowGet(TBBUr,i,TBBUrw);
+  	BHistrw.ArtCode = TBBUrw.ArtCode;
+  	BHistrw.Spec =TBBUrw.Spec;
+  	BHistrw.Qty = TBBUrw.Qty;
+  	BHistrw.Price = TBBUrw.Price;
+  	BHistrw.Discount = TBBUrw.Discount;
+  	BHistrw.Sum = TBBUrw.Sum;
+  	BHistrw.EMCode = TBBUrw.EMCode;
+  	BHistrw.RowType =TBBUrw.RowType;
+  	BHistrw.BudType = TBBUrw.BudType;
+  	BHistrw.ItemType =  TBBUrw.ItemType;
+  	BHistrw.Comment = TBBUrw.Comment;
+  	BHistrw.Cost = TBBUrw.Cost;
+  	BHistrw.Objects = TBBUrw.Objects;
+  	BHistrw.InvDate = TBBUrw.InvDate;
+  	BHistrw.FromTBQT = TBBUrw.FromTBQT;
+  	BHistrw.stp = TBBUrw.stp;
+  	BHistrw.PRStage = TBBUrw.PRStage;
+		BHistrw.PRStageSign = TBBUrw.PRStageSign;
+  	BHistrw.MotherArtCode = TBBUrw.MotherArtCode;
+  	BHistrw.RecipeQuant = TBBUrw.RecipeQuant;
+		BHistrw.VECode = TBBUrw.VECode;
+		BHistrw.ExtraObj = TBBUrw.ExtraObj;
+		MatRowPut(BHistr,i,BHistrw);
+
+	end;  
+	
+	RecordInsert(BHistr,true);
+  
+end;
+
+
+
+global updating procedure CreateNewBudget()		//Edit----------------------Dima  13.07.2015
+begin
+  record TBBUVc TBBUr;
+  record BudgetsHistVc BHistr;
+  Integer wn;
+  
+  wn = CurWindow;
+  DeselectWindow(wn,false);
+  
+  if (WindowState(wn)!=Rs_normal) then begin
+  	MessageBox(31001,"");
+		goto LCreateNewBudget;
+	end;
+	  
+  GetWindowRecord(wn,TBBUr);
+  
+  if (TBBUr.AcceptanceStatus != kAcceptanceStateApproved) then begin
+	  MessageBox(31002,"");
+  	goto LCreateNewBudget;
+  end;
+  
+  if (UserCanAction("UpdateBudget",false)==false) then begin
+		MessageBox(31003,"");
+		goto LCreateNewBudget;
+	end;  
+  
+  CopyBudgetToHistory(TBBUr);
+  TBBUr.AcceptanceStatus = kAcceptanceStateNotRequired;
+  BHistr.PRCode = TBBUr.PRCode;
+  if(ReadLastMain(BHistr,1,true)) then begin
+		TBBUr.Version = BHistr.Version + 1;
+	end;
+  
+  PutWindowRecord(wn,TBBUr);
+  WindowDoOK(wn,0);
+		
+	  
+  LCreateNewBudget:;
+end;
+

@@ -1,0 +1,14 @@
+
+
+global
+function LongInt BudgetsHistVcRecordRemoveTest(var record BudgetsHistVc BudgetsHistr,record BudgetsHistVc BudgetsHistr,LongInt stat,LongInt long4)
+BEGIN
+  LongInt res;
+
+  res = 0;
+
+  BudgetsHistVcRecordRemoveTest = res;
+  RETURN;
+END;
+
+

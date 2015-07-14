@@ -1,0 +1,20 @@
+
+global
+procedure BudgetsHistDClassButtonFlags(Integer wn,var Boolean duplOK,var Boolean newOK,var Boolean saveOK,var Boolean restOK)
+begin
+  duplOK = false;
+  newOK = false;
+  saveOK = false;
+  return;
+end;
+
+
+global
+function Boolean BudgetsHistDClassUpdateTest(Integer wn)
+begin
+  Boolean res;
+	res = false;
+	
+	BudgetsHistDClassUpdateTest = res;
+  return;
+end;

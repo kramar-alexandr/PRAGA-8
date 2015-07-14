@@ -2062,18 +2062,19 @@ begin
   EditField(h,v+=vs,80, "Customer",St_i,CustCode,false,CUSClass);
   EditField(h2,v,240, "Name",Normal,CustName,false,0);
   EditField(h,v+=vs,80, "Trans. Date",Normal,TransDate,false,PasteCurDate);
+  EditField(h2,v,240, "Version",ViewOnly,Version,false,0);						//Edit----------------------Dima  13.07.2015
   EnterSkip(Math);
   tnr = 1;
-  TileButton(tnr,"Invoicing"); tnr = tnr + 1;
+ // TileButton(tnr,"Invoicing"); tnr = tnr + 1;//Edit----------------------Dima  13.07.2015
   TileButton(tnr,"Items"); tnr = tnr + 1;
   if (HasMultiCurrency or HasBase2) then begin
     //TileButton(tnr,"Currency"); tnr = tnr + 1;
   end;
   //TileButton(tnr,"Text"); tnr = tnr + 1;
-  //TileButton(tnr,"Members"); tnr = tnr + 1;
+  TileButton(tnr,"Members"); tnr = tnr + 1;
   tnr = 1;
-  Tile(tnr,65,false,tnr,Math); tnr = tnr + 1;
-  /*if (IsEnterprise) then begin
+ /* Tile(tnr,65,false,tnr,Math); tnr = tnr + 1;
+  if (IsEnterprise) then begin
     ButtonFrame(h1,vm=(v=20),120,2,"Invoice Time");
     RadioButton(h1,v,0,0,"Actual",BudTime);
     RadioButton(h1,v+=16,1,255,"As Budgeted",BudTime);
@@ -2241,7 +2242,9 @@ begin
   EditField(h,v+=20,-20,"",Normal,Text6,false,0);
   EditField(h,v+=20,-20,"",Normal,Text7,false,0);
   EditField(h,v+=20,-20,"",Normal,Text8,false,0);
-  EditField(h,v+=20,-20,"",Normal,Text9,false,0);
+  EditField(h,v+=20,-20,"",Normal,Text9,false,0);*/
+  
+  
   if (IsEnterprise) then begin
     Tile(tnr,120,false,tnr,Members); tnr = tnr + 1;
   end else begin
@@ -2251,20 +2254,23 @@ begin
       Tile(tnr,80,false,tnr,Members); tnr = tnr + 1;
     end;
   end;
+  h=100;
   EditField(h,vm=(v=6),-170,"Project Members",ViewOnly,Members,false,0);
   EditField(h,v+=vs,50,"Project Manager",Normal,PRLeader,false,0);
-  if (HasLanguages) then begin
-    EditField(h,v+=vs,50,"Language",Normal,LangCode,false,LangSClass);
-  end;
   if (HasSalesman) then begin
     EditField(h2,v=vm+vs,50,"#Salesman#",Normal,SalesMan,false,UserSClass);
   end;
-  if (HasSalesGroup) then begin
-    EditField(h2,v+=vs,50,"Sales Group",Normal,SalesGroup,false,SalesGroupSClass);
-  end;
+
   if (HasApprovals) then begin
-    SoftEditField(h3=570,v,123,"Approval Status",ViewOnly,"AcceptanceStatusFlag",false,0,M4Str,255);
-  end;*/
+    //SoftEditField(h3=570,v,123,"Approval Status",ViewOnly,"AcceptanceStatusFlag",false,0,M4Str,255);
+    ButtonFrame(h,v+=60,123,6,"Approval Status");
+    RadioButton(h,v,kAcceptanceStateNotRequired,0,"Not Required",AcceptanceStatus);
+    RadioButton(h,v+=16,kAcceptanceStateNotStarted,0,"Not Started",AcceptanceStatus);
+    RadioButton(h,v+=16,kAcceptanceStateNotRequested,0,"Not Requested",AcceptanceStatus);
+    RadioButton(h,v+=16,kAcceptanceStatePending,0,"Pending",AcceptanceStatus);
+    RadioButton(h,v+=16,kAcceptanceStateApproved,0,"Approved",AcceptanceStatus);
+    RadioButton(h,v+=16,kAcceptanceStateRejected,0,"Rejected",AcceptanceStatus);
+  end;
    
 
 	SpecialMenu("Create Purchase Order",'u',1,"POFromTBBUDsm");
@@ -2277,7 +2283,9 @@ begin
     SpecialMenu("Add Quartal I Line",'l',3,"HeaderLine1TBBUDsm");
 	SpecialMenu("Add Quartal II Line",'l',4,"HeaderLine2TBBUDsm");  
 	SpecialMenu("Add Quartal III Line",'l',5,"HeaderLine3TBBUDsm");
-	SpecialMenu("Add Quartal IV Line",'l',6,"HeaderLine4TBBUDsm");		
+	SpecialMenu("Add Quartal IV Line",'l',6,"HeaderLine4TBBUDsm");	
+	
+	SpecialMenu("New budget version",'l',6,"CreateNewBudget");			//Edit----------------------Dima  13.07.2015		
 
   SpecMenuGroup("",kSpecMenuGroupTypeExtendedPlusMenu,0);
   if (HasModSL) then begin
@@ -2290,13 +2298,11 @@ begin
 
 
   SpecialMenu("Sales Order",'l',2,"ORFromTBBUDsm");
- 
-
-
 
 //      SpecialMenu("Open Tax Matrix",' ',25,"OpenTaxMatrixTBBUDsm");
   EndWindow;
 end;
+
 
 
 window Obj3SClass:2
@@ -3662,5 +3668,125 @@ begin
       SpecialMenu("#VAT# Correction #P/L#",' ',9,"VATCorrectionVIsm");
     end;
   end;
+  EndWindow;
+end;
+
+
+
+
+window BudgetsHistLClass:1			//Edit----------------------Dima  13.07.2015
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Budgets History",BudgetsHistLClass,CGmlist,-);
+  SpawnClass(BudgetsHistDClass);
+  SetWRect(64,80,700,298);
+  Sizeable(-1,-1,0,0);
+  UseView(BudgetsHistVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,    "Project",PRCode,false,MainKey);
+  RlCol(100,100,"Version",Version,false);
+  RlColKey(145,145,"Date",TransDate,false,TransDate);
+  RlColKey(210,210,"Name",PRName,false,PRName);
+  RlColKey(-220,-220,"Cust.",CustCode,false,CustCode);
+  RlColKey(-160,-160,"Rec. Date",CreateDate,false,CreateDate);
+  RlCol(-85,-35,"Total",TotSum,true);
+  SearchField("Search");
+  EndWindow;
+end;
+
+
+window BudgetsHistDClass:1			//Edit----------------------Dima  13.07.2015
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,h1,h2,h3,t,v,vm,vs;
+  Integer tnr;
+
+  WindowBegin("Project Budget",BudgetsHistDClass,CGview,-);
+  SetWRect(20,80,640,410);
+  Sizeable(-1,-1,0,0);
+  UseView(BudgetsHistVc);
+  vs=20; h=100; h2=260; h1=50; h3 = 600;
+  Tile(0,90,false,"",PRCode);
+  EditField(h,v=6,80, "Project",ViewOnly,PRCode,false,PRSClass);
+  EditField(h2,v,200, "Description",ViewOnly,PRName,false,0);
+  EditField(h3,v,100, "Record Date",ViewOnly,CreateDate,false,0);
+  EditField(h,v+=vs,80, "Customer",ViewOnly,CustCode,false,CUSClass);
+  EditField(h2,v,200, "Name",ViewOnly,CustName,false,0);
+  EditField(h3,v,100, "Record Time",ViewOnly,CreateTime,false,0);
+  EditField(h,v+=vs,80, "Trans. Date",ViewOnly,TransDate,false,PasteCurDate);
+  EditField(h2,v,200, "Version",ViewOnly,Version,false,0);
+  EditField(h3,v,100, "User",ViewOnly,User,false,0);
+  EnterSkip(Math);
+  tnr = 1;
+  TileButton(tnr,"Items"); tnr = tnr + 1;
+  TileButton(tnr,"Members"); tnr = tnr + 1;
+  tnr = 1;
+  Tile(tnr,120,true,tnr,Math); tnr = tnr + 1;
+  v=6; h = 20;
+  MatrixBegin(h,vm=(v+=16),-50,-56,-,999);
+  MatTypedRow(stp);
+  Flip(0);
+  MatText(t=9,30,"Subtotal",true);
+  MatCol(t,100,"",0,Spec,false,0);
+  MatCol(t,-140,"Sum",0,Sum,true,0);
+  MatCol(t,-70,"Cost",0,Cost,true,0);
+  MatText(t=17,30,"Header",true);
+  MatCol(t,100,"",0,Spec,false,0);
+  MatText(t=18,30,"Quartal",true);
+  MatCol(t,100,"",0,Spec,false,0);
+  MatCol(1,30,"Item",0,ArtCode,false,CLCorspSClass);
+  MatCol(1,100,"Suppl",0,VECode,false,VESClass);
+  MatCol(1,155,"Qty",0,Qty,true,0);
+  MatCol(1,200,"Foundation",0,ExtraObj,true,Obj3SClass);
+  MatCol(1,255,"Description",0,Comment,false,0);
+  MatCol(t=kInvoiceRowTypeStructuredItemComponent,30,"Item",0,ArtCode,false,INSClass);
+  MatCol(t,100,"Person",0,EMCode,false,UserSClass);
+  MatCol(t,155,"Qty",0,Qty,true,0);
+  MatCol(t,200,"Description",0,Comment,false,0);
+  Flip(1);
+  MatCol(t=1,-160,"Price",0,Price,true,0);
+  MatCol(t,-80,"Sum",0,Sum,true,0);
+
+  MatCol(t=kInvoiceRowTypeStructuredItemComponent,-285,"Price",0,Price,true,0);
+  MatCol(t,-215,"%",0,Discount,true,0);
+  MatCol(t,-175,"Sum",0,Sum,true,0);
+  MatCol(t,-100,"Phase",0,PRStage,false,PRStageSClass);
+  MatCol(t,-50,"Sign",0,PRStageSign,false,UserSClass);
+  DeleteRowTest;
+  EndMatrix;
+  vs = 22;
+  v = 18; VTab(-35,v,-16,v+vs,ToolFlip,1,"A");
+  //v=v+ vs; VTab(-35,v,-16,v+vs,ToolFlip,2,"B");
+  if (IsEnterprise) then begin
+    //v=v+ vs; VTab(-35,v,-16,v+vs,ToolFlip,5,"E");
+    EditField(63,-25,40,"Currency",ViewOnly,CurncyCode,false,CurncyCodeSClass);
+    EditField(210,-45,80, "Sum Time",ViewOnly,SumTime,true,0);
+    EditField(210,-25,80, "Sum Materials",ViewOnly,SumMaterial,true,0);
+    EditField(400,-45,80, "Sum #Stocked#",ViewOnly,SumStocked,true,0);
+    EditField(400,-25,80, "Sum Purchases",ViewOnly,SumOther,true,0);
+  end;
+  EditField(580,-45,80, "Budget Markup",ViewOnly,Markup,true,0);
+  EditField(580,-25,80, "Total Sum",ViewOnly,TotSum,true,0);  
+  
+ 
+  Tile(tnr,200,false,tnr,Members); tnr = tnr + 1;
+
+  h=100;
+  EditField(h,vm=(v=6),-170,"Project Members",ViewOnly,Members,false,0);
+  EditField(h,v+=vs,50,"Project Manager",ViewOnly,PRLeader,false,0);
+  if (HasSalesman) then begin
+    EditField(h2,v=vm+vs,50,"#Salesman#",ViewOnly,SalesMan,false,UserSClass);
+  end;
+  if (HasApprovals) then begin
+    //SoftEditField(h3=570,v,123,"Approval Status",ViewOnly,"AcceptanceStatusFlag",false,0,M4Str,255);
+    ButtonFrame(h,v+=60,123,6,"Approval Status");
+    RadioButton(h,v,kAcceptanceStateNotRequired,0,"Not Required",AcceptanceStatus);
+    RadioButton(h,v+=16,kAcceptanceStateNotStarted,0,"Not Started",AcceptanceStatus);
+    RadioButton(h,v+=16,kAcceptanceStateNotRequested,0,"Not Requested",AcceptanceStatus);
+    RadioButton(h,v+=16,kAcceptanceStatePending,0,"Pending",AcceptanceStatus);
+    RadioButton(h,v+=16,kAcceptanceStateApproved,0,"Approved",AcceptanceStatus);
+    RadioButton(h,v+=16,kAcceptanceStateRejected,0,"Rejected",AcceptanceStatus);
+  end;
+
   EndWindow;
 end;
