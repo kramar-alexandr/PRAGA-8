@@ -84,55 +84,56 @@ procedure DataCollect(array string ArtArrayWithoutGroups, array string ProjArray
 BEGIN
 	record PRVc PRr,PR2r;
 	record TBBUVc TBBUr;
-	record TRVc TRr;
 	record ITVc ITr;
+	record TRVc TRr;
 	row TBBUVc TBBUrw;
 	integer i,k,j,mtrw,PAi;
 	boolean TrHs,testf;
 	string 20 group;
 	
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin 
-		k=0;
 		PRr.Code = ProjArray[PAi];
-		If (ReadFirstMain(PRr,1,true)) then begin
-			TBBUr.PRCode = PRr.Code;
-			if (readfirstmain(TBBUr,1,true)) then begin
-				mtrw = matrowcnt(TBBUr);
-				k = 0;
-				for (i=0;i<mtrw;i=i+1) begin
-					matrowget(TBBUr,i,TBBUrw);
-					if(TBBUrw.stp==18) then begin
-						k = TBBUrw.ItemType;
-					end;
-					if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode) and TBBUrw.ExtraObj==RepSpec.f1) then begin
-						for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
-							if (setinset(ArtArrayWithoutGroups[j],TBBUrw.Objects)) then begin
-							ITr.Code = ArtArrayWithoutGroups[j];
-							ReadLastMain(ITr,1,false);
-							group = ITr.Code;
-								switch(k) begin
-									case 1:
-										Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-										Quart1Vect[group & ":" & ProjArray[PAi]] = Quart1Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-									case 2:
-										Quart2Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart2Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-										Quart2Vect[group & ":" & ProjArray[PAi]] = Quart2Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-									case 3:
-										Quart3Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart3Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-										Quart3Vect[group & ":" & ProjArray[PAi]] = Quart3Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-									case 4:
-										Quart4Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart4Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-										Quart4Vect[group & ":" & ProjArray[PAi]] = Quart4Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-									otherwise
-										Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-										Quart1Vect[group & ":" & ProjArray[PAi]] = Quart1Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+		if (ReadFirstMain(PRr,1,true)) then begin
+			if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
+				TBBUr.PRCode = PRr.Code;
+				if (readfirstmain(TBBUr,1,true)) then begin
+					mtrw = matrowcnt(TBBUr);
+					k = 0;
+					for (i=0;i<mtrw;i=i+1) begin
+						matrowget(TBBUr,i,TBBUrw);
+						if(TBBUrw.stp==18) then begin
+							k = TBBUrw.ItemType;
+						end;
+						if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode) and TBBUrw.ExtraObj==RepSpec.f1) then begin
+							for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
+								if (setinset(ArtArrayWithoutGroups[j],TBBUrw.Objects)) then begin
+									ITr.Code = ArtArrayWithoutGroups[j];
+									ReadLastMain(ITr,1,false);
+									group = ITr.Code;
+									switch(k) begin
+										case 1:
+											Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+											Quart1Vect[group & ":" & ProjArray[PAi]] = Quart1Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+										case 2:
+											Quart2Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart2Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+											Quart2Vect[group & ":" & ProjArray[PAi]] = Quart2Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+										case 3:
+											Quart3Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart3Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+											Quart3Vect[group & ":" & ProjArray[PAi]] = Quart3Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+										case 4:
+											Quart4Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart4Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+											Quart4Vect[group & ":" & ProjArray[PAi]] = Quart4Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+										otherwise
+											Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+											Quart1Vect[group & ":" & ProjArray[PAi]] = Quart1Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+									end;
+									TOTALVect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = TOTALVect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+									TOTALVect[group & ":" & ProjArray[PAi]] = TOTALVect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
 								end;
-								TOTALVect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = TOTALVect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-								TOTALVect[group & ":" & ProjArray[PAi]] = TOTALVect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-							end;
-						end; 
-					end;
-				end; 
+							end; 
+						end;
+					end; 
+				end;
 			end;
 
 			PR2r.MotherCode = PRr.Code;
@@ -143,7 +144,9 @@ BEGIN
 					TrHs = false;
 					testf = false;
 				end;
-				if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
+				if ((PR2r.StartDate<RepSpec.sStartDate and nonblank(PR2r.EndDate) and PR2r.EndDate>=RepSpec.sStartDate and PR2r.EndDate<=RepSpec.sEndDate) or (PR2r.StartDate>=RepSpec.sStartDate and PR2r.StartDate<=RepSpec.sEndDate) or (PR2r.StartDate<=RepSpec.sStartDate and nonblank(PR2r.EndDate) and PR2r.EndDate>=RepSpec.sEndDate)) then begin
+					testf = true;
+				end else begin
 					testf = false;
 				end;
 				if (testf) then begin
@@ -159,9 +162,9 @@ BEGIN
 							if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode) and TBBUrw.ExtraObj==RepSpec.f1) then begin
 								for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
 									if (setinset(ArtArrayWithoutGroups[j],TBBUrw.Objects)) then begin
-									ITr.Code = ArtArrayWithoutGroups[j];
-									ReadLastMain(ITr,1,false);
-									group = ITr.Code;
+										ITr.Code = ArtArrayWithoutGroups[j];
+										ReadLastMain(ITr,1,false);
+										group = ITr.Code;
 										switch(k) begin
 											case 1:
 												//на пересечении столбец проект - строка статья

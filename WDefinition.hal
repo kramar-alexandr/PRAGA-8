@@ -3881,3 +3881,17 @@ begin
 
   EndWindow;
 end;
+
+window BudgetTotalRClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+real h,v,vs,h1;
+	WindowBegin("Budget Total",BudgetTotalRClass,CGother,RcType);
+		SetWRect(20,80,400,250);
+		v = 20; vs = 20; h = 120;
+		StaticText(h,v,"Period",false);
+		EditField(h,v+=10,120,"Start",Normal,sStartDate,false,PasteCurDate);
+		EditField(h,v+=vs,120,"End",Normal,sEndDate,false,PasteCurDate);
+		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunBudgetTotalRn","Run");
+	EndWindow;
+end;

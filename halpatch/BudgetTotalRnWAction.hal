@@ -1,0 +1,26 @@
+external remote procedure BudgetTotalRn(record RcVc,var area);
+
+global
+procedure RunBudgetTotalRn()
+begin
+	string 255 filename,tstr;
+	area fileToSave;
+	record RcVc RepSpec;
+	integer wn;
+	
+	wn = curwindow;
+	deselectwindow(wn,true);
+	getwindowrecord(wn,RepSpec);
+	tstr = "Budget Total Report" & " filled in on " & DateToString(CurrentDate,"DD MM YYYY");
+	filename = SaveFileDialog(tstr,"","xlsx");
+	if ((filename!=tstr) and nonblank(filename)) then begin
+		BudgetTotalRn(RepSpec,fileToSave);
+		if(fileexists(filename))then begin
+			delete_file(filename);
+		end;
+		writeareatofile(fileToSave,filename,0);
+		CloseWindow(wn);
+		Messagebox(0,"Done!");
+	end;
+return;
+end;
