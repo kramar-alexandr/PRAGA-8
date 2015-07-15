@@ -117,7 +117,6 @@ begin
 		RecordField(Suppl10Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
   EndRecordAdd;
 
-
  RecordBegin(BudgetsHistVc,-,"BUhist");	//Edit----------------------Dima  13.07.2015
   RecordField(PRCode,M4Code,20,PRVc);
   RecordField(Version,M4Int,0,0);
@@ -197,5 +196,17 @@ begin
 	KeySegment(Version);	  
  EndRecord;    
 
+	RecordAddBegin(VIVc,"MyVIVc");
+		ArrayField(Prj,M4UStr,60,ObjVc);
+		ArrayField(Exp,M4UStr,60,ObjVc);
+		ArrayField(Supp,M4UStr,60,ObjVc);
+		ArrayField(Loc,M4UStr,60,ObjVc);
+		ArrayField(SupName,M4Str,100,0);
+	EndRecordAdd;
+	
 return;  
 end;
+
+
+	
+	

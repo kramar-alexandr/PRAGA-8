@@ -2325,6 +2325,85 @@ begin
   EndWindow;
 end;
 
+window ObjPrjSClass:2
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer,iPad,iPhone")
+begin
+  real v;
+  Integer mwn;
+  Boolean contf;
+  
+  WindowBegin("Paste Object",ObjPrjSClass,CGslist,ObjView);
+  DynamicWindow;
+  SpawnClass(ObjDClass);
+  UseView(ObjVc);
+  Sizeable(-1,-1,0,0);
+  SetWRect(220,80,600,298);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,1,    "Object",Code,false,ActSbstOTCode);
+  RlColKey(201,201,"Name",Comment,false,ActSbstComment);
+  SearchField("Search");
+  EndWindow;
+end;
+
+window ObjExpSClass:2
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer,iPad,iPhone")
+begin
+  real v;
+  Integer mwn;
+  Boolean contf;
+  
+  WindowBegin("Paste Object",ObjExpSClass,CGslist,ObjView);
+  DynamicWindow;
+  SpawnClass(ObjDClass);
+  UseView(ObjVc);
+  Sizeable(-1,-1,0,0);
+  SetWRect(220,80,600,298);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,1,    "Object",Code,false,ActSbstOTCode);
+  RlColKey(201,201,"Name",Comment,false,ActSbstComment);
+  SearchField("Search");
+  EndWindow;
+end;
+
+window ObjSuppSClass:2
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer,iPad,iPhone")
+begin
+  real v;
+  Integer mwn;
+  Boolean contf;
+  
+  WindowBegin("Paste Object",ObjSuppSClass,CGslist,ObjView);
+  DynamicWindow;
+  SpawnClass(ObjDClass);
+  UseView(ObjVc);
+  Sizeable(-1,-1,0,0);
+  SetWRect(220,80,600,298);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,1,    "Object",Code,false,ActSbstOTCode);
+  RlColKey(201,201,"Name",Comment,false,ActSbstComment);
+  SearchField("Search");
+  EndWindow;
+end;
+
+window ObjLocSClass:2
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer,iPad,iPhone")
+begin
+  real v;
+  Integer mwn;
+  Boolean contf;
+  
+  WindowBegin("Paste Object",ObjLocSClass,CGslist,ObjView);
+  DynamicWindow;
+  SpawnClass(ObjDClass);
+  UseView(ObjVc);
+  Sizeable(-1,-1,0,0);
+  SetWRect(220,80,600,298);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,1,    "Object",Code,false,ActSbstOTCode);
+  RlColKey(201,201,"Name",Comment,false,ActSbstComment);
+  SearchField("Search");
+  EndWindow;
+end;
 
 window CLInDClass:1
   wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
@@ -3005,7 +3084,7 @@ begin
   Integer pos;
 
   WindowBegin("#Purchase Invoice#",VIDClass,CGview,-);
-  SetWRect(20,80,750,460);
+  SetWRect(20,80,950,460);
   if (IsEnterprise==false) and (HasModNL==false) then begin
   end else begin
     Sizeable(-1,-1,0,0);
@@ -3108,11 +3187,11 @@ begin
         MatCol(t,90,"Description",0,Comment,false,0);
       end;
       MatCol(t,-130,"Amount",0,Sum,true,0);
-      if (CYb.UseTaxTemplatesforTaxCalc!=0) then begin
+      /*if (CYb.UseTaxTemplatesforTaxCalc!=0) then begin// Edit ************************** Wednesday, 15 July 2015 10:11:01
         MatCol(t,-35,"T-Cd",0,TaxTemplateCode,false,TaxTemplateSClass);
       end else begin
         MatCol(t,-35,"#V-Cd#",0,VATCode,false,VATCodeSClass);
-      end;
+      end;*/
 
       MatText(t=kInvoiceRowTypePrepayment,24,"Prepayment Number",true);
       MatCol(t,208,"",0,PrepayNr,false,APPay3SClass);
@@ -3365,9 +3444,9 @@ begin
       Flip(flipnr); flipnr = flipnr + 1;
       //MatCol(t=kInvoiceRowTypeNormal,32,"A/C",0,AccNumber,false,AccSClass);// Edit ************************** Monday, 13 July 2015 11:01:38
       MatCol(t=kInvoiceRowTypeNormal,32,"Item",0,Item,false,INSClass);// Edit ************************** Monday, 13 July 2015 11:01:39
-      if (HasObjects) then begin
+      /*if (HasObjects) then begin// Edit ************************** Wednesday, 15 July 2015 10:16:53
         MatCol(t,90,"Objects",0,Objects,false,ObjSClass);
-      end;
+      end;*/
       MatText(t=6,32,"Prepayment Number",true);
       MatCol(t,208,"",0,PrepayNr,false,APPay3SClass);
       MatCol(t,-266,"",0,Comment,false,0);
@@ -3396,11 +3475,11 @@ begin
       end;
       MatCol(t,-210,"Account",0,AccNumber,false,AccSClass);
       MatCol(t,-110,"Sum",0,Sum,true,0);
-      if (CYb.UseTaxTemplatesforTaxCalc!=0) then begin
+      /*if (CYb.UseTaxTemplatesforTaxCalc!=0) then begin
         MatCol(t,-30,"T-Cd",0,TaxTemplateCode,false,TaxTemplateSClass);
       end else begin
         MatCol(t,-30,"#V-Cd#",0,VATCode,false,VATCodeSClass);
-      end;
+      end;*/
       MatText(t=kInvoiceRowTypeWithholdingTax,32,"Withholding Tax",true);
       MatCol(t,132,"",0,WHTax,false,WHTaxSClass);
       MatCol(t,172,"",0,AccNumber,false,AccSClass);
@@ -3408,22 +3487,34 @@ begin
       MatCol(t,392,"",0,Comment,false,0);
       Flip(flipnr); flipnr = flipnr + 1;
       t = 1; pos = 180;
-      if (HasAdvancedAccounting) then begin
+      /*if (HasAdvancedAccounting) then begin// Edit ************************** Wednesday, 15 July 2015 10:12:32
         MatCol(t,pos,"Short.",0,ACShort,false,ACShortSClass);
         pos = pos + 60;
+      end;*/
+      if (HasObjects) then begin	
+      	
+        //MatCol(t,90,"Objects",0,Objects,false,ObjSClass);
+        MatCol(t,90,"Project",0,Prj,false,ObjPrjSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:18
+        MatCol(t,150,"Expences",0,Exp,false,ObjExpSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
+        MatCol(t,210,"Supplier",0,Supp,false,ObjSuppSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
+        MatCol(t,270,"Location",0,Loc,false,ObjLocSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
       end;
-      MatCol(t,pos,"Description",0,Comment,false,0);
-      MatCol(t,-120,"Amount",0,Sum,true,0);
-      if (CYb.UseTaxTemplatesforTaxCalc!=0) then begin
+      MatCol(t,330,"Suppl. Name",0,SupName,false,0);
+      MatCol(t,400,"Description",0,Comment,false,0);
+      MatCol(t,-80,"Amount",0,Sum,true,0);// Edit ************************** Wednesday, 15 July 2015 10:15:50
+      /*if (CYb.UseTaxTemplatesforTaxCalc!=0) then begin
         MatCol(t,-30,"T-Cd",0,TaxTemplateCode,false,TaxTemplateSClass);
       end else begin
         MatCol(t,-30,"#V-Cd#",0,VATCode,false,VATCodeSClass);
-      end;
+      end;*/
     //  MatCol(t,-30,"TT",0,TaxTemplateCode,false,VATCodeSClass);
       if (HasAdvancedStock or HasModTS or HasModPO) then begin
         Flip(flipnr); flipnr = flipnr + 1;
         pos = 140;
         t=1;
+        if (HasObjects) then begin	
+        	MatCol(t,90,"Objects",0,Objects,false,ObjSClass);// Edit ************************** Wednesday, 15 July 2015 10:18:14
+    		end;
         if (HasAdvancedStock) then begin
           MatCol(t,pos,"Order Type",0,OrderType,false,0);
           MatCol(t,-360,"#Stock# Type",0,StockType,false,SetSClass);
@@ -3437,11 +3528,11 @@ begin
         if (HasModTS) then begin
           MatCol(t,-100,"Project",0,PRCode,false,PRSClass);
         end;
-        if (CYb.UseTaxTemplatesforTaxCalc!=0) then begin
+       /* if (CYb.UseTaxTemplatesforTaxCalc!=0) then begin
           MatCol(t,-30,"T-Cd",0,TaxTemplateCode,false,TaxTemplateSClass);
         end else begin
           MatCol(t,-30,"#V-Cd#",0,VATCode,false,VATCodeSClass);
-        end;
+        end;*/
         MatText(3,270,"",true);
       end;
       if (HasSimAccruals) then begin

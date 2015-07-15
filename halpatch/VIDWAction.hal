@@ -676,6 +676,128 @@ begin
   return;
 end;
 
+
+
+// Edit Start ---------------------------------------------- Edit Start
+	//Wednesday, 15 July 2015 11:21:53
+
+function Boolean VIDClassPrjEFAfter(Integer wn,Integer rownr,Integer changedf)
+begin
+  record VIVc VIr;
+  row VIVc VIrw;
+  Integer rwcnt;
+  Boolean res;
+  string 255 objstr;
+
+  if (changedf!=0) then begin 
+    GetWindowRecord(wn,VIr);
+    if (rownr>-1) then begin
+      rwcnt = MatRowCnt(VIr);
+      if (rownr<rwcnt) then begin
+        MatRowGet(VIr,rownr,VIrw);
+        AddHierObjects(VIrw.Prj,objstr);
+        AutoObj(objstr);
+        VIrw.Prj = objstr;
+        MatRowPut(VIr,rownr,VIrw);
+      end;
+    end;
+    PutWindowRecord(wn,VIr);
+    res = false;
+  end;
+  VIDClassPrjEFAfter = res;
+  
+  return;
+end;
+
+function Boolean VIDClassExpEFAfter(Integer wn,Integer rownr,Integer changedf)
+begin
+  record VIVc VIr;
+  row VIVc VIrw;
+  Integer rwcnt;
+  Boolean res;
+  string 255 objstr;
+
+  if (changedf!=0) then begin 
+    GetWindowRecord(wn,VIr);
+    if (rownr>-1) then begin
+      rwcnt = MatRowCnt(VIr);
+      if (rownr<rwcnt) then begin
+        MatRowGet(VIr,rownr,VIrw);
+        AddHierObjects(VIrw.Exp,objstr);
+        AutoObj(objstr);
+        VIrw.Exp = objstr;
+        MatRowPut(VIr,rownr,VIrw);
+      end;
+    end;
+    PutWindowRecord(wn,VIr);
+    res = false;
+  end;
+  VIDClassExpEFAfter = res;
+  return;
+end;
+
+function Boolean VIDClassSuppEFAfter(Integer wn,Integer rownr,Integer changedf)
+begin
+  record VIVc VIr;
+  row VIVc VIrw;
+  Integer rwcnt;
+  Boolean res;
+  string 255 objstr;
+	record ObjVc Objr;
+	
+  if (changedf!=0) then begin 
+    GetWindowRecord(wn,VIr);
+    if (rownr>-1) then begin
+      rwcnt = MatRowCnt(VIr);
+      if (rownr<rwcnt) then begin
+        MatRowGet(VIr,rownr,VIrw);
+        Objr.Code = VIrw.Supp;
+        if(readfirstmain(Objr,1,true))then begin
+        	VIrw.SupName = Objr.Comment;
+        end;
+        AddHierObjects(VIrw.Supp,objstr);
+        AutoObj(objstr);
+        VIrw.Supp = objstr;
+        MatRowPut(VIr,rownr,VIrw);
+      end;
+    end;
+    PutWindowRecord(wn,VIr);
+    res = false;
+	end;
+  VIDClassSuppEFAfter = res;
+  return;
+end;
+
+function Boolean VIDClassLocEFAfter(Integer wn,Integer rownr,Integer changedf)
+begin
+  record VIVc VIr;
+  row VIVc VIrw;
+  Integer rwcnt;
+  Boolean res;
+  string 255 objstr;
+		
+  if (changedf!=0) then begin 
+    GetWindowRecord(wn,VIr);
+    if (rownr>-1) then begin
+      rwcnt = MatRowCnt(VIr);
+      if (rownr<rwcnt) then begin
+        MatRowGet(VIr,rownr,VIrw);
+        AddHierObjects(VIrw.Loc,objstr);
+        AutoObj(objstr);
+        VIrw.Loc = objstr;
+        MatRowPut(VIr,rownr,VIrw);
+      end;
+    end;
+    PutWindowRecord(wn,VIr);
+    res = false;
+  end;
+  VIDClassLocEFAfter = res;
+  return;
+end;
+
+	// Edit End ---------------------------------------------- Edit End
+	
+
 function Boolean VIDClassItemEFAfter(Integer wn,Integer rownr,Integer changedf)
 begin
   record VIVc VIr;
@@ -699,9 +821,10 @@ begin
           
           if (nonblank(VIrw.Objects)) then begin
             VIrw.Objects = VIrw.Objects & "," & INr.Objects;
-            
+            VIrw.Exp = INr.Objects;// Edit ************************** Wednesday, 15 July 2015 12:19:30
           end else begin
             VIrw.Objects = INr.Objects;
+            VIrw.Exp = INr.Objects;// Edit ************************** Wednesday, 15 July 2015 12:19:32
           end;
         end;
       end;
@@ -753,6 +876,10 @@ BEGIN
     case "TaxTemplateCode": res = VIDClassTaxTemplateCodeEFAfter(wn,rownr,changed);    
     case "Sum": res = VIDClassSumEFAfter(wn,rownr,changed);
     case "Objects": res = VIDClassObjectsEFAfter(wn,rownr,changed);
+    case "Prj": res = VIDClassPrjEFAfter(wn,rownr,changed);// Edit ************************** Wednesday, 15 July 2015 11:21:20
+    case "Exp": res = VIDClassExpEFAfter(wn,rownr,changed);// Edit ************************** Wednesday, 15 July 2015 11:21:19
+    case "Supp": res = VIDClassSuppEFAfter(wn,rownr,changed);// Edit ************************** Wednesday, 15 July 2015 11:21:18
+    case "Loc": res = VIDClassLocEFAfter(wn,rownr,changed);// Edit ************************** Wednesday, 15 July 2015 11:21:16
     case "Item": res = VIDClassItemEFAfter(wn,rownr,changed);   
     case "PRCode": res = VIDClassPRCodeEFAfter(wn,VIr,rownr,changed!=0);
     case "InventoryNr": res = VIDClassInventoryNrEFAfter(wn,VIr,rownr,changed!=0);
@@ -837,6 +964,10 @@ BEGIN
       case kInvoiceRowTypeNormal:
         if (changed!=0) then begin
           switch (fieldname) begin
+          	case "Prj": res = VIDClassPrjEFAfter(wn,rownr,changed);// Edit ************************** Wednesday, 15 July 2015 11:21:20
+						case "Exp": res = VIDClassExpEFAfter(wn,rownr,changed);// Edit ************************** Wednesday, 15 July 2015 11:21:19
+						case "Supp": res = VIDClassSuppEFAfter(wn,rownr,changed);// Edit ************************** Wednesday, 15 July 2015 11:21:18
+						case "Loc": res = VIDClassLocEFAfter(wn,rownr,changed);// Edit ************************** Wednesday, 15 July 2015 11:21:16
             case "TaxTemplateCode":
             otherwise
               VICalcVals(VIr);//why here ? 

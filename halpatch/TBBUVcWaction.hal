@@ -53,3 +53,48 @@ begin
   Obj3SClassOnOpenWindow = false;
   return;
 end;
+
+
+global
+Function Boolean ObjPrjSClassOnOpenWindow(Integer wn)
+begin
+  
+	SetWindowSubset(wn,"PRJ");
+  
+  
+  ObjPrjSClassOnOpenWindow = false;
+  return;
+end;
+
+global
+Function Boolean ObjExpSClassOnOpenWindow(Integer wn)
+begin
+  
+	SetWindowSubset(wn,"EXP");
+  
+  
+  ObjExpSClassOnOpenWindow = false;
+  return;
+end;
+
+global
+Function Boolean ObjSuppSClassOnOpenWindow(Integer wn)
+begin
+  
+	SetWindowSubset(wn,"SUPPL");
+  
+  
+  ObjSuppSClassOnOpenWindow = false;
+  return;
+end;
+
+global
+Function Boolean ObjLocSClassOnOpenWindow(Integer wn)
+begin
+  
+	SetWindowSubset(wn,"LOCAT");
+  
+  
+  ObjLocSClassOnOpenWindow = false;
+  return;
+end;

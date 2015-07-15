@@ -47,7 +47,8 @@ external function Boolean HasIncomeAndExpenseBook();
 
 external procedure VIDDefault(Integer,string,var record VIVc);// Edit ************************** Monday, 13 July 2015 11:16:44
 external procedure VICalcVals(var record VIVc);// Edit ************************** Monday, 13 July 2015 11:16:58
-
+external procedure NormalizeObjstr(var string);// Edit ************************** Wednesday, 15 July 2015 11:04:06
+external procedure NoDupObjs(string,var string);// Edit ************************** Wednesday, 15 July 2015 12:10:47
 
 
 function Boolean CheckPrepaymentAmount(record VIVc VIp,Integer rwcnt)
@@ -988,6 +989,24 @@ what the hell?
                 end;
               end;
               objstr = VIrw.Objects;
+              if(nonblank(VIrw.Prj))then begin
+              	objstr = objstr & "," & VIrw.Prj;// Edit ************************** Wednesday, 15 July 2015 10:59:15
+              end;
+              if(nonblank(VIrw.Loc))then begin
+              	objstr = objstr & "," & VIrw.Loc;// Edit ************************** Wednesday, 15 July 2015 10:59:15
+              end;
+              if(nonblank(VIrw.Exp))then begin
+              	objstr = objstr & "," & VIrw.Exp;// Edit ************************** Wednesday, 15 July 2015 10:59:15
+              end;
+              if(nonblank(VIrw.Supp))then begin
+              	objstr = objstr & "," & VIrw.Supp;// Edit ************************** Wednesday, 15 July 2015 10:59:15
+              end;
+              
+              NoDupObjs(objstr,objstr);
+              NormalizeObjstr(objstr);// Edit ************************** Wednesday, 15 July 2015 11:05:34
+              VIrw.Objects = objstr;// Edit ************************** Wednesday, 15 July 2015 11:05:33
+              matrowput(VIp,i,VIrw);// Edit ************************** Wednesday, 15 July 2015 11:09:29
+              
               if (APAccb.SkipObjectsOnVIFromHeader==0) then begin
                 if (nonblank(VIp.Objects)) then begin
                    if (nonblank(objstr)) then begin
@@ -996,6 +1015,8 @@ what the hell?
                   objstr = objstr & VIp.Objects;
                 end;  
               end;
+              
+              
               errcode = CheckObjs(VIrw.AccNumber,objstr,errstr);
               if (errcode!=0) then begin
                 RecordCheckError(errcode,errstr,i,"Objects");      
