@@ -211,7 +211,6 @@ BEGIN
 	string 100 group,nextgroup;
 	val totrow;
 	
-	logtext(0,"ProjectRn is runing");
 	array string 10 sheetNames;
 	array val sheetColls;
 	array string 21 mergeCell;
@@ -222,6 +221,7 @@ BEGIN
 	integer numOfUniqueSharedStrings,numOfSharedStrings,qtyMergeCell;
 	string 16 reportName;
 	
+	logtext(0,"ProjectRn is runing");
 	ArraysCollect(RepSpec,ArtArrayWithoutGroups,ProjArray,ArtArrayWithGroups,PrjFoundf);
 	if (PrjFoundf) then begin
 		DataCollect(ArtArrayWithoutGroups,ProjArray,RepSpec,Quart1Vect,Quart2Vect,Quart3Vect,Quart4Vect,TOTALVect);
