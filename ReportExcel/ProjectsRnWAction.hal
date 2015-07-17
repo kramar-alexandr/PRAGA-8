@@ -1,4 +1,4 @@
-external remote procedure ProjectRn(record RcVc,var area,var boolean);
+remote procedure ProjectRn(record RcVc,var area,var boolean);
 
 global
 procedure RunProjectRn()

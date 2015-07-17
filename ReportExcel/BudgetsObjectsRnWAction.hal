@@ -1,4 +1,4 @@
-external remote procedure BudgetsObjectsRn(record RcVc,var area);
+remote procedure BudgetsObjectsRn(record RcVc,var area);
 
 global
 procedure RunBudgetObjectsRn()
