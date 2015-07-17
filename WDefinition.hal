@@ -3499,8 +3499,8 @@ begin
         MatCol(t,210,"Supplier",0,Supp,false,ObjSuppSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
         MatCol(t,270,"Location",0,Loc,false,ObjLocSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
       end;
-      MatCol(t,330,"Suppl. Name",0,SupName,false,0);
-      MatCol(t,400,"Description",0,Comment,false,0);
+      MatCol(t,380,"Suppl. Name",0,SupName,false,0);
+      MatCol(t,520,"Description",0,Comment,false,0);
       MatCol(t,-80,"Amount",0,Sum,true,0);// Edit ************************** Wednesday, 15 July 2015 10:15:50
       /*if (CYb.UseTaxTemplatesforTaxCalc!=0) then begin
         MatCol(t,-30,"T-Cd",0,TaxTemplateCode,false,TaxTemplateSClass);
