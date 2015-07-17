@@ -3516,8 +3516,8 @@ begin
         	MatCol(t,90,"Objects",0,Objects,false,ObjSClass);// Edit ************************** Wednesday, 15 July 2015 10:18:14
     		end;
         if (HasAdvancedStock) then begin
-          MatCol(t,pos,"Order Type",0,OrderType,false,0);
-          MatCol(t,-360,"#Stock# Type",0,StockType,false,SetSClass);
+          //MatCol(t,pos,"Order Type",0,OrderType,false,0);
+          //MatCol(t,-360,"#Stock# Type",0,StockType,false,SetSClass);
         end else begin
           MatCol(t=1,pos,"Description",0,Comment,false,0);
         end;
