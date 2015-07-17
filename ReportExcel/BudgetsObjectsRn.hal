@@ -1,4 +1,4 @@
-external inner procedure ExtractObj(string,var Integer,var string);
+external procedure ExtractObj(string,var Integer,var string);
 external procedure XmlXlsxWorkBegin(string,string);
 external procedure CreateSheetsXLSX(integer,array string,string,integer);
 external procedure EndSheet(integer,string,integer);
