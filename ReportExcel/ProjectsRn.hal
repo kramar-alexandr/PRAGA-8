@@ -211,6 +211,7 @@ BEGIN
 	string 100 group,nextgroup;
 	val totrow;
 	
+	logtext(0,"ProjectRn is runing");
 	array string 10 sheetNames;
 	array val sheetColls;
 	array string 21 mergeCell;

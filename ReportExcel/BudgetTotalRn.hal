@@ -141,6 +141,7 @@ BEGIN
 	integer i,j;
 	vector val FPVect;
 	
+	logtext(0,"BudgetTotalRn is runing");
 	array string 10 sheetNames;
 	array val sheetColls;
 	array string 21 mergeCell;

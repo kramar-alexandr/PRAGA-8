@@ -8,6 +8,7 @@ begin
 	record RcVc RepSpec;
 	integer wn;
 	
+	logtext(0,"RunBudgetTotalRn is runing");
 	wn = curwindow;
 	deselectwindow(wn,true);
 	getwindowrecord(wn,RepSpec);

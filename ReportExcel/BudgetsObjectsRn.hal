@@ -286,6 +286,7 @@ begin
 	integer numOfUniqueSharedStrings,numOfSharedStrings,qtyMergeCell;
 	string 16 reportName;
 	
+	logtext(0,"BudgetsObjectsRn is runing");
 	reportName = "BudgetsObjectsRn"	;
 	mainobj = RepSpec.f1;
 	totalBudget = 0;
