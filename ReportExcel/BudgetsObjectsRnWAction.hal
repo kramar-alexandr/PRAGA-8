@@ -25,7 +25,8 @@ begin
 		tick = GetCurTick;
 		RepSpec.FirstVer = tick;
 		RepSpec.repname = "BudgetsObjectsRn";
-		RunReport(RepSpec,0);
+		BudgetsObjectsRn(RepSpec);
+		//RunReport(RepSpec,0);
 		BudgetsObjectsArea(tick,fileToSave);
 		if(fileexists(filename))then begin
 			delete_file(filename);
