@@ -362,31 +362,30 @@ BEGIN
 							for (PRi=0;PRi<PRrCodes.length;PRi=PRi+1) begin
 								if setinset(prjobjs[PRi],TRrw.Objects) then begin
 									BRr = ArrayBRr[PRrCodes[PRi]];
+									repmtrw = matrowcnt(BRr);
+									for (repi=0;repi<repmtrw;repi=repi+1) begin
+										matrowget(BRr,repi,BRrw);
+										if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))) then begin
+											k = GetQuartal(TRr.TransDate);
+											switch (k) begin
+												case 1:
+													BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
+												case 2:
+													BRrw.Spend2 = BRrw.Spend2 - TRrw.CredVal + TRrw.DebVal;
+												case 3:
+													BRrw.Spend3 = BRrw.Spend3 - TRrw.CredVal + TRrw.DebVal;
+												case 4:
+													BRrw.Spend4 = BRrw.Spend4 - TRrw.CredVal + TRrw.DebVal;
+												otherwise
+													BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;	//I Quartal as default
+											end;													
+											matrowput(BRr,repi,BRrw);
+										end;
+									end;
+									ArrayBRr[PRrCodes[PRi]] = BRr;
 									PRi = PRrCodes.length;
 								end;
 							end;
-							repmtrw = matrowcnt(BRr);
-							for (repi=0;repi<repmtrw;repi=repi+1) begin
-								matrowget(BRr,repi,BRrw);
-								if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))) then begin
-									k = GetQuartal(TRr.TransDate);
-									switch (k) begin
-										case 1:
-											BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
-										case 2:
-											BRrw.Spend2 = BRrw.Spend2 - TRrw.CredVal + TRrw.DebVal;
-messagebox(0,BRrw.Spend2 & "   " & repi);
-										case 3:
-											BRrw.Spend3 = BRrw.Spend3 - TRrw.CredVal + TRrw.DebVal;
-										case 4:
-											BRrw.Spend4 = BRrw.Spend4 - TRrw.CredVal + TRrw.DebVal;
-										otherwise
-											BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;	//I Quartal as default
-									end;													
-									matrowput(BRr,repi,BRrw);
-								end;
-							end;
-							ArrayBRr[PRrCodes[PRi]] = BRr;
 						end;
 					end;
 				end;
