@@ -1,4 +1,5 @@
 remote procedure BudgetsObjectsArea(LongInt,var area);
+remote procedure BudgetsObjectsRr(record RcVc RepSpec);
 
 global
 procedure RunBudgetObjectsRn()
