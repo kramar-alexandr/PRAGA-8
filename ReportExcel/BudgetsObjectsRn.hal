@@ -107,7 +107,6 @@ BEGIN
 		if(PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate)then begin
 			prjobj = PRr.Objects;
 			TBBUr.PRCode = PRr.Code;
-			logtext(0,"          Begin reading TBBUr for PRr = " & PRr.Code & " " & GetCurTick);
 			if(readfirstmain(TBBUr,1,true))then begin
 				mtrw = matrowcnt(TBBUr);
 				k=0;
@@ -138,12 +137,10 @@ BEGIN
 					end;
 				end; 
 			end;
-			logtext(0,"          End reading TBBUr for PRr = " & PRr.Code & " " & GetCurTick);
 				
 			PR2r.MotherCode = PRr.Code;
 			TrHs = true;
 			//Collect subprojects' budjets
-			logtext(0,"          Begin collecting  subprojects' budjets " & GetCurTick);
 			while(loopkey("MotherCode",PR2r,1,TrHs)) begin
 				testf = true;
 				if(PR2r.MotherCode!=PRr.Code)then begin TrHs = false; testf = false; end;
@@ -180,10 +177,8 @@ BEGIN
 					end;
 				end;
 			end;
-			logtext(0,"          End collecting  subprojects' budjets " & GetCurTick);
 		end;
 	end;
-	logtext(0,"          Begin loopmain(Mainr,1,TrHs) " & GetCurTick);
 	Mainr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
 	while (loopmain(Mainr,1,TrHs)) begin
@@ -229,7 +224,6 @@ BEGIN
 			end;
 		end;
 	end;
-	logtext(0,"          End loopmain(Mainr,1,TrHs) " & GetCurTick);
 	PRrName = PRr.Name;
 RETURN;
 END;
@@ -255,8 +249,6 @@ BEGIN
 	mainobjname = Objr.Comment;
 	k=0;
 	for (PRi=0;PRi<PRrCodes.length;PRi=PRi+1) begin
-		//ArrayBRr[PRrCodes[PRi]] = PatternBRr;
-		//BRr = ArrayBRr[PRrCodes[PRi]];
 		BRr = PatternBRr;
 		repmtrw = matrowcnt(BRr);
 		PRr.Code = PRrCodes[PRi];
@@ -425,7 +417,6 @@ begin
 	string 16 reportName;
 	string 255 AccStr;
 	
-	logtext(0,"BudgetsObjectsRn is runing");
 	reportName = "BudgetsObjectsRn"	;
 	totalBudget = 0;
 	totalSpend = 0;
@@ -440,7 +431,6 @@ begin
 	BlockLoad(BCb);
 //Collect array of all items for every vendor  
 	k = 0;
-	logtext(0,"Begin collecting array of all items for every vendor " & GetCurTick);
 	while (loopmain(ITr,1,true)) begin
 		clearrow(PatternBRr,PatternBRrw,1);
 		PatternBRrw.Code = ITr.Code;
@@ -476,7 +466,6 @@ begin
 				end; 
 				if(!foundf)then begin
 					CUr.Code = "";
-					logtext(0,"loopkey(VEActCode,CUr,1,true) - " & GetCurTick);
 					while (loopkey("VEActCode",CUr,1,true)) begin
 						if(nonblank(CUr.VEObjects))then begin
 							PatternBRrw.VECode = CUr.VEObjects;
@@ -484,7 +473,6 @@ begin
 							k=k+1;
 						end;
 					end;
-					logtext(0,"loopkey(VEActCode,CUr,1,true) - " & GetCurTick);
 					resetloop(CUr);
 				end;
 				repmtrw = matrowcnt(PatternBRr);
@@ -504,12 +492,9 @@ begin
 		end;
 	end;
 	AccStr = right(AccStr,len(AccStr) - 1);
-	logtext(0,"End collecting array of all items for every vendor " & GetCurTick);
 
 	if (blank(RepSpec.f2)) then begin
-		logtext(0,"Project is BLANK");
 		TrHs = true;
-		logtext(0,"Begin collecting PRCodes " & GetCurTick);
 		while (loopmain(PRr,1,TrHs)) begin
 			if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
 				if Blank(PRr.MotherCode) then begin
@@ -519,7 +504,6 @@ begin
 				end;
 			end;
 		end;
-		logtext(0,"End collecting PRCodes " & GetCurTick);
 		sheetNames[PRCodesCount] = "Total";
 		qtyOfSheets = PRCodesCount + 1;
 		
@@ -551,20 +535,14 @@ begin
 		for (k=0;k<qtyOfSheets;k=k+1) begin
 			sheetnum = k + 1;
 			if (sheetNames[k] <> "Total") then begin
-				//RepSpec.f2 = PRCodes[k];
 				RecordClear(BRr);
-				//BRr = PatternBRr;
-				logtext(0,"CALL BRrCollect " & GetCurTick);
-				//BRrCollect(RepSpec,AccStr,mainobjname,PRrName,BRr);
 				BRr = ArrayBRr[PRCodes[k]];
 				PRrName = PRNames[k];
-				logtext(0,"END BRrCollect " & GetCurTick);
 				if (matrowcnt(TotBRr) == 0) then begin
 					RecordClear(TotBRr);
 					TotBRr = BRr;
 				end else begin
 					mtrw = matrowcnt(BRr);
-					logtext(0,"Begin adding BRr to TotBRr " & GetCurTick);
 					For(i=0;i<mtrw;i=i+1) begin
 						matrowget(BRr,i,BRrw);
 						matrowget(TotBRr,i,TotBRrw);
@@ -578,14 +556,12 @@ begin
 						TotBRrw.Spend4 = TotBRrw.Spend4 + BRrw.Spend4;
 						matrowput(TotBRr,i,TotBRrw);
 					end;
-					logtext(0,"End adding BRr to TotBRr " & GetCurTick);
 				end;
 			end else begin
 				PRrName = "Total";
 				RecordClear(BRr);
 				BRr = TotBRr;
 			end;
-			logtext(0,"BEGIN PRINTING  sheetnum = " & sheetnum & " " & GetCurTick);
 			SetSheetsCols(sheetnum,sheetColls,fileToSave);
 			BeginSheetData(sheetnum,fileToSave);
 				style = 1;
@@ -713,7 +689,6 @@ begin
 			EndSheetData(sheetnum,fileToSave);
 			MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
 			EndSheet(sheetnum,fileToSave,0);
-			logtext(0,"END PRINTING  sheetnum = " & sheetnum & " " & GetCurTick);
 		end;
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		ConvertToXLSX(fileToSave);
@@ -724,9 +699,7 @@ begin
 	end else begin
 		RecordClear(BRr);
 		BRr = PatternBRr;
-		logtext(0,"Call BRrCollect " & GetCurTick);
 		BRrCollect(RepSpec,AccStr,mainobjname,PRrName,BRr);
-		logtext(0,"END BRrCollect " & GetCurTick);
 		sheetNames[0] = PRrName;
 		qtyOfSheets = 1;
 		for (i=0;i<qtyOfSheets;i=i+1) begin
@@ -763,7 +736,6 @@ begin
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
 		
 		sheetnum = 1;
-		logtext(0,"BEGIN PRINTING  sheetnum = " & sheetnum & " " & GetCurTick);
 		SetSheetsCols(sheetnum,sheetColls,fileToSave);
 		BeginSheetData(sheetnum,fileToSave);
 			rownum = 1;
@@ -889,7 +861,6 @@ begin
 				end;
 			end;		
 		EndSheetData(sheetnum,fileToSave);
-		logtext(0,"END PRINTING  sheetnum = " & sheetnum & " " & GetCurTick);
 		MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
 		EndSheet(sheetnum,fileToSave,0);
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
