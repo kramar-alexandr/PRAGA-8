@@ -97,6 +97,7 @@ BEGIN
 	integer i,k,repi,mtrw,repmtrw,pos;
 	boolean TrHs,testf;
 	string 20 prjobj,vendobj,tstr;
+	string 255 AccStr;
 	
 	Objr.Code = mainobj;
 	readfirstmain(Objr,1,true);
@@ -187,70 +188,63 @@ BEGIN
 			logtext(0,"          End collecting  subprojects' budjets " & GetCurTick);
 		end;
 	end;
-	For(repi=0;repi<repmtrw;repi=repi+1) begin
-	  	matrowget(BRr,repi,BRrw);
-	  	if(nonblank(BRrw.CostAcc))then begin
-	  		resetloop(Mainr);
-	  		Mainr.AccNumber = BRrw.CostAcc;
-	  		Mainr.TransDate = RepSpec.sStartDate;
-	  		TrHs = true;
-			logtext(0,"          Begin loopmain(Mainr,2,TrHs) for  repi = " & repi & " - " & BRrw.CostAcc & " " & GetCurTick);
-	  		While(loopmain(Mainr,2,TrHs))begin
-	  			testf = true;
-	  			if(Mainr.AccNumber!=BRrw.CostAcc)then begin TrHs = false; testf = false; end;
-	  			if(Mainr.TransDate>RepSpec.sEndDate)then begin TrHs = false; testf = false; end;
-	  			if(testf)then begin
-	  				TRr.Number = Mainr.TransNr;
-	  				TRr.IntYc = Mainr.IntYc;
-	  				if(readfirstmain(TRr,2,true))then begin
-	  					mtrw = matrowcnt(TRr);
-	  					k = GetQuartal(TRr.TransDate);
-	  					For(i=0;i<mtrw;i=i+1) begin
-	  						matrowget(TRr,i,TRrw);
-	  						if(TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber)then begin
-	  							if(setinset(mainobj,TRrw.Objects) or blank(mainobj))then begin
-									vendobj = "";
-									tstr = "";
-									pos = 0;
-									//GetObjs("SUPPL",TRrw.Objects,vendobj);
-									ExtractObj(TRrw.Objects,pos,tstr);
-									while(nonblank(tstr))begin
-										if(nonblank(tstr))then begin
-											Objr.Code = tstr;
-											if(readfirstmain(Objr,1,true))then begin
-												if(Objr.OTCode=="SUPPL")then begin
-													vendobj = Objr.Code;
-												end;
-											end;
-										end;
-										ExtractObj(TRrw.Objects,pos,tstr);
-									end;
-									if(setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))then begin
-										if(setinset(prjobj,TRrw.Objects))then begin													
-											switch(k) begin
-												case 1:
-													BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
-												case 2:
-													BRrw.Spend2 = BRrw.Spend2 - TRrw.CredVal + TRrw.DebVal;
-												case 3:
-													BRrw.Spend3 = BRrw.Spend3 - TRrw.CredVal + TRrw.DebVal;
-												case 4:
-													BRrw.Spend4 = BRrw.Spend4 - TRrw.CredVal + TRrw.DebVal;
-												otherwise
-													BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;	//I Quartal as default
-											end;													
-											matrowput(BRr,repi,BRrw);
-										end;
-									end;
-	  							end;
-	  						end;
-						end; 
-	  				end;
-	  			end;
-	  		end;
-			logtext(0,"          End loopmain(Mainr,2,TrHs) for  repi = " & repi & " - " & BRrw.CostAcc & " " & GetCurTick);
-	  	end;
+
+	matrowget(BRr,0,BRrw);
+	AccStr = BRrw.CostAcc;
+	for (repi=1;repi<repmtrw;repi=repi+1) begin
+		matrowget(BRr,repi,BRrw);
+		if !(SetInSet(BRrw.CostAcc,AccStr)) then begin
+			AccStr = AccStr & "," & BRrw.CostAcc;
+		end;
 	end;
+	
+	Mainr.TransDate = RepSpec.sStartDate;
+	TrHs = true;
+	logtext(0,"          Begin loopmain(Mainr,1,TrHs) " & GetCurTick);
+	while (loopmain(Mainr,1,TrHs)) begin
+		testf = true;
+		if (!SetInSet(Mainr.AccNumber,AccStr)) then begin
+			testf = false;
+		end;
+		if (Mainr.TransDate>RepSpec.sEndDate) then begin
+			TrHs = false;
+			testf = false;
+		end;
+		if (testf) then begin
+			TRr.Number = Mainr.TransNr;
+			TRr.IntYc = Mainr.IntYc;
+			if (readfirstmain(TRr,2,true)) then begin
+				for (i=0;i<mtrw;i=i+1) begin
+					matrowget(TRr,i,TRrw);
+					if (TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber) then begin
+						if (setinset(mainobj,TRrw.Objects) or blank(mainobj)) then begin
+							GetObjs("SUPPL",TRrw.Objects,vendobj);	//while... readfirstmain(Objr,1,true) ...end;
+							for (repi=0;repi<repmtrw;repi=repi+1) begin
+								matrowget(BRr,repi,BRrw);
+								if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode))))) and (setinset(prjobj,TRrw.Objects))) then begin
+									k = GetQuartal(TRr.TransDate);
+									switch (k) begin
+										case 1:
+											BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
+										case 2:
+											BRrw.Spend2 = BRrw.Spend2 - TRrw.CredVal + TRrw.DebVal;
+										case 3:
+											BRrw.Spend3 = BRrw.Spend3 - TRrw.CredVal + TRrw.DebVal;
+										case 4:
+											BRrw.Spend4 = BRrw.Spend4 - TRrw.CredVal + TRrw.DebVal;
+										otherwise
+											BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;	//I Quartal as default
+									end;													
+									matrowput(BRr,repi,BRrw);
+								end;
+							end;
+						end;
+					end;
+				end;
+			end;
+		end;
+	end;
+	logtext(0,"          End loopmain(Mainr,1,TrHs) " & GetCurTick);
 	PRrName = PRr.Name;
 RETURN;
 END;
