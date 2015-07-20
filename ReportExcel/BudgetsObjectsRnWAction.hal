@@ -1,4 +1,4 @@
-remote procedure BudgetsObjectsRn(record RcVc,var area);
+remote procedure BudgetsObjectsArea(LongInt,var area);
 
 global
 procedure RunBudgetObjectsRn()
@@ -7,8 +7,8 @@ begin
 	area fileToSave;
 	record RcVc RepSpec;
 	integer wn;
+	LongInt tick;
 	
-	logtext(0,"RunBudgetObjectsRn is runing");
 	wn = curwindow;
 	deselectwindow(wn,true);
 	getwindowrecord(wn,RepSpec);
@@ -22,7 +22,11 @@ begin
 	tstr = tstr & " filled in on " & DateToString(CurrentDate,"DD MM YYYY");
 	filename = SaveFileDialog(tstr,"","xlsx");
 	if ((filename!=tstr) and nonblank(filename)) then begin
-		BudgetsObjectsRn(RepSpec,fileToSave);
+		tick = GetCurTick;
+		RepSpec.FirstVer = tick;
+		RepSpec.repname = "BudgetsObjectsRn";
+		RunReport(RepSpec,0);
+		BudgetsObjectsArea(tick,fileToSave);
 		if(fileexists(filename))then begin
 			delete_file(filename);
 		end;

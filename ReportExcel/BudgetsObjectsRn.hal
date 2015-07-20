@@ -388,7 +388,7 @@ RETURN;
 END;
 
 global
-procedure BudgetsObjectsRn(record RcVc RepSpec,var area areatofile)
+procedure BudgetsObjectsRn(record RcVc RepSpec)
 begin
 	record BaseCurBlock BCb;
 	record BudRepVc BRr,PatternBRr,TotBRr;
@@ -422,12 +422,12 @@ begin
 	totalSpend = 0;
 	
 	if(windowsmode==1)then begin
-		fileToSave = "tmpxlsx.xlsx";
+		fileToSave = RepSpec.FirstVer & ".xlsx";
 	end else begin
-		fileToSave = "/tmpxlsx.xlsx";
+		fileToSave = "/" & RepSpec.FirstVer & ".xlsx";
 	end;
 	deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
-	
+	logtext(0,"                    " & fileToSave);
 	BlockLoad(BCb);
 //Collect array of all items for every vendor  
 	k = 0;
@@ -692,10 +692,6 @@ begin
 		end;
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		ConvertToXLSX(fileToSave);
-		
-		MilliSleep(2000);
-		addfiletoarea(fileToSave,areatofile,false);
-		delete_file(fileToSave);
 	end else begin
 		RecordClear(BRr);
 		BRr = PatternBRr;
@@ -727,11 +723,7 @@ begin
 		
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
-		if(windowsmode==1)then begin
-			fileToSave = "tmpxlsx.xlsx";
-		end else begin
-			fileToSave = "/tmpxlsx.xlsx";
-		end;
+		
 		XmlXlsxWorkBegin(fileToSave,reportName);
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
 		
@@ -865,128 +857,22 @@ begin
 		EndSheet(sheetnum,fileToSave,0);
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		ConvertToXLSX(fileToSave);
-		MilliSleep(2000);
-		addfiletoarea(fileToSave,areatofile,false);
-		delete_file(fileToSave);
 	end;
-/*	startreportnoheaderjob("BudgetsObjects");
-		if (blank(RepSpec.f2)) then begin
-			Outstring(0,0,"Choose the project, please",false);
-			goto LBudgetsObjectsRn;
-		end;		
-//Edit---------------Vitalii 10:50 29.05.2015
-		RecordClear(BRr);
-		BRr = PatternBRr;
-		BRrCollect(RepSpec,AccStr,mainobjname,PRrName,BRr);
+	return;
+end;
 
-		StartFormat(15);
-			Outstring(0,0,"",false);
-			Outstring(0,0,"",false);
-			Outstring(0,0,"",false);
-			Outstring(0,0,"",false);
-			Outstring(100,0,PRrName & "," & GetYear(RepSpec.sStartDate),false);
-		EndFormat;
-		StartFormat(15);
-		EndFormat;
-		StartFormat(15);
-			Outstring(0,0,"period",false);
-			Outstring(0,0,RepSpec.sStartDate & "-" & RepSpec.sEndDate,false);
-		EndFormat;
-		StartFormat(15);
-			Outstring(0,0,"currency",false);
-			Outstring(0,0,BCb.BaseCur1,false);
-		EndFormat;
-		StartFormat(15);
-		EndFormat;
-		StartFormat(15);
-		EndFormat;
-		  
-		StartFormat(15);
-			Outstring(0,0,"",false);
-			Outstring(50,0,mainobjname,false);
-			Outstring(100,0,"",false);
-			Outstring(120,0,"Vendor",false);
+global
+procedure BudgetsObjectsArea(LongInt tick,var area areatofile)
+begin
+	string 255 fileToSave;
 
-			Outstring(100,0,"QI",false);
-			Outstring(100,0,"QI-Fact",false);
-			Outstring(100,0,"QII",false);
-			Outstring(100,0,"QII-Fact",false);
-			Outstring(100,0,"QIII",false);
-			Outstring(100,0,"QIII-Fact",false);
-			Outstring(100,0,"QIV",false);
-			Outstring(100,0,"QIV-Fact",false);
-					
-			Outstring(100,0,"total",false);
-			Outstring(100,0,"total-Fact",false);
-		EndFormat;
-		
-		mtrw = matrowcnt(BRr);
-		For(i=0;i<mtrw;i=i+1) begin
-			matrowget(BRr,i,BRrw);
-			if (nonblank(BRrw.CatName))	 then begin				
-				if (CollectSubTotals(BRr,i,subtotals)) then begin	//check if item group is empty
-					StartFormat(15);
-					EndFormat; 			//empty string between different items group
-					StartFormat(15);
-						Outstring(0,0,BRrw.Code,false);
-						Outstring(50,0,BRrw.CatName,false);	
-						Outstring(100,0,"",false);
-						Outstring(100,0,"",false);	
-						for(j=0;j<8;j=j+1) begin	
-							OutStringExcel(200,0,subtotals[j],false);
-							totalrow[j] = totalrow[j] + subtotals[j];
-						end;
-						totalbubyrow = 	subtotals[0] + subtotals[2] + subtotals[4] + subtotals[6];		//Quartals
-						totalspendbyrow = subtotals[1] + subtotals[3] + subtotals[5] + subtotals[7];	//Quartals-Fact
-						OutStringExcel(0,0,totalbubyrow,false);
-						OutStringExcel(0,0,totalspendbyrow,false);
-					EndFormat;
-				end;					
-			end;
-			
-			totalbubyrow = BRrw.Bud1+BRrw.Bud2+BRrw.Bud3+BRrw.Bud4;
-			totalspendbyrow = BRrw.Spend1+BRrw.Spend2+BRrw.Spend3+BRrw.Spend4;						  		
-				
-			if(totalbubyrow!=0 or totalspendbyrow!=0 )then begin
-				StartFormat(15);
-					Outstring(0,0,BRrw.Code,false);
-					Outstring(50,0,BRrw.CatName,false);
-					Outstring(100,0,BRrw.Name,false);
-					Outstring(100,0,BRrw.VECode,false);
-					
-					OutStringExcel(100,0,BRrw.Bud1,false);
-					OutStringExcel(100,0,BRrw.Spend1,false);
-					OutStringExcel(100,0,BRrw.Bud2,false);
-					OutStringExcel(100,0,BRrw.Spend2,false);
-					OutStringExcel(100,0,BRrw.Bud3,false);
-					OutStringExcel(100,0,BRrw.Spend3,false);
-					OutStringExcel(100,0,BRrw.Bud4,false);
-					OutStringExcel(100,0,BRrw.Spend4,false);
-			
-					OutStringExcel(0,0,totalbubyrow,false);
-					OutStringExcel(0,0,totalspendbyrow,false);
-				EndFormat;
-			end;
-		end; 
-		
-		StartFormat(15);
-		EndFormat;
-		StartFormat(15);
-			Outstring(0,0,GetYear(RepSpec.sStartDate),false);
-			Outstring(50,0,"",false);
-			Outstring(100,0,"total",false);
-			Outstring(100,0,"",false);
-			for(i=0;i<8;i=i+1) begin	
-				Outstring(100,0,totalrow[i],false);				
-			end;
-			totalBudget = totalrow[0] + totalrow[2] + totalrow[4] + totalrow[6];
-			totalSpend = totalrow[1] + totalrow[3] + totalrow[5] + totalrow[7];			
-			OutStringExcel(0,0,totalBudget,false);
-			OutStringExcel(0,0,totalSpend,false); 
-		EndFormat;
-
-	LBudgetsObjectsRn:;	
-	endjob;
-*/
-return;
+	if(windowsmode==1)then begin
+		fileToSave = tick & ".xlsx";
+	end else begin
+		fileToSave = "/" & tick & ".xlsx";
+	end;
+	MilliSleep(2000);
+	addfiletoarea(fileToSave,areatofile,false);
+	delete_file(fileToSave);
+	return;
 end;

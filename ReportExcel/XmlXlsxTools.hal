@@ -278,12 +278,14 @@ BEGIN
 	integer i;
 	area tempArea;
 	string 225 path;
+	string 100 tstr
 
 	path = PathCorrection(pathToXLSX);
 	AddTextToArea("<cols>",tempArea);
 	i = 0;
 	while (sizeArray[i] <> 0) begin
-		AddTextToArea("<col min=" & Chr(34) & i+1 & Chr(34) & " max=" & Chr(34) & i+1 & Chr(34) & " width=" & Chr(34) & sizeArray[i]+0.71 & Chr(34) & " customWidth=" & Chr(34) & "1" & Chr(34) & "/>",tempArea);
+		tstr = ValToString(sizeArray[i],M4Val,"",".",0);
+		AddTextToArea("<col min=" & Chr(34) & i+1 & Chr(34) & " max=" & Chr(34) & i+1 & Chr(34) & " width=" & Chr(34) & tstr & Chr(34) & " customWidth=" & Chr(34) & "1" & Chr(34) & "/>",tempArea);
 		i = i + 1;
 	end;
 	AddTextToArea("</cols>",tempArea);
@@ -398,14 +400,16 @@ BEGIN
 	area tempArea;
 	string 225 path;
 	string 10 r;
+	string 100 tstr;
 	integer i;
 	
 	r = GetStringCellNum(ColNum, RowNum);
 	path = PathCorrection(pathToXLSX);
+	tstr = ValToString(data,M4Val,"",".",0);
 	if (data==BlankVal) then begin
 		AddTextToArea("<c r=" & Chr(34) & r & Chr(34) & " s=" & Chr(34) & style & Chr(34) & "><v>" & 0 & "</v></c>",tempArea);
 	end else begin
-		AddTextToArea("<c r=" & Chr(34) & r & Chr(34) & " s=" & Chr(34) & style & Chr(34) & "><v>" & data & "</v></c>",tempArea);
+		AddTextToArea("<c r=" & Chr(34) & r & Chr(34) & " s=" & Chr(34) & style & Chr(34) & "><v>" & tstr & "</v></c>",tempArea);
 	end;
 	AppendAreaToFile(path & "/xl/worksheets/sheet" & SheetNum & ".xml",tempArea);
 	ColNum = ColNum + 1;
@@ -489,13 +493,13 @@ BEGIN
 
 		WriteAreaToFile(newcmd,"/cmd",0);
 		RunProgram("jar.sh","");*/
-		if(fileexists("/tmpxlsx/.DS_Store"))then begin
-			delete_file("/tmpxlsx/.DS_Store");
+		if(fileexists("/" & path & "/.DS_Store"))then begin
+			delete_file("/" & path & "/.DS_Store");
 		end;
-		if(fileexists("/tmpxlsx/xl/.DS_Store"))then begin
-			delete_file("/tmpxlsx/xl/.DS_Store");
+		if(fileexists("/" & path & "/xl/.DS_Store"))then begin
+			delete_file("/" & path & "/xl/.DS_Store");
 		end;
-		RunProgram("jar","-cf0M /tmpxlsx.xlsx -C /tmpxlsx/ .");
+		RunProgram("jar","-cf0M /" & path & ".xlsx -C /" & path & "/ .");
 	end;
 	RETURN;
 END;
