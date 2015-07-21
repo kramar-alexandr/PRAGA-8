@@ -625,10 +625,11 @@ BEGIN
 				BRr = ArrayBRr[PRCodes[k]];
 				PRrName = PRNames[k];
 				mtrw = matrowcnt(BRr);
-				repmtrw = matrowcnt(TotBRr);
 				for (i=0;i<mtrw;i=i+1) begin
 					matrowget(BRr,i,BRrw);
 					foundf = false;
+					pos = 0;
+					repmtrw = matrowcnt(TotBRr);
 					for (repi=0;repi<repmtrw;repi=repi+1) begin
 						matrowget(TotBRr,repi,TotBRrw);
 						if (TotBRrw.Code==BRrw.Code) then begin
