@@ -38,9 +38,9 @@ return;
 end;
 
 
-function boolean CollectSubTotals(record BudRepVc BRr,integer rownr,var array val subtotals)
+function boolean CollectSubTotals(record BudRep1Vc BRr,integer rownr,var array val subtotals)
 begin
-	row BudRepVc BRrw;
+	row BudRep1Vc BRrw;
 	integer rwcnt,i;
 	val totSum;
 	boolean res;
@@ -73,7 +73,7 @@ begin
 return;
 end;
 
-procedure BRrCollect(record RcVc RepSpec, string AccStr, var string mainobjname, var string PRrName, var record BudRepVc BRr)
+procedure BRrCollect(record RcVc RepSpec, string AccStr, var string mainobjname, var string PRrName, var record BudRep1Vc BRr)
 BEGIN
 	record ObjVc Objr;
 	record PRVc PRr,PR2r;
@@ -81,7 +81,7 @@ BEGIN
 	record MainVc Mainr;
 	record TRVc TRr;
 	row TBBUVc TBBUrw;
-	row BudRepVc BRrw;
+	row BudRep1Vc BRrw;
 	row TRVc TRrw;
 	integer i,k,repi,mtrw,repmtrw,pos;
 	boolean TrHs,testf;
@@ -221,16 +221,16 @@ BEGIN
 RETURN;
 END;
 
-procedure BRrCollectForFew(record RcVc RepSpec, string AccStr, array string PRrCodes, var string mainobjname, var array string PRrNames, var vector record BudRepVc ArrayBRr, record BudRepVc PatternBRr)
+procedure BRrCollectForFew(record RcVc RepSpec, string AccStr, array string PRrCodes, var string mainobjname, var array string PRrNames, var vector record BudRep1Vc ArrayBRr, record BudRep1Vc PatternBRr)
 BEGIN
 	record ObjVc Objr;
 	record PRVc PRr,PR2r;
 	record TBBUVc TBBUr;
 	record MainVc Mainr;
 	record TRVc TRr;
-	record BudRepVc BRr;
+	record BudRep1Vc BRr;
 	row TBBUVc TBBUrw;
-	row BudRepVc BRrw;
+	row BudRep1Vc BRrw;
 	row TRVc TRrw;
 	integer i,k,PRi,repi,mtrw,repmtrw,pos;
 	boolean TrHs,testf;
@@ -353,7 +353,6 @@ BEGIN
 								if(setinset(prjobjs[PRi],TRrw.Objects)) then begin
 									BRr = ArrayBRr[PRrCodes[PRi]];
 									repmtrw = matrowcnt(BRr);
-									logtext(0,"BRSize "  & repmtrw);
 									for (repi=0;repi<repmtrw;repi=repi+1) begin
 										matrowget(BRr,repi,BRrw);
 										if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))) then begin
@@ -390,14 +389,14 @@ global
 procedure BudgetsObjectsRn(record RcVc RepSpec)
 BEGIN
 	record BaseCurBlock BCb;
-	record BudRepVc BRr,PatternBRr,TotBRr;
+	record BudRep1Vc BRr,PatternBRr,TotBRr;
 	record PRVc PRr;
 	record ITVc ITr;
 	record INVc INr;
 	record CUVc CUr;
 	record ObjVc Objr;
-	row BudRepVc BRrw,PatternBRrw,PatternBR2rw,TotBRrw;
-	vector record BudRepVc ArrayBRr;
+	row BudRep1Vc BRrw,PatternBRrw,PatternBR2rw,TotBRrw;
+	vector record BudRep1Vc ArrayBRr;
 	integer i,j,k,repi,mtrw,repmtrw;
 	array val totalrowbud,totalrowsped,subtotals, totalrow;
 	val totalbubyrow,totalspendbyrow,totalBudget,totalSpend;
