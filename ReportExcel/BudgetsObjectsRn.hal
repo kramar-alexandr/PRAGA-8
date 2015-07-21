@@ -648,6 +648,7 @@ BEGIN
 								repi = repmtrw;
 							end else begin
 								pos = repi + 1;
+								repi = repmtrw;
 							end;
 						end else begin
 							pos = repmtrw;
