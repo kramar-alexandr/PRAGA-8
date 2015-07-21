@@ -51,6 +51,7 @@ BEGIN
 		ITr.Code = CLCorspr.Code;
 		ReadLastMain(ITr,1,false);
 		INr.Group = ITr.Code;
+		INr.CostAcc = CLCorspr.AccNumber;
 		RecordStore(INr,true);
 	end;
 
