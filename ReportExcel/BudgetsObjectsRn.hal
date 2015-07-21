@@ -14,16 +14,6 @@ external procedure MergeCells(integer,string,array string,integer);
 external procedure FillSharedStrings(string,array string,integer,integer);
 external procedure ConvertToXLSX(string);
 
-procedure OutStringExcel(Integer position,String func,String printstring,Boolean alignment)
-begin
-	if (nonblank(printstring)) then begin
-  		Outstring(position,func,printstring,alignment);
-  end else begin	
-  		Outstring(position,func,"",alignment);
-  end;	
-end;
-
-
 function integer GetQuartal(date trDate)
 begin
 	integer res,i;
@@ -195,6 +185,7 @@ BEGIN
 			TRr.Number = Mainr.TransNr;
 			TRr.IntYc = Mainr.IntYc;
 			if (readfirstmain(TRr,2,true)) then begin
+				mtrw = matrowcnt(TRr);
 				for (i=0;i<mtrw;i=i+1) begin
 					matrowget(TRr,i,TRrw);
 					if (TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber) then begin
