@@ -233,7 +233,7 @@ BEGIN
 	row BudRep1Vc BRrw;
 	row TRVc TRrw;
 	integer i,k,PRi,repi,mtrw,repmtrw,pos;
-	boolean TrHs,testf;
+	boolean TrHs,testf,foundf;
 	string 20 vendobj,tstr;
 	array string 20 prjobjs;
 	
@@ -243,7 +243,7 @@ BEGIN
 	k=0;
 	for (PRi=0;PRi<PRrCodes.length;PRi=PRi+1) begin
 		BRr = PatternBRr;
-		repmtrw = matrowcnt(BRr);
+		
 		PRr.Code = PRrCodes[PRi];
 		if (ReadFirstMain(PRr,1,true)) then begin
 			if(PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate)then begin
@@ -259,9 +259,38 @@ BEGIN
 						if(TBBUrw.stp==18) then begin k=TBBUrw.ItemType; end;		//I,II,III,IV Quartal
 						
 						if(TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))then begin
+							foundf = false;
+							if nonblank(TBBUrw.VECode) then begin
+								repmtrw = matrowcnt(BRr);
+								For(repi=0;repi<repmtrw;repi=repi+1) begin
+									matrowget(BRr,repi,BRrw);
+									if setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode))) then begin
+										foundf = true;
+									end;
+								end;
+								if !foundf then begin
+									For(repi=0;repi<repmtrw;repi=repi+1) begin
+										matrowget(BRr,repi,BRrw);
+										if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+											BRrw.Bud1 = blankval;
+											BRrw.Bud2 = blankval;
+											BRrw.Bud3 = blankval;
+											BRrw.Bud4 = blankval;
+											BRrw.Spend1 = blankval;
+											BRrw.Spend2 = blankval;
+											BRrw.Spend3 = blankval;
+											BRrw.Spend4 = blankval;
+											BRrw.VECode = TBBUrw.VECode;
+											matrowinsert(BRr,repi+1,BRrw);
+											repi = repmtrw;
+										end;
+									end;
+								end;
+							end;
+							repmtrw = matrowcnt(BRr);
 							For(repi=0;repi<repmtrw;repi=repi+1) begin
 								matrowget(BRr,repi,BRrw);
-								if(setinset(BRrw.Code,TBBUrw.Objects) and (((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode)))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1)))then begin
+								if (setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode)))) then begin
 									switch(k) begin
 										case 1:
 											BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
@@ -276,7 +305,7 @@ BEGIN
 									end;
 									matrowput(BRr,repi,BRrw);
 								end;
-							end; 
+							end;
 						end;
 					end; 
 				end;
@@ -297,9 +326,38 @@ BEGIN
 								matrowget(TBBUr,i,TBBUrw);
 								if(TBBUrw.stp==18) then begin k=TBBUrw.ItemType; end;		//I,II,III,IV Quartal									
 								if(TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))then begin
+									foundf = false;
+									if nonblank(TBBUrw.VECode) then begin
+										repmtrw = matrowcnt(BRr);
+										For(repi=0;repi<repmtrw;repi=repi+1) begin
+											matrowget(BRr,repi,BRrw);
+											if setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode))) then begin
+												foundf = true;
+											end;
+										end;
+										if !foundf then begin
+											For(repi=0;repi<repmtrw;repi=repi+1) begin
+												matrowget(BRr,repi,BRrw);
+												if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+													BRrw.Bud1 = blankval;
+													BRrw.Bud2 = blankval;
+													BRrw.Bud3 = blankval;
+													BRrw.Bud4 = blankval;
+													BRrw.Spend1 = blankval;
+													BRrw.Spend2 = blankval;
+													BRrw.Spend3 = blankval;
+													BRrw.Spend4 = blankval;
+													BRrw.VECode = TBBUrw.VECode;
+													matrowinsert(BRr,repi+1,BRrw);
+													repi = repmtrw;
+												end;
+											end;
+										end;
+									end;
+									repmtrw = matrowcnt(BRr);
 									For(repi=0;repi<repmtrw;repi=repi+1) begin
 										matrowget(BRr,repi,BRrw);
-										if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1)))then begin
+										if(setinset(BRrw.Code,TBBUrw.Objects) and (setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode)))then begin
 											switch(k) begin
 												case 1:
 													BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
@@ -464,7 +522,7 @@ BEGIN
 						foundf = true;
 					end;
 				end; 
-				if(!foundf)then begin
+				/*if(!foundf)then begin
 					CUr.Code = "";
 					while (loopkey("VEActCode",CUr,1,true)) begin
 						if(nonblank(CUr.VEObjects))then begin
@@ -474,7 +532,7 @@ BEGIN
 						end;
 					end;
 					resetloop(CUr);
-				end;
+				end;*/
 				repmtrw = matrowcnt(PatternBRr);
 				foundf = false;
 				For(i=0;i<repmtrw;i=i+1) begin
