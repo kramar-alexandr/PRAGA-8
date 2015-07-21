@@ -337,6 +337,7 @@ BEGIN
 	Mainr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
 	while (loopmain(Mainr,1,TrHs)) begin
+		
 		testf = true;
 		if (!SetInSet(Mainr.AccNumber,AccStr)) then begin
 			testf = false;
@@ -346,9 +347,11 @@ BEGIN
 			testf = false;
 		end;
 		if (testf) then begin
+			LogText(0,"Main " & Mainr.TransNr & " " & Mainr.IntYc);
 			TRr.Number = Mainr.TransNr;
 			TRr.IntYc = Mainr.IntYc;
 			if (readfirstmain(TRr,2,true)) then begin
+				mtrw = matrowcnt(TRr);// Edit ************************** Tuesday, 21 July 2015 10:21:13
 				for (i=0;i<mtrw;i=i+1) begin
 					matrowget(TRr,i,TRrw);
 					if (TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber) then begin
