@@ -483,7 +483,7 @@ BEGIN
 	record ObjVc Objr;
 	row BudRep1Vc BRrw,PatternBRrw,PatternBR2rw,TotBRrw;
 	vector record BudRep1Vc ArrayBRr;
-	integer i,j,k,repi,mtrw,repmtrw;
+	integer i,j,k,repi,mtrw,repmtrw,pos;
 	array val totalrowbud,totalrowsped,subtotals, totalrow;
 	val totalbubyrow,totalspendbyrow,totalBudget,totalSpend;
 	string 30 PRrName;
@@ -624,23 +624,48 @@ BEGIN
 				RecordClear(BRr);
 				BRr = ArrayBRr[PRCodes[k]];
 				PRrName = PRNames[k];
-				if (matrowcnt(TotBRr) == 0) then begin
-					RecordClear(TotBRr);
-					TotBRr = BRr;
-				end else begin
-					mtrw = matrowcnt(BRr);
-					For(i=0;i<mtrw;i=i+1) begin
-						matrowget(BRr,i,BRrw);
-						matrowget(TotBRr,i,TotBRrw);
-						TotBRrw.Bud1 = TotBRrw.Bud1 + BRrw.Bud1;
-						TotBRrw.Bud2 = TotBRrw.Bud2 + BRrw.Bud2;
-						TotBRrw.Bud3 = TotBRrw.Bud3 + BRrw.Bud3;
-						TotBRrw.Bud4 = TotBRrw.Bud4 + BRrw.Bud4;
-						TotBRrw.Spend1 = TotBRrw.Spend1 + BRrw.Spend1;
-						TotBRrw.Spend2 = TotBRrw.Spend2 + BRrw.Spend2;
-						TotBRrw.Spend3 = TotBRrw.Spend3 + BRrw.Spend3;
-						TotBRrw.Spend4 = TotBRrw.Spend4 + BRrw.Spend4;
-						matrowput(TotBRr,i,TotBRrw);
+				mtrw = matrowcnt(BRr);
+				repmtrw = matrowcnt(TotBRr);
+				for (i=0;i<mtrw;i=i+1) begin
+					matrowget(BRr,i,BRrw);
+					foundf = false;
+					for (repi=0;repi<repmtrw;repi=repi+1) begin
+						matrowget(TotBRr,repi,TotBRrw);
+						if (TotBRrw.Code==BRrw.Code) then begin
+							if (TotBRrw.VECode==BRrw.VECode) or (blank(BRrw.VECode) and (BRrw.CatName==TotBRrw.CatName)) then begin
+								TotBRrw.Bud1 = TotBRrw.Bud1 + BRrw.Bud1;
+								TotBRrw.Bud2 = TotBRrw.Bud2 + BRrw.Bud2;
+								TotBRrw.Bud3 = TotBRrw.Bud3 + BRrw.Bud3;
+								TotBRrw.Bud4 = TotBRrw.Bud4 + BRrw.Bud4;
+								TotBRrw.Spend1 = TotBRrw.Spend1 + BRrw.Spend1;
+								TotBRrw.Spend2 = TotBRrw.Spend2 + BRrw.Spend2;
+								TotBRrw.Spend3 = TotBRrw.Spend3 + BRrw.Spend3;
+								TotBRrw.Spend4 = TotBRrw.Spend4 + BRrw.Spend4;
+								matrowput(TotBRr,repi + 1,TotBRrw);
+								foundf = true;
+								//pos = repi + 1;
+								repi = repmtrw;
+							end else begin
+								pos = repi + 1;
+							end;
+						end else begin
+							pos = repmtrw;
+						end;
+					end;
+					if !foundf then begin
+						TotBRrw.Bud1 = BRrw.Bud1;
+						TotBRrw.Bud2 = BRrw.Bud2;
+						TotBRrw.Bud3 = BRrw.Bud3;
+						TotBRrw.Bud4 = BRrw.Bud4;
+						TotBRrw.Spend1 = BRrw.Spend1;
+						TotBRrw.Spend2 = BRrw.Spend2;
+						TotBRrw.Spend3 = BRrw.Spend3;
+						TotBRrw.Spend4 = BRrw.Spend4;
+						TotBRrw.Code = BRrw.Code;
+						TotBRrw.VECode = BRrw.VECode;
+						TotBRrw.Name = BRrw.Name;
+						TotBRrw.CatName = BRrw.CatName;
+						matrowput(TotBRr,pos,TotBRrw);
 					end;
 				end;
 			end else begin
