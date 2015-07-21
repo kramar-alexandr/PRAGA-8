@@ -410,6 +410,34 @@ BEGIN
 							for (PRi=0;PRi<PRrCodes.length;PRi=PRi+1) begin
 								if(setinset(prjobjs[PRi],TRrw.Objects)) then begin
 									BRr = ArrayBRr[PRrCodes[PRi]];
+									foundf = false;
+									if nonblank(vendobj) then begin
+										repmtrw = matrowcnt(BRr);
+										For(repi=0;repi<repmtrw;repi=repi+1) begin
+											matrowget(BRr,repi,BRrw);
+											if setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code) and ((setinset(BRrw.VECode,vendobj) and nonblank(BRrw.VECode))) then begin
+												foundf = true;
+											end;
+										end;
+										if !foundf then begin
+											For(repi=0;repi<repmtrw;repi=repi+1) begin
+												matrowget(BRr,repi,BRrw);
+												if (setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+													BRrw.Bud1 = blankval;
+													BRrw.Bud2 = blankval;
+													BRrw.Bud3 = blankval;
+													BRrw.Bud4 = blankval;
+													BRrw.Spend1 = blankval;
+													BRrw.Spend2 = blankval;
+													BRrw.Spend3 = blankval;
+													BRrw.Spend4 = blankval;
+													BRrw.VECode = vendobj;
+													matrowinsert(BRr,repi+1,BRrw);
+													repi = repmtrw;
+												end;
+											end;
+										end;
+									end;
 									repmtrw = matrowcnt(BRr);
 									for (repi=0;repi<repmtrw;repi=repi+1) begin
 										matrowget(BRr,repi,BRrw);
