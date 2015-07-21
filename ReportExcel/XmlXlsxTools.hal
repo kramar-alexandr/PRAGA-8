@@ -269,6 +269,7 @@ BEGIN
 	end;
 	AddTextToArea("<" & Chr(47) & "worksheet>",tempArea);
 	WriteAreaToFile(tempArea,path & "/xl/worksheets/sheet" & SheetNum & ".xml",1);
+	logtext(0,"EndSheet: sheet" & SheetNum & ".xml");
 	RETURN;
 END;
 
@@ -463,6 +464,7 @@ BEGIN
 	string 1 c;
 	longint alen,i;
  
+	logtext(0,"ConvertToXLSX BEGIN");
 	PosOfSleshInPath = 0;
 	path = PathCorrection(pathToXLSX);
 	fileName = path;
@@ -501,5 +503,6 @@ BEGIN
 		end;
 		RunProgram("jar","-cf0M /" & path & ".xlsx -C /" & path & "/ .");
 	end;
+	logtext(0,"ConvertToXLSX END");
 	RETURN;
 END;

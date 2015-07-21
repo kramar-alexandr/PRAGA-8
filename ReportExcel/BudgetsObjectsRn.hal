@@ -179,6 +179,7 @@ BEGIN
 			end;
 		end;
 	end;
+	logtext(0,"BRrCollect: Bud1..4 COLLECTED");
 	Mainr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
 	while (loopmain(Mainr,1,TrHs)) begin
@@ -224,6 +225,7 @@ BEGIN
 			end;
 		end;
 	end;
+	logtext(0,"BRrCollect: Spend1..4 COLLECTED");
 	PRrName = PRr.Name;
 RETURN;
 END;
@@ -331,6 +333,7 @@ BEGIN
 		end;
 		ArrayBRr[PRrCodes[PRi]] = BRr;
 	end;
+	logtext(0,"BRrCollectForFew: Bud1..4 COLLECTED");
 	Mainr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
 	while (loopmain(Mainr,1,TrHs)) begin
@@ -384,12 +387,13 @@ BEGIN
 			end;
 		end;
 	end;
-RETURN;
+	logtext(0,"BRrCollectForFew: Spend1..4 COLLECTED");
+	RETURN;
 END;
 
 global
 procedure BudgetsObjectsRn(record RcVc RepSpec)
-begin
+BEGIN
 	record BaseCurBlock BCb;
 	record BudRepVc BRr,PatternBRr,TotBRr;
 	record PRVc PRr;
@@ -421,6 +425,7 @@ begin
 	totalBudget = 0;
 	totalSpend = 0;
 	
+	logtext(0,"RunReport " & reportName);
 	if(windowsmode==1)then begin
 		fileToSave = RepSpec.FirstVer & ".xlsx";
 	end else begin
@@ -431,6 +436,7 @@ begin
 	BlockLoad(BCb);
 //Collect array of all items for every vendor  
 	k = 0;
+	logtext(0,"Collect PatternBRr/AccStr begin");
 	while (loopmain(ITr,1,true)) begin
 		clearrow(PatternBRr,PatternBRrw,1);
 		PatternBRrw.Code = ITr.Code;
@@ -492,6 +498,7 @@ begin
 		end;
 	end;
 	AccStr = right(AccStr,len(AccStr) - 1);
+	logtext(0,"Collect PatternBRr/AccStr end");
 
 	if (blank(RepSpec.f2)) then begin
 		TrHs = true;
@@ -506,7 +513,8 @@ begin
 		end;
 		sheetNames[PRCodesCount] = "Total";
 		qtyOfSheets = PRCodesCount + 1;
-		
+		BRrCollectForFew(RepSpec,AccStr,PRCodes,mainobjname,PRNames,ArrayBRr,PatternBRr);
+		logtext(0,"Output BEGIN");
 		sheetColls[0] = 8.43;
 		sheetColls[1] = 8.43;
 		sheetColls[2] = 31.71;
@@ -530,8 +538,6 @@ begin
 		
 		XmlXlsxWorkBegin(fileToSave,reportName);
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
-		ArrayBRr["PatternBRr"] = PatternBRr;
-		BRrCollectForFew(RepSpec,AccStr,PRCodes,mainobjname,PRNames,ArrayBRr,PatternBRr);
 		for (k=0;k<qtyOfSheets;k=k+1) begin
 			sheetnum = k + 1;
 			if (sheetNames[k] <> "Total") then begin
@@ -692,10 +698,12 @@ begin
 		end;
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		ConvertToXLSX(fileToSave);
+		logtext(0,"Output END");
 	end else begin
 		RecordClear(BRr);
 		BRr = PatternBRr;
 		BRrCollect(RepSpec,AccStr,mainobjname,PRrName,BRr);
+		logtext(0,"Output BEGIN");
 		sheetNames[0] = PRrName;
 		qtyOfSheets = 1;
 		for (i=0;i<qtyOfSheets;i=i+1) begin
@@ -857,13 +865,14 @@ begin
 		EndSheet(sheetnum,fileToSave,0);
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		ConvertToXLSX(fileToSave);
+		logtext(0,"Output END");
 	end;
-	return;
-end;
+	RETURN;
+END;
 
 global
 procedure BudgetsObjectsArea(LongInt tick,var area areatofile)
-begin
+BEGIN
 	string 255 fileToSave;
 
 	if(windowsmode==1)then begin
@@ -873,6 +882,7 @@ begin
 	end;
 	MilliSleep(2000);
 	addfiletoarea(fileToSave,areatofile,false);
+	logtext(0,"BudgetsObjectsRn: FILE " & fileToSave & " SENT TO CLIENT");
 	delete_file(fileToSave);
-	return;
-end;
+	RETURN;
+END;
