@@ -17,6 +17,7 @@ begin
 	SString(31001,"Current document should be saved");
 	SString(31002,"You should approve this budget before updating");
 	SString(31003,"You are not allowed to create new budget.");
+	SString(31004,"Object mismatch. Clear this field to create new object."); //Edit---------------Vitalii 14:12 21.07.2015
 	
   StrSetAdd(3);
   StrSetText(UpdateBudget,"Allow creation new budget version");

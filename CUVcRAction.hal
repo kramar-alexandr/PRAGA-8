@@ -18,6 +18,11 @@ BEGIN
 					goto LCUVcRecordCheck;
 				end;
 			end else begin
+				if (Objr.Code!=CUr.VEObjects) then begin
+					RecordCheckError(31004,"",-1,"VEObjects");      
+					res = -1;
+					goto LCUVcRecordCheck;
+				end;
 				RecordNew(OBjr);
 				Objr.Code = CUr.Code;
 				Objr.Comment = CUr.Name;
