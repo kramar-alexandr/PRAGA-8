@@ -634,7 +634,7 @@ BEGIN
 					for (repi=0;repi<repmtrw;repi=repi+1) begin
 						matrowget(TotBRr,repi,TotBRrw);
 						if (TotBRrw.Code==BRrw.Code) then begin
-							if ((TotBRrw.VECode==BRrw.VECode) and (nonblank(TotBRrw.VECode) and nonblank(BRrw.VECode))) or ((BRrw.CatName==TotBRrw.CatName) and (blank(TotBRrw.VECode) and blank(BRrw.VECode))) or (blank(TotBRrw.VECode) and blank(BRrw.VECode)blank(TotBRrw.VECode) and blank(BRrw.VECode) and blank(TotBRrw.CatName) and blank(BRrw.CatName)) then begin
+							if ((TotBRrw.VECode==BRrw.VECode) and (nonblank(TotBRrw.VECode) and nonblank(BRrw.VECode))) or ((BRrw.CatName==TotBRrw.CatName) and (blank(TotBRrw.VECode) and blank(BRrw.VECode))) or (blank(TotBRrw.VECode) and blank(BRrw.VECode) and blank(TotBRrw.CatName) and blank(BRrw.CatName)) then begin
 								TotBRrw.Bud1 = TotBRrw.Bud1 + BRrw.Bud1;
 								TotBRrw.Bud2 = TotBRrw.Bud2 + BRrw.Bud2;
 								TotBRrw.Bud3 = TotBRrw.Bud3 + BRrw.Bud3;
