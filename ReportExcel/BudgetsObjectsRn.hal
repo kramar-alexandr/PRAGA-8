@@ -172,7 +172,7 @@ BEGIN
 	logtext(0,"BRrCollect: Bud1..4 COLLECTED");
 	Mainr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
-	while (loopmain(Mainr,1,TrHs)) begin
+	while (loopkey("TransDate",Mainr,1,TrHs)) begin
 		testf = true;
 		if (!SetInSet(Mainr.AccNumber,AccStr)) then begin
 			testf = false;
@@ -327,7 +327,7 @@ BEGIN
 	logtext(0,"BRrCollectForFew: Bud1..4 COLLECTED");
 	Mainr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
-	while (loopmain(Mainr,1,TrHs)) begin
+	while (loopkey("TransDate",Mainr,1,TrHs)) begin
 		
 		testf = true;
 		if (!SetInSet(Mainr.AccNumber,AccStr)) then begin
@@ -337,11 +337,12 @@ BEGIN
 			TrHs = false;
 			testf = false;
 		end;
+		
 		if (testf) then begin
-			LogText(0,"Main " & Mainr.TransNr & " " & Mainr.IntYc);
 			TRr.Number = Mainr.TransNr;
 			TRr.IntYc = Mainr.IntYc;
 			if (readfirstmain(TRr,2,true)) then begin
+				k = GetQuartal(TRr.TransDate);
 				mtrw = matrowcnt(TRr);// Edit ************************** Tuesday, 21 July 2015 10:21:13
 				for (i=0;i<mtrw;i=i+1) begin
 					matrowget(TRr,i,TRrw);
@@ -349,13 +350,13 @@ BEGIN
 						if (setinset(RepSpec.f1,TRrw.Objects) or blank(RepSpec.f1)) then begin
 							GetObjs("SUPPL",TRrw.Objects,vendobj);
 							for (PRi=0;PRi<PRrCodes.length;PRi=PRi+1) begin
-								if setinset(prjobjs[PRi],TRrw.Objects) then begin
+								if(setinset(prjobjs[PRi],TRrw.Objects)) then begin
 									BRr = ArrayBRr[PRrCodes[PRi]];
 									repmtrw = matrowcnt(BRr);
+									logtext(0,"BRSize "  & repmtrw);
 									for (repi=0;repi<repmtrw;repi=repi+1) begin
 										matrowget(BRr,repi,BRrw);
 										if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))) then begin
-											k = GetQuartal(TRr.TransDate);
 											switch (k) begin
 												case 1:
 													BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
