@@ -264,7 +264,7 @@ BEGIN
 								repmtrw = matrowcnt(BRr);
 								For(repi=0;repi<repmtrw;repi=repi+1) begin
 									matrowget(BRr,repi,BRrw);
-									if setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode))) then begin
+									if setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode))) then begin
 										foundf = true;
 									end;
 								end;
@@ -331,7 +331,7 @@ BEGIN
 										repmtrw = matrowcnt(BRr);
 										For(repi=0;repi<repmtrw;repi=repi+1) begin
 											matrowget(BRr,repi,BRrw);
-											if setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode))) then begin
+											if setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode))) then begin
 												foundf = true;
 											end;
 										end;
