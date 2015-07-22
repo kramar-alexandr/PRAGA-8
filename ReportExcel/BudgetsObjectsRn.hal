@@ -722,14 +722,14 @@ BEGIN
 						repmtrw = matrowcnt(TotBRr);
 						For(repi=0;repi<repmtrw;repi=repi+1) begin
 							matrowget(TotBRr,repi,TotBRrw);
-							if (TotBRrw.Code==BRrw.Code) and nonblank(TotBRrw.Code) and (((TotBRrw.VECode==BRrw.VECode) and nonblank(TotBRrw.VECode))) then begin
+							if (TotBRrw.Code==BRrw.Code) and (TotBRrw.VECode==BRrw.VECode) then begin
 								foundf = true;
 							end;
 						end;
 						if !foundf then begin
 							For(repi=0;repi<repmtrw;repi=repi+1) begin
 								matrowget(TotBRr,repi,TotBRrw);
-								if ((TotBRrw.Code==BRrw.Code) and nonblank(TotBRrw.Code)) and  blank(TotBRrw.VECode) and blank(TotBRrw.CatName) then begin
+								if (TotBRrw.Code==BRrw.Code) then begin
 									TotBRrw.Bud1 = blankval;
 									TotBRrw.Bud2 = blankval;
 									TotBRrw.Bud3 = blankval;
@@ -748,7 +748,7 @@ BEGIN
 					repmtrw = matrowcnt(TotBRr);
 					For(repi=0;repi<repmtrw;repi=repi+1) begin
 						matrowget(TotBRr,repi,TotBRrw);
-						if((TotBRrw.Code==BRrw.Code) and ((TotBRrw.VECode==BRrw.VECode) and nonblank(TotBRrw.VECode)) or (blank(TotBRrw.VECode) and blank(BRrw.VECode)))then begin
+						if((TotBRrw.Code==BRrw.Code) and (TotBRrw.VECode==BRrw.VECode))then begin
 							TotBRrw.Bud1 = TotBRrw.Bud1 + BRrw.Bud1;
 							TotBRrw.Bud2 = TotBRrw.Bud2 + BRrw.Bud2;
 							TotBRrw.Bud3 = TotBRrw.Bud3 + BRrw.Bud3;
