@@ -14,6 +14,7 @@ external procedure MergeCells(integer,string,array string,integer);
 external procedure FillSharedStrings(string,array string,integer,integer);
 external procedure ConvertToXLSX(string);
 
+global
 function integer GetQuartal(date trDate)
 begin
 	integer res,i;
@@ -84,7 +85,7 @@ BEGIN
 	row BudRep1Vc BRrw;
 	row TRVc TRrw;
 	integer i,k,repi,mtrw,repmtrw,pos;
-	boolean TrHs,testf;
+	boolean TrHs,testf,foundf;
 	string 20 prjobj,vendobj,tstr;
 	
 	Objr.Code = RepSpec.f1;
@@ -106,9 +107,38 @@ BEGIN
 					if(TBBUrw.stp==18) then begin k=TBBUrw.ItemType; end;		//I,II,III,IV Quartal
 					
 					if(TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))then begin
+						foundf = false;
+						if nonblank(TBBUrw.VECode) then begin
+							repmtrw = matrowcnt(BRr);
+							For(repi=0;repi<repmtrw;repi=repi+1) begin
+								matrowget(BRr,repi,BRrw);
+								if setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode))) then begin
+									foundf = true;
+								end;
+							end;
+							if !foundf then begin
+								For(repi=0;repi<repmtrw;repi=repi+1) begin
+									matrowget(BRr,repi,BRrw);
+									if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+										BRrw.Bud1 = blankval;
+										BRrw.Bud2 = blankval;
+										BRrw.Bud3 = blankval;
+										BRrw.Bud4 = blankval;
+										BRrw.Spend1 = blankval;
+										BRrw.Spend2 = blankval;
+										BRrw.Spend3 = blankval;
+										BRrw.Spend4 = blankval;
+										BRrw.VECode = TBBUrw.VECode;
+										matrowinsert(BRr,repi+1,BRrw);
+										repi = repmtrw;
+									end;
+								end;
+							end;
+						end;
+						repmtrw = matrowcnt(BRr);
 						For(repi=0;repi<repmtrw;repi=repi+1) begin
 							matrowget(BRr,repi,BRrw);
-							if(setinset(BRrw.Code,TBBUrw.Objects) and (((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode)))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1)))then begin
+							if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1)))then begin
 								switch(k) begin
 									case 1:
 										BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
@@ -144,6 +174,35 @@ BEGIN
 							matrowget(TBBUr,i,TBBUrw);
 							if(TBBUrw.stp==18) then begin k=TBBUrw.ItemType; end;		//I,II,III,IV Quartal									
 							if(TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))then begin
+								foundf = false;
+								if nonblank(TBBUrw.VECode) then begin
+									repmtrw = matrowcnt(BRr);
+									For(repi=0;repi<repmtrw;repi=repi+1) begin
+										matrowget(BRr,repi,BRrw);
+										if setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode))) then begin
+											foundf = true;
+										end;
+									end;
+									if !foundf then begin
+										For(repi=0;repi<repmtrw;repi=repi+1) begin
+											matrowget(BRr,repi,BRrw);
+											if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+												BRrw.Bud1 = blankval;
+												BRrw.Bud2 = blankval;
+												BRrw.Bud3 = blankval;
+												BRrw.Bud4 = blankval;
+												BRrw.Spend1 = blankval;
+												BRrw.Spend2 = blankval;
+												BRrw.Spend3 = blankval;
+												BRrw.Spend4 = blankval;
+												BRrw.VECode = TBBUrw.VECode;
+												matrowinsert(BRr,repi+1,BRrw);
+												repi = repmtrw;
+											end;
+										end;
+									end;
+								end;
+								repmtrw = matrowcnt(BRr);
 								For(repi=0;repi<repmtrw;repi=repi+1) begin
 									matrowget(BRr,repi,BRrw);
 									if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1)))then begin
@@ -191,6 +250,35 @@ BEGIN
 					if (TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber) then begin
 						if (setinset(RepSpec.f1,TRrw.Objects) or blank(RepSpec.f1)) then begin
 							GetObjs("SUPPL",TRrw.Objects,vendobj);	//while... readfirstmain(Objr,1,true) ...end;
+							foundf = false;
+							if nonblank(vendobj) then begin
+								repmtrw = matrowcnt(BRr);
+								For(repi=0;repi<repmtrw;repi=repi+1) begin
+									matrowget(BRr,repi,BRrw);
+									if setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code) and ((setinset(BRrw.VECode,vendobj) and nonblank(BRrw.VECode))) then begin
+										foundf = true;
+									end;
+								end;
+								if !foundf then begin
+									For(repi=0;repi<repmtrw;repi=repi+1) begin
+										matrowget(BRr,repi,BRrw);
+										if (setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+											BRrw.Bud1 = blankval;
+											BRrw.Bud2 = blankval;
+											BRrw.Bud3 = blankval;
+											BRrw.Bud4 = blankval;
+											BRrw.Spend1 = blankval;
+											BRrw.Spend2 = blankval;
+											BRrw.Spend3 = blankval;
+											BRrw.Spend4 = blankval;
+											BRrw.VECode = vendobj;
+											matrowinsert(BRr,repi+1,BRrw);
+											repi = repmtrw;
+										end;
+									end;
+								end;
+							end;
+							repmtrw = matrowcnt(BRr);
 							for (repi=0;repi<repmtrw;repi=repi+1) begin
 								matrowget(BRr,repi,BRrw);
 								if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode))))) and (setinset(prjobj,TRrw.Objects))) then begin
@@ -243,7 +331,6 @@ BEGIN
 	k=0;
 	for (PRi=0;PRi<PRrCodes.length;PRi=PRi+1) begin
 		BRr = PatternBRr;
-		
 		PRr.Code = PRrCodes[PRi];
 		if (ReadFirstMain(PRr,1,true)) then begin
 			if(PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate)then begin
@@ -290,7 +377,7 @@ BEGIN
 							repmtrw = matrowcnt(BRr);
 							For(repi=0;repi<repmtrw;repi=repi+1) begin
 								matrowget(BRr,repi,BRrw);
-								if (setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode)))) then begin
+								if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1)))then begin
 									switch(k) begin
 										case 1:
 											BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
@@ -357,7 +444,7 @@ BEGIN
 									repmtrw = matrowcnt(BRr);
 									For(repi=0;repi<repmtrw;repi=repi+1) begin
 										matrowget(BRr,repi,BRrw);
-										if(setinset(BRrw.Code,TBBUrw.Objects) and (setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode)))then begin
+										if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1)))then begin
 											switch(k) begin
 												case 1:
 													BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
@@ -505,7 +592,7 @@ BEGIN
 	totalBudget = 0;
 	totalSpend = 0;
 	
-	logtext(0,"RunReport " & reportName);
+	logtext(0,reportName & " is runing");
 	if(windowsmode==1)then begin
 		fileToSave = RepSpec.FirstVer & ".xlsx";
 	end else begin
