@@ -988,6 +988,7 @@ what the hell?
                   goto L99VIVcRecordCheck;
                 end;
               end;
+              objstr = "";// Edit ************************** Wednesday, 22 July 2015 09:43:51
               //objstr = VIrw.Objects;// Edit ************************** Friday, 17 July 2015 18:42:55
               if(nonblank(VIrw.Prj))then begin
               	objstr = objstr & "," & VIrw.Prj;// Edit ************************** Wednesday, 15 July 2015 10:59:15
