@@ -3895,3 +3895,62 @@ real h,v,vs,h1;
 		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunBudgetTotalRn","Run");
 	EndWindow;
 end;
+
+window VILClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  Integer pos;
+
+  WindowBegin("#Purchase Invoices#",VILClass,CGmlist,-);
+  SetWRect(20,80,900,350);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(VIDClass);
+  UseView(VIVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"No.",SerNr,false,SerNr);
+  RlColKey(79,79,"OK",OKFlag,false,OKFlag);
+  RlColKey(111,111,"Invoice Date",InvDate,false,InvDate);
+  pos = 191;
+  if (HasmodPO) then begin
+    RlColKey(pos,pos,"PO. No.",POSerNr,false,POSerNr);
+    pos = pos + 60;
+    RlColKey(pos,pos,"#Supp.# Inv. No.",InvoiceNr,false,InvoiceNr);
+  end else begin
+    RlColKey(pos,pos,"#Supp.# Inv. No.",InvoiceNr,false,InvoiceNr);
+  end;
+  if (HasLocalization("ARG,MEX")) then begin
+    pos = pos + 120;
+  end else begin
+    pos = pos + 120;
+  end;
+  RlColKey(pos,pos,"#Supplier#",VECode,false,VECode);
+  pos = pos + 70;
+  RlColKey(pos,pos,"Name",VEName,false,VEName);
+  RlCol(-170,-170,"Salesman",SalesMan,false);
+  if (HasMultiCurrency) then begin
+    if (AcceptanceStatusColumnTest("VIVc")) then begin
+      CalculatedColumn(-150,-150,"Appr.","VILClassAcceptanceStatus",false);
+    end;
+    RlColKey(-110,-110,"Total",PayVal,true,PayVal);
+    RlCol(-39,-39,"",CredMark,true);
+    RlCol(-30,-30,"Cur.",CurncyCode,true);
+  end else begin
+    RlColKey(-90,-90,"Total",PayVal,true,PayVal);
+    RlCol(-10,-10,"",CredMark,true);
+  end;
+  RlCol(-1,-1,"",Invalid,true);
+  SearchField("Search");
+  if (HasLimitedAccess) then begin
+    BrowseSubsetButton(-40,-15);
+  end;
+  if (GuiType==kGuiMetro) then begin
+    RowMenuBegin("");
+    RowMenuItem(0,"OK",'G','G',4312,"OKVILsm");
+    RowMenuItem(1,"#Purchase Invoice# Status",'r','r',4300,"VIInfoVILsm");
+    EndRowMenu;
+  end else begin
+    SpecialMenu("OK",'G',0,"OKVILsm");
+    SpecialMenu("#Purchase Invoice# Status",'r',1,"VIInfoVILsm");
+  end;
+  EndWindow;
+end;
