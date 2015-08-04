@@ -2405,6 +2405,26 @@ begin
   EndWindow;
 end;
 
+window ObjFoundSClass:2
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer,iPad,iPhone")
+begin
+  real v;
+  Integer mwn;
+  Boolean contf;
+  
+  WindowBegin("Paste Object",ObjFoundSClass,CGslist,ObjView);
+  DynamicWindow;
+  SpawnClass(ObjDClass);
+  UseView(ObjVc);
+  Sizeable(-1,-1,0,0);
+  SetWRect(220,80,600,298);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,1,    "Object",Code,false,ActSbstOTCode);
+  RlColKey(201,201,"Name",Comment,false,ActSbstComment);
+  SearchField("Search");
+  EndWindow;
+end;
+
 window CLInDClass:1
   wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
@@ -3498,6 +3518,7 @@ begin
         MatCol(t,150,"Expences",0,Exp,false,ObjExpSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
         MatCol(t,210,"Supplier",0,Supp,false,ObjSuppSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
         MatCol(t,270,"Location",0,Loc,false,ObjLocSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
+		MatCol(t,320,"Foundation",0,Found,false,ObjFoundSClass);//Edit---------------Vitalii 14:15 04.08.2015
       end;
       MatCol(t,380,"Suppl. Name",0,SupName,false,0);
       MatCol(t,520,"Description",0,Comment,false,0);

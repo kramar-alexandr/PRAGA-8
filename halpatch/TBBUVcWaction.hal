@@ -98,3 +98,14 @@ begin
   ObjLocSClassOnOpenWindow = false;
   return;
 end;
+
+global
+Function Boolean ObjFoundSClassOnOpenWindow(Integer wn)
+begin
+  
+	SetWindowSubset(wn,"FOUND");
+  
+  
+  ObjFoundSClassOnOpenWindow = false;
+  return;
+end;

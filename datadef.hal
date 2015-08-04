@@ -233,6 +233,7 @@ begin
 		ArrayField(Exp,M4UStr,60,ObjVc);
 		ArrayField(Supp,M4UStr,60,ObjVc);
 		ArrayField(Loc,M4UStr,60,ObjVc);
+		ArrayField(Found,M4UStr,60,ObjVc);
 		ArrayField(SupName,M4Str,100,0);
 	EndRecordAdd;
 	
