@@ -4,7 +4,7 @@ external procedure EndSheet(integer,string,integer);
 external procedure SetSheetsCols(integer,array val,string);
 external procedure BeginSheetData(integer,string);
 external procedure EndSheetData(integer,string);
-external procedure BeginRow(integer,string,integer);
+external procedure BeginRow(integer,string,integer,boolean);
 external procedure EndRow(integer,string,var integer);
 external procedure StringCell(integer,string,var integer,integer,integer,string,var array string,var integer,var integer);
 external procedure NumericCell(integer,string,var integer,integer,integer,val);
@@ -346,6 +346,7 @@ BEGIN
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
 		sheetnum = 1;
+		qtyMergeCell = 0;
 		XmlXlsxWorkBegin(fileToSave,reportName);
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
 		SetSheetsCols(sheetnum,sheetColls,fileToSave);
@@ -353,25 +354,25 @@ BEGIN
 		style = 1;
 		colnum = 1;
 		rownum = 1;
-		BeginRow(sheetnum,fileToSave,rownum);
+		BeginRow(sheetnum,fileToSave,rownum,false);
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Projects",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		EndRow(sheetnum,fileToSave,rownum);
 		style = 45;
 		colnum = 1;
-		BeginRow(sheetnum,fileToSave,rownum);
+		BeginRow(sheetnum,fileToSave,rownum,false);
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Currency",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 2;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,BCb.BaseCur1,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		EndRow(sheetnum,fileToSave,rownum);
 		style = 46;
 		colnum = 1;
-		BeginRow(sheetnum,fileToSave,rownum);
+		BeginRow(sheetnum,fileToSave,rownum,false);
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Period",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 2;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,RepSpec.sStartDate & " - " & RepSpec.sEndDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		EndRow(sheetnum,fileToSave,rownum);
 		colnum = 4;
-		BeginRow(sheetnum,fileToSave,rownum);
+		BeginRow(sheetnum,fileToSave,rownum,false);
 			for (j=0;j<=3;j=j+1) begin
 				style = 17;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,RepSpec.f1 & " - Budget",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -398,13 +399,17 @@ BEGIN
 			colnum = colnum + 1;
 		EndRow(sheetnum,fileToSave,rownum);
 		colnum = 4;
-		BeginRow(sheetnum,fileToSave,rownum);
+		BeginRow(sheetnum,fileToSave,rownum,false);
 			for (j=0;j<=3;j=j+1) begin
 				style = 5;
 				for (i=0;i<ProjArray.length;i=i+1) begin
+					mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					style = 6;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum,rownum);
+					qtyMergeCell = qtyMergeCell + 1;
+					qtyOfEmpStr = 1;
+					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 					style = 6;
 				end;
 				qtyOfEmpStr = 1;
@@ -416,9 +421,13 @@ BEGIN
 			end;
 			style = 8;
 			for (i=0;i<ProjArray.length;i=i+1) begin
+				mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 9;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+				mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum,rownum);
+				qtyMergeCell = qtyMergeCell + 1;
+				qtyOfEmpStr = 1;
+				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 				style = 9;
 			end;
 			style = 36;
@@ -428,7 +437,7 @@ BEGIN
 			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 		EndRow(sheetnum,fileToSave,rownum);
 		colnum = 4;
-		BeginRow(sheetnum,fileToSave,rownum);
+		BeginRow(sheetnum,fileToSave,rownum,false);
 			style = 20;
 			for (i=0;i<ProjArray.length;i=i+1) begin
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -508,7 +517,7 @@ BEGIN
 				rownum = rownum + 1;
 				style = 2;
 				colnum = 1;
-				BeginRow(sheetnum,fileToSave,rownum);
+				BeginRow(sheetnum,fileToSave,rownum,false);
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,ITr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					colnum = colnum + 1;
@@ -628,7 +637,7 @@ BEGIN
 				end;
 				style = 3;
 				colnum = 1;
-				BeginRow(sheetnum,fileToSave,rownum);
+				BeginRow(sheetnum,fileToSave,rownum,true);
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					colnum = colnum + 1;
 					Objr.Code = ArtArrayWithGroups[i];
@@ -720,7 +729,7 @@ BEGIN
 		rownum = rownum + 1;
 		style = 2;
 		colnum = 2;
-		BeginRow(sheetnum,fileToSave,rownum);
+		BeginRow(sheetnum,fileToSave,rownum,false);
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"total costs",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			colnum = colnum + 1;
 			style = 10;

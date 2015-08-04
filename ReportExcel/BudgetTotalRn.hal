@@ -4,7 +4,7 @@ external procedure EndSheet(integer,string,integer);
 external procedure SetSheetsCols(integer,array val,string);
 external procedure BeginSheetData(integer,string);
 external procedure EndSheetData(integer,string);
-external procedure BeginRow(integer,string,integer);
+external procedure BeginRow(integer,string,integer,boolean);
 external procedure EndRow(integer,string,var integer);
 external procedure StringCell(integer,string,var integer,integer,integer,string,var array string,var integer,var integer);
 external procedure NumericCell(integer,string,var integer,integer,integer,val);
@@ -183,7 +183,7 @@ BEGIN
 		style = 13;
 		colnum = 2;
 		rownum = 2;
-		BeginRow(sheetnum,fileToSave,rownum);
+		BeginRow(sheetnum,fileToSave,rownum,false);
 			mergeCell[0] = GetStringCellNum(colnum,rownum);
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 14;
@@ -196,7 +196,7 @@ BEGIN
 		EndRow(sheetnum,fileToSave,rownum);
 		style = 7;
 		colnum = 2;
-		BeginRow(sheetnum,fileToSave,rownum);
+		BeginRow(sheetnum,fileToSave,rownum,false);
 			for (i=0;i<ProjArray.length - 1;i=i+1) begin
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 8;
@@ -209,7 +209,7 @@ BEGIN
 		EndRow(sheetnum,fileToSave,rownum);
 		style = 10;
 		colnum = 2;
-		BeginRow(sheetnum,fileToSave,rownum);
+		BeginRow(sheetnum,fileToSave,rownum,false);
 			for (i=0;i<ProjArray.length - 1;i=i+1) begin
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjNamesVect[ProjArray[i]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 11;
@@ -223,7 +223,7 @@ BEGIN
 		for (i=0;i<FoundArray.length;i=i+1) begin
 			style = 1;
 			colnum = 1;
-			BeginRow(sheetnum,fileToSave,rownum);
+			BeginRow(sheetnum,fileToSave,rownum,false);
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,FoundArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 2;
 				for (j=0;j<ProjArray.length;j=j+1) begin
@@ -236,7 +236,7 @@ BEGIN
 		rownum = rownum + 1;
 		style = 1;
 		colnum = 1;
-		BeginRow(sheetnum,fileToSave,rownum);
+		BeginRow(sheetnum,fileToSave,rownum,false);
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"sub tot",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 5;
 			for (i=0;i<ProjArray.length;i=i+1) begin
@@ -246,7 +246,7 @@ BEGIN
 		EndRow(sheetnum,fileToSave,rownum);
 		style = 1;
 		colnum = 1;
-		BeginRow(sheetnum,fileToSave,rownum);
+		BeginRow(sheetnum,fileToSave,rownum,false);
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"sub tot %",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 5;
 			for (i=0;i<ProjArray.length;i=i+1) begin
