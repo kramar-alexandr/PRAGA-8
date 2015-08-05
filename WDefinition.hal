@@ -3517,8 +3517,8 @@ begin
         MatCol(t,90,"Project",0,Prj,false,ObjPrjSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:18
         MatCol(t,150,"Expences",0,Exp,false,ObjExpSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
         MatCol(t,210,"Supplier",0,Supp,false,ObjSuppSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
-        MatCol(t,270,"Location",0,Loc,false,ObjLocSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
-		MatCol(t,320,"Foundation",0,Found,false,ObjFoundSClass);//Edit---------------Vitalii 14:15 04.08.2015
+		MatCol(t,270,"Foundation",0,Found,false,ObjFoundSClass);//Edit---------------Vitalii 14:15 04.08.2015
+        MatCol(t,330,"Location",0,Loc,false,ObjLocSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
       end;
       MatCol(t,380,"Suppl. Name",0,SupName,false,0);
       MatCol(t,520,"Description",0,Comment,false,0);

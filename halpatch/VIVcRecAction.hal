@@ -1002,6 +1002,9 @@ what the hell?
               if(nonblank(VIrw.Supp))then begin
               	objstr = objstr & "," & VIrw.Supp;// Edit ************************** Wednesday, 15 July 2015 10:59:15
               end;
+              if(nonblank(VIrw.Found))then begin
+              	objstr = objstr & "," & VIrw.Found;//Edit---------------Vitalii 17:12 04.08.2015
+              end;
               
               NoDupObjs(objstr,objstr);
               NormalizeObjstr(objstr);// Edit ************************** Wednesday, 15 July 2015 11:05:34
