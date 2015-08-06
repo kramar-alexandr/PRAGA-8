@@ -3975,3 +3975,17 @@ begin
   end;
   EndWindow;
 end;
+
+
+window ImportIClass:1		// added ************ Dima, 19.11.2014
+  wtag("language","RUS"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+real h,v,vs;
+Integer i;
+  WindowBegin("€мпорт товаров",ImportIClass,CGIcW,-);	//INImportIn()
+  SetWRect(20,80,470,600);
+  
+  StaticText(100,20,"Be careful!",false);
+
+  EndWindow;
+end;

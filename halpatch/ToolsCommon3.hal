@@ -1600,3 +1600,59 @@ BEGIN
   errcode = CheckObjsNew(AccStr,Objstr,otcheckaccs,otcheckobjtyps,otcheckcnt,errstr);     
   RETURN;
 END;
+
+
+
+
+
+
+
+global updating 
+procedure SetSalesmanToVIVcIn()
+Begin
+	record VIVc VIr;
+	record RHistVc RHistr;
+	string 50 num,datefield,timefield,user,type,rec,VIsernr;
+	longint sernr;
+	vector string 20 Users;
+	array longint VIlist;
+	Integer i;
+	
+	
+	while (TestEOF()==false) begin
+		num = ImportField;
+		datefield = ImportField;
+		timefield = ImportField;
+		user = ImportField;
+		type = ImportField;
+		rec = ImportField;
+		if (rec!="VIVc5") then begin
+			rec = ImportField;
+		end;
+		if (rec=="VIVc5") then begin
+			VIsernr = ImportField;
+			LogText(0,"VECTOR:" & Users[VIsernr]);
+			if(blank(Users[VIsernr])) then begin
+				VIlist[VIlist.length] = StringToLongInt(VIsernr);
+			end;
+			
+			Users[VIsernr] = user;	
+			
+		end;
+		
+		
+		if (NextImportLine(true)) then begin end;
+		if (NextImportLine(true)) then begin end;		
+		
+	end;
+	
+	for(i=0;i<VIlist.length;i=i+1) begin
+		VIr.SerNr = VIlist[i];
+		VIr.SalesMan = Users[VIlist[i]];
+		RecordStore(VIr,true);
+		LogText(0,"VIVc  changed:  " & VIlist[i]);
+	end;	
+
+end;
+
+
