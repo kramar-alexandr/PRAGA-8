@@ -1631,12 +1631,13 @@ Begin
 		end;
 		if (rec=="VIVc5") then begin
 			VIsernr = ImportField;
-			LogText(0,"VECTOR:" & Users[VIsernr]);
+			//LogText(0,"VECTOR:" & Users[VIsernr]);
 			if(blank(Users[VIsernr])) then begin
 				VIlist[VIlist.length] = StringToLongInt(VIsernr);
+				Users[VIsernr] = user; //first who changed
 			end;
 			
-			Users[VIsernr] = user;	
+			//Users[VIsernr] = user;//last who changed
 			
 		end;
 		
@@ -1648,14 +1649,26 @@ Begin
 	
 	for(i=0;i<VIlist.length;i=i+1) begin
 		VIr.SerNr = VIlist[i];
-		LogText(0,"VIVc  founding...:  " & VIlist[i]);
+		//LogText(0,"VIVc  founding...:  " & VIlist[i]);
 		if (ReadFirstMain(VIr,1,true)) then begin
 				VIr.SalesMan = Users[VIlist[i]];
 				RecordStore(VIr,true);
 				LogText(0,"VIVc  changed:  " & VIlist[i]);
 		end;
 
-	end;	
+	end;
+	
+	//additional changes:
+	VIr.SerNr = 1;
+	if (ReadFirstMain(VIr,1,true)) then begin
+			VIr.SalesMan = "JULIA";
+			RecordStore(VIr,true);
+	end;
+	VIr.SerNr = 2;
+	if (ReadFirstMain(VIr,1,true)) then begin
+			VIr.SalesMan = "JULIA";
+			RecordStore(VIr,true);
+	end;		
 
 end;
 
