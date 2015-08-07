@@ -235,6 +235,12 @@ begin
 		ArrayField(Loc,M4UStr,60,ObjVc);
 		ArrayField(Found,M4UStr,60,ObjVc);
 		ArrayField(SupName,M4Str,100,0);
+		SubsetKeyBegin2(SalesMan);	//Edit----------------------Dima  07.08.2015
+  	StoreInBaseKey;
+  	AppendFieldToKeyName(SalesGroup);
+  	AppendFieldToKeyName(SalesMan);
+  	KeySegment(SalesMan);
+  	KeySegment(SerNr);
 	EndRecordAdd;
 	
 return;  

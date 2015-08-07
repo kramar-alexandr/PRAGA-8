@@ -3947,7 +3947,8 @@ begin
   RlColKey(pos,pos,"#Supplier#",VECode,false,VECode);
   pos = pos + 70;
   RlColKey(pos,pos,"Name",VEName,false,VEName);
-  RlCol(-170,-170,"Salesman",SalesMan,false);
+  //RlCol(-170,-170,"Salesman",SalesMan,false);
+  RlColKey(-170,-170,"Salesman",SalesMan,false,SalesMan);//Edit----------------------Dima  07.08.2015
   if (HasMultiCurrency) then begin
     if (AcceptanceStatusColumnTest("VIVc")) then begin
       CalculatedColumn(-150,-150,"Appr.","VILClassAcceptanceStatus",false);

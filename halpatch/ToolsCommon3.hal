@@ -1608,7 +1608,7 @@ END;
 
 
 global updating 
-procedure SetSalesmanToVIVcIn()
+procedure SetSalesmanToVIVcIn()	//Edit----------------------Dima  07.08.2015
 Begin
 	record VIVc VIr;
 	record RHistVc RHistr;
@@ -1617,6 +1617,8 @@ Begin
 	vector string 20 Users;
 	array longint VIlist;
 	Integer i;
+	
+	//RHistVc file used for import here
 	
 	
 	while (TestEOF()==false) begin
@@ -1649,7 +1651,6 @@ Begin
 	
 	for(i=0;i<VIlist.length;i=i+1) begin
 		VIr.SerNr = VIlist[i];
-		//LogText(0,"VIVc  founding...:  " & VIlist[i]);
 		if (ReadFirstMain(VIr,1,true)) then begin
 				VIr.SalesMan = Users[VIlist[i]];
 				RecordStore(VIr,true);
