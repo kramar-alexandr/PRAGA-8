@@ -1648,9 +1648,13 @@ Begin
 	
 	for(i=0;i<VIlist.length;i=i+1) begin
 		VIr.SerNr = VIlist[i];
-		VIr.SalesMan = Users[VIlist[i]];
-		RecordStore(VIr,true);
-		LogText(0,"VIVc  changed:  " & VIlist[i]);
+		LogText(0,"VIVc  founding...:  " & VIlist[i]);
+		if (ReadFirstMain(VIr,1,true)) then begin
+				VIr.SalesMan = Users[VIlist[i]];
+				RecordStore(VIr,true);
+				LogText(0,"VIVc  changed:  " & VIlist[i]);
+		end;
+
 	end;	
 
 end;
