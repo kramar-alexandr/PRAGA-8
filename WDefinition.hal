@@ -3986,7 +3986,7 @@ Integer i;
   SetWRect(20,80,270,300);
   
   StaticText(50,20,"1. Export RHistVc register",false);
-  StaticText(50,40,"2. Remove the first 8 rows(header) ",false);
+  StaticText(50,40,"2. Remove the first 9 rows(header) ",false);
   StaticText(50,60,"3. Import it with this function",false);
 
   EndWindow;
