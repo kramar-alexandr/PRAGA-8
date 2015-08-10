@@ -233,8 +233,8 @@ begin
 		ArrayField(Exp,M4UStr,60,ObjVc);
 		ArrayField(Supp,M4UStr,60,ObjVc);
 		ArrayField(Loc,M4UStr,60,ObjVc);
-		ArrayField(Found,M4UStr,60,ObjVc);
 		ArrayField(SupName,M4Str,100,0);
+		ArrayField(Found,M4UStr,60,ObjVc);
 		SubsetKeyBegin2(SalesMan);	//Edit----------------------Dima  07.08.2015
   	StoreInBaseKey;
   	AppendFieldToKeyName(SalesGroup);
