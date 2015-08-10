@@ -1,4 +1,5 @@
 external function string 60 AddObjectToObjectList(string,string);
+external procedure GetObjs(string,string,var string);//Edit---------------Vitalii 15:20 10.08.2015
 
 global
 procedure GetPayModeAccNumber(string paymode,var string res)
@@ -1674,3 +1675,30 @@ Begin
 end;
 
 
+global 
+updating procedure FixVIVcMn(record RcVc RepSpec)
+begin
+	record VIVc VIr;
+	row VIVc VIrw;
+	record ObjVc Objr;
+	Integer rwcnt,i;
+	string 20 found;
+
+	VIr.SerNr = "";
+	while (LoopMain(VIr,1,true)) begin
+		rwcnt = MatRowCnt(VIr);
+		for (i=0;i<rwcnt;i=i+1) begin
+			found = "";
+			MatRowGet(VIr,i,VIrw);
+			Objr.Code = VIrw.Found;
+			if !ReadFirstMain(Objr,1,true) then begin
+				VIrw.SupName = VIrw.Found;
+				GetObjs("FOUND",VIrw.Objects,found);
+				VIrw.Found = found;
+			end;
+		end;
+		RECORDSTORE(VIr,false);
+	end;
+
+return;
+end;
