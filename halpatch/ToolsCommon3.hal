@@ -1680,7 +1680,7 @@ updating procedure FixVIVcMn(record RcVc RepSpec)
 begin
 	record VIVc VIr;
 	row VIVc VIrw;
-	record ObjVc Objr;
+	record ObjVc Objr,Obj2r;
 	Integer rwcnt,i;
 	string 20 found;
 	boolean changedf;
@@ -1694,7 +1694,9 @@ begin
 			MatRowGet(VIr,i,VIrw);
 			Objr.Code = VIrw.Found;
 			if !ReadFirstMain(Objr,1,true) then begin
-				VIrw.SupName = VIrw.Found;
+				Obj2r.Code = VIrw.Supp;
+				ReadFirstMain(Obj2r,1,true)
+				VIrw.SupName = Obj2r.Comment;
 				GetObjs("FOUND",VIrw.Objects,found);
 				VIrw.Found = found;
 				MatRowPut(VIr,i,VIrw);
