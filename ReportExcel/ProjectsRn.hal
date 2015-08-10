@@ -92,6 +92,7 @@ BEGIN
 	record ITVc ITr;
 	record TRVc TRr;
 	record MainVc Mainr;
+	record ObjVc Objr;
 	row TBBUVc TBBUrw;
 	row TRVc TRrw;
 	integer i,k,j,mtrw,PAi;
@@ -113,7 +114,9 @@ BEGIN
 						if(TBBUrw.stp==18) then begin
 							k = TBBUrw.ItemType;
 						end;
-						if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode) and TBBUrw.ExtraObj==RepSpec.f1) then begin
+						Objr.Code = RepSpec.ObjStr;
+						readfirstmain(Objr,1,true);
+						if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode) and TBBUrw.ExtraObj==RepSpec.f1 and (setinset(RepSpec.ObjStr,TBBUrw.Objects) or blank(RepSpec.ObjStr) or Objr.OTCode=="LOCAT")) then begin
 							for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
 								if (setinset(ArtArrayWithoutGroups[j],TBBUrw.Objects)) then begin
 									ITr.Code = ArtArrayWithoutGroups[j];
@@ -168,7 +171,9 @@ BEGIN
 							if (TBBUrw.stp==18) then begin
 								k = TBBUrw.ItemType;
 							end;
-							if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode) and TBBUrw.ExtraObj==RepSpec.f1) then begin
+							Objr.Code = RepSpec.ObjStr;
+							readfirstmain(Objr,1,true);
+							if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode) and (TBBUrw.ExtraObj==RepSpec.f1) and (setinset(RepSpec.ObjStr,TBBUrw.Objects) or blank(RepSpec.ObjStr) or Objr.OTCode=="LOCAT")) then begin
 								for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
 									if (setinset(ArtArrayWithoutGroups[j],TBBUrw.Objects)) then begin
 										ITr.Code = ArtArrayWithoutGroups[j];
@@ -225,7 +230,7 @@ BEGIN
 				mtrw = matrowcnt(TRr);
 				for (i=0;i<mtrw;i=i+1) begin
 					matrowget(TRr,i,TRrw);
-					if (TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber and setinset(RepSpec.f1,TRrw.Objects)) then begin
+					if (TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber and setinset(RepSpec.f1,TRrw.Objects) and (setinset(RepSpec.ObjStr,TRrw.Objects) or blank(RepSpec.ObjStr))) then begin
 						for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
 							if(setinset(prjobjs[PAi],TRrw.Objects)) then begin
 								for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
@@ -302,7 +307,11 @@ BEGIN
 		end;
 		deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
 		BlockLoad(BCb);
-		sheetNames[0] = RepSpec.f1 & "-Projects-TOT";
+		sheetNames[0] = RepSpec.f1;
+		if nonblank(RepSpec.ObjStr) then begin
+			sheetNames[0] = sheetNames[0] & "-" & RepSpec.ObjStr;
+		end;
+		sheetNames[0] = sheetNames[0] & "-Projects-TOT";
 		qtyOfSheets = 1;
 		colnum = 0;
 		sheetColls[colnum] = 9.5703125;
@@ -356,6 +365,8 @@ BEGIN
 		rownum = 1;
 		BeginRow(sheetnum,fileToSave,rownum,false);
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Projects",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+			colnum = colnum + 1;
+			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Location - " & RepSpec.ObjStr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		EndRow(sheetnum,fileToSave,rownum);
 		style = 38;
 		colnum = 1;

@@ -2116,7 +2116,7 @@ begin
   MatCol(1,30,"Item",0,ArtCode,false,CLCorspSClass);// Edit ************************** Thursday, 18 June 2015 17:57:24
   MatCol(1,100,"Suppl",0,VECode,false,VESClass);
   MatCol(1,155,"Qty",0,Qty,true,0);
-  MatCol(1,200,"Foundation",0,ExtraObj,true,Obj3SClass);
+  MatCol(1,200,"Foundation",0,ExtraObj,true,ObjFoundSClass);
   MatCol(1,255,"Description",0,Comment,false,0);
   MatCol(t=kInvoiceRowTypeStructuredItemComponent,30,"Item",0,ArtCode,false,INSClass);
   MatCol(t,100,"Person",0,EMCode,false,UserSClass);
@@ -2300,28 +2300,6 @@ begin
   SpecialMenu("Sales Order",'l',2,"ORFromTBBUDsm");
 
 //      SpecialMenu("Open Tax Matrix",' ',25,"OpenTaxMatrixTBBUDsm");
-  EndWindow;
-end;
-
-
-
-window Obj3SClass:2
-  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer,iPad,iPhone")
-begin
-  real v;
-  Integer mwn;
-  Boolean contf;
-  
-  WindowBegin("Paste Object",Obj3SClass,CGslist,ObjView);
-  DynamicWindow;
-  SpawnClass(ObjDClass);
-  UseView(ObjVc);
-  Sizeable(-1,-1,0,0);
-  SetWRect(220,80,600,298);
-  RecordList(4,17,-21,-39);
-  RlColKey(4,1,    "Object",Code,false,ActSbstOTCode);
-  RlColKey(201,201,"Name",Comment,false,ActSbstComment);
-  SearchField("Search");
   EndWindow;
 end;
 
@@ -3087,7 +3065,8 @@ real h,v,vs,h1;
 		StaticText(h,v,"Period",false);
 		EditField(h,v+=10,120,"Start",Normal,sStartDate,false,PasteCurDate);
 		EditField(h,v+=vs,120,"End",Normal,sEndDate,false,PasteCurDate);
-		EditField(h,v+=vs,120,"Foundation",Normal,f1,false,Obj3SClass);
+		EditField(h,v+=vs,120,"Foundation",Normal,f1,false,ObjFoundSClass);
+		EditField(h,v+=vs,120,"Location",Normal,ObjStr,false,ObjLocSClass);
 		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunProjectRn","Run");
 	EndWindow;
 end;
@@ -3849,7 +3828,7 @@ begin
   MatCol(1,30,"Item",0,ArtCode,false,CLCorspSClass);
   MatCol(1,100,"Suppl",0,VECode,false,VESClass);
   MatCol(1,155,"Qty",0,Qty,true,0);
-  MatCol(1,200,"Foundation",0,ExtraObj,true,Obj3SClass);
+  MatCol(1,200,"Foundation",0,ExtraObj,true,ObjFoundSClass);
   MatCol(1,255,"Description",0,Comment,false,0);
   MatCol(t=kInvoiceRowTypeStructuredItemComponent,30,"Item",0,ArtCode,false,INSClass);
   MatCol(t,100,"Person",0,EMCode,false,UserSClass);

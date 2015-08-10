@@ -42,19 +42,6 @@ BEGIN
   RETURN;
 END; //Edit***************************Sasha2,17:38 13.10.2014 }
 
-
-global
-Function Boolean Obj3SClassOnOpenWindow(Integer wn)
-begin
-  
-	SetWindowSubset(wn,"FOUND");
-  
-  
-  Obj3SClassOnOpenWindow = false;
-  return;
-end;
-
-
 global
 Function Boolean ObjPrjSClassOnOpenWindow(Integer wn)
 begin
