@@ -707,7 +707,7 @@ BEGIN
     VIp.VATNr  = VEr.VATNr;
     VIp.SortCode  = VEr.SortCode;
     VIp.SalesGroup = VEr.SalesGroup;
-    VIp.SalesMan = VEr.SalesMan;
+		VIp.SalesMan = VEr.SalesMan;
     VIp.ExportFlag = VEr.ExportFlag;
     VIp.SelfBilling = VEr.SelfBilling;
     VIp.VELegalForm = VEr.LegalForm;
@@ -764,6 +764,7 @@ BEGIN
       MessageBox(2020,"");
     end;
   end;
+  VIp.SalesMan = currentuser;// Edit ************************** Thursday, 23 July 2015 09:40:28
   PasteVendInVI = found;
   RETURN;
 END;
