@@ -44,7 +44,7 @@ begin
 	record ObjVc Objr;
 	
 	res = false;
-	Objr.Code = ObjCode
+	Objr.Code = ObjCode;
 	if (readfirstmain(Objr,1,true)) then begin
 		if (Objr.OTCode==OTCode) then begin
 			res = true;
