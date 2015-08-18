@@ -38,6 +38,21 @@ begin
 return;	
 end;
 
+function boolean OTCodeMatch(string ObjCode, string OTCode)
+begin
+	boolean res;
+	record ObjVc Objr;
+	
+	res = false;
+	Objr.Code = ObjCode
+	if (readfirstmain(Objr,1,true)) then begin
+		if (Objr.OTCode==OTCode) then begin
+			res = true;
+		end;
+	end;
+	OTCodeMatch = res;
+	return;
+end;
 
 function boolean CollectSubTotals(record BudRep1Vc BRr,integer rownr,var array val subtotals)
 begin
@@ -138,7 +153,7 @@ BEGIN
 						repmtrw = matrowcnt(BRr);
 						For(repi=0;repi<repmtrw;repi=repi+1) begin
 							matrowget(BRr,repi,BRrw);
-							if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1)))then begin
+							if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1) or OTCodeMatch(RepSpec.f1,"LOCAT"))) then begin
 								switch(k) begin
 									case 1:
 										BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
@@ -205,7 +220,7 @@ BEGIN
 								repmtrw = matrowcnt(BRr);
 								For(repi=0;repi<repmtrw;repi=repi+1) begin
 									matrowget(BRr,repi,BRrw);
-									if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1)))then begin
+									if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1) or OTCodeMatch(RepSpec.f1,"LOCAT")))then begin
 										switch(k) begin
 											case 1:
 												BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
@@ -377,7 +392,7 @@ BEGIN
 							repmtrw = matrowcnt(BRr);
 							For(repi=0;repi<repmtrw;repi=repi+1) begin
 								matrowget(BRr,repi,BRrw);
-								if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1)))then begin
+								if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1) or OTCodeMatch(RepSpec.f1,"LOCAT")))then begin
 									switch(k) begin
 										case 1:
 											BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
@@ -444,7 +459,7 @@ BEGIN
 									repmtrw = matrowcnt(BRr);
 									For(repi=0;repi<repmtrw;repi=repi+1) begin
 										matrowget(BRr,repi,BRrw);
-										if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1)))then begin
+										if(setinset(BRrw.Code,TBBUrw.Objects) and ((setinset(BRrw.VECode,TBBUrw.VECode) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1) or OTCodeMatch(RepSpec.f1,"LOCAT")))then begin
 											switch(k) begin
 												case 1:
 													BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
