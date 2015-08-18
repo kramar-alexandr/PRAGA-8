@@ -212,7 +212,6 @@ BEGIN
 	Mainr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
 	while (loopkey("TransDate",Mainr,1,TrHs)) begin
-		
 		testf = true;
 		if (!SetInSet(Mainr.AccNumber,AccStr)) then begin
 			testf = false;
@@ -221,7 +220,6 @@ BEGIN
 			TrHs = false;
 			testf = false;
 		end;
-		
 		if (testf) then begin
 			TRr.Number = Mainr.TransNr;
 			TRr.IntYc = Mainr.IntYc;
@@ -274,6 +272,8 @@ END;
 global
 procedure ProjectRn(record RcVc RepSpec,var area areatofile, var boolean PrjFoundf)
 BEGIN
+//RepSpec.f1 - Foundation
+//RepSpec.ObjStr - Location
 	record BaseCurBlock BCb;
 	record ITVc ITr;
 	record ObjVc Objr;

@@ -64,12 +64,16 @@ BEGIN
 	record PRVc PRr,PR2r;
 	record TBBUVc TBBUr;
 	row TBBUVc TBBUrw;
+	record TRVc TRr;
+	row TRVc TRrw;
 	integer i,k,j,mtrw,PAi,FAi;
 	boolean TrHs,testf;
+	array string 20 prjobjs;
 	
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
 		PRr.Code = ProjArray[PAi];
 		if (ReadFirstMain(PRr,1,true)) then begin
+			prjobjs[PAi] = PRr.Objects;
 			if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
 				TBBUr.PRCode = PRr.Code;
 				if (ReadFirstMain(TBBUr,1,true)) then begin
@@ -111,7 +115,7 @@ BEGIN
 						for (i=0;i<mtrw;i=i+1) begin
 							matrowget(TBBUr,i,TBBUrw);
 							if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode)) then begin
-								for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin 
+								for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin
 									if (TBBUrw.ExtraObj==FoundArray[FAi]) then begin
 										FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
 										FPVect["TOTAL:" & ProjArray[PAi]] = FPVect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
@@ -126,9 +130,39 @@ BEGIN
 			end;
 		end;
 	end;
+	TRr.TransDate = RepSpec.sStartDate;
+	TrHs = true;
+	while (loopkey("TransDate",TRr,1,TrHs)) begin
+		if (TRr.TransDate > RepSpec.sEndDate) then begin
+			TrHs = false;
+		end;
+		if (TrHs) then begin
+			mtrw = matrowcnt(TRr);
+			for (i=0;i<mtrw;i=i+1) begin
+				matrowget(TRr,i,TRrw);
+				if ((TRrw.ovst == 0) and (setinset(RepSpec.ObjStr,TRrw.Objects) or blank(RepSpec.ObjStr))) then begin
+					for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin
+						if setinset(FoundArray[FAi],TRrw.Objects) then begin
+							for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+								if setinset(prjobjs[PAi],TRrw.Objects) then begin
+									FPVect["Fact:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Fact:" & FoundArray[FAi] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+									FPVect["Fact:TOTAL:" & ProjArray[PAi]] = FPVect["Fact:TOTAL:" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+									FPVect["Fact:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Fact:" & FoundArray[FAi] & ":TOTAL"] - TRrw.CredVal + TRrw.DebVal;
+									FPVect["Fact:TOTAL:TOTAL"] = FPVect["Fact:TOTAL:TOTAL"] - TRrw.CredVal + TRrw.DebVal;
+								end;
+							end;
+						end;
+					end;
+				end;
+			end;
+		end;
+	end;
+	
 	for (i=0;i<ProjArray.length;i=i+1) begin
-		FPVect["TOTALproc:" & ProjArray[i]] = FPVect["TOTAL:" & ProjArray[i]]/FPVect["TOTAL:TOTAL"]*100;
-		FPVect["TOTALproc:TOTALproc"] = FPVect["TOTALproc:TOTALproc"] + FPVect["TOTALproc:" & ProjArray[i]];
+		FPVect[		"TOTALproc:" & ProjArray[i]] = FPVect[     "TOTAL:" & ProjArray[i]]/FPVect[     "TOTAL:TOTAL"]*100;
+		FPVect["Fact:TOTALproc:" & ProjArray[i]] = FPVect["Fact:TOTAL:" & ProjArray[i]]/FPVect["Fact:TOTAL:TOTAL"]*100;
+		FPVect[		"TOTALproc:TOTALproc"] = FPVect[	 "TOTALproc:TOTALproc"] + FPVect[	  "TOTALproc:" & ProjArray[i]];
+		FPVect["Fact:TOTALproc:TOTALproc"] = FPVect["Fact:TOTALproc:TOTALproc"] + FPVect["Fact:TOTALproc:" & ProjArray[i]];
 	end;
 	RETURN;
 END;
@@ -165,94 +199,135 @@ BEGIN
 	colnum = 0;
 	sheetColls[colnum] = 14.28515625;
 	colnum = colnum + 1;
-	
-	for (i=0;i<ProjArray.length;i=i+1) begin
-		sheetColls[colnum] = 9.7109375;
+	for (i=0;i<ProjArray.length*2;i=i+1) begin
+		sheetColls[colnum] = 11.7109375;
 		colnum = colnum + 1;
 	end;
-	sheetColls[colnum] = 13.140625;
+	sheetColls[colnum] = 15.28515625;
+	colnum = colnum + 1;
+	sheetColls[colnum] = 15.28515625;
 	colnum = 0;
 	numOfUniqueSharedStrings = 0;
 	numOfSharedStrings = 0;
 	sheetnum = 1;
-	
+	qtyMergeCell = 0;
 	XmlXlsxWorkBegin(fileToSave,reportName);
 	CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
 	SetSheetsCols(sheetnum,sheetColls,fileToSave);
 	BeginSheetData(sheetnum,fileToSave);
-		style = 13;
 		colnum = 2;
 		rownum = 2;
 		BeginRow(sheetnum,fileToSave,rownum,false);
-			mergeCell[0] = GetStringCellNum(colnum,rownum);
+			mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+			style = 5;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-			style = 14;
-			qtyOfEmpStr = ProjArray.length - 1;
+			style = 6;
+			qtyOfEmpStr = ProjArray.length*2 - 2;
+			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+			style = 7;
+			qtyOfEmpStr = 2;
+			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+			style = 8;
+			qtyOfEmpStr = 1;
+			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+			mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
+			qtyMergeCell = qtyMergeCell + 1;
+		EndRow(sheetnum,fileToSave,rownum);
+		colnum = 2;
+		BeginRow(sheetnum,fileToSave,rownum,false);
+			style = 22;
+			for (i=0;i<ProjArray.length - 1;i=i+1) begin
+				mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+				StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i] & " - " & ProjNamesVect[ProjArray[i]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+				style = 23;
+				qtyOfEmpStr = 1;
+				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+				style = 24;
+				mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
+				qtyMergeCell = qtyMergeCell + 1;
+			end;
+			style = 25;
+			mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+			StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i] & " - " & ProjNamesVect[ProjArray[i]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+			style = 26;
+			qtyOfEmpStr = 1;
 			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 			style = 15;
+			mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
+			qtyMergeCell = qtyMergeCell + 1;
 			qtyOfEmpStr = 1;
 			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-			mergeCell[0] = mergeCell[0] & ":" & GetStringCellNum(colnum-1,rownum);
-		EndRow(sheetnum,fileToSave,rownum);
-		style = 7;
-		colnum = 2;
-		BeginRow(sheetnum,fileToSave,rownum,false);
-			for (i=0;i<ProjArray.length - 1;i=i+1) begin
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				style = 8;
-			end;
 			style = 9;
-			StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-			style = 3;
 			qtyOfEmpStr = 1;
 			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 		EndRow(sheetnum,fileToSave,rownum);
-		style = 10;
 		colnum = 2;
 		BeginRow(sheetnum,fileToSave,rownum,false);
+			style = 3;
 			for (i=0;i<ProjArray.length - 1;i=i+1) begin
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjNamesVect[ProjArray[i]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				style = 11;
+				qtyOfEmpStr = 1;
+				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+				style = 19;
+				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+				style = 4;
 			end;
+			qtyOfEmpStr = 1;
+			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 			style = 12;
-			StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjNamesVect[ProjArray[i]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-			style = 4;
+			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+			style = 16;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Grand Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+			style = 10;
+			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Grand Total - Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		EndRow(sheetnum,fileToSave,rownum);
 		rownum = rownum + 1;
 		for (i=0;i<FoundArray.length;i=i+1) begin
-			style = 1;
 			colnum = 1;
 			BeginRow(sheetnum,fileToSave,rownum,false);
+				style = 1;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,FoundArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				style = 2;
 				for (j=0;j<ProjArray.length;j=j+1) begin
+					style = 2;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[i] & ":" & ProjArray[j]]);
+					style = 11;
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[i] & ":" & ProjArray[j]]);
 				end;
-				style = 2;
+				style = 17;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[i] & ":TOTAL"]);
+				style = 13;
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[i] & ":TOTAL"]);
 			EndRow(sheetnum,fileToSave,rownum);
 		end;
 		rownum = rownum + 1;
-		style = 1;
 		colnum = 1;
 		BeginRow(sheetnum,fileToSave,rownum,false);
+			style = 1;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"sub tot",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-			style = 5;
 			for (i=0;i<ProjArray.length;i=i+1) begin
+				style = 21;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]);
+				style = 20;
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTAL:" & ProjArray[i]]);
 			end;
+			style = 18;
 			NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:TOTAL"]);
+			style = 14;
+			NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTAL:TOTAL"]);
 		EndRow(sheetnum,fileToSave,rownum);
-		style = 1;
 		colnum = 1;
 		BeginRow(sheetnum,fileToSave,rownum,false);
+			style = 1;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"sub tot %",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-			style = 5;
 			for (i=0;i<ProjArray.length;i=i+1) begin
+				style = 21;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTALproc:" & ProjArray[i]]);
+				style = 20;
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTALproc:" & ProjArray[i]]);
 			end;
+			style = 18;
 			NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTALproc:TOTALproc"]);
+			style = 14;
+			NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTALproc:TOTALproc"]);
 		EndRow(sheetnum,fileToSave,rownum);
 	EndSheetData(sheetnum,fileToSave);
 	MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);

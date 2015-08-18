@@ -3892,6 +3892,7 @@ real h,v,vs,h1;
 		StaticText(h,v,"Period",false);
 		EditField(h,v+=10,120,"Start",Normal,sStartDate,false,PasteCurDate);
 		EditField(h,v+=vs,120,"End",Normal,sEndDate,false,PasteCurDate);
+		EditField(h,v+=vs,120,"Location",Normal,ObjStr,false,ObjLocSClass);
 		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunBudgetTotalRn","Run");
 	EndWindow;
 end;
