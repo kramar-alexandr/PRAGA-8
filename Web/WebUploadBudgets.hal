@@ -9,7 +9,7 @@ begin
 	string 5 tab,nl;
 	
 	tab = chr(9);
-	nl = chr(13) & chr(10);
+	nl = chr(10) & chr(13);
 	
 	TBBUr.PRCode = "";
 	while (LoopMain(TBBUr,1,true)) begin
