@@ -1,11 +1,29 @@
+external function integer GetQuartal(date);
+external procedure GetObjs(string,string,var string);
+
+function string 10 GetPrjCode(string prjObj)
+BEGIN
+	record PRVc PRr;
+	boolean foundf;
+	string 10 res;
+	
+	res = "";
+	foundf = false;
+	while(loopmain(PRr,1,!foundf)) begin
+		if (PRr.Objects == prjObj) then begin
+			foundf = true;
+			res = PRr.Code;
+		end;
+	end;
+	GetPrjCode = res;
+	RETURN;
+END;
+
 procedure HandleWebUploadBudgets()
 begin
 	record TBBUVc TBBUr;
 	row TBBUVc TBBUrw;
-	record TRVc TRr;
-	row TRVc TRrw;
-	integer i,k,j,mtrw,PAi,FAi;
-	boolean TrHs,testf;
+	integer i,k,mtrw;
 	string 5 tab,nl;
 	
 	tab = chr(9);
@@ -28,9 +46,71 @@ begin
 	return;
 end;
 
+procedure HandleWebUploadBudgetsFact()
+begin
+	record INVc INr;
+	record MainVc Mainr;
+	record TRVc TRr;
+	row TRVc TRrw;
+	integer i,k,mtrw;
+	string 5 tab,nl;
+	string 255 AccStr;
+	string 100 prj,found,suppl,exp,locat;
+	
+	tab = chr(9);
+	nl = chr(10) & chr(13);
+	
+	while(loopmain(INr,1,true)) begin
+		if (nonblank(INr.Objects)) then begin
+			if !(SetInSet(INr.CostAcc,AccStr)) then begin
+				AccStr = AccStr & "," & INr.CostAcc;
+			end;
+		end;
+	end;
+	AccStr = right(AccStr,len(AccStr) - 1);
+	
+	Mainr.TransDate = "";
+	while (loopkey("TransDate",Mainr,1,true)) begin
+		if (SetInSet(Mainr.AccNumber,AccStr)) then begin
+			TRr.Number = Mainr.TransNr;
+			TRr.IntYc = Mainr.IntYc;
+			if (readfirstmain(TRr,2,true)) then begin
+				k = GetQuartal(TRr.TransDate);
+				mtrw = matrowcnt(TRr);
+				for (i=0;i<mtrw;i=i+1) begin
+					matrowget(TRr,i,TRrw);
+					if ((TRrw.ovst==0) and (TRrw.AccNumber==Mainr.AccNumber)) then begin
+						prj = "";
+						GetObjs("PRJ",TRrw.Objects,prj);
+						if nonblank(prj) then begin
+							prj = GetPrjCode(prj);
+						end;
+						found = "";
+						GetObjs("FOUND",TRrw.Objects,found);
+						suppl = "";
+						GetObjs("SUPPL",TRrw.Objects,suppl);
+						exp = "";
+						GetObjs("EXP",TRrw.Objects,exp);
+						locat = "";
+						GetObjs("LOCAT",TRrw.Objects,locat);
+						weboutstring(prj & tab & found & tab & suppl & tab & exp & tab & locat & tab & (TRrw.DebVal - TRrw.CredVal) & tab & k & nl);
+					end;
+				end;
+			end;
+		end;
+	end;
+
+	return;
+end;
 
 global webpublic procedure WebUploadBudgets()
 begin
 	HandleWebUploadBudgets;
+	return;
+end;
+
+global webpublic procedure WebUploadBudgetsFact()
+begin
+	HandleWebUploadBudgetsFact;
 	return;
 end;
