@@ -103,6 +103,46 @@ begin
 	return;
 end;
 
+procedure HandleWebUploadUniqStrs()
+begin
+	record TBBUVc TBBUr;
+	record ObjVc Objr;
+	string 5 tab,nl;
+	
+	tab = chr(9);
+	nl = chr(10) & chr(13);
+	
+	TBBUr.PRCode = "";
+	while (LoopMain(TBBUr,1,true)) begin
+		weboutstring(TBBUr.PRCode & tab);
+	end;
+	weboutstring(nl);
+	Objr.OTCode = "FOUND";
+	while (LoopKey("OTCode",Objr,1,true)) begin
+		weboutstring(Objr.Code & tab);
+	end;
+	weboutstring(nl);
+	ResetLoop(Objr);
+	Objr.OTCode = "LOCAT";
+	while (LoopKey("OTCode",Objr,1,true)) begin
+		weboutstring(Objr.Code & tab);
+	end;
+	weboutstring(nl);
+	ResetLoop(Objr);
+	Objr.OTCode = "SUPPL";
+	while (LoopKey("OTCode",Objr,1,true)) begin
+		weboutstring(Objr.Code & tab);
+	end;
+	weboutstring(nl);
+	ResetLoop(Objr);
+	Objr.OTCode = "EXP";
+	while (LoopKey("OTCode",Objr,1,true)) begin
+		weboutstring(Objr.Code & tab);
+	end;
+	weboutstring(nl);
+	return;
+end;
+
 global webpublic procedure WebUploadBudgets()
 begin
 	HandleWebUploadBudgets;
@@ -112,5 +152,11 @@ end;
 global webpublic procedure WebUploadBudgetsFact()
 begin
 	HandleWebUploadBudgetsFact;
+	return;
+end;
+
+global webpublic procedure WebUploadUniqStrs()
+begin
+	HandleWebUploadUniqStrs;
 	return;
 end;
