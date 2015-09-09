@@ -213,9 +213,9 @@ BEGIN
 	TrHs = true;
 	while (loopkey("TransDate",Mainr,1,TrHs)) begin
 		testf = true;
-		if (!SetInSet(Mainr.AccNumber,AccStr)) then begin
-			testf = false;
-		end;
+		//if (!SetInSet(Mainr.AccNumber,AccStr)) then begin
+		//	testf = false;
+		//end;
 		if (Mainr.TransDate>RepSpec.sEndDate) then begin
 			TrHs = false;
 			testf = false;
