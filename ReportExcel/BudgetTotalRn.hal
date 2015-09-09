@@ -140,7 +140,7 @@ BEGIN
 			mtrw = matrowcnt(TRr);
 			for (i=0;i<mtrw;i=i+1) begin
 				matrowget(TRr,i,TRrw);
-				if ((TRrw.ovst == 0) and (setinset(RepSpec.ObjStr,TRrw.Objects) or blank(RepSpec.ObjStr))) then begin
+				if ((TRrw.ovst == 0) and ((mid(TRrw.AccNumber,0,1)=="5")) and (setinset(RepSpec.ObjStr,TRrw.Objects) or blank(RepSpec.ObjStr))) then begin
 					for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin
 						if setinset(FoundArray[FAi],TRrw.Objects) then begin
 							for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
