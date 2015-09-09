@@ -209,58 +209,46 @@ BEGIN
 			end; //while
 		end;
 	end; //for (PAi=0...
-	Mainr.TransDate = RepSpec.sStartDate;
+		TRr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
-	while (loopkey("TransDate",Mainr,1,TrHs)) begin
-		testf = true;
-		//if (!SetInSet(Mainr.AccNumber,AccStr)) then begin
-		//	testf = false;
-		//end;
-		if (mid(Mainr.AccNumber,0,1)!="5") then begin
-			testf = false;
-		end;
-		if (Mainr.TransDate>RepSpec.sEndDate) then begin
+	while (loopkey("TransDate",TRr,1,TrHs)) begin
+		if (TRr.TransDate > RepSpec.sEndDate) then begin
 			TrHs = false;
-			testf = false;
 		end;
-		if (testf) then begin
-			TRr.Number = Mainr.TransNr;
-			TRr.IntYc = Mainr.IntYc;
-			if (readfirstmain(TRr,2,true)) then begin
-				k = GetQuartal(TRr.TransDate);
-				mtrw = matrowcnt(TRr);
-				for (i=0;i<mtrw;i=i+1) begin
-					matrowget(TRr,i,TRrw);
-					if (TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber and setinset(RepSpec.f1,TRrw.Objects) and (setinset(RepSpec.ObjStr,TRrw.Objects) or blank(RepSpec.ObjStr))) then begin
-						for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
-							if(setinset(prjobjs[PAi],TRrw.Objects)) then begin
-								for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
-									if (setinset(ArtArrayWithoutGroups[j],TRrw.Objects)) then begin
-										ITr.Code = ArtArrayWithoutGroups[j];
-										ReadLastMain(ITr,1,false);
-										group = ITr.Code;
-										switch(k) begin
-											case 1:
-												//на пересечении столбец проект - строка статья
-												Quart1Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-												//на пересечении столбец проект - строка группа статей
-												Quart1Vect["Fact:" & group & ":" & ProjArray[PAi]] = Quart1Vect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-											case 2:
-												Quart2Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart2Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-												Quart2Vect["Fact:" & group & ":" & ProjArray[PAi]] = Quart2Vect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-											case 3:
-												Quart3Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart3Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-												Quart3Vect["Fact:" & group & ":" & ProjArray[PAi]] = Quart3Vect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-											case 4:
-												Quart4Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart4Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-												Quart4Vect["Fact:" & group & ":" & ProjArray[PAi]] = Quart4Vect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-											otherwise
-												Quart1Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-												Quart1Vect["Fact:" & group & ":" & ProjArray[PAi]] = Quart1Vect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-										end;
-										TOTALVect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = TOTALVect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-										TOTALVect["Fact:" & group & ":" & ProjArray[PAi]] = TOTALVect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+		if (TrHs) then begin
+			k = GetQuartal(TRr.TransDate);
+			mtrw = matrowcnt(TRr);
+			for (i=0;i<mtrw;i=i+1) begin
+				matrowget(TRr,i,TRrw);
+				if (TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber and setinset(RepSpec.f1,TRrw.Objects) and (setinset(RepSpec.ObjStr,TRrw.Objects) or blank(RepSpec.ObjStr))) then begin
+					for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+						if(setinset(prjobjs[PAi],TRrw.Objects)) then begin
+							for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
+								if (setinset(ArtArrayWithoutGroups[j],TRrw.Objects)) then begin
+									ITr.Code = ArtArrayWithoutGroups[j];
+									ReadLastMain(ITr,1,false);
+									group = ITr.Code;
+									switch(k) begin
+										case 1:
+											//на пересечении столбец проект - строка статья
+											Quart1Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+											//на пересечении столбец проект - строка группа статей
+											Quart1Vect["Fact:" & group & ":" & ProjArray[PAi]] = Quart1Vect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+										case 2:
+											Quart2Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart2Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+											Quart2Vect["Fact:" & group & ":" & ProjArray[PAi]] = Quart2Vect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+										case 3:
+											Quart3Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart3Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+											Quart3Vect["Fact:" & group & ":" & ProjArray[PAi]] = Quart3Vect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+										case 4:
+											Quart4Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart4Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+											Quart4Vect["Fact:" & group & ":" & ProjArray[PAi]] = Quart4Vect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+										otherwise
+											Quart1Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+											Quart1Vect["Fact:" & group & ":" & ProjArray[PAi]] = Quart1Vect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
 									end;
+									TOTALVect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = TOTALVect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+									TOTALVect["Fact:" & group & ":" & ProjArray[PAi]] = TOTALVect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
 								end;
 							end;
 						end;
@@ -269,6 +257,8 @@ BEGIN
 			end;
 		end;
 	end;
+	
+
 	RETURN;
 END;
 
