@@ -568,7 +568,6 @@ BEGIN
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,ITr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					colnum = colnum + 1;
-				//if (RepSpec.flags[1]==1) then begin 
 					totrow = 0;
 					facttotrow = 0;
 					for (j=0;j<ProjArray.length;j=j+1) begin
@@ -610,8 +609,6 @@ BEGIN
 					colnum = colnum + 1;
 					PrjTotVect["Q1:TOTAL"] = PrjTotVect["Q1:TOTAL"] + totrow;
 					PrjTotVect["Fact:Q1:TOTAL"] = PrjTotVect["Fact:Q1:TOTAL"] + facttotrow;
-				//end;
-				//if (RepSpec.flags[2]==1) then begin 
 					totrow = 0;
 					facttotrow = 0;
 					for (j=0;j<ProjArray.length;j=j+1) begin
@@ -653,8 +650,6 @@ BEGIN
 					colnum = colnum + 1;
 					PrjTotVect["Q2:TOTAL"] = PrjTotVect["Q2:TOTAL"] + totrow;
 					PrjTotVect["Fact:Q2:TOTAL"] = PrjTotVect["Fact:Q2:TOTAL"] + facttotrow;
-				//end;
-				//if (RepSpec.flags[3]==1) then begin 
 					totrow = 0;
 					facttotrow = 0;
 					for (j=0;j<ProjArray.length;j=j+1) begin
@@ -696,8 +691,6 @@ BEGIN
 					colnum = colnum + 1;
 					PrjTotVect["Q3:TOTAL"] = PrjTotVect["Q3:TOTAL"] + totrow;
 					PrjTotVect["Fact:Q3:TOTAL"] = PrjTotVect["Fact:Q3:TOTAL"] + facttotrow;
-				//end;
-				//if (RepSpec.flags[4]==1) then begin 
 					totrow = 0;
 					facttotrow = 0;
 					for (j=0;j<ProjArray.length;j=j+1) begin
@@ -739,8 +732,6 @@ BEGIN
 					colnum = colnum + 1;
 					PrjTotVect["Q4:TOTAL"] = PrjTotVect["Q4:TOTAL"] + totrow;
 					PrjTotVect["Fact:Q4:TOTAL"] = PrjTotVect["Fact:Q4:TOTAL"] + facttotrow;
-				//end;
-				//if (RepSpec.flags[1]==1) then begin 
 					totrow = 0;
 					facttotrow = 0;
 					for (j=0;j<ProjArray.length;j=j+1) begin

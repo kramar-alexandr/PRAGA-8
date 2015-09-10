@@ -290,8 +290,7 @@ BEGIN
 						repmtrw = matrowcnt(BRr);
 						for (repi=0;repi<repmtrw;repi=repi+1) begin
 							matrowget(BRr,repi,BRrw);
-							//if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode))))) and (setinset(prjobj,TRrw.Objects))) then begin
-							if (true) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode))))) and (setinset(prjobj,TRrw.Objects))) then begin
+							if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode))))) and (setinset(prjobj,TRrw.Objects))) then begin
 								switch (k) begin
 									case 1:
 										BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;

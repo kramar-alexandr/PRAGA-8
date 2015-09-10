@@ -6,67 +6,17 @@ begin
 	record ObjVc Objr;
 	record OTVc OTr;
 	string 250 filename,tstr;
-	string 10 tmpDate;
 	area fileToSave;
 	record RcVc RepSpec;
 	integer wn;
-	boolean PrjFoundf,testf;
+	boolean PrjFoundf;
 	
 	logtext(0,"RunProjectRn is runing");
-	testf = true;
 	wn = curwindow;
 	deselectwindow(wn,true);
 	getwindowrecord(wn,RepSpec);
 	PrjFoundf = true;
-	if (blank(RepSpec.f2)) then begin
-		MessageBox(0,"Input Year!");
-		testf = false;
-	end else begin
-		if len(RepSpec.f2)!=4 then  begin
-			MessageBox(0,"Incorrect Year!");
-			testf = false;
-		end;
-	end;
-	if ((RepSpec.flags[1]==0) and (RepSpec.flags[2]==0) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==0) and testf) then begin
-		MessageBox(0,"Select at least one Quartal!");
-		testf = false;
-	end;
-	if (blank(RepSpec.f1) and testf) then begin
-		MessageBox(0,"Input Foundation!");
-		testf = false;
-	end;
-	if testf then begin
-		tmpDate = "";
-		if (RepSpec.flags[4]==1) then begin
-			tmpDate = "1/10/";
-		end;
-		if (RepSpec.flags[3]==1) then begin
-			tmpDate = "1/7/";
-		end;
-		if (RepSpec.flags[2]==1) then begin
-			tmpDate = "1/4/";
-		end;
-		if (RepSpec.flags[1]==1) then begin
-			tmpDate = "1/1/";
-		end;
-		tmpDate = tmpDate & RepSpec.f2;
-		RepSpec.sStartDate = StringToDate(tmpDate);
-		
-		tmpDate = "";
-		if (RepSpec.flags[1]==1) then begin
-			tmpDate = "31/3/";
-		end;
-		if (RepSpec.flags[2]==1) then begin
-			tmpDate = "30/6/";
-		end;
-		if (RepSpec.flags[3]==1) then begin
-			tmpDate = "30/9/";
-		end;
-		if (RepSpec.flags[4]==1) then begin
-			tmpDate = "31/12/";
-		end;
-		tmpDate = tmpDate & RepSpec.f2;
-		RepSpec.sEndDate = StringToDate(tmpDate);
+	if (nonblank(RepSpec.f1)) then begin
 		tstr = RepSpec.f1;
 		if nonblank(RepSpec.ObjStr) then begin
 			tstr = tstr & "-" & RepSpec.ObjStr;
@@ -74,6 +24,8 @@ begin
 		tstr = tstr & "-Projects-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
 		filename = SaveFileDialog(tstr,"","xlsx");
 		if ((filename!=tstr) and nonblank(filename)) then begin
+		//filename = SaveFileDialog("-Projects-","","xlsx");
+		//if ((filename!="-Projects-") and nonblank(filename)) then begin
 			ProjectRn(RepSpec,fileToSave,PrjFoundf);
 			if (PrjFoundf) then begin
 				if(fileexists(filename))then begin
@@ -86,6 +38,8 @@ begin
 				MessageBox(0,"Projects for specified period not found!");
 			end;
 		end;
+	end else begin
+		MessageBox(0,"Input Foundation!");
 	end;
 return;
 end;
