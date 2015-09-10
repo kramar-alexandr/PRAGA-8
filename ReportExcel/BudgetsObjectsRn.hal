@@ -257,6 +257,7 @@ BEGIN
 				matrowget(TRr,i,TRrw);
 				if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5")) then begin
 					if (setinset(RepSpec.f1,TRrw.Objects) or blank(RepSpec.f1)) then begin
+						vendobj = "";
 						GetObjs("SUPPL",TRrw.Objects,vendobj);	//while... readfirstmain(Objr,1,true) ...end;
 						foundf = false;
 						if nonblank(vendobj) then begin
@@ -489,6 +490,7 @@ BEGIN
 				matrowget(TRr,i,TRrw);
 				if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5")) then begin
 					if (setinset(RepSpec.f1,TRrw.Objects) or blank(RepSpec.f1)) then begin
+						vendobj = "";
 						GetObjs("SUPPL",TRrw.Objects,vendobj);
 						for (PRi=0;PRi<PRrCodes.length;PRi=PRi+1) begin
 							if(setinset(prjobjs[PRi],TRrw.Objects)) then begin
@@ -524,7 +526,7 @@ BEGIN
 								repmtrw = matrowcnt(BRr);
 								for (repi=0;repi<repmtrw;repi=repi+1) begin
 									matrowget(BRr,repi,BRrw);
-									if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))) then begin
+									if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode))))) then begin
 										switch (k) begin
 											case 1:
 												BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
