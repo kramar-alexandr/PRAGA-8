@@ -304,7 +304,7 @@ BEGIN
 							logtext(0,"+_____22222_________________" & (setinset(BRrw.Code,TRrw.Objects))); 
 							logtext(0,"+_____33333___________________" & (setinset(BRrw.VECode,TRrw.Objects))); 
 							logtext(0,"+_____44444__________________" & (nonblank(vendobj))); 
-							logtext(0,"+_____5555__________________" & (nonblank(BRrw.VECode)); 
+							logtext(0,"+_____5555__________________" & (nonblank(BRrw.VECode))); 
 							logtext(0,"+____6666____________________" & (setinset(prjobj,TRrw.Objects))); 
 							
 							
