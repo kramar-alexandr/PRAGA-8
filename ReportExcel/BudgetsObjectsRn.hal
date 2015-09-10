@@ -879,10 +879,11 @@ BEGIN
 					totalspendbyrow = BRrw.Spend1+BRrw.Spend2+BRrw.Spend3+BRrw.Spend4;						  		
 					if(totalbubyrow!=0 or totalspendbyrow!=0 )then begin
 						colnum = 1;
-						outlineLevel = 1;
-						if nonblank(prevcode) and BRrw.Code!=BRrw.Code then begin
-							outlineLevel = 2;
+						outlineLevel = 2;
+						if ((nonblank(prevcode) and BRrw.Code!=prevcode) or blank(prevcode)) then begin
+							outlineLevel = 1;
 						end;
+						prevcode = BRrw.Code;
 						BeginRow(sheetnum,fileToSave,rownum,outlineLevel,blankval);
 							style = 10;
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
