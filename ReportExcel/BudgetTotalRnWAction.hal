@@ -12,7 +12,10 @@ begin
 	wn = curwindow;
 	deselectwindow(wn,true);
 	getwindowrecord(wn,RepSpec);
-	tstr = "Budget Total Report";
+	if RepSpec.flags[1] == 1 then begin
+	tstr = "[Print]";
+	end;
+	tstr = tstr & "Budget Total Report";
 	if nonblank(RepSpec.ObjStr) then begin
 		tstr = tstr & " Locat-" & RepSpec.ObjStr;
 	end;
