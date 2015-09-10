@@ -316,7 +316,7 @@ BEGIN
 RETURN;
 END;
 
-procedure BRrCollectForFew(record RcVc RepSpec, string AccStr, array string PRrCodes, var string mainobjname, var array string PRrNames, var vector record BudRep1Vc ArrayBRr, record BudRep1Vc PatternBRr)
+procedure BRrCollectForFew(record RcVc RepSpec, string AccStr, array string PRrCodes, var string mainobjname, var vector string PRrNames, var vector record BudRep1Vc ArrayBRr, record BudRep1Vc PatternBRr)
 BEGIN
 	record ObjVc Objr;
 	record PRVc PRr,PR2r;
@@ -330,7 +330,7 @@ BEGIN
 	integer i,k,PRi,repi,mtrw,repmtrw,pos;
 	boolean TrHs,testf,foundf;
 	string 20 vendobj,tstr;
-	array string 20 prjobjs;
+	vector string 20 prjobjs;
 	
 	Objr.Code = RepSpec.f1;
 	readfirstmain(Objr,1,true);
@@ -341,8 +341,8 @@ BEGIN
 		PRr.Code = PRrCodes[PRi];
 		if (ReadFirstMain(PRr,1,true)) then begin
 			if(PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate)then begin
-				PRrNames[PRi] = PRr.Name;
-				prjobjs[PRi] = PRr.Objects;
+				PRrNames[PRrCodes[PRi]] = PRr.Name;
+				prjobjs[PRrCodes[PRi]] = PRr.Objects;
 				TBBUr.PRCode = PRr.Code;
 				if(readfirstmain(TBBUr,1,true))then begin
 					mtrw = matrowcnt(TBBUr);
@@ -526,7 +526,7 @@ BEGIN
 								repmtrw = matrowcnt(BRr);
 								for (repi=0;repi<repmtrw;repi=repi+1) begin
 									matrowget(BRr,repi,BRrw);
-									if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(BRrw.VECode)) or (blank(BRrw.VECode))))) then begin
+									if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))) then begin
 										switch (k) begin
 											case 1:
 												BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
@@ -577,7 +577,8 @@ BEGIN
 		totColBudT,totColSpendT;
 	string 30 PRrName;
 	string 100 mainobjname;
-	array string 100 PRCodes,PRNames;
+	vector string 100 PRNames;
+	array string 100 PRCodes;
 	boolean TrHs,testf,foundf;
 	integer PRCodesCount;
 	array string 10 sheetNames;
@@ -714,7 +715,7 @@ BEGIN
 			if (sheetNames[k] <> "Total") then begin
 				RecordClear(BRr);
 				BRr = ArrayBRr[PRCodes[k]];
-				PRrName = PRNames[k];
+				PRrName = PRNames[PRCodes[k]];
 				if (matrowcnt(TotBRr)==0) then begin
 					TotBRr = PatternBRr;
 				end;
