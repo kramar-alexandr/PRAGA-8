@@ -591,6 +591,11 @@ BEGIN
 	integer i,j,k,repi,mtrw,repmtrw,pos;
 	array val totalrowbud,totalrowsped,subtotals, totalrow;
 	val totalbubyrow,totalspendbyrow,totalBudget,totalSpend;
+	val totColBud1,totColSpend1,
+		totColBud2,totColSpend2,
+		totColBud3,totColSpend3,
+		totColBud4,totColSpend4,
+		totColBudT,totColSpendT;
 	string 30 PRrName;
 	string 100 mainobjname;
 	array string 100 PRCodes,PRNames;
@@ -879,10 +884,11 @@ BEGIN
 					totalspendbyrow = BRrw.Spend1+BRrw.Spend2+BRrw.Spend3+BRrw.Spend4;						  		
 					if(totalbubyrow!=0 or totalspendbyrow!=0 )then begin
 						colnum = 1;
-						outlineLevel = 2;
-						if ((nonblank(prevcode) and BRrw.Code!=prevcode) or blank(prevcode)) then begin
-							outlineLevel = 1;
-						end;
+						outlineLevel = 1;
+						//outlineLevel = 0;
+						//if ((nonblank(prevcode) and BRrw.Code!=prevcode) or blank(prevcode)) then begin
+						//	outlineLevel = 1;
+						//end;
 						prevcode = BRrw.Code;
 						BeginRow(sheetnum,fileToSave,rownum,outlineLevel,blankval);
 							style = 10;
@@ -893,18 +899,46 @@ BEGIN
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							style = 11;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud1);
+							totColBud1 = totColBud1 + BRrw.Bud1;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend1);
+							totColSpend1 = totColSpend1 + BRrw.Spend1;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud2);
+							totColBud2 = totColBud2 + BRrw.Bud2;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend2);
+							totColSpend2 = totColSpend2 + BRrw.Spend2;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud3);
+							totColBud3 = totColBud3 + BRrw.Bud3;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend3);
+							totColSpend3 = totColSpend3 + BRrw.Spend3;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud4);
+							totColBud4 = totColBud4 + BRrw.Bud4;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend4);
+							totColSpend4 = totColSpend4 + BRrw.Spend4;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbubyrow);
+							totColBudT = totColBudT + totalbubyrow;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalspendbyrow);
+							totColSpendT = totColSpendT + totalspendbyrow;
 						EndRow(sheetnum,fileToSave,rownum);
 					end;
-				end;		
+				end;
+				rownum = rownum + 1;
+				colnum = 3;
+				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+					style = 7;
+					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					colnum = colnum + 1;
+					style = 8;
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud1);
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend1);
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud2);
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend2);
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud3);
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend3);
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud4);
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend4);
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBudT);
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpendT);
+				EndRow(sheetnum,fileToSave,rownum);
 			EndSheetData(sheetnum,fileToSave);
 			MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
 			EndSheet(sheetnum,fileToSave,0);
@@ -1026,10 +1060,11 @@ BEGIN
 				totalspendbyrow = BRrw.Spend1+BRrw.Spend2+BRrw.Spend3+BRrw.Spend4;						  		
 				if(totalbubyrow!=0 or totalspendbyrow!=0 )then begin
 					colnum = 1;
-					outlineLevel = 2;
-					if ((nonblank(prevcode) and BRrw.Code!=prevcode) or blank(prevcode)) then begin
-						outlineLevel = 1;
-					end;
+					outlineLevel = 1;
+					//outlineLevel = 2;
+					//if ((nonblank(prevcode) and BRrw.Code!=prevcode) or blank(prevcode)) then begin
+					//	outlineLevel = 1;
+					//end;
 					prevcode = BRrw.Code;
 					colnum = 1;
 					BeginRow(sheetnum,fileToSave,rownum,outlineLevel,blankval);
