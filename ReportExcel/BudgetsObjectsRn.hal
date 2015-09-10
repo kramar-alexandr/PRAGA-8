@@ -251,27 +251,35 @@ BEGIN
 			TrHs = false;
 		end;
 		if (TrHs) then begin
+		if TRr.Number==548 then begin logtext(0,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"); end;
 			k = GetQuartal(TRr.TransDate);
 			mtrw = matrowcnt(TRr);
 			for (i=0;i<mtrw;i=i+1) begin
 				matrowget(TRr,i,TRrw);
+				if TRr.Number==548 then begin logtext(0,"111111111111111111111111111111111         " & TRrw.AccNumber); end;
 				if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5")) then begin
+					if TRr.Number==548 then begin logtext(0,"@@@@@@@@@@@@@@@@@@@@@@@@@@" & TRrw.AccNumber); end;
 					if (setinset(RepSpec.f1,TRrw.Objects) or blank(RepSpec.f1)) then begin
+						if TRr.Number==548 then begin logtext(0,"222222222222222222222222222222222" & TRrw.AccNumber); end;
 						vendobj = "";
 						GetObjs("SUPPL",TRrw.Objects,vendobj);	//while... readfirstmain(Objr,1,true) ...end;
 						foundf = false;
 						if nonblank(vendobj) then begin
+							if TRr.Number==548 then begin logtext(0,"44444444444444444444444444444444444444444444" & TRrw.AccNumber); end;
 							repmtrw = matrowcnt(BRr);
 							For(repi=0;repi<repmtrw;repi=repi+1) begin
 								matrowget(BRr,repi,BRrw);
 								if setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code) and ((setinset(BRrw.VECode,vendobj) and nonblank(BRrw.VECode))) then begin
 									foundf = true;
+									if TRr.Number==548 then begin logtext(0,"5555555555555555555555555555" & TRrw.AccNumber); end;
 								end;
 							end;
 							if !foundf then begin
+								if TRr.Number==548 then begin logtext(0,"qqqqqqqqqqqqqqqqqqqqqqqqqq" & TRrw.AccNumber); end;
 								For(repi=0;repi<repmtrw;repi=repi+1) begin
 									matrowget(BRr,repi,BRrw);
 									if (setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+									if TRr.Number==548 then begin logtext(0,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" & TRrw.AccNumber); end;
 										BRrw.Bud1 = blankval;
 										BRrw.Bud2 = blankval;
 										BRrw.Bud3 = blankval;
@@ -291,6 +299,7 @@ BEGIN
 						for (repi=0;repi<repmtrw;repi=repi+1) begin
 							matrowget(BRr,repi,BRrw);
 							if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode))))) and (setinset(prjobj,TRrw.Objects))) then begin
+								if TRr.Number==548 then begin logtext(0,"rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrs" & TRrw.AccNumber); end;
 								switch (k) begin
 									case 1:
 										BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
@@ -493,7 +502,7 @@ BEGIN
 						vendobj = "";
 						GetObjs("SUPPL",TRrw.Objects,vendobj);
 						for (PRi=0;PRi<PRrCodes.length;PRi=PRi+1) begin
-							if(setinset(prjobjs[PRi],TRrw.Objects)) then begin
+							if(setinset(prjobjs[PRrCodes[PRi]],TRrw.Objects)) then begin
 								BRr = ArrayBRr[PRrCodes[PRi]];
 								foundf = false;
 								if nonblank(vendobj) then begin
