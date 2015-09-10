@@ -85,7 +85,7 @@ begin
 	end;
 	if (totSum==0) then begin res = false; end;
 	
-	CollectSubTotals = res;
+	CollectSubTotals = true;
 return;
 end;
 
@@ -956,15 +956,8 @@ BEGIN
 			colnum = 1;
 			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,PRrName & "," & GetYear(RepSpec.sStartDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				qtyOfEmpStr = 13;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 			EndRow(sheetnum,fileToSave,rownum);
-			style = 3;
-			colnum = 5;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				qtyOfEmpStr = 10;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-			EndRow(sheetnum,fileToSave,rownum);
+			rownum = rownum + 1;
 
 			style = 4;
 			colnum = 1;
@@ -972,9 +965,6 @@ BEGIN
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"period",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 5;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,RepSpec.sStartDate & "-" & RepSpec.sEndDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				colnum = colnum + 1;
-				qtyOfEmpStr = 10;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 			EndRow(sheetnum,fileToSave,rownum);
 			
 			style = 4;
@@ -983,20 +973,9 @@ BEGIN
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"currency",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 5;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,BCb.BaseCur1,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				colnum = colnum + 1;
-				qtyOfEmpStr = 10;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 5;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				qtyOfEmpStr = 10;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 5;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				qtyOfEmpStr = 10;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-			EndRow(sheetnum,fileToSave,rownum);
+			rownum = rownum + 1;
+			rownum = rownum + 1;
 			
 			style = 6;
 			colnum = 1;
@@ -1023,12 +1002,7 @@ BEGIN
 				matrowget(BRr,i,BRrw);
 				if (nonblank(BRrw.CatName))	 then begin				
 					if (CollectSubTotals(BRr,i,subtotals)) then begin	//check if item group is empty
-						style = 3;
-						colnum = 5;
-						BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-							qtyOfEmpStr = 10;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						EndRow(sheetnum,fileToSave,rownum);
+						rownum = rownum + 1;
 						style = 7;
 						colnum = 1;
 						BeginRow(sheetnum,fileToSave,rownum,0,blankval);
@@ -1051,9 +1025,15 @@ BEGIN
 				totalbubyrow = BRrw.Bud1+BRrw.Bud2+BRrw.Bud3+BRrw.Bud4;
 				totalspendbyrow = BRrw.Spend1+BRrw.Spend2+BRrw.Spend3+BRrw.Spend4;						  		
 				if(totalbubyrow!=0 or totalspendbyrow!=0 )then begin
-					style = 10;
 					colnum = 1;
-					BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+					outlineLevel = 2;
+					if ((nonblank(prevcode) and BRrw.Code!=prevcode) or blank(prevcode)) then begin
+						outlineLevel = 1;
+					end;
+					prevcode = BRrw.Code;
+					colnum = 1;
+					BeginRow(sheetnum,fileToSave,rownum,outlineLevel,blankval);
+						style = 10;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						qtyOfEmpStr = 1;
 						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
