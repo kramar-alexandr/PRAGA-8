@@ -60,24 +60,15 @@ begin
 	row TRVc TRrw;
 	integer i,k,mtrw;
 	string 5 tab,nl;
-	string 255 AccStr;
+	
 	string 100 prj,found,suppl,exp,locat;
 	
 	tab = chr(9);
 	nl = chr(10) & chr(13);
 	
-	while(loopmain(INr,1,true)) begin
-		if (nonblank(INr.Objects)) then begin
-			if !(SetInSet(INr.CostAcc,AccStr)) then begin
-				AccStr = AccStr & "," & INr.CostAcc;
-			end;
-		end;
-	end;
-	AccStr = right(AccStr,len(AccStr) - 1);
-	
 	Mainr.TransDate = "";
 	while (loopkey("TransDate",Mainr,1,true)) begin
-		if (SetInSet(Mainr.AccNumber,AccStr)) then begin
+		if (mid(Mainr.AccNumber,0,1)!="5") then begin
 			TRr.Number = Mainr.TransNr;
 			TRr.IntYc = Mainr.IntYc;
 			if (readfirstmain(TRr,2,true)) then begin

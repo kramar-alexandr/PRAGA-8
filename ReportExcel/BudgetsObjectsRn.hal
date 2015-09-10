@@ -244,77 +244,65 @@ BEGIN
 		end;
 	end;
 	logtext(0,"BRrCollect: Bud1..4 COLLECTED");
-	Mainr.TransDate = RepSpec.sStartDate;
+	TRr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
-	while (loopkey("TransDate",Mainr,1,TrHs)) begin
-		testf = true;
-		//if (!SetInSet(Mainr.AccNumber,AccStr)) then begin
-		//	testf = false;
-		//end;
-		if (mid(Mainr.AccNumber,0,1)!="5") then begin
-			testf = false;
-		end;
-		if (Mainr.TransDate>RepSpec.sEndDate) then begin
+	while (loopkey("TransDate",TRr,1,TrHs)) begin
+		if (TRr.TransDate > RepSpec.sEndDate) then begin
 			TrHs = false;
-			testf = false;
 		end;
-		if (testf) then begin
-			TRr.Number = Mainr.TransNr;
-			TRr.IntYc = Mainr.IntYc;
-			if (readfirstmain(TRr,2,true)) then begin
-				mtrw = matrowcnt(TRr);
-				for (i=0;i<mtrw;i=i+1) begin
-					matrowget(TRr,i,TRrw);
-					if (TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber) then begin
-						if (setinset(RepSpec.f1,TRrw.Objects) or blank(RepSpec.f1)) then begin
-							GetObjs("SUPPL",TRrw.Objects,vendobj);	//while... readfirstmain(Objr,1,true) ...end;
-							foundf = false;
-							if nonblank(vendobj) then begin
-								repmtrw = matrowcnt(BRr);
+		if (TrHs) then begin
+			k = GetQuartal(TRr.TransDate);
+			mtrw = matrowcnt(TRr);
+			for (i=0;i<mtrw;i=i+1) begin
+				matrowget(TRr,i,TRrw);
+				if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5")) then begin
+					if (setinset(RepSpec.f1,TRrw.Objects) or blank(RepSpec.f1)) then begin
+						GetObjs("SUPPL",TRrw.Objects,vendobj);	//while... readfirstmain(Objr,1,true) ...end;
+						foundf = false;
+						if nonblank(vendobj) then begin
+							repmtrw = matrowcnt(BRr);
+							For(repi=0;repi<repmtrw;repi=repi+1) begin
+								matrowget(BRr,repi,BRrw);
+								if setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code) and ((setinset(BRrw.VECode,vendobj) and nonblank(BRrw.VECode))) then begin
+									foundf = true;
+								end;
+							end;
+							if !foundf then begin
 								For(repi=0;repi<repmtrw;repi=repi+1) begin
 									matrowget(BRr,repi,BRrw);
-									if setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code) and ((setinset(BRrw.VECode,vendobj) and nonblank(BRrw.VECode))) then begin
-										foundf = true;
-									end;
-								end;
-								if !foundf then begin
-									For(repi=0;repi<repmtrw;repi=repi+1) begin
-										matrowget(BRr,repi,BRrw);
-										if (setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
-											BRrw.Bud1 = blankval;
-											BRrw.Bud2 = blankval;
-											BRrw.Bud3 = blankval;
-											BRrw.Bud4 = blankval;
-											BRrw.Spend1 = blankval;
-											BRrw.Spend2 = blankval;
-											BRrw.Spend3 = blankval;
-											BRrw.Spend4 = blankval;
-											BRrw.VECode = vendobj;
-											matrowinsert(BRr,repi+1,BRrw);
-											repi = repmtrw;
-										end;
+									if (setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+										BRrw.Bud1 = blankval;
+										BRrw.Bud2 = blankval;
+										BRrw.Bud3 = blankval;
+										BRrw.Bud4 = blankval;
+										BRrw.Spend1 = blankval;
+										BRrw.Spend2 = blankval;
+										BRrw.Spend3 = blankval;
+										BRrw.Spend4 = blankval;
+										BRrw.VECode = vendobj;
+										matrowinsert(BRr,repi+1,BRrw);
+										repi = repmtrw;
 									end;
 								end;
 							end;
-							repmtrw = matrowcnt(BRr);
-							for (repi=0;repi<repmtrw;repi=repi+1) begin
-								matrowget(BRr,repi,BRrw);
-								if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode))))) and (setinset(prjobj,TRrw.Objects))) then begin
-									k = GetQuartal(TRr.TransDate);
-									switch (k) begin
-										case 1:
-											BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
-										case 2:
-											BRrw.Spend2 = BRrw.Spend2 - TRrw.CredVal + TRrw.DebVal;
-										case 3:
-											BRrw.Spend3 = BRrw.Spend3 - TRrw.CredVal + TRrw.DebVal;
-										case 4:
-											BRrw.Spend4 = BRrw.Spend4 - TRrw.CredVal + TRrw.DebVal;
-										otherwise
-											BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;	//I Quartal as default
-									end;													
-									matrowput(BRr,repi,BRrw);
-								end;
+						end;
+						repmtrw = matrowcnt(BRr);
+						for (repi=0;repi<repmtrw;repi=repi+1) begin
+							matrowget(BRr,repi,BRrw);
+							if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode))))) and (setinset(prjobj,TRrw.Objects))) then begin
+								switch (k) begin
+									case 1:
+										BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
+									case 2:
+										BRrw.Spend2 = BRrw.Spend2 - TRrw.CredVal + TRrw.DebVal;
+									case 3:
+										BRrw.Spend3 = BRrw.Spend3 - TRrw.CredVal + TRrw.DebVal;
+									case 4:
+										BRrw.Spend4 = BRrw.Spend4 - TRrw.CredVal + TRrw.DebVal;
+									otherwise
+										BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;	//I Quartal as default
+								end;													
+								matrowput(BRr,repi,BRrw);
 							end;
 						end;
 					end;
@@ -488,83 +476,72 @@ BEGIN
 		ArrayBRr[PRrCodes[PRi]] = BRr;
 	end;
 	logtext(0,"BRrCollectForFew: Bud1..4 COLLECTED");
-	Mainr.TransDate = RepSpec.sStartDate;
+	TRr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
-	while (loopkey("TransDate",Mainr,1,TrHs)) begin
-		
-		testf = true;
-		if (!SetInSet(Mainr.AccNumber,AccStr)) then begin
-			testf = false;
-		end;
-		if (Mainr.TransDate>RepSpec.sEndDate) then begin
+	while (loopkey("TransDate",TRr,1,TrHs)) begin
+		if (TRr.TransDate > RepSpec.sEndDate) then begin
 			TrHs = false;
-			testf = false;
 		end;
-		
-		if (testf) then begin
-			TRr.Number = Mainr.TransNr;
-			TRr.IntYc = Mainr.IntYc;
-			if (readfirstmain(TRr,2,true)) then begin
-				k = GetQuartal(TRr.TransDate);
-				mtrw = matrowcnt(TRr);// Edit ************************** Tuesday, 21 July 2015 10:21:13
-				for (i=0;i<mtrw;i=i+1) begin
-					matrowget(TRr,i,TRrw);
-					if (TRrw.ovst==0 and TRrw.AccNumber==Mainr.AccNumber) then begin
-						if (setinset(RepSpec.f1,TRrw.Objects) or blank(RepSpec.f1)) then begin
-							GetObjs("SUPPL",TRrw.Objects,vendobj);
-							for (PRi=0;PRi<PRrCodes.length;PRi=PRi+1) begin
-								if(setinset(prjobjs[PRi],TRrw.Objects)) then begin
-									BRr = ArrayBRr[PRrCodes[PRi]];
-									foundf = false;
-									if nonblank(vendobj) then begin
-										repmtrw = matrowcnt(BRr);
+		if (TrHs) then begin
+			k = GetQuartal(TRr.TransDate);
+			mtrw = matrowcnt(TRr);// Edit ************************** Tuesday, 21 July 2015 10:21:13
+			for (i=0;i<mtrw;i=i+1) begin
+				matrowget(TRr,i,TRrw);
+				if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5")) then begin
+					if (setinset(RepSpec.f1,TRrw.Objects) or blank(RepSpec.f1)) then begin
+						GetObjs("SUPPL",TRrw.Objects,vendobj);
+						for (PRi=0;PRi<PRrCodes.length;PRi=PRi+1) begin
+							if(setinset(prjobjs[PRi],TRrw.Objects)) then begin
+								BRr = ArrayBRr[PRrCodes[PRi]];
+								foundf = false;
+								if nonblank(vendobj) then begin
+									repmtrw = matrowcnt(BRr);
+									For(repi=0;repi<repmtrw;repi=repi+1) begin
+										matrowget(BRr,repi,BRrw);
+										if setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code) and ((setinset(BRrw.VECode,vendobj) and nonblank(BRrw.VECode))) then begin
+											foundf = true;
+										end;
+									end;
+									if !foundf then begin
 										For(repi=0;repi<repmtrw;repi=repi+1) begin
 											matrowget(BRr,repi,BRrw);
-											if setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code) and ((setinset(BRrw.VECode,vendobj) and nonblank(BRrw.VECode))) then begin
-												foundf = true;
-											end;
-										end;
-										if !foundf then begin
-											For(repi=0;repi<repmtrw;repi=repi+1) begin
-												matrowget(BRr,repi,BRrw);
-												if (setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
-													BRrw.Bud1 = blankval;
-													BRrw.Bud2 = blankval;
-													BRrw.Bud3 = blankval;
-													BRrw.Bud4 = blankval;
-													BRrw.Spend1 = blankval;
-													BRrw.Spend2 = blankval;
-													BRrw.Spend3 = blankval;
-													BRrw.Spend4 = blankval;
-													BRrw.VECode = vendobj;
-													matrowinsert(BRr,repi+1,BRrw);
-													repi = repmtrw;
-												end;
+											if (setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+												BRrw.Bud1 = blankval;
+												BRrw.Bud2 = blankval;
+												BRrw.Bud3 = blankval;
+												BRrw.Bud4 = blankval;
+												BRrw.Spend1 = blankval;
+												BRrw.Spend2 = blankval;
+												BRrw.Spend3 = blankval;
+												BRrw.Spend4 = blankval;
+												BRrw.VECode = vendobj;
+												matrowinsert(BRr,repi+1,BRrw);
+												repi = repmtrw;
 											end;
 										end;
 									end;
-									repmtrw = matrowcnt(BRr);
-									for (repi=0;repi<repmtrw;repi=repi+1) begin
-										matrowget(BRr,repi,BRrw);
-										if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))) then begin
-											switch (k) begin
-												case 1:
-													BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
-												case 2:
-													BRrw.Spend2 = BRrw.Spend2 - TRrw.CredVal + TRrw.DebVal;
-												case 3:
-													BRrw.Spend3 = BRrw.Spend3 - TRrw.CredVal + TRrw.DebVal;
-												case 4:
-													BRrw.Spend4 = BRrw.Spend4 - TRrw.CredVal + TRrw.DebVal;
-												otherwise
-													BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;	//I Quartal as default
-											end;													
-											matrowput(BRr,repi,BRrw);
-										end;
-									end;
-									ArrayBRr[PRrCodes[PRi]] = BRr;
-									PRi = PRrCodes.length;
 								end;
+								repmtrw = matrowcnt(BRr);
+								for (repi=0;repi<repmtrw;repi=repi+1) begin
+									matrowget(BRr,repi,BRrw);
+									if ((nonblank(BRrw.CostAcc)) and (setinset(BRrw.Code,TRrw.Objects) and ((setinset(BRrw.VECode,TRrw.Objects) and nonblank(vendobj) and nonblank(BRrw.VECode)) or (blank(vendobj) and (blank(BRrw.VECode)))))) then begin
+										switch (k) begin
+											case 1:
+												BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;
+											case 2:
+												BRrw.Spend2 = BRrw.Spend2 - TRrw.CredVal + TRrw.DebVal;
+											case 3:
+												BRrw.Spend3 = BRrw.Spend3 - TRrw.CredVal + TRrw.DebVal;
+											case 4:
+												BRrw.Spend4 = BRrw.Spend4 - TRrw.CredVal + TRrw.DebVal;
+											otherwise
+												BRrw.Spend1 = BRrw.Spend1 - TRrw.CredVal + TRrw.DebVal;	//I Quartal as default
+										end;													
+										matrowput(BRr,repi,BRrw);
+									end;
+								end;
+								ArrayBRr[PRrCodes[PRi]] = BRr;
+								PRi = PRrCodes.length;
 							end;
 						end;
 					end;
@@ -855,6 +832,16 @@ BEGIN
 			
 				mtrw = matrowcnt(BRr);
 				prevcode = "";
+				totColBud1 = 0;
+				totColSpend1 = 0;
+				totColBud2 = 0;
+				totColSpend2 = 0;
+				totColBud3 = 0;
+				totColSpend3 = 0;
+				totColBud4 = 0;
+				totColSpend4 = 0;
+				totColBudT = 0;
+				totColSpendT = 0;
 				For(i=0;i<mtrw;i=i+1) begin
 					matrowget(BRr,i,BRrw);
 					if (nonblank(BRrw.CatName))	 then begin				
@@ -1032,6 +1019,17 @@ BEGIN
 			EndRow(sheetnum,fileToSave,rownum);
 		
 			mtrw = matrowcnt(BRr);
+			prevcode = "";
+			totColBud1 = 0;
+			totColSpend1 = 0;
+			totColBud2 = 0;
+			totColSpend2 = 0;
+			totColBud3 = 0;
+			totColSpend3 = 0;
+			totColBud4 = 0;
+			totColSpend4 = 0;
+			totColBudT = 0;
+			totColSpendT = 0;
 			For(i=0;i<mtrw;i=i+1) begin
 				matrowget(BRr,i,BRrw);
 				if (nonblank(BRrw.CatName))	 then begin				
@@ -1076,18 +1074,46 @@ BEGIN
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						style = 11;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud1);
+						totColBud1 = totColBud1 + BRrw.Bud1;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend1);
+						totColSpend1 = totColSpend1 + BRrw.Spend1;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud2);
+						totColBud2 = totColBud2 + BRrw.Bud2;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend2);
+						totColSpend2 = totColSpend2 + BRrw.Spend2;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud3);
+						totColBud3 = totColBud3 + BRrw.Bud3;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend3);
+						totColSpend3 = totColSpend3 + BRrw.Spend3;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud4);
+						totColBud4 = totColBud4 + BRrw.Bud4;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend4);
+						totColSpend4 = totColSpend4 + BRrw.Spend4;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbubyrow);
+						totColBudT = totColBudT + totalbubyrow;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalspendbyrow);
+						totColSpendT = totColSpendT + totalspendbyrow;
 					EndRow(sheetnum,fileToSave,rownum);
 				end;
-			end;		
+			end;
+			rownum = rownum + 1;
+			colnum = 3;
+			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+				style = 7;
+				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+				colnum = colnum + 1;
+				style = 8;
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud1);
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend1);
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud2);
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend2);
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud3);
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend3);
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud4);
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend4);
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBudT);
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpendT);
+			EndRow(sheetnum,fileToSave,rownum);
 		EndSheetData(sheetnum,fileToSave);
 		MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
 		EndSheet(sheetnum,fileToSave,0);
