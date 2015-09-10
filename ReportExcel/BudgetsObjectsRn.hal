@@ -266,8 +266,6 @@ BEGIN
 								matrowget(BRr,repi,BRrw);
 								if setinset(BRrw.Code,TRrw.Objects) and nonblank(BRrw.Code) and ((setinset(BRrw.VECode,vendobj) and nonblank(BRrw.VECode))) then begin
 									foundf = true;
-									if TRr.Number==548 then begin 
-									end;
 								end;
 							end;
 							if !foundf then begin
