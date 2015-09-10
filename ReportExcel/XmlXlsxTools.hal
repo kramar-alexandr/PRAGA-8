@@ -319,7 +319,7 @@ BEGIN
 END;
 
 global
-procedure BeginRow(integer SheetNum, string pathToXLSX, integer RowNum, boolean hidden, val height)
+procedure BeginRow(integer SheetNum, string pathToXLSX, integer RowNum, integer outlineLevel, val height)
 BEGIN
 	area tempArea;
 	string 225 path;
@@ -329,8 +329,8 @@ BEGIN
 	if (height <> blankval) then begin
 		AddTextToArea(" ht=" & Chr(34) & height & Chr(34) & " customHeight=" & Chr(34) & "1" & Chr(34),tempArea);
 	end;
-	if (hidden) then begin
-		AddTextToArea(" hidden=" & Chr(34) & "1" & Chr(34) & " outlineLevel=" & Chr(34) & "1" & Chr(34),tempArea);
+	if (outlineLevel!=0) then begin
+		AddTextToArea(" hidden=" & Chr(34) & "1" & Chr(34) & " outlineLevel=" & Chr(34) & outlineLevel & Chr(34),tempArea);
 	end;
 	AddTextToArea(">",tempArea);
 	AppendAreaToFile(path & "/xl/worksheets/sheet" & SheetNum & ".xml",tempArea);
