@@ -110,7 +110,7 @@ BEGIN
 	k=0;
 	PRr.Code = RepSpec.f2;
 	If (ReadFirstMain(PRr,1,true)) then begin
-		if(PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate)then begin
+		if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
 			prjobj = PRr.Objects;
 			TBBUr.PRCode = PRr.Code;
 			if(readfirstmain(TBBUr,1,true))then begin
@@ -340,7 +340,7 @@ BEGIN
 		BRr = PatternBRr;
 		PRr.Code = PRrCodes[PRi];
 		if (ReadFirstMain(PRr,1,true)) then begin
-			if(PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate)then begin
+			if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
 				PRrNames[PRrCodes[PRi]] = PRr.Name;
 				prjobjs[PRrCodes[PRi]] = PRr.Objects;
 				TBBUr.PRCode = PRr.Code;
