@@ -460,7 +460,7 @@ BEGIN
 		BeginRow(sheetnum,fileToSave,rownum,false,blankval);
 			for (i=0;i<ProjArray.length;i=i+1) begin
 				style = 5;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 11;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 12;
@@ -469,8 +469,7 @@ BEGIN
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			end;
 			style = 16;
-			qtyOfEmpStr = 1;
-			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 15;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 12;
@@ -480,7 +479,7 @@ BEGIN
 			colnum = colnum + 1;
 			for (i=0;i<ProjArray.length;i=i+1) begin
 				style = 5;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 11;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 12;
@@ -489,8 +488,7 @@ BEGIN
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII-%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			end;
 			style = 16;
-			qtyOfEmpStr = 1;
-			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 15;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 12;
@@ -500,7 +498,7 @@ BEGIN
 			colnum = colnum + 1;
 			for (i=0;i<ProjArray.length;i=i+1) begin
 				style = 5;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIII",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIII-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 11;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIII-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 12;
@@ -509,8 +507,7 @@ BEGIN
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIII-%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			end;
 			style = 16;
-			qtyOfEmpStr = 1;
-			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 15;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 12;
@@ -520,7 +517,7 @@ BEGIN
 			colnum = colnum + 1;
 			for (i=0;i<ProjArray.length;i=i+1) begin
 				style = 5;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIV",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIV-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 11;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIV-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 12;
@@ -529,8 +526,7 @@ BEGIN
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIV-%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			end;
 			style = 16;
-			qtyOfEmpStr = 1;
-			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 15;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 12;
@@ -540,8 +536,7 @@ BEGIN
 			colnum = colnum + 1;
 			for (i=0;i<ProjArray.length;i=i+1) begin
 				style = 51;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 52;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 14;
@@ -550,8 +545,7 @@ BEGIN
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			end;
 			style = 70;
-			qtyOfEmpStr = 1;
-			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 77;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 14;
