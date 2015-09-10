@@ -77,6 +77,11 @@ BEGIN
 		ReadLastMain(ITr,1,false);
 		INr.Group = ITr.Code;
 		RecordStore(INr,true);
+	end else begin
+		INr.Name = CLCorspr.Comment;
+		INr.Objects = CLCorspr.Objects;
+		INr.CostAcc = CLCorspr.AccNumber;
+		RecordStore(INr,true);
 	end;
   
   CLCorspVcRecordUpdateAfter = res; 
