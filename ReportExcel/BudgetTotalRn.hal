@@ -202,7 +202,7 @@ BEGIN
 	numOfSharedStrings = 0;
 	sheetnum = 1;
 	qtyMergeCell = 0;
-	if (RepSpec.flags[1] == 0) then begin
+	if (RepSpec.flags[5] == 0) then begin
 		sheetColls[colnum] = 14.7109375;
 		colnum = colnum + 1;
 		for (i=0;i<(ProjArray.length + 1)*4;i=i+1) begin

@@ -9,32 +9,85 @@ begin
 	record RcVc RepSpec;
 	integer wn;
 	LongInt tick;
+	boolean testf;
+	string 10 tmpDate;
 	
 	wn = curwindow;
 	deselectwindow(wn,true);
 	getwindowrecord(wn,RepSpec);
-	tstr = "Budget Report";
-	if nonblank(RepSpec.f2) then begin
-		tstr = tstr & " for Project #" & RepSpec.f2;
-	end;
-	if nonblank(RepSpec.f1) then begin
-		tstr = tstr & " Object-" & RepSpec.f1;
-	end;
-	tstr = tstr & " filled in on " & DateToString(CurrentDate,"DD MM YYYY");
-	filename = SaveFileDialog(tstr,"","xlsx");
-	if ((filename!=tstr) and nonblank(filename)) then begin
-		tick = GetCurTick;
-		RepSpec.FirstVer = tick;
-		RepSpec.repname = "BudgetsObjectsRn";
-		BudgetsObjectsRn(RepSpec);
-		//RunReport(RepSpec,0);
-		BudgetsObjectsArea(tick,fileToSave);
-		if(fileexists(filename))then begin
-			delete_file(filename);
+	testf = true;
+	if (blank(RepSpec.f3)) then begin
+		MessageBox(0,"Input Year!");
+		testf = false;
+	end else begin
+		if len(RepSpec.f3)!=4 then  begin
+			MessageBox(0,"Incorrect Year!");
+			testf = false;
 		end;
-		writeareatofile(fileToSave,filename,0);
-		CloseWindow(wn);
-		Messagebox(0,"Done!");
+	end;
+	if ((RepSpec.flags[1]==0) and (RepSpec.flags[2]==0) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==0) and testf) then begin
+		MessageBox(0,"Select at least one Quartal!");
+		testf = false;
+	end;
+	if ((((RepSpec.flags[1]==1) and (RepSpec.flags[2]==0) and ((RepSpec.flags[3]==1) or (RepSpec.flags[4]==1))) or (((RepSpec.flags[1]==1) or (RepSpec.flags[2]==1)) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==1))) and testf) then begin
+		MessageBox(0,"Incorrect selection of Quartals!");
+		testf = false;
+	end;
+	if testf then begin
+		tmpDate = "";
+		if (RepSpec.flags[4]==1) then begin
+			tmpDate = "1/10/";
+		end;
+		if (RepSpec.flags[3]==1) then begin
+			tmpDate = "1/7/";
+		end;
+		if (RepSpec.flags[2]==1) then begin
+			tmpDate = "1/4/";
+		end;
+		if (RepSpec.flags[1]==1) then begin
+			tmpDate = "1/1/";
+		end;
+		tmpDate = tmpDate & RepSpec.f3;
+		RepSpec.sStartDate = StringToDate(tmpDate);
+		
+		tmpDate = "";
+		if (RepSpec.flags[1]==1) then begin
+			tmpDate = "31/3/";
+		end;
+		if (RepSpec.flags[2]==1) then begin
+			tmpDate = "30/6/";
+		end;
+		if (RepSpec.flags[3]==1) then begin
+			tmpDate = "30/9/";
+		end;
+		if (RepSpec.flags[4]==1) then begin
+			tmpDate = "31/12/";
+		end;
+		tmpDate = tmpDate & RepSpec.f3;
+		RepSpec.sEndDate = StringToDate(tmpDate);
+		tstr = "Budget Report";
+		if nonblank(RepSpec.f2) then begin
+			tstr = tstr & " for Project #" & RepSpec.f2;
+		end;
+		if nonblank(RepSpec.f1) then begin
+			tstr = tstr & " Object-" & RepSpec.f1;
+		end;
+		tstr = tstr & " filled in on " & DateToString(CurrentDate,"DD MM YYYY");
+		filename = SaveFileDialog(tstr,"","xlsx");
+		if ((filename!=tstr) and nonblank(filename)) then begin
+			tick = GetCurTick;
+			RepSpec.FirstVer = tick;
+			RepSpec.repname = "BudgetsObjectsRn";
+			BudgetsObjectsRn(RepSpec);
+			//RunReport(RepSpec,0);
+			BudgetsObjectsArea(tick,fileToSave);
+			if(fileexists(filename))then begin
+				delete_file(filename);
+			end;
+			writeareatofile(fileToSave,filename,0);
+			CloseWindow(wn);
+			Messagebox(0,"Done!");
+		end;
 	end;
 return;
 end;

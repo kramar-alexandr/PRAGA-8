@@ -217,7 +217,6 @@ BEGIN
 		SetAreaZeroSize(tempArea);
 		AddTextToArea("<?xml version=" & Chr(34) & "1.0" & Chr(34) & " encoding=" & Chr(34) & "UTF-8" & Chr(34) & " standalone=" & Chr(34) & "yes" & Chr(34) & "?><worksheet xmlns=" & Chr(34) & "http:" & Chr(47) & Chr(47) & "schemas.openxmlformats.org" & Chr(47) & "spreadsheetml" & Chr(47) & "2006" & Chr(47) & "main" & Chr(34) & " xmlns:r=" & Chr(34) & "http:" & Chr(47) & Chr(47) & "schemas.openxmlformats.org" & Chr(47) & "officeDocument" & Chr(47) & "2006" & Chr(47) & "relationships" & Chr(34) & " xmlns:mc=" & Chr(34) & "http:" & Chr(47) & Chr(47) & "schemas.openxmlformats.org" & Chr(47) & "markup-compatibility" & Chr(47) & "2006" & Chr(34) & " mc:Ignorable=" & Chr(34) & "x14ac" & Chr(34) & " xmlns:x14ac=" & Chr(34) & "http:" & Chr(47) & Chr(47) & "schemas.microsoft.com" & Chr(47) & "office" & Chr(47) & "spreadsheetml" & Chr(47) & "2009" & Chr(47) & "9" & Chr(47) & "ac" & Chr(34) & "><dimension ref=" & Chr(34) & "A1:AZ3000" & Chr(34) & Chr(47) & "><sheetViews><sheetView workbookViewId=" & Chr(34) & "0" & Chr(34) & Chr(47) & "><" & Chr(47) & "sheetViews><sheetFormatPr defaultRowHeight=" & Chr(34) & "15" & Chr(34) & Chr(47) & ">",tempArea);
 		WriteAreaToFile(tempArea,path & "/xl/worksheets/sheet" & i+1 & ".xml",0);
-		logtext(0,"CreateSheetsXLSX: sheet" & i+1 & ".xml is created");
 	end;
 	RETURN;
 END;
@@ -269,7 +268,6 @@ BEGIN
 	end;
 	AddTextToArea("<" & Chr(47) & "worksheet>",tempArea);
 	WriteAreaToFile(tempArea,path & "/xl/worksheets/sheet" & SheetNum & ".xml",1);
-	logtext(0,"EndSheet: sheet" & SheetNum & ".xml");
 	RETURN;
 END;
 
@@ -471,7 +469,6 @@ BEGIN
 	string 1 c;
 	longint alen,i;
  
-	logtext(0,"ConvertToXLSX BEGIN");
 	PosOfSleshInPath = 0;
 	path = PathCorrection(pathToXLSX);
 	fileName = path;
@@ -510,6 +507,5 @@ BEGIN
 		end;
 		RunProgram("jar","-cf0M /" & path & ".xlsx -C /" & path & "/ .");
 	end;
-	logtext(0,"ConvertToXLSX END");
 	RETURN;
 END;
