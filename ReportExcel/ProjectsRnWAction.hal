@@ -1,4 +1,5 @@
 remote procedure ProjectRn(record RcVc,var area,var boolean);
+remote function boolean OTCodeMatch(string,string);
 
 global
 procedure RunProjectRn()
@@ -38,6 +39,18 @@ begin
 	if (blank(RepSpec.f1) and testf) then begin
 		MessageBox(0,"Input Foundation!");
 		testf = false;
+	end;
+	if (nonblank(RepSpec.f1) and testf) then begin
+		if !OTCodeMatch(RepSpec.f1,"FOUND") then begin
+			testf = false;
+			MessageBox(0,"Incorrect Foundation!");
+		end;
+	end;
+	if (nonblank(RepSpec.ObjStr) and testf) then begin
+		if !OTCodeMatch(RepSpec.ObjStr,"LOCAT") then begin
+			testf = false;
+			MessageBox(0,"Incorrect Location!");
+		end;
 	end;
 	if testf then begin
 		tmpDate = "";
@@ -91,5 +104,5 @@ begin
 			end;
 		end;
 	end;
-return;
+	return;
 end;

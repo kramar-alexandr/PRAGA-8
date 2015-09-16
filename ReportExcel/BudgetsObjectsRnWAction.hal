@@ -1,5 +1,6 @@
 remote procedure BudgetsObjectsArea(LongInt,var area);
 remote procedure BudgetsObjectsRn(record RcVc);
+remote function boolean isProject(string);
 
 global
 procedure RunBudgetObjectsRn()
@@ -32,6 +33,12 @@ begin
 	if ((((RepSpec.flags[1]==1) and (RepSpec.flags[2]==0) and ((RepSpec.flags[3]==1) or (RepSpec.flags[4]==1))) or (((RepSpec.flags[1]==1) or (RepSpec.flags[2]==1)) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==1))) and testf) then begin
 		MessageBox(0,"Incorrect selection of Quartals!");
 		testf = false;
+	end;
+	if (nonblank(RepSpec.f2) and testf) then begin
+		if !isProject(RepSpec.f2) then begin
+			testf = false;
+			MessageBox(0,"Incorrect Project!");
+		end;
 	end;
 	if testf then begin
 		tmpDate = "";
@@ -89,5 +96,5 @@ begin
 			Messagebox(0,"Done!");
 		end;
 	end;
-return;
+	return;
 end;

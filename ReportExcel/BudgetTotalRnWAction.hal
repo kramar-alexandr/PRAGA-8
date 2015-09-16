@@ -1,4 +1,5 @@
 remote procedure BudgetTotalRn(record RcVc,var area);
+remote function boolean OTCodeMatch(string,string);
 
 global
 procedure RunBudgetTotalRn()
@@ -31,6 +32,12 @@ begin
 	if ((((RepSpec.flags[1]==1) and (RepSpec.flags[2]==0) and ((RepSpec.flags[3]==1) or (RepSpec.flags[4]==1))) or (((RepSpec.flags[1]==1) or (RepSpec.flags[2]==1)) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==1))) and testf) then begin
 		MessageBox(0,"Incorrect selection of Quartals!");
 		testf = false;
+	end;
+	if (nonblank(RepSpec.ObjStr) and testf) then begin
+		if !OTCodeMatch(RepSpec.ObjStr,"LOCAT") then begin
+			testf = false;
+			MessageBox(0,"Incorrect Location!");
+		end;
 	end;
 	if testf then begin
 		tmpDate = "";
@@ -83,5 +90,5 @@ begin
 			Messagebox(0,"Done!");
 		end;
 	end;
-return;
+	return;
 end;

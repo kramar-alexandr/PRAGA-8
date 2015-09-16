@@ -38,6 +38,7 @@ begin
 return;	
 end;
 
+global
 function boolean OTCodeMatch(string ObjCode, string OTCode)
 begin
 	boolean res;
@@ -51,6 +52,16 @@ begin
 		end;
 	end;
 	OTCodeMatch = res;
+	return;
+end;
+
+global
+function boolean isProject(string PrjCode)
+begin
+	record PRVc PRr;
+	
+	PRr.Code = PrjCode;
+	isProject = readfirstmain(PRr,1,true);
 	return;
 end;
 
