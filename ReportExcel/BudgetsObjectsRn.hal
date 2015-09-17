@@ -784,13 +784,13 @@ BEGIN
 			quartCount = quartCount + 1;
 		end;
 		for (j=1;j<=quartCount*2;j=j+1) begin
-			sheetColls[colnum] = 10.57;
+			sheetColls[colnum] = 14.42578125;
 			colnum = colnum + 1;
 		end;
 		
-		sheetColls[colnum] = 10.57;
+		sheetColls[colnum] = 14.42578125;
 		colnum = colnum + 1;
-		sheetColls[colnum] = 10.57;
+		sheetColls[colnum] = 14.42578125;
 		
 		qtyMergeCell = 1;
 		mergeCell[0] = "A1:N1";
@@ -1134,13 +1134,13 @@ BEGIN
 			quartCount = quartCount + 1;
 		end;
 		for (j=1;j<=quartCount*2;j=j+1) begin
-			sheetColls[colnum] = 10.57;
+			sheetColls[colnum] = 14.42578125;
 			colnum = colnum + 1;
 		end;
 		
-		sheetColls[colnum] = 10.57;
+		sheetColls[colnum] = 14.42578125;
 		colnum = colnum + 1;
-		sheetColls[colnum] = 10.57;
+		sheetColls[colnum] = 14.42578125;
 		
 		qtyMergeCell = 1;
 		mergeCell[0] = "A1:N1";
