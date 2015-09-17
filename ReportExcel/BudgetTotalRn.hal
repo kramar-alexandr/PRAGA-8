@@ -1,7 +1,7 @@
 external procedure XmlXlsxWorkBegin(string,string);
 external procedure CreateSheetsXLSX(integer,array string,string,integer);
 external procedure EndSheet(integer,string,integer);
-external procedure SetSheetsCols(integer,array val,string);
+external procedure SetSheetsCols(integer,array val,array integer,string);
 external procedure BeginSheetData(integer,string);
 external procedure EndSheetData(integer,string);
 external procedure BeginRow(integer,string,integer,integer,val);
@@ -216,6 +216,7 @@ BEGIN
 	
 	array string 10 sheetNames;
 	array val sheetColls;
+	array integer sheetCollsOutLvl;
 	array string 21 mergeCell;
 	string 255 fileToSave;
 	integer qtyOfSheets,sheetnum,rownum,colnum,style,qtyOfEmpStr;
@@ -241,16 +242,27 @@ BEGIN
 	sheetnum = 1;
 	qtyMergeCell = 0;
 	if (RepSpec.flags[5] == 0) then begin
-		sheetColls[colnum] = 14.7109375;
+		sheetColls[colnum] = 22.7109375;
+		sheetCollsOutLvl[colnum] = 0;
 		colnum = colnum + 1;
-		for (i=0;i<(ProjArray.length + 1)*4;i=i+1) begin
-			sheetColls[colnum] = 10.7109375;
+		for (j=0;j<(ProjArray.length + 1);j=j+1) begin
+			sheetColls[colnum] = 14.5703125;
+			sheetCollsOutLvl[colnum] = 0;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 14.5703125;
+			sheetCollsOutLvl[colnum] = 1;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 14.5703125;
+			sheetCollsOutLvl[colnum] = 1;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 14.5703125;
+			sheetCollsOutLvl[colnum] = 1;
 			colnum = colnum + 1;
 		end;
 		colnum = 0;
 		XmlXlsxWorkBegin(fileToSave,reportName);
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
-		SetSheetsCols(sheetnum,sheetColls,fileToSave);
+		SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 		BeginSheetData(sheetnum,fileToSave);
 			rownum = 2;
 			colnum = 2;
@@ -323,54 +335,30 @@ BEGIN
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,FoundArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					for (j=0;j<ProjArray.length;j=j+1) begin
 						style = 2;
-						if (FPVect[FoundArray[i] & ":" & ProjArray[j]] < 0) then begin
-							style  = style + 25;
-						end;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[i] & ":" & ProjArray[j]]);
 						style = 3;
-						if (FPVect["Fact:" & FoundArray[i] & ":" & ProjArray[j]] < 0) then begin
-							style  = style + 25;
-						end;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[i] & ":" & ProjArray[j]]);
 						style = 4;
-						if ((FPVect["Fact:" & FoundArray[i] & ":" & ProjArray[j]] - FPVect[FoundArray[i] & ":" & ProjArray[j]]) < 0) then begin
-							style  = style + 25;
-						end;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[i] & ":" & ProjArray[j]] - FPVect[FoundArray[i] & ":" & ProjArray[j]]);
 						style = 5;
 						if (FPVect[FoundArray[i] & ":" & ProjArray[j]] == 0) then begin
 							qtyOfEmpStr = 1;
 							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 						end else begin
-							if (100*(FPVect["Fact:" & FoundArray[i] & ":" & ProjArray[j]] - FPVect[FoundArray[i] & ":" & ProjArray[j]])/FPVect[FoundArray[i] & ":" & ProjArray[j]] < 0) then begin
-								style  = style + 25;
-							end;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(FPVect["Fact:" & FoundArray[i] & ":" & ProjArray[j]] - FPVect[FoundArray[i] & ":" & ProjArray[j]])/FPVect[FoundArray[i] & ":" & ProjArray[j]]);
 						end;
 					end;
 					style = 6;
-					if (FPVect[FoundArray[i] & ":TOTAL"] < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[i] & ":TOTAL"]);
 					style = 7;
-					if (FPVect["Fact:" & FoundArray[i] & ":TOTAL"] < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[i] & ":TOTAL"]);
 					style = 4;
-					if ((FPVect["Fact:" & FoundArray[i] & ":TOTAL"] - FPVect[FoundArray[i] & ":TOTAL"]) < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[i] & ":TOTAL"] - FPVect[FoundArray[i] & ":TOTAL"]);
 					style = 5;
 					if (FPVect[FoundArray[i] & ":TOTAL"] == 0) then begin
 						qtyOfEmpStr = 1;
 						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 					end else begin
-						if (100*(FPVect["Fact:" & FoundArray[i] & ":TOTAL"] - FPVect[FoundArray[i] & ":TOTAL"])/FPVect[FoundArray[i] & ":TOTAL"] < 0) then begin
-							style  = style + 25;
-						end;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(FPVect["Fact:" & FoundArray[i] & ":TOTAL"] - FPVect[FoundArray[i] & ":TOTAL"])/FPVect[FoundArray[i] & ":TOTAL"]);
 					end;
 				EndRow(sheetnum,fileToSave,rownum);
@@ -382,26 +370,14 @@ BEGIN
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"sub tot",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				for (i=0;i<ProjArray.length;i=i+1) begin
 					style = 10;
-					if (FPVect["TOTAL:" & ProjArray[i]] < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]);
 					style = 11;
-					if (FPVect["Fact:TOTAL:" & ProjArray[i]] < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTAL:" & ProjArray[i]]);
 					colnum = colnum + 2;
 				end;
 				style = 8;
-				if (FPVect["TOTAL:TOTAL"] < 0) then begin
-					style  = style + 25;
-				end;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:TOTAL"]);
 				style = 9;
-				if (FPVect["Fact:TOTAL:TOTAL"] < 0) then begin
-					style  = style + 25;
-				end;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTAL:TOTAL"]);
 			EndRow(sheetnum,fileToSave,rownum);
 			colnum = 1;
@@ -410,26 +386,14 @@ BEGIN
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"sub tot %",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				for (i=0;i<ProjArray.length;i=i+1) begin
 					style = 10;
-					if (FPVect["TOTALproc:" & ProjArray[i]] < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTALproc:" & ProjArray[i]]);
 					style = 11;
-					if (FPVect["Fact:TOTALproc:" & ProjArray[i]] < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTALproc:" & ProjArray[i]]);
 					colnum = colnum + 2;
 				end;
 				style = 8;
-				if (FPVect["TOTALproc:TOTALproc"] < 0) then begin
-					style  = style + 25;
-				end;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTALproc:TOTALproc"]);
 				style = 9;
-				if (FPVect["Fact:TOTALproc:TOTALproc"] < 0) then begin
-					style  = style + 25;
-				end;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTALproc:TOTALproc"]);
 			EndRow(sheetnum,fileToSave,rownum);
 		EndSheetData(sheetnum,fileToSave);
@@ -438,15 +402,18 @@ BEGIN
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		ConvertToXLSX(fileToSave);
 	end else begin
-		sheetColls[colnum] = 14.7109375;
+		sheetColls[colnum] = 22.7109375;
 		colnum = colnum + 1;
-		for (i=0;i<4;i=i+1) begin
-			sheetColls[colnum] = 10.7109375;
-			colnum = colnum + 1;
-		end;
+		sheetColls[colnum] = 14.5703125;
+		colnum = colnum + 1;
+		sheetColls[colnum] = 14.5703125;
+		colnum = colnum + 1;
+		sheetColls[colnum] = 14.5703125;
+		colnum = colnum + 1;
+		sheetColls[colnum] = 14.5703125;
 		XmlXlsxWorkBegin(fileToSave,reportName);
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
-		SetSheetsCols(sheetnum,sheetColls,fileToSave);
+		SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 		BeginSheetData(sheetnum,fileToSave);
 			rownum = 2;
 			colnum = 2;
@@ -497,28 +464,16 @@ BEGIN
 						style = 1;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,FoundArray[j],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						style = 2;
-						if (FPVect[FoundArray[j] & ":" & ProjArray[i]] < 0) then begin
-							style  = style + 25;
-						end;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":" & ProjArray[i]]);
 						style = 3;
-						if (FPVect["Fact:" & FoundArray[j] & ":" & ProjArray[i]] < 0) then begin
-							style  = style + 25;
-						end;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[j] & ":" & ProjArray[i]]);
 						style = 4;
-						if ((FPVect["Fact:" & FoundArray[j] & ":" & ProjArray[i]] - FPVect[FoundArray[j] & ":" & ProjArray[i]]) < 0) then begin
-							style  = style + 25;
-						end;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[j] & ":" & ProjArray[i]] - FPVect[FoundArray[j] & ":" & ProjArray[i]]);
 						style = 5;
 						if (FPVect[FoundArray[j] & ":" & ProjArray[i]] == 0) then begin
 							qtyOfEmpStr = 1;
 							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 						end else begin
-							if (100*(FPVect["Fact:" & FoundArray[j] & ":" & ProjArray[i]] - FPVect[FoundArray[j] & ":" & ProjArray[i]])/FPVect[FoundArray[j] & ":" & ProjArray[i]] < 0) then begin
-								style  = style + 25;
-							end;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(FPVect["Fact:" & FoundArray[j] & ":" & ProjArray[i]] - FPVect[FoundArray[j] & ":" & ProjArray[i]])/FPVect[FoundArray[j] & ":" & ProjArray[i]]);
 						end;
 					EndRow(sheetnum,fileToSave,rownum);
@@ -529,14 +484,8 @@ BEGIN
 					style = 1;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"sub tot",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					style = 10;
-					if (FPVect["TOTAL:" & ProjArray[i]] < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]);
 					style = 11;
-					if (FPVect["Fact:TOTAL:" & ProjArray[i]] < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTAL:" & ProjArray[i]]);
 				EndRow(sheetnum,fileToSave,rownum);
 				colnum = 1;
@@ -544,14 +493,8 @@ BEGIN
 					style = 1;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"sub tot %",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					style = 10;
-					if (FPVect["TOTALproc:" & ProjArray[i]] < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTALproc:" & ProjArray[i]]);
 					style = 11;
-					if (FPVect["Fact:TOTALproc:" & ProjArray[i]] < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTALproc:" & ProjArray[i]]);
 				EndRow(sheetnum,fileToSave,rownum);
 			end;
@@ -588,28 +531,16 @@ BEGIN
 					style = 1;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,FoundArray[j],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					style = 6;
-					if (FPVect[FoundArray[j] & ":TOTAL"] < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":TOTAL"]);
 					style = 7;
-					if (FPVect["Fact:" & FoundArray[j] & ":TOTAL"] < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[j] & ":TOTAL"]);
 					style = 4;
-					if ((FPVect["Fact:" & FoundArray[j] & ":TOTAL"] - FPVect[FoundArray[j] & ":TOTAL"]) < 0) then begin
-						style  = style + 25;
-					end;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[j] & ":TOTAL"] - FPVect[FoundArray[j] & ":TOTAL"]);
 					style = 5;
 					if (FPVect[FoundArray[j] & ":TOTAL"] == 0) then begin
 						qtyOfEmpStr = 1;
 						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 					end else begin
-						if (100*(FPVect["Fact:" & FoundArray[j] & ":TOTAL"] - FPVect[FoundArray[j] & ":TOTAL"])/FPVect[FoundArray[j] & ":TOTAL"] < 0) then begin
-							style  = style + 25;
-						end;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(FPVect["Fact:" & FoundArray[j] & ":TOTAL"] - FPVect[FoundArray[j] & ":TOTAL"])/FPVect[FoundArray[j] & ":TOTAL"]);
 					end;
 				EndRow(sheetnum,fileToSave,rownum);
@@ -620,14 +551,8 @@ BEGIN
 				style = 1;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"sub tot",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 8;
-				if (FPVect["TOTAL:TOTAL"] < 0) then begin
-					style  = style + 25;
-				end;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:TOTAL"]);
 				style = 9;
-				if (FPVect["TOTAL:TOTAL"] < 0) then begin
-					style  = style + 25;
-				end;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTAL:TOTAL"]);
 			EndRow(sheetnum,fileToSave,rownum);
 			colnum = 1;
@@ -635,14 +560,8 @@ BEGIN
 				style = 1;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"sub tot %",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				style = 8;
-				if (FPVect["TOTALproc:TOTALproc"] < 0) then begin
-					style  = style + 25;
-				end;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTALproc:TOTALproc"]);
 				style = 9;
-				if (FPVect["Fact:TOTALproc:TOTALproc"] < 0) then begin
-					style  = style + 25;
-				end;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTALproc:TOTALproc"]);
 			EndRow(sheetnum,fileToSave,rownum);
 		EndSheetData(sheetnum,fileToSave);

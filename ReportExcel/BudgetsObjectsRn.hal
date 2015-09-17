@@ -2,7 +2,7 @@ external procedure GetObjs(string,string,var string);
 external procedure XmlXlsxWorkBegin(string,string);
 external procedure CreateSheetsXLSX(integer,array string,string,integer);
 external procedure EndSheet(integer,string,integer);
-external procedure SetSheetsCols(integer,array val,string);
+external procedure SetSheetsCols(integer,array val,array integer,string);
 external procedure BeginSheetData(integer,string);
 external procedure EndSheetData(integer,string);
 external procedure BeginRow(integer,string,integer,integer,val);
@@ -660,6 +660,7 @@ BEGIN
 	integer PRCodesCount;
 	array string 10 sheetNames;
 	array val sheetColls;
+	array integer sheetCollsOutLvl;
 	array string 21 mergeCell;
 	string 255 fileToSave;
 	integer qtyOfSheets,sheetnum,rownum,colnum,style,qtyOfEmpStr;
@@ -860,7 +861,7 @@ BEGIN
 				RecordClear(BRr);
 				BRr = TotBRr;
 			end;
-			SetSheetsCols(sheetnum,sheetColls,fileToSave);
+			SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 			BeginSheetData(sheetnum,fileToSave);
 				colnum = 1;
 				rownum = 1;
@@ -950,88 +951,48 @@ BEGIN
 								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 								style = 8;
 								if (RepSpec.flags[1]==1) then begin
-									if (subtotals[0] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
+									style = 8;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[0]);
 									totalrow[0] = totalrow[0] + subtotals[0];
-									if (subtotals[1] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
+									style = 8;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[1]);
 									totalrow[1] = totalrow[1] + subtotals[1];
 									totalbubyrow = totalbubyrow + subtotals[0];
 									totalspendbyrow = totalspendbyrow + subtotals[1];
 								end;
 								if (RepSpec.flags[2]==1) then begin 
-									if (subtotals[2] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
+									style = 8;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[2]);
 									totalrow[2] = totalrow[2] + subtotals[2];
-									if (subtotals[3] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
+									style = 8;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[3]);
 									totalrow[3] = totalrow[3] + subtotals[3];
 									totalbubyrow = totalbubyrow + subtotals[2];
 									totalspendbyrow = totalspendbyrow + subtotals[3];
 								end;
 								if (RepSpec.flags[3]==1) then begin 
-									if (subtotals[4] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
+									style = 8;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[4]);
 									totalrow[4] = totalrow[4] + subtotals[4];
-									if (subtotals[5] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
+									style = 8;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[5]);
 									totalrow[5] = totalrow[5] + subtotals[5];
 									totalbubyrow = totalbubyrow + subtotals[4];
 									totalspendbyrow = totalspendbyrow + subtotals[5];
 								end;
 								if (RepSpec.flags[4]==1) then begin 
-									if (subtotals[6] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
+									style = 8;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[6]);
 									totalrow[6] = totalrow[6] + subtotals[6];
-									if (subtotals[7] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
+									style = 8;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[7]);
 									totalrow[7] = totalrow[7] + subtotals[7];
 									totalbubyrow = totalbubyrow + subtotals[6];
 									totalspendbyrow = totalspendbyrow + subtotals[7];
 								end;
-								if (totalbubyrow < 0) then begin
-									style = 13;
-								end else begin
-									style = 8;
-								end;
+								style = 8;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbubyrow);
-								if (totalspendbyrow < 0) then begin
-									style = 13;
-								end else begin
-									style = 8;
-								end;
+								style = 8;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalspendbyrow);
 								totalbubyrow = 0;
 								totalspendbyrow = 0;
@@ -1057,81 +1018,41 @@ BEGIN
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							style = 11;
 							if (RepSpec.flags[1]==1) then begin 
-								if (BRrw.Bud1 < 0) then begin
-									style = 14;
-								end else begin
-									style = 11;
-								end;
+								style = 11;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud1);
 								totColBud1 = totColBud1 + BRrw.Bud1;
-								if (BRrw.Spend1 < 0) then begin
-									style = 14;
-								end else begin
-									style = 11;
-								end;
+								style = 11;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend1);
 								totColSpend1 = totColSpend1 + BRrw.Spend1;
 							end;
 							if (RepSpec.flags[2]==1) then begin 
-								if (BRrw.Bud2 < 0) then begin
-									style = 14;
-								end else begin
-									style = 11;
-								end;
+								style = 11;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud2);
 								totColBud2 = totColBud2 + BRrw.Bud2;
-								if (BRrw.Spend2 < 0) then begin
-									style = 14;
-								end else begin
-									style = 11;
-								end;
+								style = 11;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend2);
 								totColSpend2 = totColSpend2 + BRrw.Spend2;
 							end;
 							if (RepSpec.flags[3]==1) then begin 
-								if (BRrw.Bud3 < 0) then begin
-									style = 14;
-								end else begin
-									style = 11;
-								end;
+								style = 11;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud3);
 								totColBud3 = totColBud3 + BRrw.Bud3;
-								if (BRrw.Spend3 < 0) then begin
-									style = 14;
-								end else begin
-									style = 11;
-								end;
+								style = 11;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend3);
 								totColSpend3 = totColSpend3 + BRrw.Spend3;
 							end;
 							if (RepSpec.flags[4]==1) then begin 
-								if (BRrw.Bud4 < 0) then begin
-									style = 14;
-								end else begin
-									style = 11;
-								end;
+								style = 11;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud4);
 								totColBud4 = totColBud4 + BRrw.Bud4;
-								if (BRrw.Spend4 < 0) then begin
-									style = 14;
-								end else begin
-									style = 11;
-								end;
+								style = 11;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend4);
 								totColSpend4 = totColSpend4 + BRrw.Spend4;
 							end;
-							if (totalbubyrow < 0) then begin
-								style = 14;
-							end else begin
-								style = 11;
-							end;
+							style = 11;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbubyrow);
 							totColBudT = totColBudT + totalbubyrow;
-							if (totalspendbyrow < 0) then begin
-								style = 14;
-							end else begin
-								style = 11;
-							end;
+							style = 11;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalspendbyrow);
 							totColSpendT = totColSpendT + totalspendbyrow;
 						EndRow(sheetnum,fileToSave,rownum);
@@ -1145,72 +1066,32 @@ BEGIN
 					colnum = colnum + 1;
 					style = 8;
 					if (RepSpec.flags[1]==1) then begin 
-						if (totColBud1 < 0) then begin
-							style = 13;
-						end else begin
-							style = 8;
-						end;
+						style = 8;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud1);
-						if (totColSpend1 < 0) then begin
-							style = 13;
-						end else begin
-							style = 8;
-						end;
+						style = 8;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend1);
 					end;
 					if (RepSpec.flags[2]==1) then begin 
-						if (totColBud2 < 0) then begin
-							style = 13;
-						end else begin
-							style = 8;
-						end;
+						style = 8;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud2);
-						if (totColSpend2 < 0) then begin
-							style = 13;
-						end else begin
-							style = 8;
-						end;
+						style = 8;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend2);
 					end;
 					if (RepSpec.flags[3]==1) then begin 
-						if (totColBud3 < 0) then begin
-							style = 13;
-						end else begin
-							style = 8;
-						end;
+						style = 8;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud3);
-						if (totColSpend3 < 0) then begin
-							style = 13;
-						end else begin
-							style = 8;
-						end;
+						style = 8;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend3);
 					end;
 					if (RepSpec.flags[4]==1) then begin 
-						if (totColBud4 < 0) then begin
-							style = 13;
-						end else begin
-							style = 8;
-						end;
+						style = 8;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud4);
-						if (totColSpend4 < 0) then begin
-							style = 13;
-						end else begin
-							style = 8;
-						end;
+						style = 8;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend4);
 					end;
-					if (totColBudT < 0) then begin
-						style = 13;
-					end else begin
-						style = 8;
-					end;
+					style = 8;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBudT);
-					if (totColSpendT < 0) then begin
-						style = 13;
-					end else begin
-						style = 8;
-					end;
+					style = 8;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpendT);
 				EndRow(sheetnum,fileToSave,rownum);
 			EndSheetData(sheetnum,fileToSave);
@@ -1271,7 +1152,7 @@ BEGIN
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
 		
 		sheetnum = 1;
-		SetSheetsCols(sheetnum,sheetColls,fileToSave);
+		SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 		BeginSheetData(sheetnum,fileToSave);
 			rownum = 1;
 			colnum = 1;
@@ -1352,88 +1233,48 @@ BEGIN
 							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 							style = 8;
 							if (RepSpec.flags[1]==1) then begin 
-									if (subtotals[0] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[0]);
-									totalrow[0] = totalrow[0] + subtotals[0];
-									if (subtotals[1] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[1]);
-									totalrow[1] = totalrow[1] + subtotals[1];
-									totalbubyrow = totalbubyrow + subtotals[0];
-									totalspendbyrow = totalspendbyrow + subtotals[1];
-								end;
-								if (RepSpec.flags[2]==1) then begin 
-									if (subtotals[2] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[2]);
-									totalrow[2] = totalrow[2] + subtotals[2];
-									if (subtotals[3] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[3]);
-									totalrow[3] = totalrow[3] + subtotals[3];
-									totalbubyrow = totalbubyrow + subtotals[2];
-									totalspendbyrow = totalspendbyrow + subtotals[3];
-								end;
-								if (RepSpec.flags[3]==1) then begin 
-									if (subtotals[4] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[4]);
-									totalrow[4] = totalrow[4] + subtotals[4];
-									if (subtotals[5] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[5]);
-									totalrow[5] = totalrow[5] + subtotals[5];
-									totalbubyrow = totalbubyrow + subtotals[4];
-									totalspendbyrow = totalspendbyrow + subtotals[5];
-								end;
-								if (RepSpec.flags[4]==1) then begin 
-									if (subtotals[6] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[6]);
-									totalrow[6] = totalrow[6] + subtotals[6];
-									if (subtotals[7] < 0) then begin
-										style = 13;
-									end else begin
-										style = 8;
-									end;
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[7]);
-									totalrow[7] = totalrow[7] + subtotals[7];
-									totalbubyrow = totalbubyrow + subtotals[6];
-									totalspendbyrow = totalspendbyrow + subtotals[7];
-								end;
-							if (totalbubyrow < 0) then begin
-								style = 13;
-							end else begin
 								style = 8;
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[0]);
+								totalrow[0] = totalrow[0] + subtotals[0];
+								style = 8;
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[1]);
+								totalrow[1] = totalrow[1] + subtotals[1];
+								totalbubyrow = totalbubyrow + subtotals[0];
+								totalspendbyrow = totalspendbyrow + subtotals[1];
 							end;
+							if (RepSpec.flags[2]==1) then begin 
+								style = 8;
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[2]);
+								totalrow[2] = totalrow[2] + subtotals[2];
+								style = 8;
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[3]);
+								totalrow[3] = totalrow[3] + subtotals[3];
+								totalbubyrow = totalbubyrow + subtotals[2];
+								totalspendbyrow = totalspendbyrow + subtotals[3];
+							end;
+							if (RepSpec.flags[3]==1) then begin 
+								style = 8;
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[4]);
+								totalrow[4] = totalrow[4] + subtotals[4];
+								style = 8;
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[5]);
+								totalrow[5] = totalrow[5] + subtotals[5];
+								totalbubyrow = totalbubyrow + subtotals[4];
+								totalspendbyrow = totalspendbyrow + subtotals[5];
+							end;
+							if (RepSpec.flags[4]==1) then begin 
+								style = 8;
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[6]);
+								totalrow[6] = totalrow[6] + subtotals[6];
+								style = 8;
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[7]);
+								totalrow[7] = totalrow[7] + subtotals[7];
+								totalbubyrow = totalbubyrow + subtotals[6];
+								totalspendbyrow = totalspendbyrow + subtotals[7];
+							end;
+							style = 8;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbubyrow);
-							if (totalspendbyrow < 0) then begin
-								style = 13;
-							end else begin
-								style = 8;
-							end;
+							style = 8;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalspendbyrow);
 						EndRow(sheetnum,fileToSave,rownum);
 					end;					
@@ -1458,81 +1299,41 @@ BEGIN
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						style = 11;
 						if (RepSpec.flags[1]==1) then begin 
-							if (BRrw.Bud1 < 0) then begin
-								style = 14;
-							end else begin
-								style = 11;
-							end;
+							style = 11;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud1);
 							totColBud1 = totColBud1 + BRrw.Bud1;
-							if (BRrw.Spend1 < 0) then begin
-								style = 14;
-							end else begin
-								style = 11;
-							end;
+							style = 11;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend1);
 							totColSpend1 = totColSpend1 + BRrw.Spend1;
 						end;
 						if (RepSpec.flags[2]==1) then begin 
-							if (BRrw.Bud2 < 0) then begin
-								style = 14;
-							end else begin
-								style = 11;
-							end;
+							style = 11;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud2);
 							totColBud2 = totColBud2 + BRrw.Bud2;
-							if (BRrw.Spend2 < 0) then begin
-								style = 14;
-							end else begin
-								style = 11;
-							end;
+							style = 11;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend2);
 							totColSpend2 = totColSpend2 + BRrw.Spend2;
 						end;
 						if (RepSpec.flags[3]==1) then begin 
-							if (BRrw.Bud3 < 0) then begin
-								style = 14;
-							end else begin
-								style = 11;
-							end;
+							style = 11;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud3);
 							totColBud3 = totColBud3 + BRrw.Bud3;
-							if (BRrw.Spend3 < 0) then begin
-								style = 14;
-							end else begin
-								style = 11;
-							end;
+							style = 11;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend3);
 							totColSpend3 = totColSpend3 + BRrw.Spend3;
 						end;
 						if (RepSpec.flags[4]==1) then begin 
-							if (BRrw.Bud4 < 0) then begin
-								style = 14;
-							end else begin
-								style = 11;
-							end;
+							style = 11;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud4);
 							totColBud4 = totColBud4 + BRrw.Bud4;
-							if (BRrw.Spend4 < 0) then begin
-								style = 14;
-							end else begin
-								style = 11;
-							end;
+							style = 11;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend4);
 							totColSpend4 = totColSpend4 + BRrw.Spend4;
 						end;
-						if (totalbubyrow < 0) then begin
-							style = 14;
-						end else begin
-							style = 11;
-						end;
+						style = 11;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbubyrow);
 						totColBudT = totColBudT + totalbubyrow;
-						if (totalspendbyrow < 0) then begin
-							style = 14;
-						end else begin
-							style = 11;
-						end;
+						style = 11;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalspendbyrow);
 						totColSpendT = totColSpendT + totalspendbyrow;
 					EndRow(sheetnum,fileToSave,rownum);
@@ -1546,72 +1347,32 @@ BEGIN
 				colnum = colnum + 1;
 				style = 8;
 				if (RepSpec.flags[1]==1) then begin 
-					if (totColBud1 < 0) then begin
-						style = 13;
-					end else begin
-						style = 8;
-					end;
+					style = 8;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud1);
-					if (totColSpend1 < 0) then begin
-						style = 13;
-					end else begin
-						style = 8;
-					end;
+					style = 8;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend1);
 				end;
 				if (RepSpec.flags[2]==1) then begin 
-					if (totColBud2 < 0) then begin
-						style = 13;
-					end else begin
-						style = 8;
-					end;
+					style = 8;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud2);
-					if (totColSpend2 < 0) then begin
-						style = 13;
-					end else begin
-						style = 8;
-					end;
+					style = 8;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend2);
 				end;
 				if (RepSpec.flags[3]==1) then begin 
-					if (totColBud3 < 0) then begin
-						style = 13;
-					end else begin
-						style = 8;
-					end;
+					style = 8;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud3);
-					if (totColSpend3 < 0) then begin
-						style = 13;
-					end else begin
-						style = 8;
-					end;
+					style = 8;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend3);
 				end;
 				if (RepSpec.flags[4]==1) then begin 
-					if (totColBud4 < 0) then begin
-						style = 13;
-					end else begin
-						style = 8;
-					end;
+					style = 8;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud4);
-					if (totColSpend4 < 0) then begin
-						style = 13;
-					end else begin
-						style = 8;
-					end;
+					style = 8;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend4);
 				end;
-				if (totColBudT < 0) then begin
-					style = 13;
-				end else begin
-					style = 8;
-				end;
+				style = 8;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBudT);
-				if (totColSpendT < 0) then begin
-					style = 13;
-				end else begin
-					style = 8;
-				end;
+				style = 8;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpendT);
 			EndRow(sheetnum,fileToSave,rownum);
 		EndSheetData(sheetnum,fileToSave);

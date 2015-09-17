@@ -272,7 +272,7 @@ BEGIN
 END;
 
 global
-procedure SetSheetsCols(integer SheetNum,array val sizeArray, string pathToXLSX)
+procedure SetSheetsCols(integer SheetNum,array val sizeArray, array integer lvlArray, string pathToXLSX)
 BEGIN
 	integer i;
 	area tempArea;
@@ -284,7 +284,15 @@ BEGIN
 	i = 0;
 	while (sizeArray[i] <> 0) begin
 		tstr = ValToString(sizeArray[i],M4Val,"",".",0);
-		AddTextToArea("<col min=" & Chr(34) & i+1 & Chr(34) & " max=" & Chr(34) & i+1 & Chr(34) & " width=" & Chr(34) & tstr & Chr(34) & " customWidth=" & Chr(34) & "1" & Chr(34) & "/>",tempArea);
+		AddTextToArea("<col min=" & Chr(34) & i+1 & Chr(34) & " max=" & Chr(34) & i+1 & Chr(34) & " width=" & Chr(34) & tstr & Chr(34),tempArea);
+		if (lvlArray[i] <> 0) then begin
+			AddTextToArea(" hidden=" & Chr(34) & "1" & Chr(34),tempArea);
+		end;
+		AddTextToArea(" customWidth=" & Chr(34) & "1" & Chr(34),tempArea);
+		if (lvlArray[i] <> 0) then begin
+			AddTextToArea(" outlineLevel=" & Chr(34) & lvlArray[i] & Chr(34),tempArea);
+		end;
+		AddTextToArea("/>",tempArea);
 		i = i + 1;
 	end;
 	AddTextToArea("</cols>",tempArea);
