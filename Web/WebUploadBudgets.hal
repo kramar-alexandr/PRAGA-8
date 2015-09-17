@@ -68,7 +68,7 @@ begin
 	
 	Mainr.TransDate = "";
 	while (loopkey("TransDate",Mainr,1,true)) begin
-		if (mid(Mainr.AccNumber,0,1)!="5") then begin
+		if (mid(Mainr.AccNumber,0,1)=="5") then begin
 			TRr.Number = Mainr.TransNr;
 			TRr.IntYc = Mainr.IntYc;
 			if (readfirstmain(TRr,2,true)) then begin
@@ -91,6 +91,7 @@ begin
 						locat = "";
 						GetObjs("LOCAT",TRrw.Objects,locat);
 						weboutstring(prj & tab & found & tab & suppl & tab & exp & tab & locat & tab & (TRrw.DebVal - TRrw.CredVal) & tab & k & nl);
+						
 					end;
 				end;
 			end;
