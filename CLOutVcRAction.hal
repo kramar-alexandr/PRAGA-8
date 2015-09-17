@@ -1,0 +1,46 @@
+external inner procedure NormalizeObjstr(var string);// Edit ************************** Wednesday, 15 July 2015 11:04:06
+external inner procedure NoDupObjs(string,var string);// Edit ************************** Wednesday, 15 July 2015 12:10:47
+
+
+global
+updating function LongInt CLOutVcRecordCheck(var record CLOutVc CLOutp,record CLOutVc CLOut2p,LongInt stat,LongInt long4)
+BEGIN
+LongInt res;
+integer mtrw,i;
+row CLOutVc CLOutrw;
+string 200 objstr;
+ 
+	mtrw = matrowcnt(CLOutp);
+	For(i=0;i<mtrw;i=i+1) begin
+		matrowget(CLOutp,i,CLOutrw);
+		
+		objstr = "";// Edit ************************** Wednesday, 22 July 2015 09:43:51
+		if(nonblank(CLOutrw.CorspCode))then begin
+			objstr = objstr & "," & CLOutrw.CorspCode;// Edit ************************** Wednesday, 15 July 2015 10:59:15
+		end;
+		if(nonblank(CLOutrw.Prj))then begin
+			objstr = objstr & "," & CLOutrw.Prj;// Edit ************************** Wednesday, 15 July 2015 10:59:15
+		end;
+		if(nonblank(CLOutrw.Company))then begin
+			objstr = objstr & "," & CLOutrw.Company;// Edit ************************** Wednesday, 15 July 2015 10:59:15
+		end;
+		if(nonblank(CLOutrw.Found))then begin
+			objstr = objstr & "," & CLOutrw.Found;// Edit ************************** Wednesday, 15 July 2015 10:59:15
+		end;
+		if(nonblank(CLOutrw.Loc))then begin
+			objstr = objstr & "," & CLOutrw.Loc;//Edit---------------Vitalii 17:12 04.08.2015
+		end;
+	
+		NoDupObjs(objstr,objstr);
+		NormalizeObjstr(objstr);// Edit ************************** Wednesday, 15 July 2015 11:05:34
+		CLOutrw.Objects = objstr;// Edit ************************** Wednesday, 15 July 2015 11:05:33
+		matrowput(CLOutp,i,CLOutrw);// Edit ************************** Wednesday, 15 July 2015 11:09:29
+		
+		  
+	end; 
+	
+	res = inner.CLOutVcRecordCheck(CLOutp,CLOut2p,stat,long4);
+
+	CLOutVcRecordCheck = res;
+return;
+end;

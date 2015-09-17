@@ -2572,7 +2572,7 @@ begin
   Integer pos,tilenr,flipnr,f;
   
   WindowBegin("Cash Out",CLOutDClass,CGview,-);
-  SetWRect(20,80,700,550);
+  SetWRect(20,80,950,550);// Edit ************************** Thursday, 17 September 2015 14:14:13
   UseView(CLOutVc);
   ActiveFieldOnNew("TransDate");
 //  Sizeable(-1,-1,0,0);
@@ -2664,18 +2664,25 @@ begin
   MatrixBegin(4,v,-50,-10,-,99);
   Flip(1);
   MatTypedRow(stp);
+  
+  MatCol(t=1,h=34,"Pay. Mode",Normal,PayMode,false,PMSClass);
+  MatCol(t,h+=70,"Expense",Normal,CorspCode,false,CLCorspSClass);
+  MatCol(t,h+=70,"Project",Normal,Prj,false,ObjPrjSClass);
+  MatCol(t,h+=70,"#Supplier#",0,Company,false,VESClass);
+  MatCol(t,h+=70,"Foundation",0,Found,false,ObjFoundSClass);
+  MatCol(t,h+=70,"Location",0,Loc,false,ObjLocSClass);
+  MatCol(1,h+=70,"#Supplier# Name",0,VEName,true,0);
+  MatCol(t,h+=100,"Comment",0,Comment,false,0);// Edit ************************** Tuesday, 26 May 2015 13:46:50
+  MatCol(t,-80,"Sum",0,Sum,true,0);
+  
+  
+  Flip(2);
+  
   //MatCol(t=1,h=34,"Type",0,Type,false,SetSClass);// Edit ************************** Wednesday, 10 June 2015 10:56:41
   MatCol(t=1,h=34,"#Supplier#",0,Company,false,VESClass);// Edit ************************** Wednesday, 10 June 2015 10:57:08
-  /*if (HasLocalization("POL") and IsStandardProduct) then begin
-    MatCol(t,h+=120,"Number",0,TransOfficialSerNr,false,ARSClass);
-  end else begin
-    MatCol(t,h+=120,"Number",0,TransNr,false,ARSClass);
-  end;*/
   MatCol(t,h+=120,"Pay. Mode",Normal,PayMode,false,PMSClass);// Edit ************************** Tuesday, 26 May 2015 13:43:24
   
-  /*if (HasModSO) then begin
-    MatCol(t,h+=70,"Order",0,OrderNr,false,ORSClass);
-  end;*/
+
   MatCol(t,h+=70,"Expense A/C",ViewOnly,CorspCode,false,CLCorspSClass);
   if (HasObjects) then begin
     MatCol(t,h+=70,"Objects",0,Objects,false,ObjSClass);
@@ -2688,7 +2695,8 @@ begin
   MatCol(t,h+=200,"",0,TransNr,false,0);
   MatCol(t,-180,"Company",ViewOnly,Company,false,0);
   MatCol(t,-80,"Sum",0,Sum,true,0);
-  Flip(2);
+  
+  Flip(3);
   t=1; h = 34;
   if (HasModPL) then begin
     MatCol(t,h,"Type",0,Type,false,SetSClass);
