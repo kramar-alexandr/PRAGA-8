@@ -1718,35 +1718,33 @@ begin
 	record CUVc CUr;
 	record CLCorspVc CLCorspr;
 	integer rwcnt,i;
-	boolean changedf;
+	string 255 tmp;
 	
 	TBBUr.PRCode = "";
 	while (LoopMain(TBBUr,1,true)) begin
 		rwcnt = MatRowCnt(TBBUr);
-		changedf = false;
 		for (i=0;i<rwcnt;i=i+1) begin
 			MatRowGet(TBBUr,i,TBBUrw);
 			if nonblank(TBBUrw.ArtCode) then begin
 				CLCorspr.Code = TBBUrw.ArtCode;
 				ReadFirstMain(CLCorspr,1,true);
-				TBBUrw.Objects = CLCorspr.Objects & ",";
-				changedf = true;
+				tmp = CLCorspr.Objects & ",";
 			end;
 			if nonblank(TBBUrw.VECode) then begin
 				CUr.Code = TBBUrw.VECode;
 				ReadFirstMain(CUr,1,true);
-				TBBUrw.Objects = TBBUrw.Objects & CUr.VEObjects & ",";
-				changedf = true;
+				tmp = tmp & CUr.VEObjects & ",";
 			end;
 			if nonblank(TBBUrw.ExtraObj) then begin
-				TBBUrw.Objects = TBBUrw.Objects & TBBUrw.ExtraObj;
-				changedf = true;
+				tmp = tmp & TBBUrw.ExtraObj;
+			end;
+			if TBBUrw.Objects != tmp then begin
+				logtext(0,TBBUr.PRCode & " " & i & " - " & TBBUrw.Objects & " - (new)" & tmp);
+				TBBUrw.Objects = tmp;
+				MatRowPut(TBBUr,i,TBBUrw);
 			end;
 		end;
-		if (changedf) then begin
-			logtext(0,TBBUr.PRCode & " " & i & " - " & TBBUrw.Objects);
-			RECORDSTORE(TBBUr,true);
-		end;
+		RECORDSTORE(TBBUr,true);
 	end;
 
 return;
