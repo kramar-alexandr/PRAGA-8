@@ -938,6 +938,8 @@ BEGIN
 				totColSpendT = 0;
 				For(i=0;i<mtrw;i=i+1) begin
 					matrowget(BRr,i,BRrw);
+					totalbubyrow = 0;
+					totalspendbyrow = 0;
 					if (nonblank(BRrw.CatName))	 then begin				
 						if (CollectSubTotals(BRr,i,subtotals)) then begin	//check if item group is empty
 							style = 3;
