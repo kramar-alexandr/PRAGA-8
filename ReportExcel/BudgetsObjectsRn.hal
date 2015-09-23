@@ -13,6 +13,7 @@ external procedure EmptyCell(integer,string,var integer,integer,integer,integer)
 external procedure MergeCells(integer,string,array string,integer);
 external procedure FillSharedStrings(string,array string,integer,integer);
 external procedure ConvertToXLSX(string);
+external function string 10 GetStringCellNum(integer,integer);
 
 global
 function integer GetQuartal(date trDate)
@@ -668,7 +669,6 @@ BEGIN
 	integer numOfUniqueSharedStrings,numOfSharedStrings,qtyMergeCell;
 	string 16 reportName;
 	string 255 AccStr;
-	string 20 prevcode;
 	integer outlineLevel;
 	
 	reportName = "BudgetsObjectsRn"	;
@@ -793,7 +793,7 @@ BEGIN
 		sheetColls[colnum] = 14.42578125;
 		
 		qtyMergeCell = 1;
-		mergeCell[0] = "A1:N1";
+		mergeCell[0] = "A1:" & GetStringCellNum(quartCount*2 + 6,1);
 		
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
@@ -868,8 +868,6 @@ BEGIN
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 					style = 1;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,PRrName & "," & GetYear(RepSpec.sStartDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					qtyOfEmpStr = 13;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 				EndRow(sheetnum,fileToSave,rownum);
 				rownum = rownum + 1;
 				colnum = 1;
@@ -878,9 +876,6 @@ BEGIN
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"period",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					style = 5;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,RepSpec.sStartDate & "-" & RepSpec.sEndDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					colnum = colnum + 1;
-					qtyOfEmpStr = 10;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 				EndRow(sheetnum,fileToSave,rownum);
 				
 				colnum = 1;
@@ -889,11 +884,7 @@ BEGIN
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"currency",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					style = 5;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,BCb.BaseCur1,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					colnum = colnum + 1;
-					qtyOfEmpStr = 10;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 				EndRow(sheetnum,fileToSave,rownum);
-				colnum = 5;
 				rownum = rownum + 2;
 				
 				colnum = 1;
@@ -925,7 +916,6 @@ BEGIN
 				EndRow(sheetnum,fileToSave,rownum);
 			
 				mtrw = matrowcnt(BRr);
-				prevcode = "";
 				totColBud1 = 0;
 				totColSpend1 = 0;
 				totColBud2 = 0;
@@ -1006,11 +996,6 @@ BEGIN
 					if (totalbubyrow!=0 or totalspendbyrow!=0) then begin
 						colnum = 1;
 						outlineLevel = 1;
-						//outlineLevel = 0;
-						//if ((nonblank(prevcode) and BRrw.Code!=prevcode) or blank(prevcode)) then begin
-						//	outlineLevel = 1;
-						//end;
-						prevcode = BRrw.Code;
 						BeginRow(sheetnum,fileToSave,rownum,outlineLevel,blankval);
 							style = 10;
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -1145,7 +1130,7 @@ BEGIN
 		sheetColls[colnum] = 14.42578125;
 		
 		qtyMergeCell = 1;
-		mergeCell[0] = "A1:N1";
+		mergeCell[0] = "A1:" & GetStringCellNum(quartCount*2 + 6,1);
 		
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
@@ -1210,7 +1195,6 @@ BEGIN
 			EndRow(sheetnum,fileToSave,rownum);
 		
 			mtrw = matrowcnt(BRr);
-			prevcode = "";
 			totColBud1 = 0;
 			totColSpend1 = 0;
 			totColBud2 = 0;
@@ -1288,7 +1272,6 @@ BEGIN
 				if(totalbubyrow!=0 or totalspendbyrow!=0 )then begin
 					colnum = 1;
 					outlineLevel = 1;
-					prevcode = BRrw.Code;
 					colnum = 1;
 					BeginRow(sheetnum,fileToSave,rownum,outlineLevel,blankval);
 						style = 10;
