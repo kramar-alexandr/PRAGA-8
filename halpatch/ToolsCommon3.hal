@@ -1674,7 +1674,6 @@ Begin
 
 end;
 
-
 global 
 updating procedure FixVIVcMn(record RcVc RepSpec)
 begin
@@ -1705,6 +1704,47 @@ begin
 		end;
 		if (changedf) then begin
 			RECORDSTORE(VIr,true);
+		end;
+	end;
+
+return;
+end;
+
+global 
+updating procedure FixTBBUrwObjectsMn(record RcVc RepSpec)
+begin
+	record TBBUVc TBBUr;
+	row TBBUVc TBBUrw;
+	record CUVc CUr;
+	record CLCorspVc CLCorspr;
+	integer rwcnt,i;
+	boolean changedf;
+	
+	TBBUr.PRCode = "";
+	while (LoopMain(TBBUr,1,true)) begin
+		rwcnt = MatRowCnt(TBBUr);
+		changedf = false;
+		for (i=0;i<rwcnt;i=i+1) begin
+			MatRowGet(TBBUr,i,TBBUrw);
+			if nonblank(TBBUrw.ArtCode) then begin
+				CLCorspr.Code = TBBUrw.ArtCode;
+				ReadFirstMain(CLCorspr,1,true);
+				TBBUrw.Objects = CLCorspr.Objects & ",";
+				changedf = true;
+			end;
+			if nonblank(TBBUrw.VECode) then begin
+				CUr.Code = TBBUrw.VECode;
+				ReadFirstMain(CUr,1,true);
+				TBBUrw.Objects = TBBUrw.Objects & CUr.VEObjects & ",";
+				changedf = true;
+			end;
+			if nonblank(TBBUrw.ExtraObj) then begin
+				TBBUrw.Objects = TBBUrw.Objects & TBBUrw.ExtraObj;
+				changedf = true;
+			end;
+		end;
+		if (changedf) then begin
+			RECORDSTORE(TBBUr,true);
 		end;
 	end;
 
