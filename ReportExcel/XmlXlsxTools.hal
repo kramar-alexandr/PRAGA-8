@@ -1,3 +1,5 @@
+external function string 255 ConvertXml(string);
+
 // only for 8.x
 function string 255 StrReplace(string original,string target,string replacement) 
 begin
@@ -395,7 +397,7 @@ BEGIN
 			end;
 		end;
 		if (foundStr == -1) then begin
-			SharedStrings[numOfUniqueSharedStrings] = str;
+			SharedStrings[numOfUniqueSharedStrings] = ConvertXml(str);
 			foundStr = numOfUniqueSharedStrings;
 			numOfUniqueSharedStrings = numOfUniqueSharedStrings + 1;
 		end;
