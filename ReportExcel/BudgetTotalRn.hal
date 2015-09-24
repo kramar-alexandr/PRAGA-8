@@ -513,7 +513,7 @@ BEGIN
 					colnum = 1;
 					BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 						style = 1;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,FoundArray[j],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,FoundNamesVect[FoundArray[j]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						for (k=0;k<prjInRow;k=k+1) begin
 							style = 2;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":" & ProjArray[i + k]]);
