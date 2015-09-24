@@ -81,7 +81,7 @@ begin
 	MatRowGet(BRr,i,BRrw);
 	while (blank(BRrw.CatName) and (i<rwcnt)) begin
 		MatRowGet(BRr,i,BRrw);
-		subtotals[0] = subtotals[0] + BRrw.Bud1;			//Quartal I
+		subtotals[0] = subtotals[0] + BRrw.Bud1;		//Quartal I
 		subtotals[1] = subtotals[1] + BRrw.Spend1;		//Quartal I - Fact
 		subtotals[2] = subtotals[2] + BRrw.Bud2;
 		subtotals[3] = subtotals[3] + BRrw.Spend2;
@@ -101,7 +101,7 @@ begin
 return;
 end;
 
-procedure BRrCollect(record RcVc RepSpec, string AccStr, var string mainobjname, var string PRrName, var record BudRep1Vc BRr)
+procedure BRrCollect(record RcVc RepSpec, var string mainobjname, var string PRrName, var record BudRep1Vc BRr)
 BEGIN
 	record ObjVc Objr;
 	record PRVc PRr,PR2r;
@@ -174,6 +174,9 @@ BEGIN
 										BRrw.Spend3 = blankval;
 										BRrw.Spend4 = blankval;
 										BRrw.VECode = TBBUrw.VECode;
+										Objr.Code = BRrw.VECode;
+										readfirstmain(Objr,1,true);
+										BRrw.VEName = Objr.Comment;
 										matrowinsert(BRr,repi+1,BRrw);
 										repi = repmtrw;
 									end;
@@ -260,6 +263,9 @@ BEGIN
 												BRrw.Spend3 = blankval;
 												BRrw.Spend4 = blankval;
 												BRrw.VECode = TBBUrw.VECode;
+												Objr.Code = BRrw.VECode;
+												readfirstmain(Objr,1,true);
+												BRrw.VEName = Objr.Comment;
 												matrowinsert(BRr,repi+1,BRrw);
 												repi = repmtrw;
 											end;
@@ -306,7 +312,7 @@ BEGIN
 				if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5")) then begin
 					if (setinset(RepSpec.f1,TRrw.Objects) or blank(RepSpec.f1)) then begin
 						vendobj = "";
-						GetObjs("SUPPL",TRrw.Objects,vendobj);	//while... readfirstmain(Objr,1,true) ...end;
+						GetObjs("SUPPL",TRrw.Objects,vendobj);
 						foundf = false;
 						if nonblank(vendobj) then begin
 							repmtrw = matrowcnt(BRr);
@@ -329,6 +335,9 @@ BEGIN
 										BRrw.Spend3 = blankval;
 										BRrw.Spend4 = blankval;
 										BRrw.VECode = vendobj;
+										Objr.Code = BRrw.VECode;
+										readfirstmain(Objr,1,true);
+										BRrw.VEName = Objr.Comment;
 										matrowinsert(BRr,repi+1,BRrw);
 										repi = repmtrw;
 									end;
@@ -363,7 +372,7 @@ BEGIN
 RETURN;
 END;
 
-procedure BRrCollectForFew(record RcVc RepSpec, string AccStr, array string PRrCodes, var string mainobjname, var vector string PRrNames, var vector record BudRep1Vc ArrayBRr, record BudRep1Vc PatternBRr)
+procedure BRrCollectForFew(record RcVc RepSpec, array string PRrCodes, var string mainobjname, var vector string PRrNames, var vector record BudRep1Vc ArrayBRr, record BudRep1Vc PatternBRr)
 BEGIN
 	record ObjVc Objr;
 	record PRVc PRr,PR2r;
@@ -438,6 +447,9 @@ BEGIN
 											BRrw.Spend3 = blankval;
 											BRrw.Spend4 = blankval;
 											BRrw.VECode = TBBUrw.VECode;
+											Objr.Code = BRrw.VECode;
+											readfirstmain(Objr,1,true);
+											BRrw.VEName = Objr.Comment;
 											matrowinsert(BRr,repi+1,BRrw);
 											repi = repmtrw;
 										end;
@@ -472,7 +484,7 @@ BEGIN
 				//Collect subprojects' budjets
 				while(loopkey("MotherCode",PR2r,1,TrHs)) begin
 					testf = true;
-					if(PR2r.MotherCode!=PRr.Code)then begin TrHs = false; testf = false; end;
+					if (PR2r.MotherCode!=PRr.Code) then begin TrHs = false; testf = false; end;
 					//if(PR2r.StartDate<RepSpec.sStartDate and PR2r.StartDate>RepSpec.sEndDate)then begin testf = false; end;
 					if ((GetYear(PR2r.StartDate) & "" != RepSpec.f3) and (GetYear(PR2r.EndDate) & "" != RepSpec.f3)) then begin testf = false; end;
 					if(testf)then begin
@@ -522,6 +534,9 @@ BEGIN
 													BRrw.Spend3 = blankval;
 													BRrw.Spend4 = blankval;
 													BRrw.VECode = TBBUrw.VECode;
+													Objr.Code = BRrw.VECode;
+													readfirstmain(Objr,1,true);
+													BRrw.VEName = Objr.Comment;
 													matrowinsert(BRr,repi+1,BRrw);
 													repi = repmtrw;
 												end;
@@ -596,6 +611,9 @@ BEGIN
 												BRrw.Spend3 = blankval;
 												BRrw.Spend4 = blankval;
 												BRrw.VECode = vendobj;
+												Objr.Code = BRrw.VECode;
+												readfirstmain(Objr,1,true);
+												BRrw.VEName = Objr.Comment;
 												matrowinsert(BRr,repi+1,BRrw);
 												repi = repmtrw;
 											end;
@@ -668,7 +686,6 @@ BEGIN
 	array string 100 SharedStrings;
 	integer numOfUniqueSharedStrings,numOfSharedStrings,qtyMergeCell;
 	string 16 reportName;
-	string 255 AccStr;
 	integer outlineLevel;
 	
 	reportName = "BudgetsObjectsRn"	;
@@ -706,9 +723,6 @@ BEGIN
 					PatternBRrw.Name = Objr.Comment;
 				end;
 				PatternBRrw.CostAcc = INr.CostAcc;
-				if !(SetInSet(PatternBRrw.CostAcc,AccStr)) then begin
-					AccStr = AccStr & "," & PatternBRrw.CostAcc;
-				end;
 				repmtrw = matrowcnt(PatternBRr);
 				foundf = false;
 				For(i=0;i<repmtrw;i=i+1) begin
@@ -717,17 +731,6 @@ BEGIN
 						foundf = true;
 					end;
 				end; 
-				/*if(!foundf)then begin
-					CUr.Code = "";
-					while (loopkey("VEActCode",CUr,1,true)) begin
-						if(nonblank(CUr.VEObjects))then begin
-							PatternBRrw.VECode = CUr.VEObjects;
-							matrowput(PatternBRr,k,PatternBRrw);
-							k=k+1;
-						end;
-					end;
-					resetloop(CUr);
-				end;*/
 				repmtrw = matrowcnt(PatternBRr);
 				foundf = false;
 				For(i=0;i<repmtrw;i=i+1) begin
@@ -744,7 +747,6 @@ BEGIN
 			end;
 		end;
 	end;
-	AccStr = right(AccStr,len(AccStr) - 1);
 	
 	if (blank(RepSpec.f2)) then begin
 		TrHs = true;
@@ -760,7 +762,7 @@ BEGIN
 		end;
 		sheetNames[PRCodesCount] = "Total";
 		qtyOfSheets = PRCodesCount + 1;
-		BRrCollectForFew(RepSpec,AccStr,PRCodes,mainobjname,PRNames,ArrayBRr,PatternBRr);
+		BRrCollectForFew(RepSpec,PRCodes,mainobjname,PRNames,ArrayBRr,PatternBRr);
 		colnum = 0;
 		sheetColls[colnum] = 8.43;
 		colnum = colnum + 1;
@@ -769,6 +771,8 @@ BEGIN
 		sheetColls[colnum] = 31.71;
 		colnum = colnum + 1;
 		sheetColls[colnum] = 10.57; //vendor
+		colnum = colnum + 1;
+		sheetColls[colnum] = 20.57;
 		colnum = colnum + 1;
 		quartCount = 0;
 		if (RepSpec.flags[1] == 1) then begin
@@ -793,7 +797,7 @@ BEGIN
 		sheetColls[colnum] = 14.42578125;
 		
 		qtyMergeCell = 1;
-		mergeCell[0] = "A1:" & GetStringCellNum(quartCount*2 + 6,1);
+		mergeCell[0] = "A1:" & GetStringCellNum(quartCount*2 + 7,1);
 		
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
@@ -895,6 +899,7 @@ BEGIN
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,mainobjname,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Vendor",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					colnum = colnum + 1;
 					if (RepSpec.flags[1]==1) then begin 
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -939,8 +944,7 @@ BEGIN
 								style = 7;
 								StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 								StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.CatName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-								qtyOfEmpStr = 2;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+								colnum = colnum + 3;
 								style = 8;
 								if (RepSpec.flags[1]==1) then begin
 									style = 8;
@@ -999,10 +1003,10 @@ BEGIN
 						BeginRow(sheetnum,fileToSave,rownum,outlineLevel,blankval);
 							style = 10;
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-							qtyOfEmpStr = 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+							colnum = colnum + 2;
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Name,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VEName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							style = 11;
 							if (RepSpec.flags[1]==1) then begin 
 								style = 11;
@@ -1050,7 +1054,7 @@ BEGIN
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 					style = 7;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					colnum = colnum + 1;
+					colnum = colnum + 2;
 					style = 8;
 					if (RepSpec.flags[1]==1) then begin 
 						style = 8;
@@ -1090,7 +1094,7 @@ BEGIN
 	end else begin
 		RecordClear(BRr);
 		BRr = PatternBRr;
-		BRrCollect(RepSpec,AccStr,mainobjname,PRrName,BRr);
+		BRrCollect(RepSpec,mainobjname,PRrName,BRr);
 		sheetNames[0] = PRrName;
 		qtyOfSheets = 1;
 		for (i=0;i<qtyOfSheets;i=i+1) begin
@@ -1106,6 +1110,8 @@ BEGIN
 		sheetColls[colnum] = 31.71;
 		colnum = colnum + 1;
 		sheetColls[colnum] = 10.57; //vendor
+		colnum = colnum + 1;
+		sheetColls[colnum] = 20.57;
 		colnum = colnum + 1;
 		quartCount = 0;
 		if (RepSpec.flags[1] == 1) then begin
@@ -1130,7 +1136,7 @@ BEGIN
 		sheetColls[colnum] = 14.42578125;
 		
 		qtyMergeCell = 1;
-		mergeCell[0] = "A1:" & GetStringCellNum(quartCount*2 + 6,1);
+		mergeCell[0] = "A1:" & GetStringCellNum(quartCount*2 + 7,1);
 		
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
@@ -1170,10 +1176,11 @@ BEGIN
 			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 				style = 6;
 				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+				colnum = colnum + 1;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,mainobjname,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+				colnum = colnum + 1;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Vendor",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+				colnum = colnum + 1;
 				if (RepSpec.flags[1]==1) then begin 
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -1217,8 +1224,7 @@ BEGIN
 						BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.CatName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-							qtyOfEmpStr = 2;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+							colnum = colnum + 3;
 							style = 8;
 							if (RepSpec.flags[1]==1) then begin 
 								style = 8;
@@ -1276,10 +1282,10 @@ BEGIN
 					BeginRow(sheetnum,fileToSave,rownum,outlineLevel,blankval);
 						style = 10;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+						colnum = colnum + 2;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Name,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VEName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						style = 11;
 						if (RepSpec.flags[1]==1) then begin 
 							style = 11;
@@ -1327,7 +1333,7 @@ BEGIN
 			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 				style = 7;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				colnum = colnum + 1;
+				colnum = colnum + 2;
 				style = 8;
 				if (RepSpec.flags[1]==1) then begin 
 					style = 8;
