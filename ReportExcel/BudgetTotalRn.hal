@@ -424,7 +424,7 @@ BEGIN
 			i = 0;
 			while (i <= ProjArray.length) begin
 				lastBigRow = false;
-				if ((ProjArray.length - mod((ProjArray.length - i),prjInRow))/i == 0) then begin
+				if ((ProjArray.length - mod((ProjArray.length - i),prjInRow))/i == 1) then begin
 					lastBigRow = true;
 					prjInRow = ProjArray.length - i + 1;
 				end;
