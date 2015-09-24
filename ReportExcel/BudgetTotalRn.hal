@@ -14,7 +14,7 @@ external procedure FillSharedStrings(string,array string,integer,integer);
 external procedure ConvertToXLSX(string);
 external function string 10 GetStringCellNum(integer,integer);
 
-procedure ArraysCollect(record RcVc RepSpec, var array string FoundArray, var array string ProjArray, var vector string ProjNamesVect)
+procedure ArraysCollect(record RcVc RepSpec, var array string FoundArray, var array string ProjArray, var vector string ProjNamesVect, var vector string FoundNamesVect)
 BEGIN
 	record ObjVc Objr;
 	record PRVc PRr;
@@ -33,12 +33,14 @@ BEGIN
 		end;
 		if (testf) then begin
 			FoundArray[k] = Objr.Code;
+			FoundNamesVect[FoundArray[k]] = Objr.Comment;
 			k = k + 1;
 		end;
 	end;
 	k = 0;
 	while(loopmain(PRr,1,true)) begin
-		if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
+		//if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
+		if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
 			if blank(PRr.MotherCode) then begin
 				ProjArray[k] = PRr.Code;
 				ProjNamesVect[ProjArray[k]] = PRr.Name;
@@ -74,7 +76,8 @@ BEGIN
 		PRr.Code = ProjArray[PAi];
 		if (ReadFirstMain(PRr,1,true)) then begin
 			prjobjs[PAi] = PRr.Objects;
-			if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
+			//if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
+			if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
 				TBBUr.PRCode = PRr.Code;
 				if (ReadFirstMain(TBBUr,1,true)) then begin
 					mtrw = matrowcnt(TBBUr);
@@ -122,7 +125,8 @@ BEGIN
 					TrHs = false;
 					testf = false;
 				end;
-				if ((PR2r.StartDate<RepSpec.sStartDate and nonblank(PR2r.EndDate) and PR2r.EndDate>=RepSpec.sStartDate and PR2r.EndDate<=RepSpec.sEndDate) or (PR2r.StartDate>=RepSpec.sStartDate and PR2r.StartDate<=RepSpec.sEndDate) or (PR2r.StartDate<=RepSpec.sStartDate and nonblank(PR2r.EndDate) and PR2r.EndDate>=RepSpec.sEndDate)) then begin
+				//if ((PR2r.StartDate<RepSpec.sStartDate and nonblank(PR2r.EndDate) and PR2r.EndDate>=RepSpec.sStartDate and PR2r.EndDate<=RepSpec.sEndDate) or (PR2r.StartDate>=RepSpec.sStartDate and PR2r.StartDate<=RepSpec.sEndDate) or (PR2r.StartDate<=RepSpec.sStartDate and nonblank(PR2r.EndDate) and PR2r.EndDate>=RepSpec.sEndDate)) then begin
+				if ((GetYear(PR2r.StartDate) & "" == RepSpec.f2) or (GetYear(PR2r.EndDate) & "" == RepSpec.f2)) then begin
 					testf = true;
 				end else begin
 					testf = false;
@@ -210,7 +214,7 @@ global
 procedure BudgetTotalRn(record RcVc RepSpec,var area areatofile)
 BEGIN
 	array string 255 FoundArray,ProjArray;
-	vector string 255 ProjNamesVect;
+	vector string 255 ProjNamesVect,FoundNamesVect;
 	integer i,j,k,prjInRow;
 	vector val FPVect;
 	boolean lastBigRow;
@@ -225,7 +229,7 @@ BEGIN
 	integer numOfUniqueSharedStrings,numOfSharedStrings,qtyMergeCell;
 	string 16 reportName;
 
-	ArraysCollect(RepSpec,FoundArray,ProjArray,ProjNamesVect);
+	ArraysCollect(RepSpec,FoundArray,ProjArray,ProjNamesVect,FoundNamesVect);
 	DataCollect(FoundArray,ProjArray,RepSpec,FPVect);
 	reportName = "BudgetTotalRn";
 	if (windowsmode==1) then begin
@@ -333,7 +337,7 @@ BEGIN
 				colnum = 1;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 					style = 1;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,FoundArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					StringCell(sheetnum,fileToSave,colnum,rownum,style,FoundNamesVect[FoundArray[i]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					for (j=0;j<ProjArray.length;j=j+1) begin
 						style = 2;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[i] & ":" & ProjArray[j]]);
