@@ -426,7 +426,7 @@ BEGIN
 				lastBigRow = false;
 				if ((ProjArray.length - mod((ProjArray.length - i),prjInRow))/i == 1) then begin
 					lastBigRow = true;
-					prjInRow = ProjArray.length - i + 1;
+					prjInRow = ProjArray.length - i;
 				end;
 				colnum = 2;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
@@ -442,23 +442,39 @@ BEGIN
 						end;
 						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 					end;
+					if lastBigRow then begin
+						qtyOfEmpStr = 4;
+						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+					end;
 					style = 26;
 					qtyOfEmpStr = 1;
 					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 					mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
 					qtyMergeCell = qtyMergeCell + 1;
 				EndRow(sheetnum,fileToSave,rownum);
-				rownum = rownum + 1;
 				colnum = 2;
 				BeginRow(sheetnum,fileToSave,rownum,0,30);
 					for (k=0;k<prjInRow;k=k+1) begin
 						mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
 						style = 21;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i + k] & " - " & ProjNamesVect[ProjArray[i]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i + k] & " - " & ProjNamesVect[ProjArray[i + k]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						style = 22;
 						qtyOfEmpStr = 2;
 						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 						style = 23;
+						qtyOfEmpStr = 1;
+						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+						mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
+						qtyMergeCell = qtyMergeCell + 1;
+					end;
+					if lastBigRow then begin
+						mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+						style = 18;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Grand Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 19;
+						qtyOfEmpStr = 2;
+						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+						style = 20;
 						qtyOfEmpStr = 1;
 						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 						mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
@@ -471,6 +487,16 @@ BEGIN
 						style = 12;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						style = 13;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 14;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Overrun",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 16;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,"%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					end;
+					if lastBigRow then begin
+						style = 17;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 15;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						style = 14;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Overrun",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -499,6 +525,21 @@ BEGIN
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(FPVect["Fact:" & FoundArray[j] & ":" & ProjArray[i + k]] - FPVect[FoundArray[j] & ":" & ProjArray[i + k]])/FPVect[FoundArray[j] & ":" & ProjArray[i + k]]);
 							end;
 						end;
+						if lastBigRow then begin
+							style = 6;
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":TOTAL"]);
+							style = 7;
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[j] & ":TOTAL"]);
+							style = 4;
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[j] & ":TOTAL"] - FPVect[FoundArray[j] & ":TOTAL"]);
+							style = 5;
+							if (FPVect[FoundArray[j] & ":TOTAL"] == 0) then begin
+								qtyOfEmpStr = 1;
+								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+							end else begin
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(FPVect["Fact:" & FoundArray[j] & ":TOTAL"] - FPVect[FoundArray[j] & ":TOTAL"])/FPVect[FoundArray[j] & ":TOTAL"]);
+							end;
+						end;
 					EndRow(sheetnum,fileToSave,rownum);
 				end;
 				rownum = rownum + 1;
@@ -513,6 +554,12 @@ BEGIN
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTAL:" & ProjArray[i + k]]);
 						colnum = colnum + 2;
 					end;
+					if lastBigRow then begin
+						style = 8;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:TOTAL"]);
+						style = 9;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTAL:TOTAL"]);
+					end;
 				EndRow(sheetnum,fileToSave,rownum);
 				colnum = 1;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
@@ -525,10 +572,19 @@ BEGIN
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTALproc:" & ProjArray[i + k]]);
 						colnum = colnum + 2;
 					end;
+					if lastBigRow then begin
+						style = 8;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTALproc:TOTALproc"]);
+						style = 9;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTALproc:TOTALproc"]);
+					end;
 				EndRow(sheetnum,fileToSave,rownum);
 				rownum = rownum + 2;
 				
 				i = i + prjInRow;
+				if lastBigRow then begin
+					i = i + 1;
+				end;
 			end;
 		EndSheetData(sheetnum,fileToSave);
 		MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
