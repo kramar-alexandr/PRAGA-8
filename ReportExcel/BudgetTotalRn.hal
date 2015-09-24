@@ -211,7 +211,7 @@ procedure BudgetTotalRn(record RcVc RepSpec,var area areatofile)
 BEGIN
 	array string 255 FoundArray,ProjArray;
 	vector string 255 ProjNamesVect;
-	integer i,j;
+	integer i,j,k,prjInRow;
 	vector val FPVect;
 	
 	array string 10 sheetNames;
@@ -402,7 +402,138 @@ BEGIN
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		ConvertToXLSX(fileToSave);
 	end else begin
+		prjInRow = 6;
 		sheetColls[colnum] = 22.7109375;
+		colnum = colnum + 1;
+		for (i=0;i<prjInRow;i=i+1) begin
+			sheetColls[colnum] = 14.5703125;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 14.5703125;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 14.5703125;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 14.5703125;
+			colnum = colnum + 1;
+		end;
+		XmlXlsxWorkBegin(fileToSave,reportName);
+		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
+		SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
+		BeginSheetData(sheetnum,fileToSave);
+			rownum = 2;
+			i = 0;
+			while (i < ProjArray.length) begin
+				colnum = 2;
+				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+					mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+					style = 24;
+					StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					style = 25;
+					qtyOfEmpStr = prjInRow * 4 - 2;
+					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+					style = 26;
+					qtyOfEmpStr = 1;
+					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+					mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
+					qtyMergeCell = qtyMergeCell + 1;
+				EndRow(sheetnum,fileToSave,rownum);
+				rownum = rownum + 1;
+				colnum = 2;
+				BeginRow(sheetnum,fileToSave,rownum,0,30);
+					for (k=0;k<prjInRow;k=k+1) begin
+						mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+						style = 21;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i + k] & " - " & ProjNamesVect[ProjArray[i]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 22;
+						qtyOfEmpStr = 2;
+						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+						style = 23;
+						qtyOfEmpStr = 1;
+						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+						mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
+						qtyMergeCell = qtyMergeCell + 1;
+					end;
+				EndRow(sheetnum,fileToSave,rownum);
+				colnum = 2;
+				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+					for (k=0;k<prjInRow;k=k+1) begin
+						style = 12;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 13;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 14;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Overrun",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 16;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,"%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					end;
+				EndRow(sheetnum,fileToSave,rownum);
+				rownum = rownum + 1;
+				for (j=0;j<FoundArray.length;j=j+1) begin
+					colnum = 1;
+					BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+						style = 1;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,FoundArray[j],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						for (k=0;k<prjInRow;k=k+1) begin
+							style = 2;
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":" & ProjArray[i + k]]);
+							style = 3;
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[j] & ":" & ProjArray[i + k]]);
+							style = 4;
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:" & FoundArray[j] & ":" & ProjArray[i + k]] - FPVect[FoundArray[j] & ":" & ProjArray[i + k]]);
+							style = 5;
+							if (FPVect[FoundArray[j] & ":" & ProjArray[i + k]] == 0) then begin
+								qtyOfEmpStr = 1;
+								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+							end else begin
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(FPVect["Fact:" & FoundArray[j] & ":" & ProjArray[i + k]] - FPVect[FoundArray[j] & ":" & ProjArray[i + k]])/FPVect[FoundArray[j] & ":" & ProjArray[i + k]]);
+							end;
+						end;
+					EndRow(sheetnum,fileToSave,rownum);
+				end;
+				rownum = rownum + 1;
+				colnum = 1;
+				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+					style = 1;
+					StringCell(sheetnum,fileToSave,colnum,rownum,style,"sub tot",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					for (k=0;k<prjInRow;k=k+1) begin
+						style = 10;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i + k]]);
+						style = 11;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTAL:" & ProjArray[i + k]]);
+						colnum = colnum + 2;
+					end;
+					style = 8;
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:TOTAL"]);
+					style = 9;
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTAL:TOTAL"]);
+				EndRow(sheetnum,fileToSave,rownum);
+				colnum = 1;
+				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+					style = 1;
+					StringCell(sheetnum,fileToSave,colnum,rownum,style,"sub tot %",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					for (k=0;k<prjInRow;k=k+1) begin
+						style = 10;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTALproc:" & ProjArray[i + k]]);
+						style = 11;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTALproc:" & ProjArray[i + k]]);
+						colnum = colnum + 2;
+					end;
+					style = 8;
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTALproc:TOTALproc"]);
+					style = 9;
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTALproc:TOTALproc"]);
+				EndRow(sheetnum,fileToSave,rownum);
+				rownum = rownum + 2;
+				
+				i = i + prjInRow;
+			end;
+		EndSheetData(sheetnum,fileToSave);
+		MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
+		EndSheet(sheetnum,fileToSave,0);
+		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+		ConvertToXLSX(fileToSave);
+		
+		
+		/*sheetColls[colnum] = 22.7109375;
 		colnum = colnum + 1;
 		sheetColls[colnum] = 14.5703125;
 		colnum = colnum + 1;
@@ -569,7 +700,7 @@ BEGIN
 		EndSheet(sheetnum,fileToSave,0);
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		ConvertToXLSX(fileToSave);
-
+		*/
 	end;
 	MilliSleep(2000);
 	addfiletoarea(fileToSave,areatofile,false);
