@@ -1003,7 +1003,7 @@ BEGIN
 						BeginRow(sheetnum,fileToSave,rownum,outlineLevel,blankval);
 							style = 10;
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-							colnum = colnum + 2;
+							colnum = colnum + 1;
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Name,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VEName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -1282,7 +1282,7 @@ BEGIN
 					BeginRow(sheetnum,fileToSave,rownum,outlineLevel,blankval);
 						style = 10;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						colnum = colnum + 2;
+						colnum = colnum + 1;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Name,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VEName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
