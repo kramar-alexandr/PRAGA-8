@@ -213,6 +213,7 @@ BEGIN
 	vector string 255 ProjNamesVect;
 	integer i,j,k,prjInRow;
 	vector val FPVect;
+	boolean lastBigRow;
 	
 	array string 10 sheetNames;
 	array val sheetColls;
@@ -403,16 +404,16 @@ BEGIN
 		ConvertToXLSX(fileToSave);
 	end else begin
 		prjInRow = 6;
-		sheetColls[colnum] = 22.7109375;
+		sheetColls[colnum] = 15.7109375;
 		colnum = colnum + 1;
 		for (i=0;i<prjInRow;i=i+1) begin
-			sheetColls[colnum] = 14.5703125;
+			sheetColls[colnum] = 12.7109375;
 			colnum = colnum + 1;
-			sheetColls[colnum] = 14.5703125;
+			sheetColls[colnum] = 12.7109375;
 			colnum = colnum + 1;
-			sheetColls[colnum] = 14.5703125;
+			sheetColls[colnum] = 10.42578125;
 			colnum = colnum + 1;
-			sheetColls[colnum] = 14.5703125;
+			sheetColls[colnum] = 6;
 			colnum = colnum + 1;
 		end;
 		XmlXlsxWorkBegin(fileToSave,reportName);
@@ -421,15 +422,26 @@ BEGIN
 		BeginSheetData(sheetnum,fileToSave);
 			rownum = 2;
 			i = 0;
-			while (i < ProjArray.length) begin
+			while (i <= ProjArray.length) begin
+				lastBigRow = false;
+				if ((ProjArray.length - mod((ProjArray.length - i),prjInRow))/i == 0) then begin
+					lastBigRow = true;
+					prjInRow = ProjArray.length - i + 1;
+				end;
 				colnum = 2;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 					mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
 					style = 24;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					style = 25;
-					qtyOfEmpStr = prjInRow * 4 - 2;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+					for (k=0;k<prjInRow;k=k+1) begin
+						if k == prjInRow - 1 then begin
+							qtyOfEmpStr = 2;
+						end else begin
+							qtyOfEmpStr = 4;
+						end;
+						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+					end;
 					style = 26;
 					qtyOfEmpStr = 1;
 					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -501,10 +513,6 @@ BEGIN
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTAL:" & ProjArray[i + k]]);
 						colnum = colnum + 2;
 					end;
-					style = 8;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:TOTAL"]);
-					style = 9;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTAL:TOTAL"]);
 				EndRow(sheetnum,fileToSave,rownum);
 				colnum = 1;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
@@ -517,10 +525,6 @@ BEGIN
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTALproc:" & ProjArray[i + k]]);
 						colnum = colnum + 2;
 					end;
-					style = 8;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTALproc:TOTALproc"]);
-					style = 9;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Fact:TOTALproc:TOTALproc"]);
 				EndRow(sheetnum,fileToSave,rownum);
 				rownum = rownum + 2;
 				
