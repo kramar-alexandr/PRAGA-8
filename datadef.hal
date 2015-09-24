@@ -107,6 +107,7 @@ begin
 	
 	ArrayField(Bud4,M4Val,0,0);
 	ArrayField(Spend4,M4Val,0,0);
+  ArrayField(VEName,M4Str,200,0);
 	
   EndArray;
   MainKeyBegin(Code,0);
