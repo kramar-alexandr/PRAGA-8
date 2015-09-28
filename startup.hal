@@ -16,6 +16,7 @@ begin
 	Import("Set salesman in purchase invoices from history",ImportIClass,SetSalesmanToVIVcIn,modPL);
 	Maintenance("Update Purch.Inv. Supplier Name",FixVIVcVClass,FixVIVcMn,modDBMain); //Edit---------------Vitalii 15:36 10.08.2015
 	Maintenance("Update Objects in Budgets",FixTBBUrwObjectsVClass,FixTBBUrwObjectsMn,modDBMain); //Edit---------------Vitalii 15:49 23.09.2015
+	Maintenance("Update Suppliers",FixSuppliersVClass,FixSuppliersMn,modDBMain); //Edit-------------------Vitalii 13:08 25.09.2015
 	
 	SString(31000,"Object with this name but with other type already exists");
 	SString(31001,"Current document should be saved");

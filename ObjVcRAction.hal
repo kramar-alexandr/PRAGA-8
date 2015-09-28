@@ -1,0 +1,157 @@
+global
+updating function LongInt ObjVcRecordSaveAfter(var record ObjVc Objr,record ObjVc Obj2r,LongInt stat,LongInt long4)
+BEGIN
+	LongInt res;
+	record INVc INr;
+	record ITVc ITr;
+	record CLCorspVc CLCorspr;
+	record CUVc CUr;
+    
+	switch (Objr.OTCode) begin
+		case "EXP":
+			INr.Code = Objr.Code;
+			if (!ReadFirstMain(INr,1,true)) then begin
+				RecordNew(INr);
+				INr.Code = Objr.Code;
+				INr.ItemType = kItemTypeService;
+				INr.Name = Objr.Comment;
+				INr.Objects = Objr.Code;
+				ITr.Code = Objr.Code;
+				ReadLastMain(ITr,1,false);
+				INr.Group = ITr.Code;
+				RecordStore(INr,true);
+			end else begin
+				INr.ItemType = kItemTypeService;
+				INr.Name = Objr.Comment;
+				INr.Objects = Objr.Code;
+				ITr.Code = Objr.Code;
+				ReadLastMain(ITr,1,false);
+				INr.Group = ITr.Code;
+				RecordStore(INr,true);
+			end;
+			CLCorspr.Code = Objr.Code;
+			if (!ReadFirstMain(CLCorspr,1,true)) then begin
+				RecordNew(CLCorspr);
+				CLCorspr.Code = Objr.Code;
+				CLCorspr.Comment = Objr.Comment;
+				CLCorspr.Objects = Objr.Code;
+				RecordStore(CLCorspr,true);
+			end else begin
+				CLCorspr.Comment = Objr.Comment;
+				CLCorspr.Objects = Objr.Code;
+				RecordStore(CLCorspr,true);
+			end;
+		case "SUPPL":
+			CUr.Code = Objr.Code;
+			if (!ReadFirstMain(CUr,1,true)) then begin
+				RecordNew(CUr);
+				CUr.Code = Objr.Code;
+				CUr.Name = Objr.Comment;
+				CUr.VEObjects = Objr.Code;
+				CUr.VEType = 1;
+				CUr.CUType = 0;
+				CUr.GuestType = 0;
+				CUr.EmployeeType = 0;
+				CUr.DealerType = 0;
+				CUr.LeadType = 0;
+				CUr.AccAP = "321";
+				CUr.AccCost = "521";
+				RecordStore(CUr,true);
+			end else begin
+				CUr.Name = Objr.Comment;
+				RecordStore(CUr,true);
+			end;
+	end;
+	
+	ObjVcRecordSaveAfter = res; 
+	RETURN;
+END;
+
+global
+updating function LongInt ObjVcRecordUpdateAfter(var record ObjVc Objr,record ObjVc Obj2r,LongInt stat,LongInt long4)
+BEGIN
+	LongInt res;
+	record INVc INr;
+	record ITVc ITr;
+	record CLCorspVc CLCorspr;
+	record CUVc CUr;
+	record PRVc PRr;
+	
+	switch (Objr.OTCode) begin
+		case "EXP":
+			INr.Code = Objr.Code;
+			if (!ReadFirstMain(INr,1,true)) then begin
+				RecordNew(INr);
+				INr.Code = Objr.Code;
+				INr.ItemType = kItemTypeService;
+				INr.Name = Objr.Comment;
+				INr.Objects = Objr.Code;
+				ITr.Code = Objr.Code;
+				ReadLastMain(ITr,1,false);
+				INr.Group = ITr.Code;
+				RecordStore(INr,true);
+			end else begin
+				INr.ItemType = kItemTypeService;
+				INr.Name = Objr.Comment;
+				INr.Objects = Objr.Code;
+				ITr.Code = Objr.Code;
+				ReadLastMain(ITr,1,false);
+				INr.Group = ITr.Code;
+				RecordStore(INr,true);
+			end;
+			CLCorspr.Code = Objr.Code;
+			if (!ReadFirstMain(CLCorspr,1,true)) then begin
+				RecordNew(CLCorspr);
+				CLCorspr.Code = Objr.Code;
+				CLCorspr.Comment = Objr.Comment;
+				CLCorspr.Objects = Objr.Code;
+				RecordStore(CLCorspr,true);
+			end else begin
+				CLCorspr.Comment = Objr.Comment;
+				CLCorspr.Objects = Objr.Code;
+				RecordStore(CLCorspr,true);
+			end;
+		case "SUPPL":
+			CUr.Code = Objr.Code;
+			if (!ReadFirstMain(CUr,1,true)) then begin
+				RecordNew(CUr);
+				CUr.Code = Objr.Code;
+				CUr.Name = Objr.Comment;
+				CUr.VEObjects = Objr.Code;
+				CUr.VEType = 1;
+				CUr.CUType = 0;
+				CUr.GuestType = 0;
+				CUr.EmployeeType = 0;
+				CUr.DealerType = 0;
+				CUr.LeadType = 0;
+				CUr.AccAP = "321";
+				CUr.AccCost = "521";
+				RecordStore(CUr,true);
+			end else begin
+				CUr.Name = Objr.Comment;
+				RecordStore(CUr,true);
+			end;
+		case "PRJ":
+			PRr.Code = Objr.Code;
+			if (!ReadFirstMain(PRr,1,true)) then begin
+				RecordNew(PRr);
+				CUr.Code = Objr.Code;
+				CUr.Name = Objr.Comment;
+				CUr.VEObjects = Objr.Code;
+				CUr.VEType = 1;
+				CUr.CUType = 0;
+				CUr.GuestType = 0;
+				CUr.EmployeeType = 0;
+				CUr.DealerType = 0;
+				CUr.LeadType = 0;
+				CUr.AccAP = "321";
+				CUr.AccCost = "521";
+				RecordStore(CUr,true);
+			end else begin
+				CUr.Name = Objr.Comment;
+				RecordStore(CUr,true);
+			end;
+	end;
+	ObjVcRecordUpdateAfter = res; 
+	RETURN;
+END;

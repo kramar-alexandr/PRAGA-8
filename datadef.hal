@@ -149,6 +149,9 @@ begin
 		RecordField(Suppl9Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
 		RecordField(Suppl10,M4Code,60,CUVc);// Edit ************************** Tuesday, 26 May 2015 13:22:09
 		RecordField(Suppl10Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
+		KeyBegin(Objects);
+		KeySegment(Objects);
+		KeySegment(Code);
   EndRecordAdd;
 
  RecordBegin(BudgetsHistVc,-,"BUhist");	//Edit----------------------Dima  13.07.2015

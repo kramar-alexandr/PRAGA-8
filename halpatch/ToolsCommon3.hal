@@ -1749,3 +1749,45 @@ begin
 
 return;
 end;
+
+global 
+updating procedure FixSuppliersMn(record RcVc RepSpec)
+begin
+	record CUVc CUr;
+	record ObjVc Objr;
+	boolean TrHs;
+	
+	Objr.OTCode = "SUPPL";
+	TrHs = true;
+	while (LoopKey("OTCode",Objr,1,TrHs)) begin
+		if (Objr.OTCode != "SUPPL") then begin
+			TrHs = false;
+		end;
+		if TrHs then begin
+			CUr.Code = Objr.Code;
+			if ReadFirstMain(CUr,1,true) then begin
+				if (Objr.Comment != CUr.Name) then begin
+					Objr.Comment = CUr.Name;
+					RECORDSTORE(Objr,true);
+				end;
+			end else begin  
+				logtext(0,"NEW supplier (contacts register) whith code - " & Objr.Code);
+				RecordNew(CUr);
+				CUr.Code = Objr.Code;
+				CUr.Name = Objr.Comment;
+				CUr.VEObjects = Objr.Code;
+				CUr.VEType = 1;
+				CUr.CUType = 0;
+				CUr.GuestType = 0;
+				CUr.EmployeeType = 0;
+				CUr.DealerType = 0;
+				CUr.LeadType = 0;
+				CUr.AccAP = "321";
+				CUr.AccCost = "521";
+				RECORDSTORE(CUr,true);
+			end;
+		end;
+	end;
+
+return;
+end;

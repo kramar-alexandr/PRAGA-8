@@ -1,0 +1,74 @@
+global
+updating function LongInt INVcRecordSaveAfter(var record INVc INr,record INVc IN2r,LongInt stat,LongInt long4)
+BEGIN
+	LongInt res;
+	record ObjVc Objr;
+	record ITVc ITr;
+	record CLCorspVc CLCorspr;
+    
+	CLCorspr.Code = INr.Code;
+	if (!ReadFirstMain(CLCorspr,1,true)) then begin
+		RecordNew(CLCorspr);
+		CLCorspr.Code = INr.Code;
+		CLCorspr.Comment = INr.Name;
+		CLCorspr.Objects = CLCorspr.Code;
+		RecordStore(CLCorspr,true);
+	end else begin
+		CLCorspr.Comment = INr.Name;
+		CLCorspr.Objects = CLCorspr.Code;
+		RecordStore(CLCorspr,true);
+	end;
+	Objr.Code = INr.Code;
+	if(!ReadFirstMain(Objr,1,true)) then begin
+		RecordNew(OBjr);
+		Objr.Code = INr.Code;
+		Objr.Comment = INr.Name;
+		Objr.OTCode = "EXP";
+		RecordStore(Objr,true);
+	end else begin
+		Objr.Comment = INr.Name;
+		Objr.OTCode = "EXP";
+		RecordStore(Objr,true);
+	end;
+
+	INVcRecordSaveAfter = res; 
+	RETURN;
+END;
+
+global
+updating function LongInt INVcRecordUpdateAfter(var record INVc INr,record INVc IN2r,LongInt stat,LongInt long4)
+BEGIN
+	LongInt res;
+	record ObjVc Objr;
+	record ITVc ITr;
+	record CLCorspVc CLCorspr;
+	
+	CLCorspr.Code = Objr.Code;
+	if (!ReadFirstMain(CLCorspr,1,true)) then begin
+		RecordNew(CLCorspr);
+		CLCorspr.Code = INr.Code;
+		CLCorspr.Comment = INr.Name;
+		CLCorspr.AccNumber = INr.CostAcc;
+		CLCorspr.Objects = CLCorspr.Code;
+		RecordStore(CLCorspr,true);
+	end else begin
+		CLCorspr.AccNumber = INr.CostAcc;
+		CLCorspr.Comment = INr.Name;
+		CLCorspr.Objects = CLCorspr.Code;
+		RecordStore(CLCorspr,true);
+	end;
+	Objr.Code = INr.Code;
+	if(!ReadFirstMain(Objr,1,true)) then begin
+		RecordNew(OBjr);
+		Objr.Code = INr.Code;
+		Objr.Comment = INr.Name;
+		Objr.OTCode = "EXP";
+		RecordStore(Objr,true);
+	end else begin
+		Objr.Comment = INr.Name;
+		Objr.OTCode = "EXP";
+		RecordStore(Objr,true);
+	end;
+	INVcRecordUpdateAfter = res; 
+	RETURN;
+END;

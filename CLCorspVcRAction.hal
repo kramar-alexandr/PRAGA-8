@@ -40,6 +40,7 @@ BEGIN
 	LongInt res;
 	record INVc INr;
 	record ITVc ITr;
+	record ObjVc Objr;
     
 	INr.Code = CLCorspr.Code;
 	if (!ReadFirstMain(INr,1,true)) then begin
@@ -53,8 +54,28 @@ BEGIN
 		INr.Group = ITr.Code;
 		INr.CostAcc = CLCorspr.AccNumber;
 		RecordStore(INr,true);
+	end else begin
+		INr.ItemType = kItemTypeService;
+		INr.Name = CLCorspr.Comment;
+		INr.Objects = CLCorspr.Objects;
+		ITr.Code = CLCorspr.Code;
+		ReadLastMain(ITr,1,false);
+		INr.Group = ITr.Code;
+		INr.CostAcc = CLCorspr.AccNumber;
+		RecordStore(INr,true);
 	end;
-
+	Objr.Code = CLCorspr.Code;
+	if(!ReadFirstMain(Objr,1,true)) then begin
+		RecordNew(OBjr);
+		Objr.Code = CLCorspr.Code;
+		Objr.Comment = CLCorspr.Comment;
+		Objr.OTCode = "EXP";
+		RecordStore(Objr,true);
+	end else begin
+		Objr.Comment = CLCorspr.Comment;
+		Objr.OTCode = "EXP";
+		RecordStore(Objr,true);
+	end;
   CLCorspVcRecordSaveAfter = res; 
   RETURN;
 END;
@@ -65,6 +86,7 @@ BEGIN
 	LongInt res;
 	record INVc INr;
 	record ITVc ITr;
+	record ObjVc Objr;
     
 	INr.Code = CLCorspr.Code;
 	if (!ReadFirstMain(INr,1,true)) then begin
@@ -76,14 +98,30 @@ BEGIN
 		ITr.Code = CLCorspr.Code;
 		ReadLastMain(ITr,1,false);
 		INr.Group = ITr.Code;
+		INr.CostAcc = CLCorspr.AccNumber;
 		RecordStore(INr,true);
 	end else begin
+		INr.ItemType = kItemTypeService;
 		INr.Name = CLCorspr.Comment;
 		INr.Objects = CLCorspr.Objects;
+		ITr.Code = CLCorspr.Code;
+		ReadLastMain(ITr,1,false);
+		INr.Group = ITr.Code;
 		INr.CostAcc = CLCorspr.AccNumber;
 		RecordStore(INr,true);
 	end;
-  
+	Objr.Code = CLCorspr.Code;
+	if(!ReadFirstMain(Objr,1,true)) then begin
+		RecordNew(OBjr);
+		Objr.Code = CLCorspr.Code;
+		Objr.Comment = CLCorspr.Comment;
+		Objr.OTCode = "EXP";
+		RecordStore(Objr,true);
+	end else begin
+		Objr.Comment = CLCorspr.Comment;
+		Objr.OTCode = "EXP";
+		RecordStore(Objr,true);
+	end;
   CLCorspVcRecordUpdateAfter = res; 
   RETURN;
 END;
