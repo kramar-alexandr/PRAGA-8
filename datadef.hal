@@ -151,6 +151,7 @@ begin
 		RecordField(Suppl10Name,M4Str,250,0);// Edit ************************** Tuesday, 26 May 2015 13:22:09
 		KeyBegin(Objects);
 		KeySegment(Objects);
+		KeySegment(MotherCode);
 		KeySegment(Code);
   EndRecordAdd;
 

@@ -256,10 +256,24 @@ updating function LongInt PRVcRecordSaveAfter(var record PRVc PRr,record PRVc PR
 BEGIN
   LongInt res;
   record SRBlock SRRec;
-      
+  record ObjVc Objr;
+    
   BlockLoad(SRRec);
   SRRec.LastPRCode = PRr.Code;
   BlockStore(SRRec);
+  
+	Objr.Code = PRr.Objects;
+	if(!ReadFirstMain(Objr,1,true)) then begin
+		RecordNew(OBjr);
+		Objr.Code = PRr.Objects;
+		Objr.Comment = PRr.Name;
+		Objr.OTCode = "PRJ";
+		RecordStore(Objr,true);
+	end else begin
+		Objr.Comment = PRr.Name;
+		Objr.OTCode = "PRJ";
+		RecordStore(Objr,true);
+	end;
   PRVcRecordSaveAfter = res; 
   RETURN;
 END;
@@ -309,6 +323,7 @@ global
 updating function LongInt PRVcRecordUpdateAfter(var record PRVc PRr,record PRVc PR2r,LongInt stat,LongInt long4)
 begin
   LongInt res;
+   record ObjVc Objr;
 
   if (PRr.Members!=PR2r.Members) then begin
     PRUpdateTBBU(PRr);
@@ -316,6 +331,18 @@ begin
   if (PRr.Members!=PR2r.Members) or (PRr.PrSalesMan!=PR2r.PrSalesMan) or (PRr.SalesGroup!=PR2r.SalesGroup) then begin
     PRUpdatePRSchedule(PRr);
   end;
+  	Objr.Code = PRr.Objects;
+	if(!ReadFirstMain(Objr,1,true)) then begin
+		RecordNew(OBjr);
+		Objr.Code = PRr.Objects;
+		Objr.Comment = PRr.Name;
+		Objr.OTCode = "PRJ";
+		RecordStore(Objr,true);
+	end else begin
+		Objr.Comment = PRr.Name;
+		Objr.OTCode = "PRJ";
+		RecordStore(Objr,true);
+	end;
   PRVcRecordUpdateAfter = res; 
   return;
 end;
