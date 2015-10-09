@@ -781,10 +781,12 @@ BEGIN
 		colnum = colnum + 1;
 		sheetColls[colnum] = 31.71;
 		colnum = colnum + 1;
-		sheetColls[colnum] = 10.57;
-		colnum = colnum + 1;
-		sheetColls[colnum] = 20.57;
-		colnum = colnum + 1;
+		if (RepSpec.flags[5] == 0) then begin
+			sheetColls[colnum] = 10.57;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 20.57;
+			colnum = colnum + 1;
+		end;
 		quartCount = 0;
 		if (RepSpec.flags[1] == 1) then begin
 			quartCount = quartCount + 1;
@@ -968,8 +970,10 @@ BEGIN
 					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,mainobjname,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Vendor",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					colnum = colnum + 1;
+					if (RepSpec.flags[5] == 0) then begin
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Vendor",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						colnum = colnum + 1;
+					end;
 					if (RepSpec.flags[1]==1) then begin 
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -1014,7 +1018,10 @@ BEGIN
 								style = 7;
 								StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 								StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.CatName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-								colnum = colnum + 3;
+								if (RepSpec.flags[5] == 0) then begin
+									colnum = colnum + 2;
+								end;
+								colnum = colnum + 1;
 								style = 8;
 								if (RepSpec.flags[1]==1) then begin
 									style = 8;
@@ -1075,8 +1082,10 @@ BEGIN
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							colnum = colnum + 1;
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Name,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VEName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+							if (RepSpec.flags[5] == 0) then begin
+								StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+								StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VEName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+							end;
 							style = 11;
 							if (RepSpec.flags[1]==1) then begin 
 								style = 11;
@@ -1124,7 +1133,9 @@ BEGIN
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 					style = 7;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					colnum = colnum + 2;
+					if (RepSpec.flags[5] == 0) then begin
+						colnum = colnum + 2;
+					end;
 					style = 8;
 					if (RepSpec.flags[1]==1) then begin 
 						style = 8;
@@ -1179,10 +1190,12 @@ BEGIN
 		colnum = colnum + 1;
 		sheetColls[colnum] = 31.71;
 		colnum = colnum + 1;
-		sheetColls[colnum] = 10.57;
-		colnum = colnum + 1;
-		sheetColls[colnum] = 20.57;
-		colnum = colnum + 1;
+		if (RepSpec.flags[5] == 0) then begin
+			sheetColls[colnum] = 10.57;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 20.57;
+			colnum = colnum + 1;
+		end;
 		quartCount = 0;
 		if (RepSpec.flags[1] == 1) then begin
 			quartCount = quartCount + 1;
@@ -1249,8 +1262,10 @@ BEGIN
 				colnum = colnum + 1;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,mainobjname,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				colnum = colnum + 1;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Vendor",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				colnum = colnum + 1;
+				if (RepSpec.flags[5] == 0) then begin
+					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Vendor",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					colnum = colnum + 1;
+				end;
 				if (RepSpec.flags[1]==1) then begin 
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -1294,7 +1309,10 @@ BEGIN
 						BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.CatName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-							colnum = colnum + 3;
+							if (RepSpec.flags[5] == 0) then begin
+								colnum = colnum + 2;
+							end;
+							colnum = colnum + 1;
 							style = 8;
 							if (RepSpec.flags[1]==1) then begin 
 								style = 8;
@@ -1354,8 +1372,10 @@ BEGIN
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						colnum = colnum + 1;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Name,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VEName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						if (RepSpec.flags[5] == 0) then begin
+							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VEName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						end;
 						style = 11;
 						if (RepSpec.flags[1]==1) then begin 
 							style = 11;
@@ -1403,7 +1423,9 @@ BEGIN
 			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 				style = 7;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				colnum = colnum + 2;
+				if (RepSpec.flags[5] == 0) then begin
+					colnum = colnum + 2;
+				end;
 				style = 8;
 				if (RepSpec.flags[1]==1) then begin 
 					style = 8;
