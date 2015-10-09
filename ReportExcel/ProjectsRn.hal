@@ -1,5 +1,5 @@
 external procedure XmlXlsxWorkBegin(string,string);
-external procedure CreateSheetsXLSX(integer,array string,string,integer);
+external procedure CreateSheetsXLSX(integer,array string,string,integer,boolean);
 external procedure EndSheet(integer,string,integer);
 external procedure SetSheetsCols(integer,array val,array integer,string);
 external procedure BeginSheetData(integer,string);
@@ -398,7 +398,7 @@ BEGIN
 		sheetnum = 1;
 		qtyMergeCell = 0;
 		XmlXlsxWorkBegin(fileToSave,reportName);
-		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
+		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,true);
 		SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 		BeginSheetData(sheetnum,fileToSave);
 		rownum = 1;

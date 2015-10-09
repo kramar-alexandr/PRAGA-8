@@ -1,6 +1,6 @@
 external procedure GetObjs(string,string,var string);
 external procedure XmlXlsxWorkBegin(string,string);
-external procedure CreateSheetsXLSX(integer,array string,string,integer);
+external procedure CreateSheetsXLSX(integer,array string,string,integer,boolean);
 external procedure EndSheet(integer,string,integer);
 external procedure SetSheetsCols(integer,array val,array integer,string);
 external procedure BeginSheetData(integer,string);
@@ -122,7 +122,6 @@ BEGIN
 	k=0;
 	PRr.Code = RepSpec.f2;
 	If (ReadFirstMain(PRr,1,true)) then begin
-		//if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
 		if ((GetYear(PRr.StartDate) & "" == RepSpec.f3) or (GetYear(PRr.EndDate) & "" == RepSpec.f3)) then begin
 			prjobj = PRr.Objects;
 			TBBUr.PRCode = PRr.Code;
@@ -131,7 +130,9 @@ BEGIN
 				k=0;
 				For(i=0;i<mtrw;i=i+1) begin
 					matrowget(TBBUr,i,TBBUrw);
-					
+					if (RepSpec.flags[5] == 1) then begin
+						TBBUrw.VECode = "";
+					end;
 					if(TBBUrw.stp==18) then begin
 						k = TBBUrw.ItemType;
 					end;		//I,II,III,IV Quartal
@@ -212,7 +213,6 @@ BEGIN
 			while(loopkey("MotherCode",PR2r,1,TrHs)) begin
 				testf = true;
 				if(PR2r.MotherCode!=PRr.Code)then begin TrHs = false; testf = false; end;
-				//if(PR2r.StartDate<RepSpec.sStartDate and PR2r.StartDate>RepSpec.sEndDate)then begin testf = false; end;
 				if ((GetYear(PR2r.StartDate) & "" != RepSpec.f3) and (GetYear(PR2r.EndDate) & "" != RepSpec.f3)) then begin testf = false; end;
 				if(testf)then begin
 					TBBUr.PRCode = PR2r.Code;
@@ -221,6 +221,9 @@ BEGIN
 						k = 0;
 						For(i=0;i<mtrw;i=i+1) begin
 							matrowget(TBBUr,i,TBBUrw);
+							if (RepSpec.flags[5] == 1) then begin
+								TBBUrw.VECode = "";
+							end;
 							if(TBBUrw.stp==18) then begin
 								k=TBBUrw.ItemType;
 							end;		//I,II,III,IV Quartal
@@ -312,7 +315,9 @@ BEGIN
 				if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5")) then begin
 					if (setinset(RepSpec.f1,TRrw.Objects) or blank(RepSpec.f1)) then begin
 						vendobj = "";
-						GetObjs("SUPPL",TRrw.Objects,vendobj);
+						if (RepSpec.flags[5] == 0) then begin
+							GetObjs("SUPPL",TRrw.Objects,vendobj);
+						end;
 						foundf = false;
 						if nonblank(vendobj) then begin
 							repmtrw = matrowcnt(BRr);
@@ -396,7 +401,6 @@ BEGIN
 		BRr = PatternBRr;
 		PRr.Code = PRrCodes[PRi];
 		if (ReadFirstMain(PRr,1,true)) then begin
-			//if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
 			if ((GetYear(PRr.StartDate) & "" == RepSpec.f3) or (GetYear(PRr.EndDate) & "" == RepSpec.f3)) then begin
 				PRrNames[PRrCodes[PRi]] = PRr.Name;
 				prjobjs[PRrCodes[PRi]] = PRr.Objects;
@@ -406,7 +410,9 @@ BEGIN
 					k=0;
 					For(i=0;i<mtrw;i=i+1) begin
 						matrowget(TBBUr,i,TBBUrw);
-						
+						if (RepSpec.flags[5] == 1) then begin
+							TBBUrw.VECode = "";
+						end;
 						if(TBBUrw.stp==18) then begin k=TBBUrw.ItemType; end;		//I,II,III,IV Quartal
 						kTestf = false;
 						if ((RepSpec.flags[1] == 1) and (k == 1)) then begin
@@ -485,7 +491,6 @@ BEGIN
 				while(loopkey("MotherCode",PR2r,1,TrHs)) begin
 					testf = true;
 					if (PR2r.MotherCode!=PRr.Code) then begin TrHs = false; testf = false; end;
-					//if(PR2r.StartDate<RepSpec.sStartDate and PR2r.StartDate>RepSpec.sEndDate)then begin testf = false; end;
 					if ((GetYear(PR2r.StartDate) & "" != RepSpec.f3) and (GetYear(PR2r.EndDate) & "" != RepSpec.f3)) then begin testf = false; end;
 					if(testf)then begin
 						TBBUr.PRCode = PR2r.Code;
@@ -494,6 +499,9 @@ BEGIN
 							k = 0;
 							For(i=0;i<mtrw;i=i+1) begin
 								matrowget(TBBUr,i,TBBUrw);
+								if (RepSpec.flags[5] == 1) then begin
+									TBBUrw.VECode = "";
+								end;
 								if(TBBUrw.stp==18) then begin k=TBBUrw.ItemType; end;		//I,II,III,IV Quartal									
 								kTestf = false;
 								if ((RepSpec.flags[1] == 1) and (k == 1)) then begin
@@ -585,7 +593,9 @@ BEGIN
 				if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5")) then begin
 					if (setinset(RepSpec.f1,TRrw.Objects) or blank(RepSpec.f1)) then begin
 						vendobj = "";
-						GetObjs("SUPPL",TRrw.Objects,vendobj);
+						if (RepSpec.flags[5] == 0) then begin
+							GetObjs("SUPPL",TRrw.Objects,vendobj);
+						end;
 						for (PRi=0;PRi<PRrCodes.length;PRi=PRi+1) begin
 							if(setinset(prjobjs[PRrCodes[PRi]],TRrw.Objects)) then begin
 								BRr = ArrayBRr[PRrCodes[PRi]];
@@ -750,18 +760,19 @@ BEGIN
 	
 	if (blank(RepSpec.f2)) then begin
 		TrHs = true;
+		qtyOfSheets = 0;
+		sheetNames[qtyOfSheets] = "Total";
+		qtyOfSheets = qtyOfSheets + 1;
 		while (loopmain(PRr,1,TrHs)) begin
-			//if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
 			if ((GetYear(PRr.StartDate) & "" == RepSpec.f3) or (GetYear(PRr.EndDate) & "" == RepSpec.f3)) then begin
 				if Blank(PRr.MotherCode) then begin
 					PRCodes[PRCodesCount] = PRr.Code;
-					sheetNames[PRCodesCount] = PRr.Name;
 					PRCodesCount = PRCodesCount + 1;
+					sheetNames[qtyOfSheets] = PRr.Name;
+					qtyOfSheets = qtyOfSheets + 1;
 				end;
 			end;
 		end;
-		sheetNames[PRCodesCount] = "Total";
-		qtyOfSheets = PRCodesCount + 1;
 		BRrCollectForFew(RepSpec,PRCodes,mainobjname,PRNames,ArrayBRr,PatternBRr);
 		colnum = 0;
 		sheetColls[colnum] = 8.43;
@@ -770,7 +781,7 @@ BEGIN
 		colnum = colnum + 1;
 		sheetColls[colnum] = 31.71;
 		colnum = colnum + 1;
-		sheetColls[colnum] = 10.57; //vendor
+		sheetColls[colnum] = 10.57;
 		colnum = colnum + 1;
 		sheetColls[colnum] = 20.57;
 		colnum = colnum + 1;
@@ -803,13 +814,12 @@ BEGIN
 		numOfSharedStrings = 0;
 		
 		XmlXlsxWorkBegin(fileToSave,reportName);
-		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
+		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,true);
 		for (k=0;k<qtyOfSheets;k=k+1) begin
-			sheetnum = k + 1;
 			if (sheetNames[k] <> "Total") then begin
 				RecordClear(BRr);
-				BRr = ArrayBRr[PRCodes[k]];
-				PRrName = PRNames[PRCodes[k]];
+				BRr = ArrayBRr[PRCodes[k-1]];
+				PRrName = PRNames[PRCodes[k-1]];
 				if (matrowcnt(TotBRr)==0) then begin
 					TotBRr = PatternBRr;
 				end;
@@ -838,6 +848,66 @@ BEGIN
 									TotBRrw.Spend3 = blankval;
 									TotBRrw.Spend4 = blankval;
 									TotBRrw.VECode = BRrw.VECode;
+									TotBRrw.VEName = BRrw.VEName;
+									matrowinsert(TotBRr,repi+1,TotBRrw);
+									repi = repmtrw;
+								end;
+							end;
+						end;
+					end;
+					repmtrw = matrowcnt(TotBRr);
+					For(repi=0;repi<repmtrw;repi=repi+1) begin
+						matrowget(TotBRr,repi,TotBRrw);
+						if((TotBRrw.Code==BRrw.Code) and (TotBRrw.VECode==BRrw.VECode))then begin
+							TotBRrw.Bud1 = TotBRrw.Bud1 + BRrw.Bud1;
+							TotBRrw.Bud2 = TotBRrw.Bud2 + BRrw.Bud2;
+							TotBRrw.Bud3 = TotBRrw.Bud3 + BRrw.Bud3;
+							TotBRrw.Bud4 = TotBRrw.Bud4 + BRrw.Bud4;
+							TotBRrw.Spend1 = TotBRrw.Spend1 + BRrw.Spend1;
+							TotBRrw.Spend2 = TotBRrw.Spend2 + BRrw.Spend2;
+							TotBRrw.Spend3 = TotBRrw.Spend3 + BRrw.Spend3;
+							TotBRrw.Spend4 = TotBRrw.Spend4 + BRrw.Spend4;
+							matrowput(TotBRr,repi,TotBRrw);
+						end;
+					end; 
+				end;
+			end;
+		end;
+		for (k=0;k<qtyOfSheets;k=k+1) begin
+			sheetnum = k + 1;
+			if (sheetNames[k] <> "Total") then begin
+				RecordClear(BRr);
+				BRr = ArrayBRr[PRCodes[k-1]];
+				PRrName = PRNames[PRCodes[k-1]];
+				if (matrowcnt(TotBRr)==0) then begin
+					TotBRr = PatternBRr;
+				end;
+				mtrw = matrowcnt(BRr);
+				for (i=0;i<mtrw;i=i+1) begin
+					matrowget(BRr,i,BRrw);
+					foundf = false;
+					if nonblank(BRrw.VECode) then begin
+						repmtrw = matrowcnt(TotBRr);
+						For(repi=0;repi<repmtrw;repi=repi+1) begin
+							matrowget(TotBRr,repi,TotBRrw);
+							if (TotBRrw.Code==BRrw.Code) and (TotBRrw.VECode==BRrw.VECode) then begin
+								foundf = true;
+							end;
+						end;
+						if !foundf then begin
+							For(repi=0;repi<repmtrw;repi=repi+1) begin
+								matrowget(TotBRr,repi,TotBRrw);
+								if (TotBRrw.Code==BRrw.Code) then begin
+									TotBRrw.Bud1 = blankval;
+									TotBRrw.Bud2 = blankval;
+									TotBRrw.Bud3 = blankval;
+									TotBRrw.Bud4 = blankval;
+									TotBRrw.Spend1 = blankval;
+									TotBRrw.Spend2 = blankval;
+									TotBRrw.Spend3 = blankval;
+									TotBRrw.Spend4 = blankval;
+									TotBRrw.VECode = BRrw.VECode;
+									TotBRrw.VEName = BRrw.VEName;
 									matrowinsert(TotBRr,repi+1,TotBRrw);
 									repi = repmtrw;
 								end;
@@ -1109,7 +1179,7 @@ BEGIN
 		colnum = colnum + 1;
 		sheetColls[colnum] = 31.71;
 		colnum = colnum + 1;
-		sheetColls[colnum] = 10.57; //vendor
+		sheetColls[colnum] = 10.57;
 		colnum = colnum + 1;
 		sheetColls[colnum] = 20.57;
 		colnum = colnum + 1;
@@ -1142,7 +1212,7 @@ BEGIN
 		numOfSharedStrings = 0;
 		
 		XmlXlsxWorkBegin(fileToSave,reportName);
-		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0);
+		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,true);
 		
 		sheetnum = 1;
 		SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
