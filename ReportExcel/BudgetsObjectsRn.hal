@@ -787,19 +787,7 @@ BEGIN
 			sheetColls[colnum] = 20.57;
 			colnum = colnum + 1;
 		end;
-		quartCount = 0;
-		if (RepSpec.flags[1] == 1) then begin
-			quartCount = quartCount + 1;
-		end;
-		if (RepSpec.flags[2] == 1) then begin
-			quartCount = quartCount + 1;
-		end;
-		if (RepSpec.flags[3] == 1) then begin
-			quartCount = quartCount + 1;
-		end;
-		if (RepSpec.flags[4] == 1) then begin
-			quartCount = quartCount + 1;
-		end;
+		quartCount = RepSpec.flags[1] + RepSpec.flags[2] + RepSpec.flags[3] + RepSpec.flags[4];
 		for (j=1;j<=quartCount*2;j=j+1) begin
 			sheetColls[colnum] = 14.42578125;
 			colnum = colnum + 1;
@@ -809,14 +797,12 @@ BEGIN
 		colnum = colnum + 1;
 		sheetColls[colnum] = 14.42578125;
 		
-		qtyMergeCell = 1;
-		mergeCell[0] = "A1:" & GetStringCellNum(quartCount*2 + 7,1);
 		
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
 		
 		XmlXlsxWorkBegin(fileToSave,reportName);
-		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,true);
+		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,false);
 		for (k=0;k<qtyOfSheets;k=k+1) begin
 			if (sheetNames[k] <> "Total") then begin
 				RecordClear(BRr);
@@ -937,60 +923,76 @@ BEGIN
 				RecordClear(BRr);
 				BRr = TotBRr;
 			end;
+			qtyMergeCell = 0;
 			SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 			BeginSheetData(sheetnum,fileToSave);
 				colnum = 1;
 				rownum = 1;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-					style = 1;
+					style = 8;
+					mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,PRrName & "," & GetYear(RepSpec.sStartDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					style = 9;
+					qtyOfEmpStr = quartCount*2 + 4;
+					if (RepSpec.flags[5] == 0) then begin
+						qtyOfEmpStr = qtyOfEmpStr + 2;
+					end;
+					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+					mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum - 1,rownum);
+					qtyMergeCell = qtyMergeCell + 1;
 				EndRow(sheetnum,fileToSave,rownum);
 				rownum = rownum + 1;
 				colnum = 1;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-					style = 4;
+					style = 1;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"period",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 5;
+					style = 2;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,RepSpec.sStartDate & "-" & RepSpec.sEndDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				EndRow(sheetnum,fileToSave,rownum);
-				
 				colnum = 1;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-					style = 4;
+					style = 1;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"currency",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 5;
+					style = 2;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,BCb.BaseCur1,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				EndRow(sheetnum,fileToSave,rownum);
 				rownum = rownum + 2;
-				
-				colnum = 1;
+				colnum = 2;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-					style = 6;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+					style = 3;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,mainobjname,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+					colnum = colnum + 1;
 					if (RepSpec.flags[5] == 0) then begin
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Vendor",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						colnum = colnum + 1;
 					end;
 					if (RepSpec.flags[1]==1) then begin 
+						style = 3;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 11;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					end;
 					if (RepSpec.flags[2]==1) then begin 
+						style = 3;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 11;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					end;
 					if (RepSpec.flags[3]==1) then begin 
+						style = 3;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIII-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 11;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIII-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					end;
 					if (RepSpec.flags[4]==1) then begin 
+						style = 3;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIV-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 11;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIV-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					end;
+					style = 3;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"total-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					style = 12;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"total-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				EndRow(sheetnum,fileToSave,rownum);
 			
@@ -1011,61 +1013,59 @@ BEGIN
 					totalspendbyrow = 0;
 					if (nonblank(BRrw.CatName))	 then begin				
 						if (CollectSubTotals(BRr,i,subtotals)) then begin	//check if item group is empty
-							style = 3;
 							rownum = rownum + 1;
 							colnum = 1;
 							BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-								style = 7;
+								style = 4;
 								StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 								StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.CatName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 								if (RepSpec.flags[5] == 0) then begin
 									colnum = colnum + 2;
 								end;
 								colnum = colnum + 1;
-								style = 8;
 								if (RepSpec.flags[1]==1) then begin
-									style = 8;
+									style = 5;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[0]);
 									totalrow[0] = totalrow[0] + subtotals[0];
-									style = 8;
+									style = 13;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[1]);
 									totalrow[1] = totalrow[1] + subtotals[1];
 									totalbubyrow = totalbubyrow + subtotals[0];
 									totalspendbyrow = totalspendbyrow + subtotals[1];
 								end;
 								if (RepSpec.flags[2]==1) then begin 
-									style = 8;
+									style = 5;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[2]);
 									totalrow[2] = totalrow[2] + subtotals[2];
-									style = 8;
+									style = 13;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[3]);
 									totalrow[3] = totalrow[3] + subtotals[3];
 									totalbubyrow = totalbubyrow + subtotals[2];
 									totalspendbyrow = totalspendbyrow + subtotals[3];
 								end;
 								if (RepSpec.flags[3]==1) then begin 
-									style = 8;
+									style = 5;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[4]);
 									totalrow[4] = totalrow[4] + subtotals[4];
-									style = 8;
+									style = 13;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[5]);
 									totalrow[5] = totalrow[5] + subtotals[5];
 									totalbubyrow = totalbubyrow + subtotals[4];
 									totalspendbyrow = totalspendbyrow + subtotals[5];
 								end;
 								if (RepSpec.flags[4]==1) then begin 
-									style = 8;
+									style = 5;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[6]);
 									totalrow[6] = totalrow[6] + subtotals[6];
-									style = 8;
+									style = 13;
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[7]);
 									totalrow[7] = totalrow[7] + subtotals[7];
 									totalbubyrow = totalbubyrow + subtotals[6];
 									totalspendbyrow = totalspendbyrow + subtotals[7];
 								end;
-								style = 8;
+								style = 5;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbubyrow);
-								style = 8;
+								style = 14;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalspendbyrow);
 								totalbubyrow = 0;
 								totalspendbyrow = 0;
@@ -1078,51 +1078,55 @@ BEGIN
 						colnum = 1;
 						outlineLevel = 1;
 						BeginRow(sheetnum,fileToSave,rownum,outlineLevel,blankval);
-							style = 10;
-							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-							colnum = colnum + 1;
+							style = 6;
+							if (Right(BRrw.Code,1)=="0") or (Right(BRrw.Code,2)=="99") then begin
+								StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+								colnum = colnum + 1;
+							end else begin
+								colnum = colnum + 1;
+								StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+							end;
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Name,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							if (RepSpec.flags[5] == 0) then begin
 								StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 								StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VEName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							end;
-							style = 11;
 							if (RepSpec.flags[1]==1) then begin 
-								style = 11;
+								style = 7;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud1);
 								totColBud1 = totColBud1 + BRrw.Bud1;
-								style = 11;
+								style = 15;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend1);
 								totColSpend1 = totColSpend1 + BRrw.Spend1;
 							end;
 							if (RepSpec.flags[2]==1) then begin 
-								style = 11;
+								style = 7;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud2);
 								totColBud2 = totColBud2 + BRrw.Bud2;
-								style = 11;
+								style = 15;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend2);
 								totColSpend2 = totColSpend2 + BRrw.Spend2;
 							end;
 							if (RepSpec.flags[3]==1) then begin 
-								style = 11;
+								style = 7;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud3);
 								totColBud3 = totColBud3 + BRrw.Bud3;
-								style = 11;
+								style = 15;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend3);
 								totColSpend3 = totColSpend3 + BRrw.Spend3;
 							end;
 							if (RepSpec.flags[4]==1) then begin 
-								style = 11;
+								style = 7;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud4);
 								totColBud4 = totColBud4 + BRrw.Bud4;
-								style = 11;
+								style = 15;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend4);
 								totColSpend4 = totColSpend4 + BRrw.Spend4;
 							end;
-							style = 11;
+							style = 7;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbubyrow);
 							totColBudT = totColBudT + totalbubyrow;
-							style = 11;
+							style = 16;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalspendbyrow);
 							totColSpendT = totColSpendT + totalspendbyrow;
 						EndRow(sheetnum,fileToSave,rownum);
@@ -1131,39 +1135,38 @@ BEGIN
 				rownum = rownum + 1;
 				colnum = 3;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-					style = 7;
+					style = 4;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					if (RepSpec.flags[5] == 0) then begin
 						colnum = colnum + 2;
 					end;
-					style = 8;
 					if (RepSpec.flags[1]==1) then begin 
-						style = 8;
+						style = 5;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud1);
-						style = 8;
+						style = 17;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend1);
 					end;
 					if (RepSpec.flags[2]==1) then begin 
-						style = 8;
+						style = 5;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud2);
-						style = 8;
+						style = 17;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend2);
 					end;
 					if (RepSpec.flags[3]==1) then begin 
-						style = 8;
+						style = 5;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud3);
-						style = 8;
+						style = 17;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend3);
 					end;
 					if (RepSpec.flags[4]==1) then begin 
-						style = 8;
+						style = 5;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud4);
-						style = 8;
+						style = 17;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend4);
 					end;
-					style = 8;
+					style = 5;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBudT);
-					style = 8;
+					style = 18;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpendT);
 				EndRow(sheetnum,fileToSave,rownum);
 			EndSheetData(sheetnum,fileToSave);
@@ -1196,19 +1199,7 @@ BEGIN
 			sheetColls[colnum] = 20.57;
 			colnum = colnum + 1;
 		end;
-		quartCount = 0;
-		if (RepSpec.flags[1] == 1) then begin
-			quartCount = quartCount + 1;
-		end;
-		if (RepSpec.flags[2] == 1) then begin
-			quartCount = quartCount + 1;
-		end;
-		if (RepSpec.flags[3] == 1) then begin
-			quartCount = quartCount + 1;
-		end;
-		if (RepSpec.flags[4] == 1) then begin
-			quartCount = quartCount + 1;
-		end;
+		quartCount = RepSpec.flags[1] + RepSpec.flags[2] + RepSpec.flags[3] + RepSpec.flags[4];
 		for (j=1;j<=quartCount*2;j=j+1) begin
 			sheetColls[colnum] = 14.42578125;
 			colnum = colnum + 1;
@@ -1218,71 +1209,87 @@ BEGIN
 		colnum = colnum + 1;
 		sheetColls[colnum] = 14.42578125;
 		
-		qtyMergeCell = 1;
-		mergeCell[0] = "A1:" & GetStringCellNum(quartCount*2 + 7,1);
 		
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
 		
 		XmlXlsxWorkBegin(fileToSave,reportName);
-		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,true);
+		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,false);
 		
 		sheetnum = 1;
+		qtyMergeCell = 0;
 		SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 		BeginSheetData(sheetnum,fileToSave);
 			rownum = 1;
 			colnum = 1;
 			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				style = 1;
+				style = 8;
+				mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,PRrName & "," & GetYear(RepSpec.sStartDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+				style = 9;
+				qtyOfEmpStr = quartCount*2 + 4;
+				if (RepSpec.flags[5] == 0) then begin
+					qtyOfEmpStr = qtyOfEmpStr + 2;
+				end;
+				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+				mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum - 1,rownum);
+				qtyMergeCell = qtyMergeCell + 1;
 			EndRow(sheetnum,fileToSave,rownum);
 			rownum = rownum + 1;
 
 			colnum = 1;
 			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				style = 4;
+				style = 1;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"period",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				style = 5;
+				style = 2;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,RepSpec.sStartDate & "-" & RepSpec.sEndDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			EndRow(sheetnum,fileToSave,rownum);
 			
 			colnum = 1;
 			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				style = 4;
+				style = 1;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"currency",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				style = 5;
+				style = 2;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,BCb.BaseCur1,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			EndRow(sheetnum,fileToSave,rownum);
 			rownum = rownum + 2;
 			
-			colnum = 1;
+			colnum = 2;
 			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				style = 6;
-				qtyOfEmpStr = 1;
-				colnum = colnum + 1;
+				style = 3;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,mainobjname,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				colnum = colnum + 1;
 				if (RepSpec.flags[5] == 0) then begin
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Vendor",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					colnum = colnum + 1;
 				end;
-				if (RepSpec.flags[1]==1) then begin 
+				if (RepSpec.flags[1]==1) then begin
+					style = 3;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					style = 11;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				end;
 				if (RepSpec.flags[2]==1) then begin 
+					style = 3;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					style = 11;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				end;
 				if (RepSpec.flags[3]==1) then begin 
+					style = 3;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIII-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					style = 11;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIII-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				end;
 				if (RepSpec.flags[4]==1) then begin 
+					style = 3;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIV-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					style = 11;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIV-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				end;
+				style = 3;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"total-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+				style = 12;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"total-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			EndRow(sheetnum,fileToSave,rownum);
 		
@@ -1304,59 +1311,58 @@ BEGIN
 				if (nonblank(BRrw.CatName))	 then begin				
 					if (CollectSubTotals(BRr,i,subtotals)) then begin	//check if item group is empty
 						rownum = rownum + 1;
-						style = 7;
 						colnum = 1;
 						BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+							style = 4;
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.CatName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							if (RepSpec.flags[5] == 0) then begin
 								colnum = colnum + 2;
 							end;
 							colnum = colnum + 1;
-							style = 8;
 							if (RepSpec.flags[1]==1) then begin 
-								style = 8;
+								style = 5;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[0]);
 								totalrow[0] = totalrow[0] + subtotals[0];
-								style = 8;
+								style = 13;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[1]);
 								totalrow[1] = totalrow[1] + subtotals[1];
 								totalbubyrow = totalbubyrow + subtotals[0];
 								totalspendbyrow = totalspendbyrow + subtotals[1];
 							end;
 							if (RepSpec.flags[2]==1) then begin 
-								style = 8;
+								style = 5;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[2]);
 								totalrow[2] = totalrow[2] + subtotals[2];
-								style = 8;
+								style = 13;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[3]);
 								totalrow[3] = totalrow[3] + subtotals[3];
 								totalbubyrow = totalbubyrow + subtotals[2];
 								totalspendbyrow = totalspendbyrow + subtotals[3];
 							end;
 							if (RepSpec.flags[3]==1) then begin 
-								style = 8;
+								style = 5;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[4]);
 								totalrow[4] = totalrow[4] + subtotals[4];
-								style = 8;
+								style = 13;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[5]);
 								totalrow[5] = totalrow[5] + subtotals[5];
 								totalbubyrow = totalbubyrow + subtotals[4];
 								totalspendbyrow = totalspendbyrow + subtotals[5];
 							end;
 							if (RepSpec.flags[4]==1) then begin 
-								style = 8;
+								style = 5;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[6]);
 								totalrow[6] = totalrow[6] + subtotals[6];
-								style = 8;
+								style = 13;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,subtotals[7]);
 								totalrow[7] = totalrow[7] + subtotals[7];
 								totalbubyrow = totalbubyrow + subtotals[6];
 								totalspendbyrow = totalspendbyrow + subtotals[7];
 							end;
-							style = 8;
+							style = 5;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbubyrow);
-							style = 8;
+							style = 14;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalspendbyrow);
 						EndRow(sheetnum,fileToSave,rownum);
 					end;					
@@ -1368,51 +1374,55 @@ BEGIN
 					outlineLevel = 1;
 					colnum = 1;
 					BeginRow(sheetnum,fileToSave,rownum,outlineLevel,blankval);
-						style = 10;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						colnum = colnum + 1;
+						style = 6;
+						if (Right(BRrw.Code,1)=="0") or (Right(BRrw.Code,2)=="99") then begin
+							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+							colnum = colnum + 1;
+						end else begin
+							colnum = colnum + 1;
+							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Code,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						end;
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Name,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						if (RepSpec.flags[5] == 0) then begin
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VECode,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.VEName,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						end;
-						style = 11;
 						if (RepSpec.flags[1]==1) then begin 
-							style = 11;
+							style = 7;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud1);
 							totColBud1 = totColBud1 + BRrw.Bud1;
-							style = 11;
+							style = 15;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend1);
 							totColSpend1 = totColSpend1 + BRrw.Spend1;
 						end;
 						if (RepSpec.flags[2]==1) then begin 
-							style = 11;
+							style = 7;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud2);
 							totColBud2 = totColBud2 + BRrw.Bud2;
-							style = 11;
+							style = 15;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend2);
 							totColSpend2 = totColSpend2 + BRrw.Spend2;
 						end;
 						if (RepSpec.flags[3]==1) then begin 
-							style = 11;
+							style = 7;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud3);
 							totColBud3 = totColBud3 + BRrw.Bud3;
-							style = 11;
+							style = 15;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend3);
 							totColSpend3 = totColSpend3 + BRrw.Spend3;
 						end;
 						if (RepSpec.flags[4]==1) then begin 
-							style = 11;
+							style = 7;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Bud4);
 							totColBud4 = totColBud4 + BRrw.Bud4;
-							style = 11;
+							style = 15;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,BRrw.Spend4);
 							totColSpend4 = totColSpend4 + BRrw.Spend4;
 						end;
-						style = 11;
+						style = 7;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbubyrow);
 						totColBudT = totColBudT + totalbubyrow;
-						style = 11;
+						style = 16;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalspendbyrow);
 						totColSpendT = totColSpendT + totalspendbyrow;
 					EndRow(sheetnum,fileToSave,rownum);
@@ -1421,39 +1431,38 @@ BEGIN
 			rownum = rownum + 1;
 			colnum = 3;
 			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				style = 7;
+				style = 4;
 				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				if (RepSpec.flags[5] == 0) then begin
 					colnum = colnum + 2;
 				end;
-				style = 8;
 				if (RepSpec.flags[1]==1) then begin 
-					style = 8;
+					style = 5;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud1);
-					style = 8;
+					style = 17;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend1);
 				end;
 				if (RepSpec.flags[2]==1) then begin 
-					style = 8;
+					style = 5;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud2);
-					style = 8;
+					style = 17;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend2);
 				end;
 				if (RepSpec.flags[3]==1) then begin 
-					style = 8;
+					style = 5;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud3);
-					style = 8;
+					style = 17;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend3);
 				end;
 				if (RepSpec.flags[4]==1) then begin 
-					style = 8;
+					style = 5;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBud4);
-					style = 8;
+					style = 17;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpend4);
 				end;
-				style = 8;
+				style = 5;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBudT);
-				style = 8;
+				style = 18;
 				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpendT);
 			EndRow(sheetnum,fileToSave,rownum);
 		EndSheetData(sheetnum,fileToSave);

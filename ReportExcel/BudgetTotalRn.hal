@@ -266,7 +266,7 @@ BEGIN
 		end;
 		colnum = 0;
 		XmlXlsxWorkBegin(fileToSave,reportName);
-		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,true);
+		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,false);
 		SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 		BeginSheetData(sheetnum,fileToSave);
 			rownum = 2;
@@ -421,7 +421,7 @@ BEGIN
 			colnum = colnum + 1;
 		end;
 		XmlXlsxWorkBegin(fileToSave,reportName);
-		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,true);
+		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,false);
 		SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 		BeginSheetData(sheetnum,fileToSave);
 			rownum = 2;
