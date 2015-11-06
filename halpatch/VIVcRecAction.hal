@@ -49,6 +49,7 @@ external procedure VIDDefault(Integer,string,var record VIVc);// Edit **********
 external procedure VICalcVals(var record VIVc);// Edit ************************** Monday, 13 July 2015 11:16:58
 external procedure NormalizeObjstr(var string);// Edit ************************** Wednesday, 15 July 2015 11:04:06
 external procedure NoDupObjs(string,var string);// Edit ************************** Wednesday, 15 July 2015 12:10:47
+external procedure GetSalesGroup(string,var string);// Edit ************************** Friday, 6 November 2015 09:29:04
 
 
 function Boolean CheckPrepaymentAmount(record VIVc VIp,Integer rwcnt)
@@ -282,6 +283,18 @@ BEGIN
   morethanonevat = false;
   somelinesmisvat = false;
   firstlinewithblankvat = -1;
+  // Edit Start ---------------------------------------------- Edit Start
+	//Friday, 6 November 2015 09:24:51
+	
+  if(blank(VIp.SalesMan))then begin
+  	VIp.SalesMan = currentuser;
+  	GetSalesGroup(VIp.SalesMan,tstr);
+		VIp.SalesGroup = tstr;
+		tstr = "";
+  end;
+  
+	// Edit End ---------------------------------------------- Edit End
+	
   if (long4>0) then begin
     check = true;
   end else begin
