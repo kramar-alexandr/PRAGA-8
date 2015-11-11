@@ -1,6 +1,7 @@
 external function string 255 ConvertXml(string);
 
 // only for 8.x
+global
 function string 255 StrReplace(string original,string target,string replacement) 
 begin
   string 255 res;

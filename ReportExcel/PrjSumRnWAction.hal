@@ -1,34 +1,8 @@
-remote procedure FoundPeopleStatRn(record RcVc,var area,var boolean);
+remote procedure PrjSumRn(record RcVc,var area,var boolean);
 remote function boolean OTCodeMatch(string,string);
 
 global
-procedure FoundPeopleStatRClassReportDefaults(integer wn)
-begin
-	record RcVc RepSpec;
-	
-	GetWindowRecord(wn,RepSpec);
-	RepSpec.f2 = "2016";
-	RepSpec.flags[5] = 1;
-	PutWindowRecord(wn,RepSpec);
-	
-	return;
-end;
-
-global
-function Boolean FoundPeopleStatRClassOnOpenWindow(Integer wn)
-begin
-	record RcVc RepSpec;
-	
-	GetWindowRecord(wn,RepSpec);
-	RepSpec.f2 = "2016";
-	RepSpec.flags[5] = 1;
-	PutWindowRecord(wn,RepSpec);
-
-	return;
-end;
-
-global
-procedure RunFoundPeopleStatRn()
+procedure RunPrjSumRn()
 begin
 	record ObjVc Objr;
 	record OTVc OTr;
@@ -39,6 +13,7 @@ begin
 	integer wn;
 	boolean PrjFoundf,testf;
 	
+	logtext(0,"RunPrjSumRn is runing");
 	testf = true;
 	wn = curwindow;
 	deselectwindow(wn,true);
@@ -60,16 +35,6 @@ begin
 	if ((((RepSpec.flags[1]==1) and (RepSpec.flags[2]==0) and ((RepSpec.flags[3]==1) or (RepSpec.flags[4]==1))) or (((RepSpec.flags[1]==1) or (RepSpec.flags[2]==1)) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==1))) and testf) then begin
 		MessageBox(0,"Incorrect selection of Quartals!");
 		testf = false;
-	end;
-	if (blank(RepSpec.f1) and testf) then begin
-		MessageBox(0,"Input Foundation!");
-		testf = false;
-	end;
-	if (nonblank(RepSpec.f1) and testf) then begin
-		if !OTCodeMatch(RepSpec.f1,"FOUND") then begin
-			testf = false;
-			MessageBox(0,"Incorrect Foundation!");
-		end;
 	end;
 	if (nonblank(RepSpec.ObjStr) and testf) then begin
 		if !OTCodeMatch(RepSpec.ObjStr,"LOCAT") then begin
@@ -111,18 +76,12 @@ begin
 		RepSpec.sEndDate = StringToDate(tmpDate);
 		tstr = RepSpec.f1;
 		if nonblank(RepSpec.ObjStr) then begin
-			tstr = tstr & "-" & RepSpec.ObjStr;
+			tstr = tstr & "-" & RepSpec.ObjStr & "-";
 		end;
-		tstr = tstr & "-Projects-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
-		if RepSpec.flags[5] != 1 then begin
-			tstr = tstr & " (all groups)";
-		end;
-		if RepSpec.flags[6] == 1 then begin
-			tstr = tstr & " (without vendors)";
-		end;
+		tstr = tstr & "Project Summary-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
 		filename = SaveFileDialog(tstr,"","xlsx");
 		if ((filename!=tstr) and nonblank(filename)) then begin
-			FoundPeopleStatRn(RepSpec,fileToSave,PrjFoundf);
+			PrjSumRn(RepSpec,fileToSave,PrjFoundf);
 			if (PrjFoundf) then begin
 				if(fileexists(filename))then begin
 					delete_file(filename);
@@ -131,7 +90,7 @@ begin
 				CloseWindow(wn);
 				MessageBox(0,"Done!");
 			end else begin
-				MessageBox(0,"Projects for specified period not found!");
+				MessageBox(0,"PrjSums for specified period not found!");
 			end;
 		end;
 	end;

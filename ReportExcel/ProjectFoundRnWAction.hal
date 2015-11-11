@@ -1,8 +1,8 @@
-remote procedure ProjectRn(record RcVc,var area,var boolean);
+remote procedure ProjectFoundRn(record RcVc,var area,var boolean);
 remote function boolean OTCodeMatch(string,string);
 
 global
-procedure RunProjectRn()
+procedure RunProjectFoundRn()
 begin
 	record ObjVc Objr;
 	record OTVc OTr;
@@ -13,7 +13,7 @@ begin
 	integer wn;
 	boolean PrjFoundf,testf;
 	
-	logtext(0,"RunProjectRn is runing");
+	logtext(0,"RunProjectFoundRn is runing");
 	testf = true;
 	wn = curwindow;
 	deselectwindow(wn,true);
@@ -91,7 +91,7 @@ begin
 		tstr = tstr & "-Projects-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
 		filename = SaveFileDialog(tstr,"","xlsx");
 		if ((filename!=tstr) and nonblank(filename)) then begin
-			ProjectRn(RepSpec,fileToSave,PrjFoundf);
+			ProjectFoundRn(RepSpec,fileToSave,PrjFoundf);
 			if (PrjFoundf) then begin
 				if(fileexists(filename))then begin
 					delete_file(filename);

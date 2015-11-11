@@ -27,9 +27,12 @@ BEGIN
 	TrHs=true;
 	while (LoopKey("OTCode",Objr,1,TrHs)) begin
 		testf = true;
-		if (Objr.OTCode<>"FOUND") then begin
+		if (Objr.OTCode != "FOUND") then begin
 			testf = false;
 			TrHs = false;
+		end;
+		if (Objr.TerminateFlag == 1) then begin
+			testf = false;
 		end;
 		if (testf) then begin
 			FoundArray[k] = Objr.Code;

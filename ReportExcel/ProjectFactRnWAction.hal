@@ -1,38 +1,11 @@
-remote procedure FoundPeopleStatRn(record RcVc,var area,var boolean);
-remote function boolean OTCodeMatch(string,string);
+remote procedure ProjectFactRn(record RcVc,var area,var boolean);
 
 global
-procedure FoundPeopleStatRClassReportDefaults(integer wn)
-begin
-	record RcVc RepSpec;
-	
-	GetWindowRecord(wn,RepSpec);
-	RepSpec.f2 = "2016";
-	RepSpec.flags[5] = 1;
-	PutWindowRecord(wn,RepSpec);
-	
-	return;
-end;
-
-global
-function Boolean FoundPeopleStatRClassOnOpenWindow(Integer wn)
-begin
-	record RcVc RepSpec;
-	
-	GetWindowRecord(wn,RepSpec);
-	RepSpec.f2 = "2016";
-	RepSpec.flags[5] = 1;
-	PutWindowRecord(wn,RepSpec);
-
-	return;
-end;
-
-global
-procedure RunFoundPeopleStatRn()
+procedure RunProjectFactRn()
 begin
 	record ObjVc Objr;
 	record OTVc OTr;
-	string 250 filename,tstr;
+	string 250 filename,tstr,tstr2;
 	string 10 tmpDate;
 	area fileToSave;
 	record RcVc RepSpec;
@@ -61,22 +34,7 @@ begin
 		MessageBox(0,"Incorrect selection of Quartals!");
 		testf = false;
 	end;
-	if (blank(RepSpec.f1) and testf) then begin
-		MessageBox(0,"Input Foundation!");
-		testf = false;
-	end;
-	if (nonblank(RepSpec.f1) and testf) then begin
-		if !OTCodeMatch(RepSpec.f1,"FOUND") then begin
-			testf = false;
-			MessageBox(0,"Incorrect Foundation!");
-		end;
-	end;
-	if (nonblank(RepSpec.ObjStr) and testf) then begin
-		if !OTCodeMatch(RepSpec.ObjStr,"LOCAT") then begin
-			testf = false;
-			MessageBox(0,"Incorrect Location!");
-		end;
-	end;
+	
 	if testf then begin
 		tmpDate = "";
 		if (RepSpec.flags[4]==1) then begin
@@ -109,20 +67,41 @@ begin
 		end;
 		tmpDate = tmpDate & RepSpec.f2;
 		RepSpec.sEndDate = StringToDate(tmpDate);
-		tstr = RepSpec.f1;
-		if nonblank(RepSpec.ObjStr) then begin
-			tstr = tstr & "-" & RepSpec.ObjStr;
+		if (RepSpec.flags[4] == 1) then begin
+			tstr = "QIV";
+		end;				
+		if (RepSpec.flags[3] == 1) then begin
+			tstr = "QIII";
 		end;
-		tstr = tstr & "-Projects-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
-		if RepSpec.flags[5] != 1 then begin
-			tstr = tstr & " (all groups)";
+		if (RepSpec.flags[2] == 1) then begin
+			tstr = "QII";
 		end;
-		if RepSpec.flags[6] == 1 then begin
-			tstr = tstr & " (without vendors)";
+		if (RepSpec.flags[1] == 1) then begin
+			tstr = "QI";
 		end;
+		if (RepSpec.flags[1] == 1) then begin
+			tstr2 ="QI";
+		end;
+		if (RepSpec.flags[2] == 1) then begin
+			tstr2 = "QII";
+		end;
+		if (RepSpec.flags[3] == 1) then begin
+			tstr2 = "QIII";
+		end;
+		if (RepSpec.flags[4] == 1) then begin
+			tstr2 = "QIV";
+		end;
+		if tstr != tstr2 then begin
+			tstr = tstr & "-" & tstr2;
+		end;
+		tstr = "Projects Facts " & RepSpec.f2 & " " & tstr;
+		if nonblank(RepSpec.f1) then begin
+			tstr = tstr & " Group-" & RepSpec.f1;
+		end;
+		tstr = tstr & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
 		filename = SaveFileDialog(tstr,"","xlsx");
 		if ((filename!=tstr) and nonblank(filename)) then begin
-			FoundPeopleStatRn(RepSpec,fileToSave,PrjFoundf);
+			ProjectFactRn(RepSpec,fileToSave,PrjFoundf);
 			if (PrjFoundf) then begin
 				if(fileexists(filename))then begin
 					delete_file(filename);

@@ -291,7 +291,7 @@ BEGIN
 END;
 
 global
-procedure ProjectRn(record RcVc RepSpec,var area areatofile, var boolean PrjFoundf)
+procedure ProjectFoundRn(record RcVc RepSpec,var area areatofile, var boolean PrjFoundf)
 BEGIN
 //RepSpec.f1 - Foundation
 //RepSpec.ObjStr - Location
@@ -320,7 +320,7 @@ BEGIN
 	if (PrjFoundf) then begin
 		DataCollect(ArtArrayWithoutGroups,ProjArray,RepSpec,Quart1Vect,Quart2Vect,Quart3Vect,Quart4Vect,TOTALVect,AccStr);
 
-		reportName = "ProjectRn";
+		reportName = "ProjectFoundRn";
 		if(windowsmode==1)then begin
 			fileToSave = "tmpxlsx.xlsx";
 		end else begin

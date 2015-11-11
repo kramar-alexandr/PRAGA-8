@@ -1,6 +1,30 @@
 remote procedure BudTotFoundRn(record RcVc,var area);
 
 global
+procedure BudTotFoundRClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2016";
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
+function Boolean BudTotFoundRClassOnOpenWindow(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2016";
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
 procedure RunBudTotFoundRn()
 begin
 	string 255 filename,tstr;
@@ -45,7 +69,7 @@ begin
 		if (RepSpec.flags[1]==1) then begin
 			tmpDate = "1/1/";
 		end;
-		tmpDate = tmpDate & RepSpec.f3;
+		tmpDate = tmpDate & RepSpec.f2;
 		RepSpec.sStartDate = StringToDate(tmpDate);
 		
 		tmpDate = "";
@@ -61,7 +85,7 @@ begin
 		if (RepSpec.flags[4]==1) then begin
 			tmpDate = "31/12/";
 		end;
-		tmpDate = tmpDate & RepSpec.f3;
+		tmpDate = tmpDate & RepSpec.f2;
 		RepSpec.sEndDate = StringToDate(tmpDate);
 		tstr = tstr & "Foundations Budgets Total 2016 Report";
 		tstr = tstr & " filled in on " & DateToString(CurrentDate,"DD MM YYYY");
