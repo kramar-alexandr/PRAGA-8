@@ -8,11 +8,14 @@ begin
 	Report("TEST",TESTRClass,TESTRn,0,modTS);
 	Report("TEST2",TEST2RClass,TEST2Rn,0,modTS);
 	Report("Budgets Objects Report",BudgetObjectsRClass,BudgetsObjectsRn,0,modTS);
-	Report("Project Foundation Statistics",ProjectRClass,ProjectRn,0,modTS);
+	Report("Project Foundation Statistics",ProjectFoundRClass,ProjectFoundRn,0,modTS);
 	Report("Budget Total",BudgetTotalRClass,BudgetTotalRn,0,modTS);
 	Report("Budget Total by Foundations 2016",BudTotFoundRClass,BudTotFoundRn,0,modTS);
 	Report("Foundation People Statistics 2016",FoundPeopleStatRClass,FoundPeopleStatRn,0,modTS);
 	Report("Project Foundation Statistics 2016",ProjFoundStatRClass,ProjFoundStatRn,0,modTS);
+	Report("Project Summary 2016",PrjSumRClass,PrjSumRn,0,modTS);
+	Report("Project Statistics 2016",ProjectStatRClass,ProjectStatRn,0,modTS);
+	Report("Projects Facts",ProjectFactRClass,ProjectFactRn,0,modTS);
 	Setting("Uploading a file to MS Excel",ExcelUploadTClass,modTS);
 	
 	Import("Set salesman in purchase invoices from history",ImportIClass,SetSalesmanToVIVcIn,modPL);
@@ -25,6 +28,8 @@ begin
 	SString(31002,"You should approve this budget before updating");
 	SString(31003,"You are not allowed to create new budget.");
 	SString(31004,"Object mismatch. Clear this field to create new object."); //Edit---------------Vitalii 14:12 21.07.2015
+	SString(31005,"You should create Contact. Object will be created automatically"); //Edit---------------Vitalii 12:37 13.10.2015
+	SString(31006,"You should create Item or Expense Account. Object will be created automatically"); //Edit---------------Vitalii 12:37 13.10.2015
 	
 	
   StrSetAdd(3);

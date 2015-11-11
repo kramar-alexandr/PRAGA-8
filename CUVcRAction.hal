@@ -7,20 +7,19 @@ BEGIN
 	res = inner.CUVcRecordCheck(CUr,CU2r,stat,long4); 
 	
 	if (res==0)  then begin 
-		if (CUr.VEType>0) then begin
+		if (CUr.VEType > 0) then begin
 			Objr.Code = CUr.Code;
 			if(ReadFirstMain(Objr,1,true)) then begin
 				if (Objr.OTCode!="SUPPL") then begin
 					RecordCheckError(31000,"",-1,"Code");      
 					res = -1;
 					goto LCUVcRecordCheck;
+				end else begin
+					Objr.Comment = CUr.Name;
+					Objr.OTCode = "SUPPL";
+					RecordStore(Objr,true);
 				end;
 			end else begin
-				if (Objr.Code!=CUr.VEObjects) then begin
-					RecordCheckError(31004,"",-1,"VEObjects");      
-					res = -1;
-					goto LCUVcRecordCheck;
-				end;
 				RecordNew(OBjr);
 				Objr.Code = CUr.Code;
 				Objr.Comment = CUr.Name;
@@ -34,51 +33,5 @@ BEGIN
  
 LCUVcRecordCheck:;
   CUVcRecordCheck = res;
-  RETURN;
-END;
-
-global
-updating function LongInt CUVcRecordSaveAfter(var record CUVc CUr,record CUVc CU2r,LongInt stat,LongInt long4)
-BEGIN
-	LongInt res;
-	record INVc INr;
-	record ITVc ITr;
-	record ObjVc Objr;
-    
-	Objr.Code = CUr.Code;
-	if(!ReadFirstMain(Objr,1,true)) then begin
-		RecordNew(OBjr);
-		Objr.Code = CUr.Code;
-		Objr.Comment = CUr.Name;
-		Objr.OTCode = "SUPPL";
-		RecordStore(Objr,true);
-	end else begin
-		Objr.Comment = CUr.Name;
-		Objr.OTCode = "SUPPL";
-		RecordStore(Objr,true);
-	end;
-  CUVcRecordSaveAfter = res; 
-  RETURN;
-END;
-
-global
-updating function LongInt CUVcRecordUpdateAfter(var record CUVc CUr,record CUVc CU2r,LongInt stat,LongInt long4)
-BEGIN
-	LongInt res;
-	record ObjVc Objr;
-    
-	Objr.Code = CUr.Code;
-	if(!ReadFirstMain(Objr,1,true)) then begin
-		RecordNew(OBjr);
-		Objr.Code = CUr.Code;
-		Objr.Comment = CUr.Name;
-		Objr.OTCode = "SUPPL";
-		RecordStore(Objr,true);
-	end else begin
-		Objr.Comment = CUr.Name;
-		Objr.OTCode = "SUPPL";
-		RecordStore(Objr,true);
-	end;
-  CUVcRecordUpdateAfter = res; 
   RETURN;
 END;
