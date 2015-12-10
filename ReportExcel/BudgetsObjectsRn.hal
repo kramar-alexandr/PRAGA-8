@@ -774,29 +774,7 @@ BEGIN
 			end;
 		end;
 		BRrCollectForFew(RepSpec,PRCodes,mainobjname,PRNames,ArrayBRr,PatternBRr);
-		colnum = 0;
-		sheetColls[colnum] = 8.43;
-		colnum = colnum + 1;
-		sheetColls[colnum] = 8.43;
-		colnum = colnum + 1;
-		sheetColls[colnum] = 31.71;
-		colnum = colnum + 1;
-		if (RepSpec.flags[5] == 0) then begin
-			sheetColls[colnum] = 10.57;
-			colnum = colnum + 1;
-			sheetColls[colnum] = 20.57;
-			colnum = colnum + 1;
-		end;
 		quartCount = RepSpec.flags[1] + RepSpec.flags[2] + RepSpec.flags[3] + RepSpec.flags[4];
-		for (j=1;j<=quartCount*2;j=j+1) begin
-			sheetColls[colnum] = 14.42578125;
-			colnum = colnum + 1;
-		end;
-		
-		sheetColls[colnum] = 14.42578125;
-		colnum = colnum + 1;
-		sheetColls[colnum] = 14.42578125;
-		
 		
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
@@ -862,8 +840,33 @@ BEGIN
 			end;
 		end;
 		for (k=0;k<qtyOfSheets;k=k+1) begin
+			colnum = 0;
+			sheetColls[colnum] = 8.43;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 8.43;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 31.71;
+			colnum = colnum + 1;
+			if (RepSpec.flags[5] == 0) then begin
+				sheetColls[colnum] = 10.57;
+				colnum = colnum + 1;
+				sheetColls[colnum] = 20.57;
+				colnum = colnum + 1;
+			end;
+			for (j=1;j<=quartCount*2;j=j+1) begin
+				sheetColls[colnum] = 14.42578125;
+				colnum = colnum + 1;
+			end;
+			sheetColls[colnum] = 14.42578125;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 14.42578125;
+			
 			sheetnum = k + 1;
 			if (sheetNames[k] <> "Total") then begin
+				colnum = colnum + 1;
+				sheetColls[colnum] = blankval;
+				colnum = colnum + 1;
+				sheetColls[colnum] = blankval;
 				RecordClear(BRr);
 				BRr = ArrayBRr[PRCodes[k-1]];
 				PRrName = PRNames[PRCodes[k-1]];
@@ -919,11 +922,16 @@ BEGIN
 					end; 
 				end;
 			end else begin
+				colnum = colnum + 1;
+				sheetColls[colnum] = 14.42578125;
+				colnum = colnum + 1;
+				sheetColls[colnum] = 8.85546875;
 				PRrName = "Total";
 				RecordClear(BRr);
 				BRr = TotBRr;
 			end;
 			qtyMergeCell = 0;
+			
 			SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 			BeginSheetData(sheetnum,fileToSave);
 				colnum = 1;
@@ -933,7 +941,10 @@ BEGIN
 					mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,PRrName & "," & GetYear(RepSpec.sStartDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					style = 9;
-					qtyOfEmpStr = quartCount*2 + 4;
+					qtyOfEmpStr = quartCount*2 + 6;
+					if (sheetNames[k] <> "Total") then begin
+						qtyOfEmpStr = qtyOfEmpStr - 2;
+					end;
 					if (RepSpec.flags[5] == 0) then begin
 						qtyOfEmpStr = qtyOfEmpStr + 2;
 					end;
@@ -994,6 +1005,12 @@ BEGIN
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"total-Plan",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					style = 12;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,"total-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					if (sheetNames[k] == "Total") then begin
+						style = 3;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Overrun",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						style = 19;
+						StringCell(sheetnum,fileToSave,colnum,rownum,style,"%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					end;
 				EndRow(sheetnum,fileToSave,rownum);
 			
 				mtrw = matrowcnt(BRr);
@@ -1067,6 +1084,17 @@ BEGIN
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbubyrow);
 								style = 14;
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalspendbyrow);
+								if (sheetNames[k] == "Total") then begin
+									style = 5;
+									NumericCell(sheetnum,fileToSave,colnum,rownum,style,(totalspendbyrow-totalbubyrow));
+									style = 20;
+									if (totalbubyrow == 0) then begin
+										qtyOfEmpStr = 1;
+										EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+									end else begin
+										NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totalspendbyrow - totalbubyrow)/totalbubyrow);
+									end;
+								end;
 								totalbubyrow = 0;
 								totalspendbyrow = 0;
 							EndRow(sheetnum,fileToSave,rownum);
@@ -1129,6 +1157,17 @@ BEGIN
 							style = 16;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalspendbyrow);
 							totColSpendT = totColSpendT + totalspendbyrow;
+							if (sheetNames[k] == "Total") then begin
+								style = 7;
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,(totalspendbyrow-totalbubyrow));
+								style = 21;
+								if (totalbubyrow == 0) then begin
+									qtyOfEmpStr = 1;
+									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+								end else begin
+									NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totalspendbyrow - totalbubyrow)/totalbubyrow);
+								end;
+							end;
 						EndRow(sheetnum,fileToSave,rownum);
 					end;
 				end;
@@ -1168,6 +1207,17 @@ BEGIN
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColBudT);
 					style = 18;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totColSpendT);
+					if (sheetNames[k] == "Total") then begin
+						style = 5;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,(totColSpendT-totColBudT));
+						style = 22;
+						if (totColBudT == 0) then begin
+							qtyOfEmpStr = 1;
+							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+						end else begin
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totColSpendT - totColBudT)/totColBudT);
+						end;
+					end;
 				EndRow(sheetnum,fileToSave,rownum);
 			EndSheetData(sheetnum,fileToSave);
 			MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);

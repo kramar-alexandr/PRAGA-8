@@ -139,8 +139,6 @@ BEGIN
 	integer i,k,j,mtrw,PAi;
 	boolean TrHs,testf,kTestf;
 	string 20 group;
-	vector boolean SupplInArr;
-	
 	
 	TRr.TransDate = RepSpec.sStartDate;
 	TrHs = true;

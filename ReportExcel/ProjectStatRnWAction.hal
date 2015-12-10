@@ -21,7 +21,6 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2016";
-	RepSpec.flags[5] = 1;
 	PutWindowRecord(wn,RepSpec);
 
 	return;

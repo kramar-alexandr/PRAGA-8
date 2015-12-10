@@ -98,7 +98,6 @@ BEGIN
 	integer i,k,j,mtrw,PAi;
 	boolean TrHs,testf,kTestf;
 	string 20 group;
-	vector boolean SupplInArr;
 	
 	Objr.Code = RepSpec.ObjStr;
 	readfirstmain(Objr,1,true);
@@ -313,6 +312,10 @@ BEGIN
 						lastBigRow = true;
 						prjInRow = ProjArray.length - Wi;
 					end;
+					if (ProjArray.length<prjInRow) then begin
+						lastBigRow = true;
+						prjInRow = ProjArray.length;
+					end;
 					rownum = rownum + 1;
 					colnum = 4;
 					BeginRow(sheetnum,fileToSave,rownum,0,4);
@@ -523,9 +526,9 @@ BEGIN
 								end;
 							EndRow(sheetnum,fileToSave,rownum);
 						end else begin
+							colnum = 1;
+							BeginRow(sheetnum,fileToSave,rownum,RepSpec.flags[5],blankval);
 							if ArtArrayWithGroups[i+1]==nextgroup or blank(ArtArrayWithGroups[i+1]) then begin
-								colnum = 1;
-								BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 									style = 7;
 									StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 									Objr.Code = ArtArrayWithGroups[i];
@@ -591,8 +594,6 @@ BEGIN
 								EndRow(sheetnum,fileToSave,rownum);
 								rownum = rownum + 1;
 							end else begin
-								colnum = 1;
-								BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 									style = 7;
 									StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 									Objr.Code = ArtArrayWithGroups[i];

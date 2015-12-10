@@ -2471,8 +2471,22 @@ begin
   Tile(tilenr,200,false,tilenr,Math); tilenr = tilenr + 1;
   h = 8; v=24; l = 35;
   MatrixBegin(4,v,-50,-10,-,99);
+  //Edit-------------------Vitalii 17:41 10.12.2015
   Flip(1);
   MatTypedRow(stp);
+  
+  MatCol(t=1,h=34,"Pay. Mode",Normal,PayMode,false,PMSClass);
+  MatCol(t,h+=70,"Expense",Normal,CorspCode,false,CLCorspSClass);
+  MatCol(t,h+=70,"Project",Normal,Prj,false,ObjPrjSClass);
+  MatCol(t,h+=70,"#Supplier#",0,Supp,false,VESClass);
+  MatCol(t,h+=70,"Foundation",0,Found,false,ObjFoundSClass);
+  MatCol(t,h+=70,"Location",0,Loc,false,ObjLocSClass);
+  MatCol(1,h+=70,"#Supplier# Name",0,SupName,true,0);
+  MatCol(t,h+=100,"Comment",0,Comment,false,0);// Edit ************************** Tuesday, 26 May 2015 13:46:50
+  MatCol(t,-80,"Sum",0,Sum,true,0);
+  
+  
+  Flip(2);
   MatCol(t=1,h=34,"Type",0,Type,false,SetSClass);
   /*if (HasLocalization("POL") and IsStandardProduct) then begin// Edit ************************** Tuesday, 26 May 2015 13:17:40
     MatCol(t,h+=120,"Number",0,TransOfficialSerNr,false,ARSClass);
@@ -2500,7 +2514,7 @@ begin
   end;
   MatCol(t,-180,"Company",ViewOnly,Company,false,0);
   MatCol(t,-80,"Sum",0,Sum,true,0);
-  Flip(2);
+  Flip(3);
   MatCol(t=1,h=34,"Type",0,Type,false,SetSClass);
   MatCol(t,h+=120,"Expense A/C",ViewOnly,CorspCode,false,CLCorspSClass);
   //MatCol(t,h+=80,"Pay. Mode",Normal,PayMode,false,PMSClass);// Edit ************************** Tuesday, 26 May 2015 13:17:20
@@ -4093,13 +4107,14 @@ real h,v,vs,h1;
 	WindowBegin("Project Statistics 2016",ProjectStatRClass,CGother,RcType);
 		SetWRect(20,80,400,250);
 		v = 20; vs = 20; h = 120;
-		EditField(h,v,120,"Year",ViewOnly,f2,false,0);
+		EditField(h,v,120,"Year",Normal,f2,false,0);
 		StaticText(h-6,v+32,"Quartals",true);
 		CheckBox(h,v+=vs,0,"I",flags[1]);
 		CheckBox(h+35,v,0,"II",flags[2]);
 		CheckBox(h+70,v,0,"III",flags[3]);
 		CheckBox(h+105,v,0,"IV",flags[4]);
 		EditField(h,v+=vs,120,"Project",Normal,f1,false,PRSClass);
+		CheckBox(h+140,v,0,"for print",flags[5]);
 		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunProjectStatRn","Run");
 	EndWindow;
 end;

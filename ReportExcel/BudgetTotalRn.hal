@@ -435,6 +435,10 @@ BEGIN
 					lastBigRow = true;
 					prjInRow = ProjArray.length - i;
 				end;
+				if (ProjArray.length<prjInRow) then begin
+					lastBigRow = true;
+					prjInRow = ProjArray.length;
+				end;
 				colnum = 2;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 					mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);

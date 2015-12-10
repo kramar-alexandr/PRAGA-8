@@ -1,0 +1,46 @@
+external inner procedure NormalizeObjstr(var string);
+external inner procedure NoDupObjs(string,var string);
+
+
+global
+updating function LongInt CLInVcRecordCheck(var record CLInVc CLInp,record CLInVc CLIn2p,LongInt stat,LongInt long4)
+BEGIN
+LongInt res;
+integer mtrw,i;
+row CLInVc CLInrw;
+string 200 objstr;
+ 
+	mtrw = matrowcnt(CLInp);
+	For(i=0;i<mtrw;i=i+1) begin
+		matrowget(CLInp,i,CLInrw);
+		
+		objstr = "";
+		if(nonblank(CLInrw.CorspCode))then begin
+			objstr = objstr & "," & CLInrw.CorspCode;
+		end;
+		if(nonblank(CLInrw.Prj))then begin
+			objstr = objstr & "," & CLInrw.Prj;
+		end;
+		if(nonblank(CLInrw.Supp))then begin
+			objstr = objstr & "," & CLInrw.Supp;
+		end;
+		if(nonblank(CLInrw.Found))then begin
+			objstr = objstr & "," & CLInrw.Found;
+		end;
+		if(nonblank(CLInrw.Loc))then begin
+			objstr = objstr & "," & CLInrw.Loc;
+		end;
+	
+		NoDupObjs(objstr,objstr);
+		NormalizeObjstr(objstr);
+		CLInrw.Objects = objstr;
+		matrowput(CLInp,i,CLInrw);
+		
+		  
+	end; 
+	
+	res = inner.CLInVcRecordCheck(CLInp,CLIn2p,stat,long4);
+
+	CLInVcRecordCheck = res;
+return;
+end;

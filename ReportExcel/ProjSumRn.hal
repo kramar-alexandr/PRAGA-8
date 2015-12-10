@@ -381,6 +381,10 @@ BEGIN
 					lastBigRow = true;
 					prjInRow = ProjArray.length - Wi;
 				end;
+				if (ProjArray.length<prjInRow) then begin
+					lastBigRow = true;
+					prjInRow = ProjArray.length;
+				end;
 				colnum = 2;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 					for (PAi=0;PAi<prjInRow;PAi=PAi+1) begin
