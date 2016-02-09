@@ -1,5 +1,5 @@
 
-function Boolean ContractsDClassCustCodeEFAfter(Integer wn,Boolean changedf)
+function Boolean ContractsDClassVECodeEFAfter(Integer wn,Boolean changedf)
 BEGIN
   Boolean res;
   record ContractsVc Contractsr;
@@ -8,13 +8,13 @@ BEGIN
   res = true;
   if (changedf) then begin
     GetWindowRecord(wn,Contractsr);
-    CUr.Code = Contractsr.CustCode;
+    CUr.Code = Contractsr.VECode;
 		if (ReadFirstMain(CUr,1,true)) then begin
-			Contractsr.CustName = CUr.Name;
+			Contractsr.VEName = CUr.Name;
 	    PutWindowRecord(wn,Contractsr);
 		end;
   end;
-  ContractsDClassCustCodeEFAfter = res;
+  ContractsDClassVECodeEFAfter = res;
   return;
 END;
 
@@ -27,7 +27,7 @@ BEGIN
 	
 	
 	switch (fieldname) begin
-		case "CustCode": res = ContractsDClassCustCodeEFAfter(wn,changed!=0);
+		case "VECode": res = ContractsDClassVECodeEFAfter(wn,changed!=0);
 	end;
 	
   ContractsDClassAfterEditField = res;

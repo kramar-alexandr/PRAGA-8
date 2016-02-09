@@ -271,8 +271,8 @@ begin
 	RecordField(SerNr,M4Long,0,0);
 	RecordField(Number,M4Str,255,0);
 	RecordField(TotalSum,M4Val,0,0);
-	RecordField(CustCode,M4Code,20,CUVc);
-	RecordField(CustName,M4Str,255,0);
+	RecordField(VECode,M4Code,20,CUVc);
+	RecordField(VEName,M4Str,255,0);
 	RecordField(StartDate,M4Date,0,0);
 	RecordField(EndDate,M4Date,0,0);
 	RecordField(SignDate,M4Date,0,0);
@@ -282,8 +282,8 @@ begin
 	RecordField(Description,M4Str,255,0);
   MainKeyBegin(MainKey,0);
   KeySegment(SerNr);
-  KeyBegin(CustCode);
-  KeySegment(CustCode);
+  KeyBegin(VECode);
+  KeySegment(VECode);
 	KeySegment(SerNr);
   KeyBegin(Number);
   KeySegment(Number);
@@ -310,7 +310,7 @@ begin
  RecordField(CorrespondentAccNum,M4Str,255,0);	
  
  EndRecordAdd;
-	
+ 
 return;  
 end;
 

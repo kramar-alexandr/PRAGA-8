@@ -24,8 +24,8 @@ BEGIN
 		goto LContractsVcRecordCheck;
 	end;
 
-	if (blank(Contractsr.CustCode)) then begin
-		RecordCheckError(1854,"",-1,"CustCode");      
+	if (blank(Contractsr.VECode)) then begin
+		RecordCheckError(1854,"",-1,"VECode");      
 		res = -1;
 		goto LContractsVcRecordCheck;
 	end;

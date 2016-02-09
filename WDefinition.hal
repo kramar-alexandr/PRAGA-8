@@ -3677,6 +3677,7 @@ begin
       EditField(h2,v+=vs,150,"Fax",Normal,Fax,false,0);
     end;
     SpecialMenu("Balance",'=',0,"BalanceVIDsm");
+    SpecialMenu("To Excel",'E',20,"ExcelVIDsm");
     if (HasModNL) then begin
       SpecialMenu("Invoice Status",'r',2,"VIInfoVIDsm");
     end;
@@ -4153,7 +4154,7 @@ begin
   RecordList(4,17,-21,-39);
 
   RlColKey(4,4,"Code",SerNr,false,MainKey);
-  RlColKey(79,79,"Supplier",CustCode,false,CustCode);
+  RlColKey(79,79,"Supplier",VECode,false,VECode);
   RlColKey(160,160,"Number",Number,false,Number);
 	RlCol(250,250,"StartDate",StartDate,true);
 	RlCol(320,320,"EndDate",EndDate,true);
@@ -4180,10 +4181,10 @@ h = 80;h2 = 220; h3 = 300; h4 = -170; vs = 25;
 
 	EditField(h,v=6,100,"Code",Normal,SerNr,false,0);
 	EditField(h4,v,150,"Contract Number",Normal,Number,false,0);
-	EditField(h,v+=vs,100,"Supplier",Normal,CustCode,false,CUSClass);
-	EditField(h2,v,270,"Name",Normal,CustName,false,0);
+	EditField(h,v+=vs,100,"Supplier",Normal,VECode,false,ObjSuppSClass);
+	EditField(h2,v,270,"Name",Normal,VEName,false,0);
 
-	EditFieldTL(h,v=90,100,"Start Date",M4Date,Normal,0 ,StartDate,false,PasteCurDate);
+  EditFieldTL(h,v=90,100,"Start Date",M4Date,Normal,0 ,StartDate,false,PasteCurDate);
 	//EditField(h,v=90,100,"Start Date",Normal,StartDate,false,PasteCurDate);
 	EditField(h3,v,100,"Approval Date",Normal,SignDate,false,PasteCurDate);
 	EditField(h,v+=vs,100,"End Date",Normal,EndDate,false,PasteCurDate);
@@ -4198,7 +4199,6 @@ h = 80;h2 = 220; h3 = 300; h4 = -170; vs = 25;
 	EndWindow;
 end;
  
-
 
 window CUDClass:14
   wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
@@ -4739,3 +4739,4 @@ begin
   end;
   EndWindow;
 end;
+
