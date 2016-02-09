@@ -31,6 +31,7 @@ begin
 	SString(31004,"Object mismatch. Clear this field to create new object."); //Edit---------------Vitalii 14:12 21.07.2015
 	SString(31005,"You should create Contact. Object will be created automatically"); //Edit---------------Vitalii 12:37 13.10.2015
 	SString(31006,"You should create Item or Expense Account. Object will be created automatically"); //Edit---------------Vitalii 12:37 13.10.2015
+	SString(31007,"Invalid period. Check dates");
 	
 	
   StrSetAdd(3);

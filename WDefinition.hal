@@ -4152,7 +4152,7 @@ begin
   UseView(ContractsVc);
   RecordList(4,17,-21,-39);
 
-  RlColKey(4,4,"Code",SerNr,false,SerNr);
+  RlColKey(4,4,"Code",SerNr,false,MainKey);
   RlColKey(79,79,"Supplier",CustCode,false,CustCode);
   RlColKey(160,160,"Number",Number,false,Number);
 	RlCol(250,250,"StartDate",StartDate,true);
@@ -4179,11 +4179,12 @@ h = 80;h2 = 220; h3 = 300; h4 = -170; vs = 25;
 	//Sizeable(-1,-1,0,0);
 
 	EditField(h,v=6,100,"Code",Normal,SerNr,false,0);
-	EditField(h4,v,150,"Number",Normal,Number,false,0);
+	EditField(h4,v,150,"Contract Number",Normal,Number,false,0);
 	EditField(h,v+=vs,100,"Supplier",Normal,CustCode,false,CUSClass);
 	EditField(h2,v,270,"Name",Normal,CustName,false,0);
 
-	EditField(h,v=90,100,"Start Date",Normal,StartDate,false,PasteCurDate);
+EditFieldTL(h,v=90,100,"Start Date",M4Date,Normal,0 ,StartDate,false,PasteCurDate);
+	//EditField(h,v=90,100,"Start Date",Normal,StartDate,false,PasteCurDate);
 	EditField(h3,v,100,"Approval Date",Normal,SignDate,false,PasteCurDate);
 	EditField(h,v+=vs,100,"End Date",Normal,EndDate,false,PasteCurDate);
 	EditField(h3,v,100,"Close Date",Normal,CloseDate,false,PasteCurDate);

@@ -1,0 +1,46 @@
+
+global
+function LongInt ContractsVcRecordDefaults(var record ContractsVc Contractsr,record ContractsVc Contracts2r,LongInt stat,LongInt long4)
+BEGIN
+  LongInt res;
+  record UserVc Userr;
+
+	Contractsr.SerNr = NextSerNr("ContractsVc",CurrentDate,-1,false,"");
+
+  ContractsVcRecordDefaults = res; 
+  RETURN;
+END;
+
+
+global
+updating function LongInt ContractsVcRecordCheck(var record ContractsVc Contractsr,record ContractsVc Contracts2r,LongInt stat,LongInt long4)
+BEGIN
+	LongInt res;
+	res = 0;
+
+	if (blank(Contractsr.SerNr)) then begin
+		RecordCheckError(1854,"",-1,"SerNr");      
+		res = -1;
+		goto LContractsVcRecordCheck;
+	end;
+
+	if (blank(Contractsr.CustCode)) then begin
+		RecordCheckError(1854,"",-1,"CustCode");      
+		res = -1;
+		goto LContractsVcRecordCheck;
+	end;
+
+	if (nonblank(Contractsr.StartDate) and nonblank(Contractsr.EndDate)) then begin
+		if (Contractsr.EndDate < Contractsr.StartDate) then begin
+			RecordCheckError(31007,"",-1,"StartDate");      
+			res = -1;
+			goto LContractsVcRecordCheck;
+		end;
+	end;
+
+  
+
+LContractsVcRecordCheck:;	
+	ContractsVcRecordCheck = res; 
+	RETURN;
+END;
