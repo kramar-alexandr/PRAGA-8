@@ -4,7 +4,8 @@ begin
 	SetLangMode(LangEnglish,"ENG",0);
 	
 	Register("Budgets History","Budgets History",BudgetsHistVc,modTS);		//Edit----------------------Dima  13.07.2015
-	
+	Register("Contracts","Contracts",ContractsVc,modPO);		//Edit----------------------Dima  09.02.2016
+
 	Report("TEST",TESTRClass,TESTRn,0,modTS);
 	Report("TEST2",TEST2RClass,TEST2Rn,0,modTS);
 	Report("Budgets Objects Report",BudgetObjectsRClass,BudgetsObjectsRn,0,modTS);
