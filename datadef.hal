@@ -119,6 +119,8 @@ begin
 		RecordField(Version,M4Int,0,0);			//Edit----------------------Dima  13.07.2015
 		ArrayField(VECode,M4Code,20,CUVc);
 		ArrayField(ExtraObj,M4Code,20,ObjVc);
+    ArrayField(VEName,M4Str,200,0);
+    ArrayField(MonthSum,M4Val,0,0);
 	EndRecordAdd;
 	
 	RecordAddBegin(CLCorspVc,"Myclcorsp");
@@ -271,6 +273,7 @@ begin
 	RecordField(SerNr,M4Long,0,0);
 	RecordField(Number,M4Str,255,0);
 	RecordField(TotalSum,M4Val,0,0);
+  RecordField(CurncyCode,M4Code,5,CurncyCodeVc);
 	RecordField(VECode,M4Code,20,CUVc);
 	RecordField(VEName,M4Str,255,0);
 	RecordField(StartDate,M4Date,0,0);

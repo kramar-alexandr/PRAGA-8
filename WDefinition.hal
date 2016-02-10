@@ -2082,35 +2082,33 @@ begin
   MatCol(t,100,"",0,Spec,false,0);
   MatText(t=18,30,"Quartal",true);// Edit ************************** Friday, 22 May 2015 10:12:52
   MatCol(t,100,"",0,Spec,false,0);// Edit ************************** Friday, 22 May 2015 10:13:17
-  
-  //MatCol(1,30,"Item",0,ArtCode,false,INSClass);// Edit ************************** Thursday, 18 June 2015 17:57:16
   MatCol(1,30,"Item",0,ArtCode,false,CLCorspSClass);// Edit ************************** Thursday, 18 June 2015 17:57:24
   MatCol(1,100,"Suppl",0,VECode,false,VESClass);
-  MatCol(1,155,"Qty",0,Qty,true,0);
-  MatCol(1,200,"Foundation",0,ExtraObj,true,ObjFoundSClass);
-  MatCol(1,255,"Description",0,Comment,false,0);
+  MatCol(1,150,"Name",0,VEName,false,0);
+  MatCol(1,h=-370,"Foundation",0,ExtraObj,true,ObjFoundSClass);
   MatCol(t=kInvoiceRowTypeStructuredItemComponent,30,"Item",0,ArtCode,false,INSClass);
   MatCol(t,100,"Person",0,EMCode,false,UserSClass);
-  MatCol(t,155,"Qty",0,Qty,true,0);
   MatCol(t,200,"Description",0,Comment,false,0);
+  MatCol(t=1,h+=60,"Description",0,Comment,false,0);
   Flip(1);
-  MatCol(t=1,-160,"Price",0,Price,true,0);
+  MatCol(t,-160,"Month Sum",0,MonthSum,true,0);
+  MatCol(t,-80,"Quart Sum",0,Price,true,0);
   //MatCol(t,-215,"%",0,Discount,true,0);
-  MatCol(t,-80,"Sum",0,Sum,true,0);
-
- 	//MatCol(t,-100,"Phase",0,PRStage,false,PRStageSClass);
+  //MatCol(t,-100,"Phase",0,PRStage,false,PRStageSClass);
   //MatCol(t,-50,"Sign",0,PRStageSign,false,UserSClass);
   MatCol(t=kInvoiceRowTypeStructuredItemComponent,-285,"Price",0,Price,true,0);
   MatCol(t,-215,"%",0,Discount,true,0);
   MatCol(t,-175,"Sum",0,Sum,true,0);
   MatCol(t,-100,"Phase",0,PRStage,false,PRStageSClass);
   MatCol(t,-50,"Sign",0,PRStageSign,false,UserSClass);
-  /*Flip(2);
-  MatCol(t=1,-235,"Markup",0,Markup,true,0);
+  Flip(2);
+  MatCol(t=1,-110,"Qty",0,Qty,true,0);
+  MatCol(t,-80,"Sum",0,Sum,true,0);
+  /*MatCol(t=1,-235,"Markup",0,Markup,true,0);
   MatCol(t,-180,"Cost",0,Cost,true,0);
   MatCol(t,-115,"GP",0,GP,true,0);
   MatCol(t,-50,"Inv. No.",0,Invoiced,true,0);
-//  MatColTL(1,-50,"Inv. No.",0,-1,0,-1,Invoiced,true,0);
+  //MatColTL(1,-50,"Inv. No.",0,-1,0,-1,Invoiced,true,0);
   MatCol(t=kInvoiceRowTypeStructuredItemComponent,-235,"Markup",0,Markup,true,0);
   MatCol(t,-180,"Cost",0,Cost,true,0);
   MatCol(t,-115,"GP",0,GP,true,0);
@@ -2161,7 +2159,7 @@ begin
   EndMatrix;
   vs = 22;
   v = 18; VTab(-35,v,-16,v+vs,ToolFlip,1,"A");
-  //v=v+ vs; VTab(-35,v,-16,v+vs,ToolFlip,2,"B");
+  v=v+ vs; VTab(-35,v,-16,v+vs,ToolFlip,2,"B");
   //v=v+ vs; VTab(-35,v,-16,v+vs,ToolFlip,3,"C");
   //v=v+ vs; VTab(-35,v,-16,v+vs,ToolFlip,4,"D");
   if (IsEnterprise) then begin
@@ -2251,12 +2249,13 @@ begin
   SpecialMenu("Purchase Orders by Vendors",'',1,"SeparatePOFromTBBUDsm"); //Edit***************************Sasha2,17:21 13.10.2014
   
   
-    SpecialMenu("Add Quartal I Line",'l',3,"HeaderLine1TBBUDsm");
-	SpecialMenu("Add Quartal II Line",'l',4,"HeaderLine2TBBUDsm");  
-	SpecialMenu("Add Quartal III Line",'l',5,"HeaderLine3TBBUDsm");
-	SpecialMenu("Add Quartal IV Line",'l',6,"HeaderLine4TBBUDsm");	
+    SpecialMenu("Add Quartal I Line",'1',3,"HeaderLine1TBBUDsm");
+	SpecialMenu("Add Quartal II Line",'2',4,"HeaderLine2TBBUDsm");  
+	SpecialMenu("Add Quartal III Line",'3',5,"HeaderLine3TBBUDsm");
+	SpecialMenu("Add Quartal IV Line",'4',6,"HeaderLine4TBBUDsm");	
 	
-	SpecialMenu("New budget version",'l',6,"CreateNewBudget");			//Edit----------------------Dima  13.07.2015		
+	SpecialMenu("New budget version",'n',7,"CreateNewBudget");			//Edit----------------------Dima  13.07.2015
+  SpecialMenu("Copy Quartal",'Q',7,"CopyQuartDsm");//Edit-------------------Vitalii 17:14 10.02.2016
 
   SpecMenuGroup("",kSpecMenuGroupTypeExtendedPlusMenu,0);
   if (HasModSL) then begin
@@ -4173,9 +4172,9 @@ window ContractsDClass:1		//Edit----------------------Dima  09.02.2016
 begin
   real h,h2,h3,h4,v,vs;
 
-h = 80;h2 = 220; h3 = 300; h4 = -170; vs = 25;
+  h = 80;h2 = 220; h3 = 300; h4 = -170; vs = 25;
   WindowBegin("Contract",ContractsDClass,CGview,-);
-  SetWRect(20,80,700,500);
+  SetWRect(20,80,700,200);
 	UseView(ContractsVc);
 	//Sizeable(-1,-1,0,0);
 
@@ -4184,16 +4183,17 @@ h = 80;h2 = 220; h3 = 300; h4 = -170; vs = 25;
 	EditField(h,v+=vs,100,"Supplier",Normal,VECode,false,ObjSuppSClass);
 	EditField(h2,v,270,"Name",Normal,VEName,false,0);
 
-  EditFieldTL(h,v=90,100,"Start Date",M4Date,Normal,0 ,StartDate,false,PasteCurDate);
-	//EditField(h,v=90,100,"Start Date",Normal,StartDate,false,PasteCurDate);
+	EditField(h,v+=30,400,"Description",Normal,Description,false,0);
+  //EditFieldTL(h,v+=30,100,"Start Date",M4Date,Normal,0 ,StartDate,false,PasteCurDate);
+	EditField(h,v+=30,100,"Start Date",Normal,StartDate,false,PasteCurDate);
 	EditField(h3,v,100,"Approval Date",Normal,SignDate,false,PasteCurDate);
 	EditField(h,v+=vs,100,"End Date",Normal,EndDate,false,PasteCurDate);
 	EditField(h3,v,100,"Close Date",Normal,CloseDate,false,PasteCurDate);
 	CheckBox(-100,v=90,0,"OK",OKFlag);
 	CheckBox(-100,v+=vs,0,"Closed",Closed);
 
-	EditField(h,v=200,400,"Description",Normal,Description,false,0);
-	EditField(h4,v=230,80,"Sum",Normal,TotalSum,false,0);
+  EditField(h,v+=50,40,"Currency",Normal,CurncyCode,false,CurncyCodeSClass);
+	EditField(h4+40,v,80,"Sum",Normal,TotalSum,false,0);
 
   
 	EndWindow;

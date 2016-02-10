@@ -1719,9 +1719,11 @@ begin
 	record CLCorspVc CLCorspr;
 	integer rwcnt,i;
 	string 255 tmp;
+  boolean chng;
 	
 	TBBUr.PRCode = "";
 	while (LoopMain(TBBUr,1,true)) begin
+    chng = false;
 		rwcnt = MatRowCnt(TBBUr);
 		for (i=0;i<rwcnt;i=i+1) begin
 			MatRowGet(TBBUr,i,TBBUrw);
@@ -1733,12 +1735,20 @@ begin
 			if nonblank(TBBUrw.VECode) then begin
 				CUr.Code = TBBUrw.VECode;
 				ReadFirstMain(CUr,1,true);
+        if blank(TBBUrw.VEName) then begin
+          TBBUrw.VEName = CUr.Name;
+          chng = true;
+        end;
 				tmp = tmp & CUr.VEObjects & ",";
 			end;
 			if nonblank(TBBUrw.ExtraObj) then begin
 				tmp = tmp & TBBUrw.ExtraObj;
 			end;
-			if TBBUrw.Objects != tmp then begin
+      if blank(TBBUrw.MonthSum) then begin
+        TBBUrw.MonthSum = TBBUrw.Price/3;
+        chng = true;
+      end;
+			if (TBBUrw.Objects!=tmp) or chng then begin
 				logtext(0,TBBUr.PRCode & " " & i & " - " & TBBUrw.Objects & " - (new)" & tmp);
 				TBBUrw.Objects = tmp;
 				MatRowPut(TBBUr,i,TBBUrw);

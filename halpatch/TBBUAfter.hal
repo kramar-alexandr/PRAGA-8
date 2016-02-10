@@ -195,17 +195,40 @@ end;
  
 function Boolean TBBUDClassArtCodeEFAfter(Integer wn,Integer fn,Integer rownr,Integer changedf)
 begin  
-  record TBBUVc TBBUr;  
+  record TBBUVc TBBUr;
+  row TBBUVc TBBUrw;
   record GeneralOptionBlock GOb;
   string 255 inmsg;
 
   if (changedf!=0) then begin
     GetWindowRecord(wn,TBBUr);
     if (TBBUVc_PasteArtCode(TBBUr,rownr,inmsg)) then begin
-      BlockLoad(GOb);
-      TBBUDchrsum(TBBUr,rownr,true,GOb.UseDiscount);
-      TBBUSumup(TBBUr);
-      PutWindowRecord(wn,TBBUr);
+      MatRowGet(TBBUr,rownr,TBBUrw);
+      if (nonblank(TBBUrw.ArtCode)) then begin //Edit-------------------Vitalii 16:26 10.02.2016
+        TBBUrw.Qty = 1;
+        if (nonblank(TBBUrw.Price)) then begin
+          TBBUrw.MonthSum = TBBUrw.Price/3;
+          TBBUrw.Sum = TBBUrw.Price*TBBUrw.Qty;
+        end else begin
+          if (nonblank(TBBUrw.MonthSum)) then begin
+            TBBUrw.Price = TBBUrw.MonthSum*3;
+            TBBUrw.Sum = TBBUrw.Price*TBBUrw.Qty;
+          end else begin
+            if (nonblank(TBBUrw.Sum)) then begin
+              TBBUrw.Price = TBBUrw.Sum/TBBUrw.Qty;
+              TBBUrw.MonthSum = TBBUrw.Price/3;
+            end;
+          end;
+        end;
+        
+        MatRowPut(TBBUr,rownr,TBBUrw);
+        if (TBBUVc_PasteQty(TBBUr,rownr)) then begin
+          BlockLoad(GOb);
+          TBBUDchrsum(TBBUr,rownr,true,GOb.UseDiscount);
+          TBBUSumup(TBBUr);
+          PutWindowRecord(wn,TBBUr);
+        end;
+      end;
       if (nonblank(inmsg)) then begin
         MessageBox(0,inmsg);
       end;
@@ -258,12 +281,42 @@ begin
     MatRowGet(TBBUr,rownr,TBBUrw);
 
     if ((nonblank(TBBUrw.ArtCode)) or (nonblank(TBBUrw.TimeClass))) then begin
+      TBBUrw.MonthSum = TBBUrw.Price/3;
+      TBBUrw.Sum = TBBUrw.MonthSum*TBBUrw.Qty;
+      MatRowPut(TBBUr,rownr,TBBUrw);
       TBBUDchrsum(TBBUr,rownr,true,GenOptRec.UseDiscount);
       TBBUSumup(TBBUr);
       PutWindowRecord(wn,TBBUr);          
     end;
   end;  
   TBBUDClassPriceEFAfter = true;
+  return;
+end;
+
+function Boolean TBBUDClassMonthSumEFAfter(Integer wn,Integer fn,Integer rownr,Integer changedf)
+begin  
+  record INVc INr;
+  record TBBUVc TBBUr;  
+  row TBBUVc TBBUrw;
+  string 255 tstr;
+  val price,reb,v;
+  record GeneralOptionBlock GenOptRec;
+
+  if (changedf!=0) then begin
+    BlockLoad(GenOptRec);
+    GetWindowRecord(wn,TBBUr);
+    MatRowGet(TBBUr,rownr,TBBUrw);
+
+    if ((nonblank(TBBUrw.ArtCode)) or (nonblank(TBBUrw.TimeClass))) then begin
+      TBBUrw.Price = TBBUrw.MonthSum*3;
+      TBBUrw.Sum = TBBUrw.Price*TBBUrw.Qty;
+      MatRowPut(TBBUr,rownr,TBBUrw);
+      TBBUDchrsum(TBBUr,rownr,true,GenOptRec.UseDiscount);
+      TBBUSumup(TBBUr);
+      PutWindowRecord(wn,TBBUr);          
+    end;
+  end;  
+  TBBUDClassMonthSumEFAfter = true;
   return;
 end;
 
@@ -302,6 +355,29 @@ begin
   return;
 end;
 
+function Boolean TBBUDClassVECodeEFAfter(Integer wn,Integer rownr,Boolean changedf)
+begin  
+  record CUVc CUr;
+  record TBBUVc TBBUr;  
+  row TBBUVc TBBUrw;
+  
+  if (changedf) then begin
+    GetWindowRecord(wn,TBBUr);
+    MatRowGet(TBBUr,rownr,TBBUrw);
+  
+    if nonblank(TBBUrw.VECode) then begin  
+      CUr.Code = TBBUrw.VECode;
+      ReadFirstMain(CUr,1,true);
+      TBBUrw.VEName = CUr.Name;
+      MatRowPut(TBBUr,rownr,TBBUrw);
+      PutWindowRecord(wn,TBBUr);          
+    end;
+
+  end;  
+  TBBUDClassVECodeEFAfter = true;
+  return;
+end;
+
 global
 function Boolean TBBUDClassAfterEditField(Integer wn,string fieldname,Integer fn, Integer rownr,Integer changed)
 BEGIN
@@ -322,6 +398,8 @@ BEGIN
     case "SalesMan": res = TBBUDClassSalesManEFAfter(wn,rownr,changed!=0);
     case "CurncyCode": res = TBBUDClassCurncyCodeEFAfter(wn,changed!=0);
     case "TransDate": res = TBBUDClassCurncyCodeEFAfter(wn,changed!=0);
+    case "VECode": res = TBBUDClassVECodeEFAfter(wn,rownr,changed!=0);
+    case "MonthSum": res = TBBUDClassMonthSumEFAfter(wn,fn,rownr,changed);
   end;
   TBBUDClassAfterEditField = res;
   RETURN;

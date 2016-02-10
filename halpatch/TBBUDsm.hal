@@ -85,3 +85,43 @@ BEGIN
   AddTBBULineType18(4,false);
   RETURN;
 END;
+
+global updating procedure CopyQuartDsm()
+begin
+  record TBBUVc TBBUr;
+  row  TBBUVc TBBUrw;
+  Integer wn,rownr;
+  boolean testf;
+  
+  wn = CurWindow;
+  DeselectWindow(wn,false);
+  GetWindowRecord(wn,TBBUr);
+  rownr = GetWindowCurRow(wn);
+  if rownr<0 then begin
+    messagebox(0,"Select quartal in matrix first!");
+  end else begin
+    MatRowGet(TBBUr,rownr,TBBUrw);
+    if TBBUrw.stp!=18 then begin
+      messagebox(0,"Select quartal first!");
+    end else begin
+      if TBBUrw.ItemType==4 then begin
+        messagebox(0,"You can not copy last quartal!");
+      end else begin
+        testf = true;
+        while (testf) begin
+          rownr = rownr + 1;
+          MatRowGet(TBBUr,rownr,TBBUrw);
+          if TBBUrw.stp==18 then begin testf = false; end;
+          if testf then begin
+            MatRowPut(TBBUr,MatRowCnt(TBBUr),TBBUrw);
+          end;
+        end;
+        PutWindowRecord(wn,TBBUr);
+      end;
+    end;
+  end;
+  
+  
+  
+  //WindowDoOK(wn,0);
+end;
