@@ -46,6 +46,7 @@ procedure ExcelVIRn(record VIVc VIr,var area areatofile)
 BEGIN
 	integer i;
 	string 100 tstr;
+  string 50 ConrNumber,ConrNumberRus;
   record ContractsVc Conr;
   record CUVc CUr;
 	
@@ -61,6 +62,10 @@ BEGIN
 	
   Conr.VECode = VIr.VECode;
   ReadFirstKey("VECode",Conr,1,true);
+  if nonblank(Conr.Number) then begin
+    ConrNumber = "No. " & Conr.Number;
+    ConrNumberRus = "Ь " & Conr.Number;
+  end;
   CUr.Code = VIr.VECode;
   ReadFirstMain(CUr,1,true);
   
@@ -125,9 +130,9 @@ BEGIN
     BeginRow(sheetnum,fileToSave,rownum,0,11.25);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,11.25);
-      colnum = 3;
-      style = 4;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Reg. No.: 09888704",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      //colnum = 3;
+      //style = 4;
+      //StringCell(sheetnum,fileToSave,colnum,rownum,style,"Reg. No.: 09888704",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,25.5);
     EndRow(sheetnum,fileToSave,rownum);
@@ -146,12 +151,12 @@ BEGIN
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
       style = 1;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Services under Services Contract No. " & Conr.Number & " of " & Conr.StartDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Services under Services Contract " & ConrNumber & " of " & Conr.StartDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
       style = 7;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"performed during " & MonthName(CurrentDate) & " " & GetYear(CurrentDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"performed during " & MonthName(VIr.InvDate) & " " & GetYear(VIr.InvDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       colnum = 8;
       style = 1;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,VIr.CurncyCode & " " & VIr.PayVal,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -166,12 +171,12 @@ BEGIN
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
       style = 1;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Ь " & Conr.Number & " от " & Conr.StartDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,ConrNumberRus & " от " & Conr.StartDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
       style = 6;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"за " & MonthNameRus(CurrentDate) & " " & GetYear(CurrentDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"за " & MonthNameRus(VIr.InvDate) & " " & GetYear(VIr.InvDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,66);
     EndRow(sheetnum,fileToSave,rownum);
@@ -263,7 +268,7 @@ BEGIN
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
       style = 3;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"by " & VIr.VEName & " during " & MonthName(CurrentDate) & " " & GetYear(CurrentDate) & " under Service Contract No. " & Conr.Number & " of " & Conr.StartDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"by " & VIr.VEName & " during " & MonthName(VIr.InvDate) & " " & GetYear(VIr.InvDate) & " under Service Contract " & ConrNumber & " of " & Conr.StartDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
   EndSheetData(sheetnum,fileToSave);
   MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);

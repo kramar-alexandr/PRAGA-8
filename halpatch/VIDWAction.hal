@@ -1542,7 +1542,6 @@ BEGIN
       delete_file(filename);
     end;
     writeareatofile(fileToSave,filename,0);
-    CloseWindow(wn);
     Messagebox(0,"Done!");
   end;
   

@@ -339,7 +339,7 @@ BEGIN
 	path = PathCorrection(pathToXLSX);
 	AddTextToArea("<row r=" & Chr(34) & RowNum & Chr(34),tempArea);
 	if (height <> blankval) then begin
-		AddTextToArea(" ht=" & Chr(34) & height & Chr(34) & " customHeight=" & Chr(34) & "1" & Chr(34),tempArea);
+  	AddTextToArea(" ht=" & Chr(34) & ValToString(height,M4Val,"",".",0) & Chr(34) & " customHeight=" & Chr(34) & "1" & Chr(34),tempArea);
 	end;
 	if (outlineLevel!=0) then begin
 		AddTextToArea(" hidden=" & Chr(34) & "1" & Chr(34) & " outlineLevel=" & Chr(34) & outlineLevel & Chr(34),tempArea);
