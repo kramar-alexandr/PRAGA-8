@@ -154,7 +154,7 @@ BEGIN
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"performed during " & MonthName(CurrentDate) & " " & GetYear(CurrentDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       colnum = 8;
       style = 1;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"USD " & VIr.PayVal,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,VIr.CurncyCode & " " & VIr.PayVal,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,24);
     EndRow(sheetnum,fileToSave,rownum);
@@ -187,7 +187,7 @@ BEGIN
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"Invoice Total/Итого",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       colnum = 8;
       style = 1;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"USD " & VIr.PayVal,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,VIr.CurncyCode & " " & VIr.PayVal,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 7;
