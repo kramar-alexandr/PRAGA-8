@@ -121,7 +121,5 @@ begin
     end;
   end;
   
-  
-  
   //WindowDoOK(wn,0);
 end;

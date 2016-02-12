@@ -1,5 +1,10 @@
 external function string 60 AddObjectToObjectList(string,string);
 external procedure GetObjs(string,string,var string);//Edit---------------Vitalii 15:20 10.08.2015
+external function integer GetQuartal(date);
+external function Boolean VIVc_PasteVECode(var record VIVc,Integer,Boolean,Boolean,var string);
+external function boolean OTCodeMatch(string,string);
+external procedure NormalizeObjstr(var string);
+external procedure NoDupObjs(string,var string);
 
 global
 procedure GetPayModeAccNumber(string paymode,var string res)
@@ -1760,7 +1765,7 @@ begin
 return;
 end;
 
-global 
+global
 updating procedure FixSuppliersMn(record RcVc RepSpec)
 begin
 	record CUVc CUr;
@@ -1799,5 +1804,148 @@ begin
 		end;
 	end;
 
+return;
+end;
+
+global
+updating procedure CreateVIfromTBBUMn(record RcVc RepSpec)
+begin
+	record TBBUVc TBBUr;
+  row TBBUVc TBBUrw;
+  record VIVc VIr,VI2r;
+  row VIVc VIrw;
+  record INVc INr;
+  record PRVc PRr;
+  Integer quart,rwcnt,i,j,AAi,PAi,SAi,FAi,CAi;
+  array string 20 ArtArr,ProjArr,SupplArr,FoundArr,CurArr;
+  vector boolean ArtInArr,ProjInArr,SupplInArr,FoundInArr,CurInArr;
+  vector val VIVect;
+  vector string 255 CommentVect;
+  string 255 vewarn,objstr;
+  
+  if blank(RepSpec.d1) then begin
+    RepSpec.d1 = CurrentDate;
+  end;
+  quart = GetQuartal(RepSpec.d1);
+  TBBUr.PRCode = "";
+	while (LoopMain(TBBUr,1,true)) begin
+    PRr.Code = TBBUr.PRCode;
+    ReadFirstMain(PRr,1,true);
+    if (GetYear(PRr.StartDate)==GetYear(RepSpec.d1)) then begin
+      rwcnt = MatRowCnt(TBBUr);
+      for (i=0;i<rwcnt;i=i+1) begin
+        MatRowGet(TBBUr,i,TBBUrw);
+        if (TBBUrw.stp==18) and (TBBUrw.ItemType==quart) then begin
+          for (j=i+1;j<rwcnt;j=j+1) begin
+            MatRowGet(TBBUr,j,TBBUrw);
+            if (TBBUrw.stp==1) then begin
+              if nonblank(TBBUrw.VECode) then begin
+                if !SupplInArr[TBBUrw.VECode] then begin
+                  SupplInArr[TBBUrw.VECode] = true;
+                  SupplArr[SAi] = TBBUrw.VECode;
+                  CommentVect[TBBUrw.VECode] = TBBUrw.VEName;
+                end;
+                SAi = SAi + 1;
+                if !CurInArr[TBBUr.CurncyCode] then begin
+                  CurInArr[TBBUr.CurncyCode] = true;
+                  CurArr[CAi] = TBBUr.CurncyCode;
+                  CAi = CAi + 1;
+                end;
+                if !ArtInArr[TBBUrw.ArtCode] then begin
+                  ArtInArr[TBBUrw.ArtCode] = true;
+                  ArtArr[AAi] = TBBUrw.ArtCode;
+                  CommentVect[TBBUrw.ArtCode] = TBBUrw.Comment;
+                  AAi = AAi + 1;
+                end;
+                if !ProjInArr[TBBUr.PRCode] then begin
+                  ProjInArr[TBBUr.PRCode] = true;
+                  ProjArr[PAi] = TBBUr.PRCode;
+                  PAi = PAi + 1;
+                end;
+                if !FoundInArr[TBBUrw.ExtraObj] then begin
+                  FoundInArr[TBBUrw.ExtraObj] = true;
+                  FoundArr[FAi] = TBBUrw.ExtraObj;
+                  FAi = FAi + 1;
+                end;
+                VIVect[TBBUrw.VECode & ":" & TBBUr.CurncyCode & ":" & TBBUrw.ArtCode & ":" & TBBUr.PRCode & ":" & TBBUrw.ExtraObj] = VIVect[TBBUrw.VECode & ":" & TBBUrw.ArtCode & ":" & TBBUr.PRCode & ":" & TBBUrw.ExtraObj] + TBBUrw.MonthSum;
+              end;
+            end else begin
+              i = rwcnt;
+              j = i;
+            end;
+          end;
+        end;
+      end;
+    end;
+  end;
+  for (SAi=0;SAi<SupplArr.length;SAi=SAi+1) begin
+    for (CAi=0;CAi<CurArr.length;CAi=CAi+1) begin
+      RecordNew(VIr);
+      VIr.SerNr = NextSerNr("VIVc",VIr.TransDate,-1,false,"");
+      VIr.InvDate = RepSpec.d1;
+      VIr.TransDate = RepSpec.d1;
+      VIr.DueDate = RepSpec.d1;
+      VIr.VECode = SupplArr[SAi];
+      VIr.VEName = CommentVect[VIr.VECode];
+      VIVc_PasteVECode(VIr,Rs_normal,true,true,vewarn);
+      MatRowDelete(VIr,0);
+      VIr.PayDeal = "0";
+      VIr.CurncyCode = CurArr[CAi];
+      for (AAi=0;AAi<ArtArr.length;AAi=AAi+1) begin
+        for (PAi=0;PAi<ProjArr.length;PAi=PAi+1) begin
+          for (FAi=0;FAi<FoundArr.length;FAi=FAi+1) begin
+            if (VIVect[SupplArr[SAi] & ":" & CurArr[CAi] & ":" & ArtArr[AAi] & ":" & ProjArr[PAi] & ":" & FoundArr[FAi]]!=blankval) then begin
+              VIrw.stp = kInvoiceRowTypeNormal;
+              VIrw.Item = ArtArr[AAi];
+              if OTCodeMatch(ArtArr[AAi],"EXP") then begin
+                VIrw.Exp = ArtArr[AAi];
+              end;
+              PRr.Code = ProjArr[PAi];
+              ReadFirstMain(PRr,1,true);
+              GetObjs("PRJ",PRr.Objects,VIrw.Prj);
+              VIrw.PRCode = ProjArr[PAi];
+              VIrw.Supp = SupplArr[SAi];
+              VIrw.Found = FoundArr[FAi];
+              VIrw.SupName = CommentVect[SupplArr[SAi]];
+              VIrw.Comment = CommentVect[ArtArr[AAi]];
+              INr.Code = VIrw.Item;
+              ReadFirstMain(INr,1,true);
+              if (nonblank(INr.CostAcc)) then begin
+                VIrw.AccNumber = INr.CostAcc;
+              end;
+              VIrw.Sum = VIVect[SupplArr[SAi] & ":" & CurArr[CAi] & ":" & ArtArr[AAi] & ":" & ProjArr[PAi] & ":" & FoundArr[FAi]];
+              VIrw.qty = 1;
+              objstr = "";
+              if(nonblank(VIrw.Prj))then begin
+              	objstr = objstr & "," & VIrw.Prj;
+              end;
+              if(nonblank(VIrw.Loc))then begin
+              	objstr = objstr & "," & VIrw.Loc;
+              end;
+              if(nonblank(VIrw.Exp))then begin
+              	objstr = objstr & "," & VIrw.Exp;
+              end;
+              if(nonblank(VIrw.Supp))then begin
+              	objstr = objstr & "," & VIrw.Supp;
+              end;
+              if(nonblank(VIrw.Found))then begin
+              	objstr = objstr & "," & VIrw.Found;
+              end;
+              NoDupObjs(objstr,objstr);
+              NormalizeObjstr(objstr);
+              VIrw.Objects = objstr;
+              MatRowPut(VIr,MatRowCnt(VIr),VIrw);
+              VIr.PayVal = VIr.PayVal + VIrw.Sum;
+              ClearRow(VIr,VIrw,VIrw.stp);
+            end;
+          end;
+        end;
+      end;
+      if (MatRowCnt(VIr)!=0) then begin
+        RecordStore(VIr,true);
+      end;
+    end;
+  end;
+  
 return;
 end;
