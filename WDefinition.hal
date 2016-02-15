@@ -4018,9 +4018,9 @@ begin
   EditField(h,v+=30,400,"Description RUS",Normal,DescriptionRus,false,0);
   //EditFieldTL(h,v+=30,100,"Start Date",M4Date,Normal,0 ,StartDate,false,PasteCurDate);
 	EditField(h,v+=30,100,"Start Date",Normal,StartDate,false,PasteCurDate);
-	EditField(h+80,v,100,"Approval Date",Normal,SignDate,false,PasteCurDate);
+	EditField(h+220,v,100,"Approval Date",Normal,SignDate,false,PasteCurDate);
 	EditField(h,v+=vs,100,"End Date",Normal,EndDate,false,PasteCurDate);
-	EditField(h+80,v,100,"Close Date",Normal,CloseDate,false,PasteCurDate);
+	EditField(h+220,v,100,"Close Date",Normal,CloseDate,false,PasteCurDate);
 	CheckBox(-100,v=90,0,"OK",OKFlag);
 	CheckBox(-100,v+=vs,0,"Closed",Closed);
 

@@ -8,7 +8,7 @@ BEGIN
 
 	res = inner.CLCorspVcRecordCheck(CLCorspr,CLCorsp2r,stat,long4); 
 	
-	if (res==0)  then begin 
+  if (res==0)  then begin 
 		Objr.Code = CLCorspr.Code;
 		if(ReadFirstMain(Objr,1,true)) then begin
 			if (Objr.OTCode!="EXP") then begin
@@ -19,13 +19,13 @@ BEGIN
 			Objr.Comment = CLCorspr.Comment;
 			Objr.OTCode = "EXP";
 			RecordStore(Objr,true);
-		end else begin
+  	end else begin
 			RecordNew(OBjr);
 			Objr.Code = CLCorspr.Code;
 			Objr.Comment = CLCorspr.Comment;
 			Objr.OTCode = "EXP";
 			RecordStore(Objr,true);
-		end;
+  	end;
     CLCorspr.Objects = Objr.Code;
 		
 		INr.Code = CLCorspr.Code;
@@ -57,68 +57,3 @@ LCLCorspVcRecordCheck:;
 	CLCorspVcRecordCheck = res;
 	RETURN;
 END;
-
-/*global
-updating function LongInt CLCorspVcRecordSave(var record CLCorspVc CLCorspr,record CLCorspVc CLCorsp2r,LongInt stat,LongInt long4)
-BEGIN
-	LongInt res;
-	record INVc INr;
-	record ITVc ITr;
-	record ObjVc Objr;
-    
-	
-	Objr.Code = CLCorspr.Code;
-	if(!ReadFirstMain(Objr,1,true)) then begin
-		
-	end else begin
-		
-	end;
-  CLCorspVcRecordSave = res; 
-  RETURN;
-END;
-
-global
-updating function LongInt CLCorspVcRecordUpdate(var record CLCorspVc CLCorspr,record CLCorspVc CLCorsp2r,LongInt stat,LongInt long4)
-BEGIN
-	LongInt res;
-	record INVc INr;
-	record ITVc ITr;
-	record ObjVc Objr;
-    
-	INr.Code = CLCorspr.Code;
-	if (!ReadFirstMain(INr,1,true)) then begin
-		RecordNew(INr);
-		INr.Code = CLCorspr.Code;
-		INr.ItemType = kItemTypeService;
-		INr.Name = CLCorspr.Comment;
-		INr.Objects = CLCorspr.Objects;
-		ITr.Code = CLCorspr.Code;
-		ReadLastMain(ITr,1,false);
-		INr.Group = ITr.Code;
-		INr.CostAcc = CLCorspr.AccNumber;
-		RecordStore(INr,true);
-	end else begin
-		INr.ItemType = kItemTypeService;
-		INr.Name = CLCorspr.Comment;
-		INr.Objects = CLCorspr.Objects;
-		ITr.Code = CLCorspr.Code;
-		ReadLastMain(ITr,1,false);
-		INr.Group = ITr.Code;
-		INr.CostAcc = CLCorspr.AccNumber;
-		RecordStore(INr,true);
-	end;
-	Objr.Code = CLCorspr.Code;
-	if(!ReadFirstMain(Objr,1,true)) then begin
-		RecordNew(OBjr);
-		Objr.Code = CLCorspr.Code;
-		Objr.Comment = CLCorspr.Comment;
-		Objr.OTCode = "EXP";
-		RecordStore(Objr,true);
-	end else begin
-		Objr.Comment = CLCorspr.Comment;
-		Objr.OTCode = "EXP";
-		RecordStore(Objr,true);
-	end;
-  CLCorspVcRecordUpdate = res; 
-  RETURN;
-END;*/
