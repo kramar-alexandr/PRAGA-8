@@ -1823,15 +1823,20 @@ begin
   vector string 255 CommentVect;
   string 255 vewarn,objstr;
   
+  if RepSpec.flags[1]==0 then begin
+    RepSpec.d2 = CurrentDate;
+  end else begin
+    RepSpec.d2 = AddMonth(CurrentDate,-1);
+  end;
   if blank(RepSpec.d1) then begin
     RepSpec.d1 = CurrentDate;
   end;
-  quart = GetQuartal(RepSpec.d1);
+  quart = GetQuartal(RepSpec.d2);
   TBBUr.PRCode = "";
 	while (LoopMain(TBBUr,1,true)) begin
     PRr.Code = TBBUr.PRCode;
     ReadFirstMain(PRr,1,true);
-    if (GetYear(PRr.StartDate)==GetYear(RepSpec.d1)) then begin
+    if (GetYear(PRr.StartDate)==GetYear(RepSpec.d2)) then begin
       rwcnt = MatRowCnt(TBBUr);
       for (i=0;i<rwcnt;i=i+1) begin
         MatRowGet(TBBUr,i,TBBUrw);

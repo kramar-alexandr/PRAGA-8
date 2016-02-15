@@ -4574,9 +4574,11 @@ begin
   real h,v,vs;
   WindowBegin("Create Purchase Invoices from Project Budgets for month",CreateVIfromTBBUVClass,CGMnt,RcType);
   SetWRect(20,80,400,240);
-  vs = 20;h = 130; v = 10;
+  vs = 20;h = 150; v = 10;
   EditFieldTL(h,v,120,"Date for new Invoices",M4Date,Normal,0,d1,false,PasteCurDate);
-  //EditField(h,v+=vs,120,"Project",Normal,f1,false,PRSClass);
+  ButtonFrame(h=37,v+=40,120,2,"Select month for new Invoices");
+  RadioButton(h,v,0,0,"Current",flags[1]);
+  RadioButton(h,v+=16,1,255,"Previous",flags[1]);
   
   EndWindow;
 end;
