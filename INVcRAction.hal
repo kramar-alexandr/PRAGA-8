@@ -11,6 +11,20 @@ BEGIN
 	if (res==0)  then begin 
 		CLCorspr.Code = INr.Code;
 		if (!ReadFirstMain(CLCorspr,1,true)) then begin
+			RecordCheckError(31008,"",-1,"Code");
+      res = -1;
+      goto LINVcRecordCheck;
+		end;
+		Objr.Code = INr.Code;
+		if(ReadFirstMain(Objr,1,true)) then begin
+			Objr.Comment = INr.Name;
+			Objr.OTCode = "EXP";
+			RecordStore(Objr,true);
+      INr.Objects = Objr.Code;
+		end;
+/*
+		CLCorspr.Code = INr.Code;
+		if (!ReadFirstMain(CLCorspr,1,true)) then begin
 			RecordNew(CLCorspr);
 			CLCorspr.Code = INr.Code;
 			CLCorspr.Comment = INr.Name;
@@ -36,6 +50,7 @@ BEGIN
 			RecordStore(Objr,true);
 		end;
 		INr.Objects = Objr.Code;
+*/
 	end;
   
  

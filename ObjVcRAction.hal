@@ -11,19 +11,43 @@ BEGIN
 	res = inner.ObjVcRecordCheck(Objr,Obj2r,stat,long4); 
 	switch (Objr.OTCode) begin
 		case "EXP":
+			CLCorspr.Code = Objr.Code;
+			if (!ReadFirstMain(CLCorspr,1,true)) then begin
+				RecordCheckError(31006,"",-1,"Code");
+				res = -1;
+				goto LObjVcRecordCheck;
+			end;
+			INr.Code = Objr.Code;
+			if (!ReadFirstMain(INr,1,true)) then begin
+				RecordCheckError(31006,"",-1,"Code");      
+				res = -1;
+				goto LObjVcRecordCheck;
+			end;
+		case "SUPPL":
+			CUr.Code = Objr.Code;
+			if (!ReadFirstMain(CUr,1,true)) then begin
+				RecordCheckError(31005,"",-1,"Code");      
+				res = -1;
+				goto LObjVcRecordCheck;
+			end;
+		case "PRJ":;
+	end;
+/*
+  switch (Objr.OTCode) begin
+		case "EXP":
 			INr.Code = Objr.Code;
 			if (!ReadFirstMain(INr,1,true)) then begin
 				RecordCheckError(31006,"",-1,"Code");      
 				res = -1;
 				goto LObjVcRecordCheck;
 			end else begin
-				/*INr.ItemType = kItemTypeService;
+        INr.ItemType = kItemTypeService;
 				INr.Name = Objr.Comment;
 				INr.Objects = Objr.Code;
 				ITr.Code = Objr.Code;
 				ReadLastMain(ITr,1,false);
 				INr.Group = ITr.Code;
-				RecordStore(INr,true);*/// Edit ************************** Friday, 29 January 2016 11:07:40
+				RecordStore(INr,true);
 			end;
 			CLCorspr.Code = Objr.Code;
 			if (!ReadFirstMain(CLCorspr,1,true)) then begin
@@ -31,9 +55,9 @@ BEGIN
 				res = -1;
 				goto LObjVcRecordCheck;
 			end else begin
-				/*CLCorspr.Comment = Objr.Comment;
+        CLCorspr.Comment = Objr.Comment;
 				CLCorspr.Objects = Objr.Code;
-				RecordStore(CLCorspr,true);*/// Edit ************************** Friday, 29 January 2016 11:07:53
+				RecordStore(CLCorspr,true);
 			end;
 		case "SUPPL":
 			CUr.Code = Objr.Code;
@@ -42,17 +66,18 @@ BEGIN
 				res = -1;
 				goto LObjVcRecordCheck;
 			end else begin
-				/*CUr.Name = Objr.Comment;
-				RecordStore(CUr,true);*/
+        CUr.Name = Objr.Comment;
+				RecordStore(CUr,true);
 			end;
 		case "PRJ":
-			/*PRr.Objects = Objr.Code;
+      PRr.Objects = Objr.Code;
 			PRr.MotherCode = "";
 			if (ReadFirstKey("Objects",PRr,2,true)) then begin
 				PRr.Name = Objr.Comment;
 				RecordStore(PRr,true);
-			end;*/
+			end;
 	end;
+*/  
 LObjVcRecordCheck:;	
 	ObjVcRecordCheck = res; 
 	RETURN;

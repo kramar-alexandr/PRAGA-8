@@ -16,20 +16,19 @@ BEGIN
 				res = -1;
 				goto LCLCorspVcRecordCheck;
 			end;
-			CLCorspr.Objects = Objr.Code;
-			/*Objr.Comment = CLCorspr.Comment;
+			Objr.Comment = CLCorspr.Comment;
 			Objr.OTCode = "EXP";
-			RecordStore(Objr,true);*/// Edit ************************** Friday, 29 January 2016 11:05:23
+			RecordStore(Objr,true);
 		end else begin
-			
-			/*RecordNew(OBjr);
+			RecordNew(OBjr);
 			Objr.Code = CLCorspr.Code;
 			Objr.Comment = CLCorspr.Comment;
 			Objr.OTCode = "EXP";
-			RecordStore(Objr,true);*/// Edit ************************** Friday, 29 January 2016 11:05:22
+			RecordStore(Objr,true);
 		end;
+    CLCorspr.Objects = Objr.Code;
 		
-		/*INr.Code = CLCorspr.Code;
+		INr.Code = CLCorspr.Code;
 		if (!ReadFirstMain(INr,1,true)) then begin
 			RecordNew(INr);
 			INr.Code = CLCorspr.Code;
@@ -50,7 +49,7 @@ BEGIN
 			INr.Group = ITr.Code;
 			INr.CostAcc = CLCorspr.AccNumber;
 			RecordStore(INr,true);
-		end;*/
+		end;
 	end;
   
  
