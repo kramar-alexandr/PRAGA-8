@@ -3469,13 +3469,13 @@ begin
       	
         //MatCol(t,90,"Objects",0,Objects,false,ObjSClass);
         MatCol(t,90,"Project",0,Prj,false,ObjPrjSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:18
-        MatCol(t,150,"Expences",0,Exp,false,ObjExpSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
-        MatCol(t,210,"Supplier",0,Supp,false,ObjSuppSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
-		MatCol(t,270,"Foundation",0,Found,false,ObjFoundSClass);//Edit---------------Vitalii 14:15 04.08.2015
-        MatCol(t,330,"Location",0,Loc,false,ObjLocSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
+        MatCol(t,170,"Expences",0,Exp,false,ObjExpSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
+        MatCol(t,230,"Supplier",0,Supp,false,ObjSuppSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
+		MatCol(t,290,"Foundation",0,Found,false,ObjFoundSClass);//Edit---------------Vitalii 14:15 04.08.2015
+        MatCol(t,350,"Location",0,Loc,false,ObjLocSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
       end;
-      MatCol(t,380,"Suppl. Name",0,SupName,false,0);
-      MatCol(t,520,"Description",0,Comment,false,0);
+      MatCol(t,400,"Suppl. Name",0,SupName,false,0);
+      MatCol(t,540,"Description",0,Comment,false,0);
       MatCol(t,-80,"Amount",0,Sum,true,0);// Edit ************************** Wednesday, 15 July 2015 10:15:50
       /*if (CYb.UseTaxTemplatesforTaxCalc!=0) then begin
         MatCol(t,-30,"T-Cd",0,TaxTemplateCode,false,TaxTemplateSClass);
@@ -3981,13 +3981,14 @@ begin
   RecordList(4,17,-21,-39);
 
   RlColKey(4,4,"Code",SerNr,false,MainKey);
-  RlColKey(79,79,"Supplier",VECode,false,VECode);
-  RlColKey(160,160,"Number",Number,false,Number);
-	RlCol(250,250,"StartDate",StartDate,true);
-	RlCol(320,320,"EndDate",EndDate,true);
-	RlColKey(370,370,"OK",OKFlag,false,OKFlag);
-	RlColKey(410,410,"Approved",SignDate,false,SignDate);
-	RlColKey(500,500,"Description",Description,false,Description);
+  RlColKey(70,70,"Supplier",VECode,false,VECode);
+  RlColKey(120,120,"Name",VEName,false,VEName);
+  RlColKey(-420,-420,"Number",Number,false,Number);
+	RlCol(-340,-340,"StartDate",StartDate,false);
+	RlCol(-270,-270,"EndDate",EndDate,false);
+	RlColKey(-200,-200,"OK",OKFlag,false,OKFlag);
+	RlColKey(-170,-170,"Approved",SignDate,false,SignDate);
+	//RlColKey(500,500,"Description",Description,false,Description);
 	RlColKey(-100,100,"Sum",TotalSum,false,TotalSum);
 
   SearchField("Search");
@@ -4000,28 +4001,31 @@ window ContractsDClass:1		//Edit----------------------Dima  09.02.2016
 begin
   real h,h2,h3,h4,v,vs;
 
-  h = 80;h2 = 220; h3 = 300; h4 = -170; vs = 25;
+  h = 100;
+  h2 = -170;
+  vs = 25;
   WindowBegin("Contract",ContractsDClass,CGview,-);
   SetWRect(20,80,700,200);
 	UseView(ContractsVc);
 	//Sizeable(-1,-1,0,0);
 
 	EditField(h,v=6,100,"Code",Normal,SerNr,false,0);
-	EditField(h4,v,150,"Contract Number",Normal,Number,false,0);
+	EditField(h2,v,150,"Contract Number",Normal,Number,false,0);
 	EditField(h,v+=vs,100,"Supplier",Normal,VECode,false,ObjSuppSClass);
-	EditField(h2,v,270,"Name",Normal,VEName,false,0);
+	EditField(h+140,v,260,"Name",Normal,VEName,false,0);
 
 	EditField(h,v+=30,400,"Description",Normal,Description,false,0);
+  EditField(h,v+=30,400,"Description RUS",Normal,DescriptionRus,false,0);
   //EditFieldTL(h,v+=30,100,"Start Date",M4Date,Normal,0 ,StartDate,false,PasteCurDate);
 	EditField(h,v+=30,100,"Start Date",Normal,StartDate,false,PasteCurDate);
-	EditField(h3,v,100,"Approval Date",Normal,SignDate,false,PasteCurDate);
+	EditField(h+80,v,100,"Approval Date",Normal,SignDate,false,PasteCurDate);
 	EditField(h,v+=vs,100,"End Date",Normal,EndDate,false,PasteCurDate);
-	EditField(h3,v,100,"Close Date",Normal,CloseDate,false,PasteCurDate);
+	EditField(h+80,v,100,"Close Date",Normal,CloseDate,false,PasteCurDate);
 	CheckBox(-100,v=90,0,"OK",OKFlag);
 	CheckBox(-100,v+=vs,0,"Closed",Closed);
 
   EditField(h,v+=50,40,"Currency",Normal,CurncyCode,false,CurncyCodeSClass);
-	EditField(h4+40,v,80,"Sum",Normal,TotalSum,false,0);
+	EditField(h2+40,v,80,"Sum",Normal,TotalSum,false,0);
 
   
 	EndWindow;
@@ -4152,6 +4156,7 @@ begin
 	EditField(h1,v+=vs,-20,"Beneficiary",Normal,Beneficiary,false,0);
 	EditField(h1,v+=vs,-20,"Beneficiary's account number",Normal,BeneficiaryAccNumber,false,0);
 	EditField(h1,v+=vs,-20,"Correspondent Bank of the Beneficiary's Bank",Normal,CorrespBankOfBenef,false,0);
+  EditField(h1,v+=vs,-20,"SWIFT Correspondent Bank",Normal,SWIFTCorrespBank,false,0);//Edit-------------------Vitalii 17:25 15.02.2016
 	EditField(h1,v+=vs,-20,"Correspondent account number",Normal,CorrespondentAccNum,false,0);		//Edit----------------------Dima  09.02.2016
 
 	v=v+30;

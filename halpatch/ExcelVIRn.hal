@@ -46,6 +46,7 @@ procedure ExcelVIRn(record VIVc VIr,var area areatofile)
 BEGIN
 	integer i;
 	string 100 tstr;
+  string 20 mn,mnr;
   string 50 ConrNumber,ConrNumberRus;
   record ContractsVc Conr;
   record CUVc CUr;
@@ -65,6 +66,18 @@ BEGIN
   if nonblank(Conr.Number) then begin
     ConrNumber = "No. " & Conr.Number;
     ConrNumberRus = "№ " & Conr.Number;
+  end;
+  if getday(VIr.InvDate)<6 then begin
+    if getmonth(VIr.InvDate)==1 then begin
+      mnr = MonthNameRus(AddMonth(VIr.InvDate,-1)) & " " & GetYear(addyear(VIr.InvDate,-1));
+      mn = MonthName(AddMonth(VIr.InvDate,-1)) & " " & GetYear(addyear(VIr.InvDate,-1));
+    end else begin
+      mnr = MonthNameRus(AddMonth(VIr.InvDate,-1)) & " " & GetYear(VIr.InvDate);
+      mn = MonthName(AddMonth(VIr.InvDate,-1)) & " " & GetYear(VIr.InvDate);
+    end;
+  end else begin
+    mnr = MonthNameRus(VIr.InvDate) & " " & GetYear(VIr.InvDate);
+    mn = MonthName(VIr.InvDate) & " " & GetYear(VIr.InvDate);
   end;
   CUr.Code = VIr.VECode;
   ReadFirstMain(CUr,1,true);
@@ -129,11 +142,6 @@ BEGIN
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,11.25);
     EndRow(sheetnum,fileToSave,rownum);
-    BeginRow(sheetnum,fileToSave,rownum,0,11.25);
-      //colnum = 3;
-      //style = 4;
-      //StringCell(sheetnum,fileToSave,colnum,rownum,style,"Reg. No.: 09888704",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-    EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,25.5);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
@@ -151,12 +159,12 @@ BEGIN
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
       style = 1;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Services under Services Contract " & ConrNumber & " of " & Conr.StartDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Services under " & Conr.Description & " " & ConrNumber & " of " & Conr.StartDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
       style = 7;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"performed during " & MonthName(VIr.InvDate) & " " & GetYear(VIr.InvDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"performed during " & mn,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       colnum = 8;
       style = 1;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,VIr.CurncyCode & " " & VIr.PayVal,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -166,7 +174,7 @@ BEGIN
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
       style = 1;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Услуги по Договору возмездного оказания услуг",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Услуги по " & Conr.DescriptionRus,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
@@ -176,7 +184,7 @@ BEGIN
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
       style = 6;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"за " & MonthNameRus(VIr.InvDate) & " " & GetYear(VIr.InvDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"за " & mnr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,66);
     EndRow(sheetnum,fileToSave,rownum);
@@ -255,6 +263,11 @@ BEGIN
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
       style = 3;
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"SWIFT Correspondent Bank: " & CUr.SWIFTCorrespBank,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+    EndRow(sheetnum,fileToSave,rownum);
+    BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+      colnum = 1;
+      style = 3;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"Correspondent account number: " & CUr.CorrespondentAccNum,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     rownum = rownum + 1;
@@ -268,7 +281,7 @@ BEGIN
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
       style = 3;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"by " & VIr.VEName & " during " & MonthName(VIr.InvDate) & " " & GetYear(VIr.InvDate) & " under Service Contract " & ConrNumber & " of " & Conr.StartDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"by " & VIr.VEName & " during " & mn & " under " & Conr.Description & " " & ConrNumber & " of " & Conr.StartDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
   EndSheetData(sheetnum,fileToSave);
   MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);

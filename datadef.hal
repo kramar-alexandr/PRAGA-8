@@ -283,6 +283,7 @@ begin
 	RecordField(OKFlag,M4Mark,0,0);
 	RecordField(Closed,M4Mark,0,0);
 	RecordField(Description,M4Str,255,0);
+  RecordField(DescriptionRus,M4Str,255,0);
   MainKeyBegin(MainKey,0);
   KeySegment(SerNr);
   KeyBegin(VECode);
@@ -310,8 +311,8 @@ begin
  RecordField(Beneficiary,M4Str,255,0);
  RecordField(BeneficiaryAccNumber,M4Str,255,0);
  RecordField(CorrespBankOfBenef,M4Str,255,0);
- RecordField(CorrespondentAccNum,M4Str,255,0);	
- 
+ RecordField(CorrespondentAccNum,M4Str,255,0);
+ RecordField(SWIFTCorrespBank,M4Str,255,0);
  EndRecordAdd;
  
 return;  
