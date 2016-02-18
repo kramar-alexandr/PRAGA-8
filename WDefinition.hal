@@ -3677,6 +3677,7 @@ begin
     end;
     SpecialMenu("Balance",'=',0,"BalanceVIDsm");
     SpecialMenu("To Excel",'E',20,"ExcelVIDsm");
+    SpecialMenu("Acceptance/delivery report",'A',20,"AcceptDelVIDsm");
     if (HasModNL) then begin
       SpecialMenu("Invoice Status",'r',2,"VIInfoVIDsm");
     end;
@@ -4152,6 +4153,7 @@ begin
 
 
 	EditField(h1,v,-20,"Beneficiary's bank",Normal,BeneficiaryBank,false,0);		//Edit----------------------Dima  09.02.2016
+  EditField(h1,v+=vs,-20,"Routing number",Normal,RoutNum,false,0);
 	EditField(h1,v+=vs,-20,"SWIFT",Normal,SWIFT,false,0);
 	EditField(h1,v+=vs,-20,"Beneficiary",Normal,Beneficiary,false,0);
 	EditField(h1,v+=vs,-20,"Beneficiary's account number",Normal,BeneficiaryAccNumber,false,0);

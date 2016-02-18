@@ -10,7 +10,7 @@ external procedure StringCell(integer,string,var integer,integer,integer,string,
 external procedure NumericCell(integer,string,var integer,integer,integer,val);
 external procedure EmptyCell(integer,string,var integer,integer,integer,integer);
 external procedure MergeCells(integer,string,array string,integer);
-external procedure FillSharedStrings(string,array string,integer,integer);
+external procedure FillSharedStrings(string,array string,integer,integer,array string);
 external procedure ConvertToXLSX(string);
 external function string 10 GetStringCellNum(integer,integer);
 external function integer GetQuartal(date);
@@ -314,7 +314,8 @@ BEGIN
 	array string 100 SharedStrings;
 	integer numOfUniqueSharedStrings,numOfSharedStrings,qtyMergeCell;
 	string 16 reportName;
-	
+	array string 225 mas;
+  
 	ArraysCollect(RepSpec,ArtArray,ProjArray,FoundArray,ProjNamesVect,FoundNamesVect,PrjFoundf);
 	if (PrjFoundf) then begin
 		DataCollect(ArtArray,ArtSuppl,ProjArray,FoundArray,RepSpec,Vect,ProjManager);
@@ -904,7 +905,7 @@ BEGIN
 		EndSheetData(sheetnum,fileToSave);
 		MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
 		EndSheet(sheetnum,fileToSave,0);
-		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
 		ConvertToXLSX(fileToSave);
 		MilliSleep(2000);
 		addfiletoarea(fileToSave,areatofile,false);

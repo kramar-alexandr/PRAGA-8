@@ -456,16 +456,44 @@ BEGIN
 END;
 
 global
-procedure FillSharedStrings(string pathToXLSX,array string SharedStrings, integer numOfUniqueSharedStrings, integer numOfSharedStrings)
+procedure FillSharedStrings(string pathToXLSX, array string SharedStrings, integer numOfUniqueSharedStrings, integer numOfSharedStrings, array string mas)
 BEGIN
 	area tempArea;
 	string 225 path;
-	integer i;
-
+	integer i,first,last,mi;
+  boolean boldf;
+  
 	path = PathCorrection(pathToXLSX);
-	AddTextToArea("<?xml version=" & Chr(34) & "1.0" & Chr(34) & " encoding=" & Chr(34) & "UTF-8" & Chr(34) & " standalone=" & Chr(34) & "yes" & Chr(34) & "?><sst xmlns=" & Chr(34) & "http://schemas.openxmlformats.org/spreadsheetml/2006/main" & Chr(34) & " count=" & Chr(34) & numOfSharedStrings & Chr(34) & " uniqueCount=" & Chr(34) & numOfUniqueSharedStrings & Chr(34) & ">",tempArea);
+  first = 0;
+  AddTextToArea("<?xml version=" & Chr(34) & "1.0" & Chr(34) & " encoding=" & Chr(34) & "UTF-8" & Chr(34) & " standalone=" & Chr(34) & "yes" & Chr(34) & "?><sst xmlns=" & Chr(34) & "http://schemas.openxmlformats.org/spreadsheetml/2006/main" & Chr(34) & " count=" & Chr(34) & numOfSharedStrings & Chr(34) & " uniqueCount=" & Chr(34) & numOfUniqueSharedStrings & Chr(34) & ">",tempArea);
 	for (i=0;i<numOfUniqueSharedStrings;i=i+1) begin
-		AddTextToArea("<si><t>" & SharedStrings[i] & "</t></si>",tempArea);
+    if left(SharedStrings[i],3)==",,," then begin
+              if left(right(SharedStrings[i],(len(SharedStrings[i]) - 3)),1)=="b" then begin
+                boldf = true;
+                last = StringToVal(right(SharedStrings[i],(len(SharedStrings[i]) - 4)),M4Val);
+              end else begin
+                boldf = false;
+                last = StringToVal(right(SharedStrings[i],(len(SharedStrings[i]) - 3)),M4Val);
+              end;
+              AddTextToArea("<si>",tempArea);
+              if boldf then begin
+                AddTextToArea("<r>",tempArea);
+              end else begin
+                AddTextToArea("<t>",tempArea);
+              end;
+              for (mi=first;mi<last;mi=mi+1) begin
+                AddTextToArea(mas[mi],tempArea);
+              end;
+              first = mi;
+              if boldf then begin
+                AddTextToArea("</r>",tempArea);
+              end else begin
+                AddTextToArea("</t>",tempArea);
+              end;
+              AddTextToArea("</si>",tempArea);
+    end else begin
+      AddTextToArea("<si><t>" & SharedStrings[i] & "</t></si>",tempArea);
+    end;
 	end;
 	AddTextToArea("</sst>",tempArea);
 	WriteAreaToFile(tempArea,path & "/xl/sharedStrings.xml",0);

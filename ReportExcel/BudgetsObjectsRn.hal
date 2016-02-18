@@ -11,7 +11,7 @@ external procedure StringCell(integer,string,var integer,integer,integer,string,
 external procedure NumericCell(integer,string,var integer,integer,integer,val);
 external procedure EmptyCell(integer,string,var integer,integer,integer,integer);
 external procedure MergeCells(integer,string,array string,integer);
-external procedure FillSharedStrings(string,array string,integer,integer);
+external procedure FillSharedStrings(string,array string,integer,integer,array string);
 external procedure ConvertToXLSX(string);
 external function string 10 GetStringCellNum(integer,integer);
 
@@ -697,6 +697,7 @@ BEGIN
 	integer numOfUniqueSharedStrings,numOfSharedStrings,qtyMergeCell;
 	string 16 reportName;
 	integer outlineLevel;
+  array string 225 mas;
 	
 	reportName = "BudgetsObjectsRn"	;
 	totalBudget = 0;
@@ -1223,7 +1224,7 @@ BEGIN
 			MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
 			EndSheet(sheetnum,fileToSave,0);
 		end;
-		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
 		ConvertToXLSX(fileToSave);
 	end else begin
 		RecordClear(BRr);
@@ -1518,7 +1519,7 @@ BEGIN
 		EndSheetData(sheetnum,fileToSave);
 		MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
 		EndSheet(sheetnum,fileToSave,0);
-		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
 		ConvertToXLSX(fileToSave);
 	end;
 	RETURN;

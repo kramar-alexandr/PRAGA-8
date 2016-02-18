@@ -313,6 +313,7 @@ begin
  RecordField(CorrespBankOfBenef,M4Str,255,0);
  RecordField(CorrespondentAccNum,M4Str,255,0);
  RecordField(SWIFTCorrespBank,M4Str,255,0);
+  RecordField(RoutNum,M4Str,255,0);
  EndRecordAdd;
  
 return;  
