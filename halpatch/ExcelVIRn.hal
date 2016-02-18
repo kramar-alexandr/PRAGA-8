@@ -65,8 +65,8 @@ BEGIN
   Conr.VECode = VIr.VECode;
   ReadFirstKey("VECode",Conr,1,true);
   if nonblank(Conr.Number) then begin
-    ConrNumber = "No. " & Conr.Number;
-    ConrNumberRus = "№ " & Conr.Number;
+    ConrNumber = "No. " & Conr.Number & " ";
+    ConrNumberRus = "№ " & Conr.Number & " ";
   end;
   if getday(VIr.InvDate)<6 then begin
     if getmonth(VIr.InvDate)==1 then begin
@@ -431,7 +431,9 @@ BEGIN
       maslen = maslen + 1;
       mas[maslen] = "</r><r><rPr><sz val=" & Chr(34) & "11" & Chr(34) & "/><color theme=" & Chr(34) & "1" & Chr(34) & "/><rFont val=" & Chr(34) & "Times New Roman" & Chr(34) & "/><family val=" & Chr(34) & "1" & Chr(34) & "/><charset val=" & Chr(34) & "204" & Chr(34) & "/></rPr>";
       maslen = maslen + 1;
-      mas[maslen] = "<t xml:space=" & Chr(34) & "preserve" & Chr(34) & ">, компания, учрежденная и осуществляющая деятельность в соответствии с законодательством Великобритании, с офисом, зарегистрированным  по адресу: Palladium House, 1-4 Argyll Street, London, W1F 7LD,";
+      mas[maslen] = "<t xml:space=" & Chr(34) & "preserve" & Chr(34) & ">, компания, учрежденная и осуществляющая деятельность в соответствии с законодательством";
+      maslen = maslen + 1;
+      mas[maslen] = " Великобритании, с офисом, зарегистрированным  по адресу: Palladium House, 1-4 Argyll Street, London, W1F 7LD,";
       maslen = maslen + 1;
       mas[maslen] = " в дальнейшем  именуемая «Заказчик»</t>";
       maslen = maslen + 1;
