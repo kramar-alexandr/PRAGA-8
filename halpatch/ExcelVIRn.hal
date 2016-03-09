@@ -61,6 +61,7 @@ BEGIN
 	integer numOfUniqueSharedStrings,numOfSharedStrings,qtyMergeCell;
 	string 16 reportName;
   array string 255 mas;
+  integer maslen;
 	
   Conr.VECode = VIr.VECode;
   ReadFirstKey("VECode",Conr,1,true);
@@ -94,11 +95,25 @@ BEGIN
   sheetNames[0] = "Sheet1";
   
   colnum = 0;
-  for (i=0;i<9;i=i+1) begin
-    sheetColls[colnum] = 9.5703125;
-    colnum = colnum + 1;
-  end;
-
+  sheetColls[colnum] = 9.5703125;
+  colnum = colnum + 1;
+  sheetColls[colnum] = 7.42578125;
+  colnum = colnum + 1;
+  sheetColls[colnum] = 13;
+  colnum = colnum + 1;
+  sheetColls[colnum] = 9.5703125;
+  colnum = colnum + 1;
+  sheetColls[colnum] = 9.5703125;
+  colnum = colnum + 1;
+  sheetColls[colnum] = 9.5703125;
+  colnum = colnum + 1;
+  sheetColls[colnum] = 9.5703125;
+  colnum = colnum + 1;
+  sheetColls[colnum] = 9.5703125;
+  colnum = colnum + 1;
+  sheetColls[colnum] = 9.5703125;
+  colnum = colnum + 1;
+  
   colnum = 0;
   numOfUniqueSharedStrings = 0;
   numOfSharedStrings = 0;
@@ -111,7 +126,7 @@ BEGIN
     rownum = 1;
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 5;
-      style = 13;
+      style = 10;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"INVOICE/CЧET No. " & VIr.SerNr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,40.5);
@@ -121,7 +136,13 @@ BEGIN
       style = 1;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"Customer/Заказчик:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       colnum = 7;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Date/Дата " & VIr.InvDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+      style = 14;
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Date/Дата: " & VIr.InvDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      qtyOfEmpStr = 2;
+      EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+      mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum - 1,rownum);
+      qtyMergeCell = qtyMergeCell + 1;
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 3;
@@ -130,7 +151,7 @@ BEGIN
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,11.25);
       colnum = 3;
-      style = 3;
+      style = 2;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"Palladium House,",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,11.25);
@@ -145,13 +166,17 @@ BEGIN
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
-      style = 5;
+      style = 3;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"Description/Описание",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       qtyOfEmpStr = 6;
       EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+      style = 15;
+      mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"Charges/Сумма",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       qtyOfEmpStr = 1;
       EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+      mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum - 1,rownum);
+      qtyMergeCell = qtyMergeCell + 1;
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,25.5);
     EndRow(sheetnum,fileToSave,rownum);
@@ -162,11 +187,16 @@ BEGIN
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
-      style = 7;
+      style = 5;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"performed during " & mn,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       colnum = 8;
-      style = 1;
+      style = 14;
+      mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
       StringCell(sheetnum,fileToSave,colnum,rownum,style,VIr.CurncyCode & " " & VIr.PayVal,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      qtyOfEmpStr = 1;
+      EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+      mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum - 1,rownum);
+      qtyMergeCell = qtyMergeCell + 1;
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,24);
     EndRow(sheetnum,fileToSave,rownum);
@@ -177,33 +207,37 @@ BEGIN
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
-      style = 1;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,ConrNumberRus & "от " & Conr.StartDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
-      style = 6;
+      style = 4;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"за " & mnr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,66);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 7;
-      style = 14;
+      style = 11;
       qtyOfEmpStr = 3;
       EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 5;
-      style = 8;
+      style = 6;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"Invoice Total/Итого",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       colnum = 8;
-      style = 1;
+      style = 14;
+      mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
       StringCell(sheetnum,fileToSave,colnum,rownum,style,VIr.CurncyCode & " " & VIr.PayVal,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      qtyOfEmpStr = 1;
+      EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+      mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum - 1,rownum);
+      qtyMergeCell = qtyMergeCell + 1;
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 7;
-      style = 9;
+      style = 7;
       qtyOfEmpStr = 3;
       EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
     EndRow(sheetnum,fileToSave,rownum);
@@ -211,16 +245,18 @@ BEGIN
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,15);
       colnum = 1;
-      style = 15;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Service Provider: (" & VIr.VEName & ")",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-      qtyOfEmpStr = 2;
+      style = 12;
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Service Provider:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      qtyOfEmpStr = 1;
       EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+      style = 13;
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"(" & VIr.VEName & ")",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,51.75);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
-      style = 11;
+      style = 16;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"Signature",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       qtyOfEmpStr = 2;
       EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -229,7 +265,7 @@ BEGIN
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
-      style = 12;
+      style = 9;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"This invoice shall be paid by bank transfer to the following account:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       qtyOfEmpStr = 5;
       EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -237,71 +273,113 @@ BEGIN
     if nonblank(CUr.BeneficiaryBank) then begin
       BeginRow(sheetnum,fileToSave,rownum,0,22.5);
         colnum = 1;
-        style = 3;
+        style = 2;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"Beneficiary's bank: " & CUr.BeneficiaryBank,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       EndRow(sheetnum,fileToSave,rownum);
     end;
     if nonblank(CUr.SWIFT) then begin
       BeginRow(sheetnum,fileToSave,rownum,0,blankval);
         colnum = 1;
-        style = 3;
+        style = 2;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"SWIFT: " & CUr.SWIFT,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       EndRow(sheetnum,fileToSave,rownum);
     end;
     if nonblank(CUr.RoutNum) then begin
       BeginRow(sheetnum,fileToSave,rownum,0,blankval);
         colnum = 1;
-        style = 3;
+        style = 2;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"Routing number: " & CUr.RoutNum,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       EndRow(sheetnum,fileToSave,rownum);
     end;
     if nonblank(CUr.Beneficiary) then begin
       BeginRow(sheetnum,fileToSave,rownum,0,blankval);
         colnum = 1;
-        style = 3;
+        style = 2;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"Beneficiary:" & CUr.Beneficiary,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       EndRow(sheetnum,fileToSave,rownum);
     end;
     if nonblank(CUr.BeneficiaryAccNumber) then begin
       BeginRow(sheetnum,fileToSave,rownum,0,blankval);
         colnum = 1;
-        style = 3;
+        style = 2;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"Beneficiary's account number:" & CUr.BeneficiaryAccNumber,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       EndRow(sheetnum,fileToSave,rownum);
     end;
     if nonblank(CUr.CorrespBankOfBenef) then begin
       BeginRow(sheetnum,fileToSave,rownum,0,blankval);
         colnum = 1;
-        style = 3;
+        style = 2;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"Correspondent Bank of the Beneficiary's Bank: " & CUr.CorrespBankOfBenef,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       EndRow(sheetnum,fileToSave,rownum);
     end;
     if nonblank(CUr.SWIFTCorrespBank) then begin
       BeginRow(sheetnum,fileToSave,rownum,0,blankval);
         colnum = 1;
-        style = 3;
+        style = 2;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"SWIFT Correspondent Bank: " & CUr.SWIFTCorrespBank,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       EndRow(sheetnum,fileToSave,rownum);
     end;
     if nonblank(CUr.CorrespondentAccNum) then begin
       BeginRow(sheetnum,fileToSave,rownum,0,blankval);
         colnum = 1;
-        style = 3;
+        style = 2;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"Correspondent account number: " & CUr.CorrespondentAccNum,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       EndRow(sheetnum,fileToSave,rownum);
     end;
     rownum = rownum + 1;
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 1;
-      style = 10;
+      style = 8;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"Reference: ",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-      style = 3;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"payment under Invoice No. " & VIr.SerNr & " of " & VIr.InvDate & " for the consulting service rendered",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      style = 2;
+      mas[maslen] = "<t xml:space=" & Chr(34) & "preserve" & Chr(34) & ">payment under </t></r><r><rPr><b/><sz val=" & Chr(34) & "10" & Chr(34) & "/><color theme=" & Chr(34) & "1" & Chr(34) & "/>";
+      maslen = maslen + 1;
+      mas[maslen] = "<rFont val=" & Chr(34) & "Times New Roman" & Chr(34) & "/><family val=" & Chr(34) & "1" & Chr(34) & "/><charset val=" & Chr(34) & "204" & Chr(34) & "/></rPr><t>";
+      maslen = maslen + 1;
+      mas[maslen] = "Invoice No. " & VIr.SerNr;
+      maslen = maslen + 1;
+      mas[maslen] = "</t></r><r><rPr><sz val=" & Chr(34) & "10" & Chr(34) & "/><color theme=" & Chr(34) & "1" & Chr(34) & "/>";
+      maslen = maslen + 1;
+      mas[maslen] = "<rFont val=" & Chr(34) & "Times New Roman" & Chr(34) & "/><family val=" & Chr(34) & "1" & Chr(34) & "/><charset val=" & Chr(34) & "204" & Chr(34) & "/></rPr><t xml:space=" & Chr(34) & "preserve" & Chr(34) & "> ";
+      maslen = maslen + 1;
+      mas[maslen] = "of " & VIr.InvDate & " for the consulting service rendered</t>";
+      maslen = maslen + 1;
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,",,,b" & maslen,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       colnum = 2;
-      style = 3;
-      StringCell(sheetnum,fileToSave,colnum,rownum,style,"by " & VIr.VEName & " during " & mn & " under " & Conr.Description & " " & ConrNumber & "of " & Conr.StartDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      style = 2;
+      mas[maslen] = "<t xml:space=" & Chr(34) & "preserve" & Chr(34) & ">by </t></r><r><rPr><b/><sz val=" & Chr(34) & "10" & Chr(34) & "/>";
+      maslen = maslen + 1;
+      mas[maslen] = "<color theme=" & Chr(34) & "1" & Chr(34) & "/><rFont val=" & Chr(34) & "Times New Roman" & Chr(34) & "/>";
+      maslen = maslen + 1;
+      mas[maslen] = "<family val=" & Chr(34) & "1" & Chr(34) & "/><charset val=" & Chr(34) & "204" & Chr(34) & "/></rPr><t>";
+      maslen = maslen + 1;
+      mas[maslen] = VIr.VEName;
+      maslen = maslen + 1;
+      mas[maslen] = "</t></r><r><rPr><sz val=" & Chr(34) & "10" & Chr(34) & "/><color theme=" & Chr(34) & "1" & Chr(34) & "/>";
+      maslen = maslen + 1;
+      mas[maslen] = "<rFont val=" & Chr(34) & "Times New Roman" & Chr(34) & "/><family val=" & Chr(34) & "1" & Chr(34) & "/>";
+      maslen = maslen + 1;
+      mas[maslen] = "<charset val=" & Chr(34) & "204" & Chr(34) & "/></rPr><t xml:space=" & Chr(34) & "preserve" & Chr(34) & "> during </t>";
+      maslen = maslen + 1;
+      mas[maslen] = "</r><r><rPr><b/><sz val=" & Chr(34) & "10" & Chr(34) & "/><color theme=" & Chr(34) & "1" & Chr(34) & "/>";
+      maslen = maslen + 1;
+      mas[maslen] = "<rFont val=" & Chr(34) & "Times New Roman" & Chr(34) & "/>";
+      maslen = maslen + 1;
+      mas[maslen] = "<family val=" & Chr(34) & "1" & Chr(34) & "/><charset val=" & Chr(34) & "204" & Chr(34) & "/></rPr><t>";
+      maslen = maslen + 1;
+      mas[maslen] = mn;
+      maslen = maslen + 1;
+      mas[maslen] = "</t></r><r><rPr><sz val=" & Chr(34) & "10" & Chr(34) & "/><color theme=" & Chr(34) & "1" & Chr(34) & "/>";
+      maslen = maslen + 1;
+      mas[maslen] = "<rFont val=" & Chr(34) & "Times New Roman" & Chr(34) & "/><family val=" & Chr(34) & "1" & Chr(34) & "/>";
+      maslen = maslen + 1;
+      mas[maslen] = "<charset val=" & Chr(34) & "204" & Chr(34) & "/></rPr><t xml:space=" & Chr(34) & "preserve" & Chr(34) & "> ";
+      maslen = maslen + 1;
+      mas[maslen] = "under " & Conr.Description & " " & ConrNumber & "of " & Conr.StartDate & "</t>";
+      maslen = maslen + 1;
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,",,,b" & maslen,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
   EndSheetData(sheetnum,fileToSave);
   MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
@@ -317,13 +395,15 @@ END;
 global
 procedure AcceptDelVI(record VIVc VIr,var area areatofile)
 BEGIN
-	integer i;
+	integer i,rwcnt;
 	string 255 tstr,tstr2;
   string 20 mn,mnr;
   string 50 ConrNumber,ConrNumberRus;
   record ContractsVc Conr;
   record CUVc CUr;
-	
+  record CountryVc Countryr;
+  row CountryVc Countryrw;
+  
 	array string 10 sheetNames;
 	array val sheetColls;
 	array integer sheetCollsOutLvl;
@@ -421,7 +501,7 @@ BEGIN
       StringCell(sheetnum,fileToSave,colnum,rownum,style,"Дата/Date: " & VIr.InvDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
     EndRow(sheetnum,fileToSave,rownum);
     rownum = rownum + 1;
-    BeginRow(sheetnum,fileToSave,rownum,0,44.25);
+    BeginRow(sheetnum,fileToSave,rownum,0,59.25);
       colnum = 1;
       style = 4;
       mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
@@ -479,18 +559,37 @@ BEGIN
     maslen = maslen + 1;
     mas[maslen] = "</t></r><r><rPr><sz val=" & Chr(34) & "11" & Chr(34) & "/><color rgb=" & Chr(34) & "FF000000" & Chr(34) & "/><rFont val=" & Chr(34) & "Times New Roman" & Chr(34) & "/><family val=" & Chr(34) & "1" & Chr(34) & "/><charset val=" & Chr(34) & "204" & Chr(34) & "/></rPr><t xml:space=" & Chr(34) & "preserve" & Chr(34) & ">";
     maslen = maslen + 1;
+    Countryr.Code = CUr.Nationality;
+    ReadFirstMain(Countryr,1,true);
+    rwcnt = MatRowCnt(Countryr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(Countryr,i,Countryrw);
+      if Countryrw.LangCode=="RUS" then begin
+        tstr = Countryrw.Text;
+      end;
+      if Countryrw.LangCode=="ENG" then begin
+        tstr2 = Countryrw.Text;
+      end;
+    end;
     if CUr.Gender==0 then begin
-      mas[maslen] = ", гражданин " & CUr.Nationality & ", проживающий по адресу: ";
+      mas[maslen] = ", гражданин " & tstr & ", проживающий по адресу: ";
       maslen = maslen + 1;
       mas[maslen] = CUr.DelAddr1;
+      if nonblank(CUr.DelAddr3) then begin
+        maslen = maslen + 1;
+        mas[maslen] =" " & CUr.DelAddr3;
+      end;
       maslen = maslen + 1;
       mas[maslen] = ", в дальнейшем именуемый «Исполнитель»,</t>";
       maslen = maslen + 1;
     end else begin
-      mas[maslen] = ", гражданка " & CUr.Nationality & ", проживающая по адресу: ";
+      mas[maslen] = ", гражданка " & tstr & ", проживающая по адресу: ";
       maslen = maslen + 1;
       mas[maslen] = CUr.DelAddr1;
-      maslen = maslen + 1;
+      if nonblank(CUr.DelAddr3) then begin
+        maslen = maslen + 1;
+        mas[maslen] =" " & CUr.DelAddr3;
+      end;
       mas[maslen] = ", в дальнейшем именуемая «Исполнитель»,</t>";
       maslen = maslen + 1;
     end;
@@ -511,9 +610,15 @@ BEGIN
     maslen = maslen + 1;
     mas[maslen] = "</t></r><r><rPr><sz val=" & Chr(34) & "11" & Chr(34) & "/><color rgb=" & Chr(34) & "FF000000" & Chr(34) & "/><rFont val=" & Chr(34) & "Times New Roman" & Chr(34) & "/><family val=" & Chr(34) & "1" & Chr(34) & "/><charset val=" & Chr(34) & "204" & Chr(34) & "/></rPr><t xml:space=" & Chr(34) & "preserve" & Chr(34) & ">";
     maslen = maslen + 1;
-    mas[maslen] = ", " & CUr.Nationality & " national, resident at: ";
+    mas[maslen] = ", " & tstr2 & " national, resident at: ";
     maslen = maslen + 1;
-    mas[maslen] = CUr.DelAddr0 & ", subsequently referred to as the " & Chr(34) & "Service Provider" & Chr(34) & ",</t>";
+    mas[maslen] = CUr.DelAddr0;
+    maslen = maslen + 1;
+    if nonblank(CUr.DelAddr2) then begin
+      mas[maslen] = " " & CUr.DelAddr2 ;
+      maslen = maslen + 1;
+    end;
+    mas[maslen] = ", subsequently referred to as the " & Chr(34) & "Service Provider" & Chr(34) & ",</t>";
     maslen = maslen + 1;
     rownum = rownum + 1;
     BeginRow(sheetnum,fileToSave,rownum,0,30);
@@ -540,7 +645,7 @@ BEGIN
       maslen = maslen + 1;
       mas[maslen] = "</r><r><rPr><sz val=" & Chr(34) & "11" & Chr(34) & "/><color rgb=" & Chr(34) & "FF000000" & Chr(34) & "/><rFont val=" & Chr(34) & "Times New Roman" & Chr(34) & "/><family val=" & Chr(34) & "1" & Chr(34) & "/><charset val=" & Chr(34) & "204" & Chr(34) & "/></rPr>";
       maslen = maslen + 1;
-      mas[maslen] = "<t xml:space=" & Chr(34) & "preserve" & Chr(34) & "> года – описание оказанных услуг в приложении</t>";
+      mas[maslen] = "<t xml:space=" & Chr(34) & "preserve" & Chr(34) & "> года – описание оказанных услуг в приложении.</t>";
       maslen = maslen + 1;
       StringCell(sheetnum,fileToSave,colnum,rownum,style,",,,b" & maslen,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
       qtyOfEmpStr = 8;

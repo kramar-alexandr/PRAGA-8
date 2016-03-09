@@ -4075,8 +4075,8 @@ begin
   v = 6; h = 130; l=223; vs = 20; h1=410; h2 = 350; h3 = 430; h4 = 580; h5 = 460;
   EditField(h,v ,   95,"No.",Normal,Code,false,TSerSClass);
   EditField(h1,v,50,"Customer Category",Normal,CustCat,false,CCatSClass);
-  EditField(h,v+=vs,95,"Short",Normal,SearchKey,false,0);
-  EditField(h1,v,50,"#Supplier# Category",Normal,VECat,false,VGSClass);
+  //EditField(h,v+=vs,95,"Short",Normal,SearchKey,false,0);
+  EditField(h1,v+=vs,50,"#Supplier# Category",Normal,VECat,false,VGSClass);
   if (HasJewelleryInterface) then begin
     EditField(h,v+=vs,95,"Title",Normal,Salutation1,false,0);
     EditField(h1,v,50,"Suffix",Normal,ANACode,false,0);
@@ -4084,8 +4084,9 @@ begin
     EditField(h,v+=vs,h1-h+50,"Last Name",Normal,Salutation3,false,0);
     EditField(h,v+=vs,h1-h+50,"Display Name",Normal,Name,false,0);
   end else begin
-    EditField(h,v+=vs,h1-h+50,"Name",Normal,Name,false,0);
+    EditField(h,v,h1-h+50,"Name",Normal,Name,false,0);
   end;
+  EditField(h,v+=vs,h1-h+50,"Name RUS",Normal,NameinDocument,false,0);
   CheckBox(h1+80,v=6,0,"C_ustomer",CUType);
   CheckBox(h1+80,v+=16,0,"#Supplier#",VEType);
   if (HasModHotel) then begin
@@ -4163,12 +4164,23 @@ begin
 
 	v=v+30;
 
-  EditField(h,v+=vs,50,"Country",Normal,CountryCode,false,CountrySClass);
+  //EditField(h,v+=vs,50,"Country",Normal,CountryCode,false,CountrySClass);//Edit-------------------Vitalii 16:18 18.02.2016
+  EditField(h,v+=vs,50,"Nationality",Normal,Nationality,false,CountrySClass);
   if (HasLocalization("BRA")) then begin 
     EditField(h2-159,v,214,"",ViewOnly,InvCountryName,false,0);
     v = v + vs;
   end;  
-  EditField(h1,v,-20,"Department",Normal,Department,false,0);
+  ButtonFrame(h2,v=v+20,100,2,"Sex");
+  RadioButton(h2,v,0,0,"Male",Gender);
+  RadioButton(h2,v+=17,1,0,"Female",Gender);
+  
+  StaticText(h+=-60,v+=30,"Address",false);
+  EditField(h+=30,v+=vs,-20,"ENG",Normal,DelAddr0,false,0);
+  EditField(h,v+=vs,-20,"",Normal,DelAddr2,false,0);
+  EditField(h,v+=vs,-20,"RUS",Normal,DelAddr1,false,0);
+  EditField(h,v+=vs,-20,"",Normal,DelAddr3,false,0);
+  h = h + 60;
+  /*EditField(h1,v,-20,"Department",Normal,Department,false,0);
   EditField(h,v+=vs,150,"Telephone",Normal,Phone,false,0);
   EditField(h1,v,-20,"Fax",Normal,Fax,false,0);
   EditField(h,v+=vs,150,"Alt Phone",Normal,AltPhone,false,0);
@@ -4180,6 +4192,7 @@ begin
   EditField(h,v+=vs,150,"Primary Contact",Normal,Person,false,ContactSClass);
   EditField(h1,v,-20,"Web Site",Normal,wwwAddr,false,0);
   EditField(h,v+=vs,-20,"Classification",Normal,Classification,false,CClassSClass);
+  */
   if (HasLocalization("CHN")) then begin
     EditField(h,v+=vs,150,"QQ Account Number",Normal,QQName,false,0);
     EditField(h1,v,-20,"Weibo Account Number",Normal,WeiboName,false,0);
@@ -4195,7 +4208,7 @@ begin
   RlCol(535,535,"E-mail",ContacteMail,false);
 */
 //  RlCol(-1,-1,"",Invalid,true);
-  Tile(tilenr,240,false,tilenr,DelAddr0); tilenr = tilenr + 1;
+  Tile(tilenr,240,false,tilenr,DelCountry); tilenr = tilenr + 1;
   v=6;
   if (HasLocalization("GBR,LVA,EST,SWE")) then begin
     HalPushButton(h+120,v,h+120+100,v+20,"UpdDeliveryAddressCUDsm","Update Address");

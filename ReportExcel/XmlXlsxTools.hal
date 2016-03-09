@@ -134,9 +134,9 @@ BEGIN
 	AddTextToArea("<?xml version=" & Chr(34) & "1.0" & Chr(34) & " encoding=" & Chr(34) & "UTF-8" & Chr(34) & " standalone=" & Chr(34) & "yes" & Chr(34) & "?><Relationships xmlns=" & Chr(34) & "http://schemas.openxmlformats.org/package/2006/relationships" & Chr(34) & "><Relationship Id=" & Chr(34) & "rId3" & Chr(34) & " Type=" & Chr(34) & "http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" & Chr(34) & " Target=" & Chr(34) & "docProps/app.xml" & Chr(34) & "/><Relationship Id=" & Chr(34) & "rId2" & Chr(34) & " Type=" & Chr(34) & "http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" & Chr(34) & " Target=" & Chr(34) & "docProps/core.xml" & Chr(34) & "/><Relationship Id=" & Chr(34) & "rId1" & Chr(34) & " Type=" & Chr(34) & "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" & Chr(34) & " Target=" & Chr(34) & "xl/workbook.xml" & Chr(34) & "/></Relationships>",tempArea);
 	WriteAreaToFile(tempArea,path & "/_rels/.rels",0);
 //---/xl/theme/theme1.xml
-	CopyFile("tmp/" & reportName & "/theme1.xml",path & "/xl/theme/theme1.xml")
+	CopyFile("tmp/" & reportName & "/theme1.xml",path & "/xl/theme/theme1.xml");
 //---/xl/styles.xml
-	CopyFile("tmp/" & reportName & "/styles.xml",path & "/xl/styles.xml")	
+	CopyFile("tmp/" & reportName & "/styles.xml",path & "/xl/styles.xml");
 	RETURN;
 END;
 
@@ -298,10 +298,10 @@ BEGIN
 		if (lvlArray[i] <> 0) then begin
 			AddTextToArea(" outlineLevel=" & Chr(34) & lvlArray[i] & Chr(34),tempArea);
 		end;
-		AddTextToArea("/>",tempArea);
+		AddTextToArea(Chr(47) & ">",tempArea);
 		i = i + 1;
 	end;
-	AddTextToArea("</cols>",tempArea);
+	AddTextToArea("<" & Chr(47) & "cols>",tempArea);
 	AppendAreaToFile(path & "/xl/worksheets/sheet" & SheetNum & ".xml",tempArea);
 	RETURN;
 END;
@@ -468,29 +468,29 @@ BEGIN
   AddTextToArea("<?xml version=" & Chr(34) & "1.0" & Chr(34) & " encoding=" & Chr(34) & "UTF-8" & Chr(34) & " standalone=" & Chr(34) & "yes" & Chr(34) & "?><sst xmlns=" & Chr(34) & "http://schemas.openxmlformats.org/spreadsheetml/2006/main" & Chr(34) & " count=" & Chr(34) & numOfSharedStrings & Chr(34) & " uniqueCount=" & Chr(34) & numOfUniqueSharedStrings & Chr(34) & ">",tempArea);
 	for (i=0;i<numOfUniqueSharedStrings;i=i+1) begin
     if left(SharedStrings[i],3)==",,," then begin
-              if left(right(SharedStrings[i],(len(SharedStrings[i]) - 3)),1)=="b" then begin
-                boldf = true;
-                last = StringToVal(right(SharedStrings[i],(len(SharedStrings[i]) - 4)),M4Val);
-              end else begin
-                boldf = false;
-                last = StringToVal(right(SharedStrings[i],(len(SharedStrings[i]) - 3)),M4Val);
-              end;
-              AddTextToArea("<si>",tempArea);
-              if boldf then begin
-                AddTextToArea("<r>",tempArea);
-              end else begin
-                AddTextToArea("<t>",tempArea);
-              end;
-              for (mi=first;mi<last;mi=mi+1) begin
-                AddTextToArea(mas[mi],tempArea);
-              end;
-              first = mi;
-              if boldf then begin
-                AddTextToArea("</r>",tempArea);
-              end else begin
-                AddTextToArea("</t>",tempArea);
-              end;
-              AddTextToArea("</si>",tempArea);
+      if left(right(SharedStrings[i],(len(SharedStrings[i]) - 3)),1)=="b" then begin
+        boldf = true;
+        last = StringToVal(right(SharedStrings[i],(len(SharedStrings[i]) - 4)),M4Val);
+      end else begin
+        boldf = false;
+        last = StringToVal(right(SharedStrings[i],(len(SharedStrings[i]) - 3)),M4Val);
+      end;
+      AddTextToArea("<si>",tempArea);
+      if boldf then begin
+        AddTextToArea("<r>",tempArea);
+      end else begin
+        AddTextToArea("<t>",tempArea);
+      end;
+      for (mi=first;mi<last;mi=mi+1) begin
+        AddTextToArea(mas[mi],tempArea);
+      end;
+      first = mi;
+      if boldf then begin
+        AddTextToArea("</r>",tempArea);
+      end else begin
+        AddTextToArea("</t>",tempArea);
+      end;
+      AddTextToArea("</si>",tempArea);
     end else begin
       AddTextToArea("<si><t>" & SharedStrings[i] & "</t></si>",tempArea);
     end;
