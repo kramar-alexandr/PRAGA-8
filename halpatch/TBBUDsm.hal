@@ -94,9 +94,10 @@ begin
   boolean testf;
   
   wn = CurWindow;
+  rownr = GetWindowCurRow(wn);
   DeselectWindow(wn,false);
   GetWindowRecord(wn,TBBUr);
-  rownr = GetWindowCurRow(wn);
+  
   i = MatRowCnt(TBBUr);
   rowstoput = i - rownr - 1;
   if rownr<0 then begin
