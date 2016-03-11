@@ -34,7 +34,12 @@ begin
 		MessageBox(0,"Incorrect selection of Quartals!");
 		testf = false;
 	end;
-	
+	if nonblank(RepSpec.f1) then begin
+    if (RepSpec.f2=="2016" and right(RepSpec.f1,3)!="_16") then begin
+      MessageBox(0,"Incorrect Group!");
+      testf = false;
+    end;
+  end;
 	if testf then begin
 		tmpDate = "";
 		if (RepSpec.flags[4]==1) then begin

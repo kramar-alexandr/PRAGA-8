@@ -130,80 +130,82 @@ BEGIN
 				k=0;
 				For(i=0;i<mtrw;i=i+1) begin
 					matrowget(TBBUr,i,TBBUrw);
-					if (RepSpec.flags[5] == 1) then begin
-						TBBUrw.VECode = "";
-					end;
-					if(TBBUrw.stp==18) then begin
-						k = TBBUrw.ItemType;
-					end;		//I,II,III,IV Quartal
-					kTestf = false;
-					if ((RepSpec.flags[1] == 1) and (k == 1)) then begin
-						kTestf = true;
-					end;
-					if ((RepSpec.flags[2] == 1) and (k == 2)) then begin
-						kTestf = true;
-					end;
-					if ((RepSpec.flags[3] == 1) and (k == 3)) then begin
-						kTestf = true;
-					end;
-					if ((RepSpec.flags[4] == 1) and (k == 4)) then begin
-						kTestf = true;
-					end;
-					if ((RepSpec.flags[1] == 1) and ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4))) then begin
-						kTestf = true;
-					end;
-					if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
-						foundf = false;
-						if nonblank(TBBUrw.VECode) then begin
-							repmtrw = matrowcnt(BRr);
-							For(repi=0;repi<repmtrw;repi=repi+1) begin
-								matrowget(BRr,repi,BRrw);
-								if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and (BRrw.VECode == TBBUrw.VECode) then begin
-									foundf = true;
-								end;
-							end;
-							if !foundf then begin
-								For(repi=0;repi<repmtrw;repi=repi+1) begin
-									matrowget(BRr,repi,BRrw);
-									if ((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and nonblank(BRrw.Code)) and blank(BRrw.VECode) and blank(BRrw.CatName) then begin
-										BRrw.Bud1 = blankval;
-										BRrw.Bud2 = blankval;
-										BRrw.Bud3 = blankval;
-										BRrw.Bud4 = blankval;
-										BRrw.Spend1 = blankval;
-										BRrw.Spend2 = blankval;
-										BRrw.Spend3 = blankval;
-										BRrw.Spend4 = blankval;
-										BRrw.VECode = TBBUrw.VECode;
-										Objr.Code = BRrw.VECode;
-										readfirstmain(Objr,1,true);
-										BRrw.VEName = Objr.Comment;
-										matrowinsert(BRr,repi+1,BRrw);
-										repi = repmtrw;
-									end;
-								end;
-							end;
-						end;
-						repmtrw = matrowcnt(BRr);
-						For(repi=0;repi<repmtrw;repi=repi+1) begin
-							matrowget(BRr,repi,BRrw);
-							if((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and ((BRrw.VECode == TBBUrw.VECode) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1) or OTCodeMatch(RepSpec.f1,"LOCAT"))) then begin
-								switch(k) begin
-									case 1:
-										BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
-									case 2:
-										BRrw.Bud2 = BRrw.Bud2 + TBBUrw.Sum;
-									case 3:
-										BRrw.Bud3 = BRrw.Bud3 + TBBUrw.Sum;
-									case 4:
-										BRrw.Bud4 = BRrw.Bud4 + TBBUrw.Sum;
-									otherwise
-										BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;	//I Quartal as default
-								end;
-								matrowput(BRr,repi,BRrw);
-							end;
-						end; 
-					end;
+					if (RepSpec.f3=="2016" and right(TBBUrw.ArtCode,3)=="_16") or (RepSpec.f3!="2016" and right(TBBUrw.ArtCode,3)!="_16") then begin
+            if (RepSpec.flags[5] == 1) then begin
+              TBBUrw.VECode = "";
+            end;
+            if(TBBUrw.stp==18) then begin
+              k = TBBUrw.ItemType;
+            end;		//I,II,III,IV Quartal
+            kTestf = false;
+            if ((RepSpec.flags[1] == 1) and (k == 1)) then begin
+              kTestf = true;
+            end;
+            if ((RepSpec.flags[2] == 1) and (k == 2)) then begin
+              kTestf = true;
+            end;
+            if ((RepSpec.flags[3] == 1) and (k == 3)) then begin
+              kTestf = true;
+            end;
+            if ((RepSpec.flags[4] == 1) and (k == 4)) then begin
+              kTestf = true;
+            end;
+            if ((RepSpec.flags[1] == 1) and ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4))) then begin
+              kTestf = true;
+            end;
+            if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
+              foundf = false;
+              if nonblank(TBBUrw.VECode) then begin
+                repmtrw = matrowcnt(BRr);
+                For(repi=0;repi<repmtrw;repi=repi+1) begin
+                  matrowget(BRr,repi,BRrw);
+                  if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and (BRrw.VECode == TBBUrw.VECode) then begin
+                    foundf = true;
+                  end;
+                end;
+                if !foundf then begin
+                  For(repi=0;repi<repmtrw;repi=repi+1) begin
+                    matrowget(BRr,repi,BRrw);
+                    if ((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and nonblank(BRrw.Code)) and blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+                      BRrw.Bud1 = blankval;
+                      BRrw.Bud2 = blankval;
+                      BRrw.Bud3 = blankval;
+                      BRrw.Bud4 = blankval;
+                      BRrw.Spend1 = blankval;
+                      BRrw.Spend2 = blankval;
+                      BRrw.Spend3 = blankval;
+                      BRrw.Spend4 = blankval;
+                      BRrw.VECode = TBBUrw.VECode;
+                      Objr.Code = BRrw.VECode;
+                      readfirstmain(Objr,1,true);
+                      BRrw.VEName = Objr.Comment;
+                      matrowinsert(BRr,repi+1,BRrw);
+                      repi = repmtrw;
+                    end;
+                  end;
+                end;
+              end;
+              repmtrw = matrowcnt(BRr);
+              For(repi=0;repi<repmtrw;repi=repi+1) begin
+                matrowget(BRr,repi,BRrw);
+                if((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and ((BRrw.VECode == TBBUrw.VECode) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1) or OTCodeMatch(RepSpec.f1,"LOCAT"))) then begin
+                  switch(k) begin
+                    case 1:
+                      BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
+                    case 2:
+                      BRrw.Bud2 = BRrw.Bud2 + TBBUrw.Sum;
+                    case 3:
+                      BRrw.Bud3 = BRrw.Bud3 + TBBUrw.Sum;
+                    case 4:
+                      BRrw.Bud4 = BRrw.Bud4 + TBBUrw.Sum;
+                    otherwise
+                      BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;	//I Quartal as default
+                  end;
+                  matrowput(BRr,repi,BRrw);
+                end;
+              end; 
+            end;
+          end;
 				end; 
 			end;
 				
@@ -221,80 +223,82 @@ BEGIN
 						k = 0;
 						For(i=0;i<mtrw;i=i+1) begin
 							matrowget(TBBUr,i,TBBUrw);
-							if (RepSpec.flags[5] == 1) then begin
-								TBBUrw.VECode = "";
-							end;
-							if(TBBUrw.stp==18) then begin
-								k=TBBUrw.ItemType;
-							end;		//I,II,III,IV Quartal
-							kTestf = false;
-							if ((RepSpec.flags[1] == 1) and (k == 1)) then begin
-								kTestf = true;
-							end;
-							if ((RepSpec.flags[2] == 1) and (k == 2)) then begin
-								kTestf = true;
-							end;
-							if ((RepSpec.flags[3] == 1) and (k == 3)) then begin
-								kTestf = true;
-							end;
-							if ((RepSpec.flags[4] == 1) and (k == 4)) then begin
-								kTestf = true;
-							end;
-							if ((RepSpec.flags[1] == 1) and ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4))) then begin
-								kTestf = true;
-							end;
-							if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
-								foundf = false;
-								if nonblank(TBBUrw.VECode) then begin
-									repmtrw = matrowcnt(BRr);
-									For(repi=0;repi<repmtrw;repi=repi+1) begin
-										matrowget(BRr,repi,BRrw);
-										if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and (BRrw.VECode == TBBUrw.VECode) then begin
-											foundf = true;
-										end;
-									end;
-									if !foundf then begin
-										For(repi=0;repi<repmtrw;repi=repi+1) begin
-											matrowget(BRr,repi,BRrw);
-											if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
-												BRrw.Bud1 = blankval;
-												BRrw.Bud2 = blankval;
-												BRrw.Bud3 = blankval;
-												BRrw.Bud4 = blankval;
-												BRrw.Spend1 = blankval;
-												BRrw.Spend2 = blankval;
-												BRrw.Spend3 = blankval;
-												BRrw.Spend4 = blankval;
-												BRrw.VECode = TBBUrw.VECode;
-												Objr.Code = BRrw.VECode;
-												readfirstmain(Objr,1,true);
-												BRrw.VEName = Objr.Comment;
-												matrowinsert(BRr,repi+1,BRrw);
-												repi = repmtrw;
-											end;
-										end;
-									end;
-								end;
-								repmtrw = matrowcnt(BRr);
-								For(repi=0;repi<repmtrw;repi=repi+1) begin
-									matrowget(BRr,repi,BRrw);
-									if ((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and ((BRrw.VECode == TBBUrw.VECode) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1) or OTCodeMatch(RepSpec.f1,"LOCAT"))) then begin
-										switch(k) begin
-											case 1:
-												BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
-											case 2:
-												BRrw.Bud2 = BRrw.Bud2 + TBBUrw.Sum;
-											case 3:
-												BRrw.Bud3 = BRrw.Bud3 + TBBUrw.Sum;
-											case 4:
-												BRrw.Bud4 = BRrw.Bud4 + TBBUrw.Sum;
-											otherwise
-												BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;	//I Quartal as default
-										end;
-										matrowput(BRr,repi,BRrw);
-									end;
-								end; 
-							end;
+              if (RepSpec.f3=="2016" and right(TBBUrw.ArtCode,3)=="_16") or (RepSpec.f3!="2016" and right(TBBUrw.ArtCode,3)!="_16") then begin
+                if (RepSpec.flags[5] == 1) then begin
+                  TBBUrw.VECode = "";
+                end;
+                if(TBBUrw.stp==18) then begin
+                  k=TBBUrw.ItemType;
+                end;		//I,II,III,IV Quartal
+                kTestf = false;
+                if ((RepSpec.flags[1] == 1) and (k == 1)) then begin
+                  kTestf = true;
+                end;
+                if ((RepSpec.flags[2] == 1) and (k == 2)) then begin
+                  kTestf = true;
+                end;
+                if ((RepSpec.flags[3] == 1) and (k == 3)) then begin
+                  kTestf = true;
+                end;
+                if ((RepSpec.flags[4] == 1) and (k == 4)) then begin
+                  kTestf = true;
+                end;
+                if ((RepSpec.flags[1] == 1) and ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4))) then begin
+                  kTestf = true;
+                end;
+                if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
+                  foundf = false;
+                  if nonblank(TBBUrw.VECode) then begin
+                    repmtrw = matrowcnt(BRr);
+                    For(repi=0;repi<repmtrw;repi=repi+1) begin
+                      matrowget(BRr,repi,BRrw);
+                      if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and (BRrw.VECode == TBBUrw.VECode) then begin
+                        foundf = true;
+                      end;
+                    end;
+                    if !foundf then begin
+                      For(repi=0;repi<repmtrw;repi=repi+1) begin
+                        matrowget(BRr,repi,BRrw);
+                        if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and  blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+                          BRrw.Bud1 = blankval;
+                          BRrw.Bud2 = blankval;
+                          BRrw.Bud3 = blankval;
+                          BRrw.Bud4 = blankval;
+                          BRrw.Spend1 = blankval;
+                          BRrw.Spend2 = blankval;
+                          BRrw.Spend3 = blankval;
+                          BRrw.Spend4 = blankval;
+                          BRrw.VECode = TBBUrw.VECode;
+                          Objr.Code = BRrw.VECode;
+                          readfirstmain(Objr,1,true);
+                          BRrw.VEName = Objr.Comment;
+                          matrowinsert(BRr,repi+1,BRrw);
+                          repi = repmtrw;
+                        end;
+                      end;
+                    end;
+                  end;
+                  repmtrw = matrowcnt(BRr);
+                  For(repi=0;repi<repmtrw;repi=repi+1) begin
+                    matrowget(BRr,repi,BRrw);
+                    if ((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and ((BRrw.VECode == TBBUrw.VECode) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1) or OTCodeMatch(RepSpec.f1,"LOCAT"))) then begin
+                      switch(k) begin
+                        case 1:
+                          BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
+                        case 2:
+                          BRrw.Bud2 = BRrw.Bud2 + TBBUrw.Sum;
+                        case 3:
+                          BRrw.Bud3 = BRrw.Bud3 + TBBUrw.Sum;
+                        case 4:
+                          BRrw.Bud4 = BRrw.Bud4 + TBBUrw.Sum;
+                        otherwise
+                          BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;	//I Quartal as default
+                      end;
+                      matrowput(BRr,repi,BRrw);
+                    end;
+                  end; 
+                end;
+              end;
 						end; 
 					end;
 				end;
@@ -410,79 +414,81 @@ BEGIN
 					k=0;
 					For(i=0;i<mtrw;i=i+1) begin
 						matrowget(TBBUr,i,TBBUrw);
-						if (RepSpec.flags[5] == 1) then begin
-							TBBUrw.VECode = "";
-						end;
-						if(TBBUrw.stp==18) then begin k=TBBUrw.ItemType; end;		//I,II,III,IV Quartal
-						kTestf = false;
-						if ((RepSpec.flags[1] == 1) and (k == 1)) then begin
-							kTestf = true;
-						end;
-						if ((RepSpec.flags[2] == 1) and (k == 2)) then begin
-							kTestf = true;
-						end;
-						if ((RepSpec.flags[3] == 1) and (k == 3)) then begin
-							kTestf = true;
-						end;
-						if ((RepSpec.flags[4] == 1) and (k == 4)) then begin
-							kTestf = true;
-						end;
-						if ((RepSpec.flags[1] == 1) and ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4))) then begin
-							kTestf = true;
-						end;
-						if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
-							foundf = false;
-							if nonblank(TBBUrw.VECode) then begin
-								repmtrw = matrowcnt(BRr);
-								For(repi=0;repi<repmtrw;repi=repi+1) begin
-									matrowget(BRr,repi,BRrw);
-									if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and (BRrw.VECode == TBBUrw.VECode) then begin
-										foundf = true;
-									end;
-								end;
-								if !foundf then begin
-									For(repi=0;repi<repmtrw;repi=repi+1) begin
-										matrowget(BRr,repi,BRrw);
-										if ((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and nonblank(BRrw.Code)) and blank(BRrw.VECode) and blank(BRrw.CatName) then begin
-											BRrw.Bud1 = blankval;
-											BRrw.Bud2 = blankval;
-											BRrw.Bud3 = blankval;
-											BRrw.Bud4 = blankval;
-											BRrw.Spend1 = blankval;
-											BRrw.Spend2 = blankval;
-											BRrw.Spend3 = blankval;
-											BRrw.Spend4 = blankval;
-											BRrw.VECode = TBBUrw.VECode;
-											Objr.Code = BRrw.VECode;
-											readfirstmain(Objr,1,true);
-											BRrw.VEName = Objr.Comment;
-											matrowinsert(BRr,repi+1,BRrw);
-											repi = repmtrw;
-										end;
-									end;
-								end;
-							end;
-							repmtrw = matrowcnt(BRr);
-							For(repi=0;repi<repmtrw;repi=repi+1) begin
-								matrowget(BRr,repi,BRrw);
-								if((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and ((BRrw.VECode == TBBUrw.VECode) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1) or OTCodeMatch(RepSpec.f1,"LOCAT")))then begin
-									switch(k) begin
-										case 1:
-											BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
-										case 2:
-											BRrw.Bud2 = BRrw.Bud2 + TBBUrw.Sum;
-										case 3:
-											BRrw.Bud3 = BRrw.Bud3 + TBBUrw.Sum;
-										case 4:
-											BRrw.Bud4 = BRrw.Bud4 + TBBUrw.Sum;
-										otherwise
-											BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;	//I Quartal as default
-									end;
-									matrowput(BRr,repi,BRrw);
-								end;
-							end;
-						end;
-					end; 
+            if (RepSpec.f3=="2016" and right(TBBUrw.ArtCode,3)=="_16") or (RepSpec.f3!="2016" and right(TBBUrw.ArtCode,3)!="_16") then begin
+              if (RepSpec.flags[5] == 1) then begin
+                TBBUrw.VECode = "";
+              end;
+              if(TBBUrw.stp==18) then begin k=TBBUrw.ItemType; end;		//I,II,III,IV Quartal
+              kTestf = false;
+              if ((RepSpec.flags[1] == 1) and (k == 1)) then begin
+                kTestf = true;
+              end;
+              if ((RepSpec.flags[2] == 1) and (k == 2)) then begin
+                kTestf = true;
+              end;
+              if ((RepSpec.flags[3] == 1) and (k == 3)) then begin
+                kTestf = true;
+              end;
+              if ((RepSpec.flags[4] == 1) and (k == 4)) then begin
+                kTestf = true;
+              end;
+              if ((RepSpec.flags[1] == 1) and ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4))) then begin
+                kTestf = true;
+              end;
+              if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
+                foundf = false;
+                if nonblank(TBBUrw.VECode) then begin
+                  repmtrw = matrowcnt(BRr);
+                  For(repi=0;repi<repmtrw;repi=repi+1) begin
+                    matrowget(BRr,repi,BRrw);
+                    if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and (BRrw.VECode == TBBUrw.VECode) then begin
+                      foundf = true;
+                    end;
+                  end;
+                  if !foundf then begin
+                    For(repi=0;repi<repmtrw;repi=repi+1) begin
+                      matrowget(BRr,repi,BRrw);
+                      if ((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and nonblank(BRrw.Code)) and blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+                        BRrw.Bud1 = blankval;
+                        BRrw.Bud2 = blankval;
+                        BRrw.Bud3 = blankval;
+                        BRrw.Bud4 = blankval;
+                        BRrw.Spend1 = blankval;
+                        BRrw.Spend2 = blankval;
+                        BRrw.Spend3 = blankval;
+                        BRrw.Spend4 = blankval;
+                        BRrw.VECode = TBBUrw.VECode;
+                        Objr.Code = BRrw.VECode;
+                        readfirstmain(Objr,1,true);
+                        BRrw.VEName = Objr.Comment;
+                        matrowinsert(BRr,repi+1,BRrw);
+                        repi = repmtrw;
+                      end;
+                    end;
+                  end;
+                end;
+                repmtrw = matrowcnt(BRr);
+                For(repi=0;repi<repmtrw;repi=repi+1) begin
+                  matrowget(BRr,repi,BRrw);
+                  if((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and ((BRrw.VECode == TBBUrw.VECode) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1) or OTCodeMatch(RepSpec.f1,"LOCAT")))then begin
+                    switch(k) begin
+                      case 1:
+                        BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
+                      case 2:
+                        BRrw.Bud2 = BRrw.Bud2 + TBBUrw.Sum;
+                      case 3:
+                        BRrw.Bud3 = BRrw.Bud3 + TBBUrw.Sum;
+                      case 4:
+                        BRrw.Bud4 = BRrw.Bud4 + TBBUrw.Sum;
+                      otherwise
+                        BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;	//I Quartal as default
+                    end;
+                    matrowput(BRr,repi,BRrw);
+                  end;
+                end;
+              end;
+            end; 
+          end;
 				end;
 					
 				PR2r.MotherCode = PRr.Code;
@@ -499,78 +505,80 @@ BEGIN
 							k = 0;
 							For(i=0;i<mtrw;i=i+1) begin
 								matrowget(TBBUr,i,TBBUrw);
-								if (RepSpec.flags[5] == 1) then begin
-									TBBUrw.VECode = "";
-								end;
-								if(TBBUrw.stp==18) then begin k=TBBUrw.ItemType; end;		//I,II,III,IV Quartal									
-								kTestf = false;
-								if ((RepSpec.flags[1] == 1) and (k == 1)) then begin
-									kTestf = true;
-								end;
-								if ((RepSpec.flags[2] == 1) and (k == 2)) then begin
-									kTestf = true;
-								end;
-								if ((RepSpec.flags[3] == 1) and (k == 3)) then begin
-									kTestf = true;
-								end;
-								if ((RepSpec.flags[4] == 1) and (k == 4)) then begin
-									kTestf = true;
-								end;
-								if ((RepSpec.flags[1] == 1) and ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4))) then begin
-									kTestf = true;
-								end;
-								if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
-									foundf = false;
-									if nonblank(TBBUrw.VECode) then begin
-										repmtrw = matrowcnt(BRr);
-										For(repi=0;repi<repmtrw;repi=repi+1) begin
-											matrowget(BRr,repi,BRrw);
-											if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and (BRrw.VECode == TBBUrw.VECode) then begin
-												foundf = true;
-											end;
-										end;
-										if !foundf then begin
-											For(repi=0;repi<repmtrw;repi=repi+1) begin
-												matrowget(BRr,repi,BRrw);
-												if ((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and nonblank(BRrw.Code)) and blank(BRrw.VECode) and blank(BRrw.CatName) then begin
-													BRrw.Bud1 = blankval;
-													BRrw.Bud2 = blankval;
-													BRrw.Bud3 = blankval;
-													BRrw.Bud4 = blankval;
-													BRrw.Spend1 = blankval;
-													BRrw.Spend2 = blankval;
-													BRrw.Spend3 = blankval;
-													BRrw.Spend4 = blankval;
-													BRrw.VECode = TBBUrw.VECode;
-													Objr.Code = BRrw.VECode;
-													readfirstmain(Objr,1,true);
-													BRrw.VEName = Objr.Comment;
-													matrowinsert(BRr,repi+1,BRrw);
-													repi = repmtrw;
-												end;
-											end;
-										end;
-									end;
-									repmtrw = matrowcnt(BRr);
-									For(repi=0;repi<repmtrw;repi=repi+1) begin
-										matrowget(BRr,repi,BRrw);
-										if((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and ((BRrw.VECode == TBBUrw.VECode) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1) or OTCodeMatch(RepSpec.f1,"LOCAT")))then begin
-											switch(k) begin
-												case 1:
-													BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
-												case 2:
-													BRrw.Bud2 = BRrw.Bud2 + TBBUrw.Sum;
-												case 3:
-													BRrw.Bud3 = BRrw.Bud3 + TBBUrw.Sum;
-												case 4:
-													BRrw.Bud4 = BRrw.Bud4 + TBBUrw.Sum;
-												otherwise
-													BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;	//I Quartal as default
-											end;
-											matrowput(BRr,repi,BRrw);
-										end;
-									end; 
-								end;
+                if (RepSpec.f3=="2016" and right(TBBUrw.ArtCode,3)=="_16") or (RepSpec.f3!="2016" and right(TBBUrw.ArtCode,3)!="_16") then begin
+                  if (RepSpec.flags[5] == 1) then begin
+                    TBBUrw.VECode = "";
+                  end;
+                  if(TBBUrw.stp==18) then begin k=TBBUrw.ItemType; end;		//I,II,III,IV Quartal									
+                  kTestf = false;
+                  if ((RepSpec.flags[1] == 1) and (k == 1)) then begin
+                    kTestf = true;
+                  end;
+                  if ((RepSpec.flags[2] == 1) and (k == 2)) then begin
+                    kTestf = true;
+                  end;
+                  if ((RepSpec.flags[3] == 1) and (k == 3)) then begin
+                    kTestf = true;
+                  end;
+                  if ((RepSpec.flags[4] == 1) and (k == 4)) then begin
+                    kTestf = true;
+                  end;
+                  if ((RepSpec.flags[1] == 1) and ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4))) then begin
+                    kTestf = true;
+                  end;
+                  if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
+                    foundf = false;
+                    if nonblank(TBBUrw.VECode) then begin
+                      repmtrw = matrowcnt(BRr);
+                      For(repi=0;repi<repmtrw;repi=repi+1) begin
+                        matrowget(BRr,repi,BRrw);
+                        if (setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and (BRrw.VECode == TBBUrw.VECode) then begin
+                          foundf = true;
+                        end;
+                      end;
+                      if !foundf then begin
+                        For(repi=0;repi<repmtrw;repi=repi+1) begin
+                          matrowget(BRr,repi,BRrw);
+                          if ((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and nonblank(BRrw.Code)) and blank(BRrw.VECode) and blank(BRrw.CatName) then begin
+                            BRrw.Bud1 = blankval;
+                            BRrw.Bud2 = blankval;
+                            BRrw.Bud3 = blankval;
+                            BRrw.Bud4 = blankval;
+                            BRrw.Spend1 = blankval;
+                            BRrw.Spend2 = blankval;
+                            BRrw.Spend3 = blankval;
+                            BRrw.Spend4 = blankval;
+                            BRrw.VECode = TBBUrw.VECode;
+                            Objr.Code = BRrw.VECode;
+                            readfirstmain(Objr,1,true);
+                            BRrw.VEName = Objr.Comment;
+                            matrowinsert(BRr,repi+1,BRrw);
+                            repi = repmtrw;
+                          end;
+                        end;
+                      end;
+                    end;
+                    repmtrw = matrowcnt(BRr);
+                    For(repi=0;repi<repmtrw;repi=repi+1) begin
+                      matrowget(BRr,repi,BRrw);
+                      if((setinset(BRrw.Code,TBBUrw.Objects) and nonblank(BRrw.Code)) and ((BRrw.VECode == TBBUrw.VECode) or (blank(BRrw.VECode) and blank(TBBUrw.VECode))) and (setinset(RepSpec.f1,TBBUrw.Objects) or blank(RepSpec.f1) or OTCodeMatch(RepSpec.f1,"LOCAT")))then begin
+                        switch(k) begin
+                          case 1:
+                            BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;
+                          case 2:
+                            BRrw.Bud2 = BRrw.Bud2 + TBBUrw.Sum;
+                          case 3:
+                            BRrw.Bud3 = BRrw.Bud3 + TBBUrw.Sum;
+                          case 4:
+                            BRrw.Bud4 = BRrw.Bud4 + TBBUrw.Sum;
+                          otherwise
+                            BRrw.Bud1 = BRrw.Bud1 + TBBUrw.Sum;	//I Quartal as default
+                        end;
+                        matrowput(BRr,repi,BRrw);
+                      end;
+                    end; 
+                  end;
+                end;
 							end; 
 						end;
 					end;
@@ -713,51 +721,54 @@ BEGIN
 //Collect array of all items for every vendor  
 	k = 0;
 	while (loopmain(ITr,1,true)) begin
-		clearrow(PatternBRr,PatternBRrw,1);
-		PatternBRrw.Code = ITr.Code;
-		PatternBRrw.CatName = ITr.Comment;
-		matrowput(PatternBRr,k,PatternBRrw);
-		k=k+1;
-		resetloop(INr);
-		INr.Group = ITr.Code;
-		TrHs = true;
-		while(loopkey("Group",INr,1,TrHs)) begin
-			testf = true;
-			if(INr.Group!=ITr.Code)then begin testf = false; TrHs = false; end;
-			if(blank(INr.Objects))then begin testf = false; end;
-			
-			if(testf)then begin
-				clearrow(PatternBRr,PatternBRrw,1);
-				PatternBRrw.Code = INr.Objects;
-				Objr.Code = INr.Objects;
-				if(readfirstmain(Objr,1,true))then begin
-					PatternBRrw.Name = Objr.Comment;
-				end;
-				PatternBRrw.CostAcc = INr.CostAcc;
-				repmtrw = matrowcnt(PatternBRr);
-				foundf = false;
-				For(i=0;i<repmtrw;i=i+1) begin
-					matrowget(PatternBRr,i,PatternBR2rw);
-					if(PatternBR2rw.Code==PatternBRrw.Code)then begin
-						foundf = true;
-					end;
-				end; 
-				repmtrw = matrowcnt(PatternBRr);
-				foundf = false;
-				For(i=0;i<repmtrw;i=i+1) begin
-					matrowget(PatternBRr,i,PatternBR2rw);
-					if(PatternBR2rw.Code==PatternBRrw.Code and PatternBR2rw.VECode=="")then begin
-						foundf = true;
-					end;
-				end; 
-				if(!foundf)then begin
-					PatternBRrw.VECode = "";
-					matrowput(PatternBRr,k,PatternBRrw);
-					k=k+1;
-				end;
-			end;
-		end;
-	end;
+    if (RepSpec.f3=="2016" and right(ITr.Code,3)=="_16") or (RepSpec.f3!="2016" and right(ITr.Code,3)!="_16") then begin
+      clearrow(PatternBRr,PatternBRrw,1);
+      PatternBRrw.Code = ITr.Code;
+      PatternBRrw.CatName = ITr.Comment;
+      matrowput(PatternBRr,k,PatternBRrw);
+      k=k+1;
+      resetloop(INr);
+      INr.Group = ITr.Code;
+      TrHs = true;
+      while(loopkey("Group",INr,1,TrHs)) begin
+        testf = true;
+        if(INr.Group!=ITr.Code)then begin testf = false; TrHs = false; end;
+        if(blank(INr.Objects))then begin testf = false; end;
+        if (RepSpec.f3=="2016" and right(INr.Objects,3)!="_16") then begin testf = false; end;
+        if (RepSpec.f3!="2016" and right(INr.Objects,3)=="_16") then begin testf = false; end;
+        if(testf)then begin
+          clearrow(PatternBRr,PatternBRrw,1);
+          PatternBRrw.Code = INr.Objects;
+          Objr.Code = INr.Objects;
+          if(readfirstmain(Objr,1,true))then begin
+            PatternBRrw.Name = Objr.Comment;
+          end;
+          PatternBRrw.CostAcc = INr.CostAcc;
+          repmtrw = matrowcnt(PatternBRr);
+          foundf = false;
+          For(i=0;i<repmtrw;i=i+1) begin
+            matrowget(PatternBRr,i,PatternBR2rw);
+            if(PatternBR2rw.Code==PatternBRrw.Code)then begin
+              foundf = true;
+            end;
+          end; 
+          repmtrw = matrowcnt(PatternBRr);
+          foundf = false;
+          For(i=0;i<repmtrw;i=i+1) begin
+            matrowget(PatternBRr,i,PatternBR2rw);
+            if(PatternBR2rw.Code==PatternBRrw.Code and PatternBR2rw.VECode=="")then begin
+              foundf = true;
+            end;
+          end; 
+          if(!foundf)then begin
+            PatternBRrw.VECode = "";
+            matrowput(PatternBRr,k,PatternBRrw);
+            k=k+1;
+          end;
+        end;
+      end;
+    end;
+  end;
 	
 	if (blank(RepSpec.f2)) then begin
 		TrHs = true;

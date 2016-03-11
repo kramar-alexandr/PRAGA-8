@@ -106,41 +106,43 @@ BEGIN
 							kTestf = true;
 						end;
 						if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
-							for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin 
-								if (TBBUrw.ExtraObj==FoundArray[FAi]) then begin
-									switch (k) begin
-										case 1:
-											FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-											FPVect["Q1:TOTAL:" & ProjArray[PAi]] = FPVect["Q1:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-											FPVect["Q1:TOTAL:TOTAL"] = FPVect["Q1:TOTAL:TOTAL"] + TBBUrw.Sum;
-										case 2:
-											FPVect["Q2:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q2:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											FPVect["Q2:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q2:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-											FPVect["Q2:TOTAL:" & ProjArray[PAi]] = FPVect["Q2:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-											FPVect["Q2:TOTAL:TOTAL"] = FPVect["Q2:TOTAL:TOTAL"] + TBBUrw.Sum;
-										case 3:
-											FPVect["Q3:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q3:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											FPVect["Q3:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q3:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-											FPVect["Q3:TOTAL:" & ProjArray[PAi]] = FPVect["Q3:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-											FPVect["Q3:TOTAL:TOTAL"] = FPVect["Q3:TOTAL:TOTAL"] + TBBUrw.Sum;
-										case 4:
-											FPVect["Q4:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q4:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											FPVect["Q4:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q4:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-											FPVect["Q4:TOTAL:" & ProjArray[PAi]] = FPVect["Q4:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-											FPVect["Q4:TOTAL:TOTAL"] = FPVect["Q4:TOTAL:TOTAL"] + TBBUrw.Sum;
-										otherwise
-											FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-											FPVect["Q1:TOTAL:" & ProjArray[PAi]] = FPVect["Q1:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-											FPVect["Q1:TOTAL:TOTAL"] = FPVect["Q1:TOTAL:TOTAL"] + TBBUrw.Sum;
-									end;
-									FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-									FPVect["TOTAL:" & ProjArray[PAi]] = FPVect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-									FPVect[FoundArray[FAi] & ":TOTAL"] = FPVect[FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-									FPVect["TOTAL:TOTAL"] = FPVect["TOTAL:TOTAL"] + TBBUrw.Sum;
-								end;
-							end;
+              if (RepSpec.f2=="2016" and right(TBBUrw.ArtCode,3)=="_16") or (RepSpec.f2!="2016" and right(TBBUrw.ArtCode,3)!="_16") then begin
+                for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin 
+                  if (TBBUrw.ExtraObj==FoundArray[FAi]) then begin
+                    switch (k) begin
+                      case 1:
+                        FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+                        FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
+                        FPVect["Q1:TOTAL:" & ProjArray[PAi]] = FPVect["Q1:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
+                        FPVect["Q1:TOTAL:TOTAL"] = FPVect["Q1:TOTAL:TOTAL"] + TBBUrw.Sum;
+                      case 2:
+                        FPVect["Q2:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q2:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+                        FPVect["Q2:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q2:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
+                        FPVect["Q2:TOTAL:" & ProjArray[PAi]] = FPVect["Q2:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
+                        FPVect["Q2:TOTAL:TOTAL"] = FPVect["Q2:TOTAL:TOTAL"] + TBBUrw.Sum;
+                      case 3:
+                        FPVect["Q3:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q3:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+                        FPVect["Q3:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q3:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
+                        FPVect["Q3:TOTAL:" & ProjArray[PAi]] = FPVect["Q3:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
+                        FPVect["Q3:TOTAL:TOTAL"] = FPVect["Q3:TOTAL:TOTAL"] + TBBUrw.Sum;
+                      case 4:
+                        FPVect["Q4:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q4:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+                        FPVect["Q4:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q4:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
+                        FPVect["Q4:TOTAL:" & ProjArray[PAi]] = FPVect["Q4:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
+                        FPVect["Q4:TOTAL:TOTAL"] = FPVect["Q4:TOTAL:TOTAL"] + TBBUrw.Sum;
+                      otherwise
+                        FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+                        FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
+                        FPVect["Q1:TOTAL:" & ProjArray[PAi]] = FPVect["Q1:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
+                        FPVect["Q1:TOTAL:TOTAL"] = FPVect["Q1:TOTAL:TOTAL"] + TBBUrw.Sum;
+                    end;
+                    FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+                    FPVect["TOTAL:" & ProjArray[PAi]] = FPVect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
+                    FPVect[FoundArray[FAi] & ":TOTAL"] = FPVect[FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
+                    FPVect["TOTAL:TOTAL"] = FPVect["TOTAL:TOTAL"] + TBBUrw.Sum;
+                  end;
+                end;
+              end;
 						end;
 					end;
 				end;
@@ -280,7 +282,7 @@ BEGIN
 		BeginRow(sheetnum,fileToSave,rownum,0,30);
 			style = 66;
 			mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
-			StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL - BUDGET - 2016",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+			StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL - BUDGET - " & RepSpec.f2,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			style = 67;
 			if (ProjArray.length + 1 + FoundArray.length) >= ((quartCount + 2)*(FoundArray.length + 1) - 1) then begin
 				qtyOfEmpStr = ProjArray.length + 1 + FoundArray.length - 2;

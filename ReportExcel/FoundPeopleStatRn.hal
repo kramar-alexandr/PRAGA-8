@@ -25,62 +25,69 @@ BEGIN
 	kw = 0;
 	if RepSpec.flags[5] == 1 then begin
 		ITr.Code = 4000;
+    if (RepSpec.f2=="2016") then begin
+      ITr.Code = "4_16";
+    end;
 		if (readfirstmain(ITr,1,true)) begin
-			ArtArrayWithGroups[kw] = ITr.Code;
-			kw = kw + 1;
-			resetloop(INr);
-			INr.Group = ITr.Code;
-			TrHs = true;
-			while(loopkey("Group",INr,1,TrHs)) begin
-				testf = true;
-				if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
-				if (blank(INr.Objects)) then begin testf = false; end;
-				
-				if (testf) then begin
-					tstr = INr.Objects;
-					foundf = false;
-					for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
-						if (ArtArrayWithoutGroups[i]==tstr) then begin
-							foundf = true;
-						end;
-					end; 
-					if (!foundf) then begin
-						ArtArrayWithoutGroups[kwo] = INr.Objects;
-						kwo = kwo + 1;
-						ArtArrayWithGroups[kw] = INr.Objects;
-						kw = kw + 1;
-					end;
-				end;
-			end;
-		end;
+      if (RepSpec.f2=="2016" and right(ITr.Code,3)=="_16") or (RepSpec.f2!="2016" and right(ITr.Code,3)!="_16") then begin
+        ArtArrayWithGroups[kw] = ITr.Code;
+        kw = kw + 1;
+        resetloop(INr);
+        INr.Group = ITr.Code;
+        TrHs = true;
+        while(loopkey("Group",INr,1,TrHs)) begin
+          testf = true;
+          if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
+          if (blank(INr.Objects)) then begin testf = false; end;
+          if (RepSpec.f2=="2016" and right(INr.Objects,3)=="_16") or (RepSpec.f2!="2016") then begin testf = false; end;
+          if (testf) then begin
+            tstr = INr.Objects;
+            foundf = false;
+            for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
+              if (ArtArrayWithoutGroups[i]==tstr) then begin
+                foundf = true;
+              end;
+            end; 
+            if (!foundf) then begin
+              ArtArrayWithoutGroups[kwo] = INr.Objects;
+              kwo = kwo + 1;
+              ArtArrayWithGroups[kw] = INr.Objects;
+              kw = kw + 1;
+            end;
+          end;
+        end;
+      end;
+    end;
 	end else begin
 		while(loopmain(ITr,1,true)) begin
-			ArtArrayWithGroups[kw] = ITr.Code;
-			kw = kw + 1;
-			resetloop(INr);
-			INr.Group = ITr.Code;
-			TrHs = true;
-			while(loopkey("Group",INr,1,TrHs)) begin
-				testf = true;
-				if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
-				if (blank(INr.Objects)) then begin testf = false; end;
-				
-				if (testf) then begin
-					tstr = INr.Objects;
-					foundf = false;
-					for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
-						if (ArtArrayWithoutGroups[i]==tstr) then begin
-							foundf = true;
-						end;
-					end; 
-					if (!foundf) then begin
-						ArtArrayWithoutGroups[kwo] = INr.Objects;
-						kwo = kwo + 1;
-						ArtArrayWithGroups[kw] = INr.Objects;
-						kw = kw + 1;
-					end;
-				end;
-			end;
+      if (RepSpec.f2=="2016" and right(ITr.Code,3)=="_16") or (RepSpec.f2!="2016" and right(ITr.Code,3)!="_16") then begin
+        ArtArrayWithGroups[kw] = ITr.Code;
+        kw = kw + 1;
+        resetloop(INr);
+        INr.Group = ITr.Code;
+        TrHs = true;
+        while(loopkey("Group",INr,1,TrHs)) begin
+          testf = true;
+          if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
+          if (blank(INr.Objects)) then begin testf = false; end;
+          if (RepSpec.f2=="2016" and right(INr.Objects,3)!="_16") then begin testf = false; end;
+          if (testf) then begin
+            tstr = INr.Objects;
+            foundf = false;
+            for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
+              if (ArtArrayWithoutGroups[i]==tstr) then begin
+                foundf = true;
+              end;
+            end; 
+            if (!foundf) then begin
+              ArtArrayWithoutGroups[kwo] = INr.Objects;
+              kwo = kwo + 1;
+              ArtArrayWithGroups[kw] = INr.Objects;
+              kw = kw + 1;
+            end;
+          end;
+        end;
+      end;
 		end;
 	end;
 	k = 0;

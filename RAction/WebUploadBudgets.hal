@@ -1,0 +1,330 @@
+external function integer GetQuartal(date);
+external procedure GetObjs(string,string,var string);
+external function LongInt VIVcRecordDefaults(var record VIVc,record VIVc,LongInt,LongInt);
+external procedure VIVc_PastePRCode(var record VIVc,Integer);
+external function Boolean VIVc_PasteVECode(var record VIVc,Integer,Boolean,Boolean,var string);
+external procedure AutoObj(var string);
+external procedure VICalcVals(var record VIVc);
+external procedure VISumup(record VIVc,var val);
+
+function string 10 GetPrjCode(string prjObj)
+BEGIN
+	record PRVc PRr;
+	boolean foundf;
+	string 10 res;
+	
+	res = "";
+	foundf = false;
+	while(loopmain(PRr,1,!foundf)) begin
+		if (PRr.Objects == prjObj) then begin
+			foundf = true;
+			res = PRr.Code;
+		end;
+	end;
+	GetPrjCode = res;
+	RETURN;
+END;
+
+procedure HandleWebUploadBudgets()
+begin
+	record TBBUVc TBBUr;
+	row TBBUVc TBBUrw;
+	integer i,k,mtrw;
+	string 5 tab,nl;
+	
+	tab = chr(9);
+	nl = chr(10) & chr(13);
+	
+	TBBUr.PRCode = "";
+	while (LoopMain(TBBUr,1,true)) begin
+		mtrw = MatRowCnt(TBBUr);
+		k = 1;
+		for (i=0;i<mtrw;i=i+1) begin
+			MatRowGet(TBBUr,i,TBBUrw);
+			if(TBBUrw.stp==18) then begin
+				k=TBBUrw.ItemType;
+			end;
+			if(TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))then begin
+				weboutstring(TBBUr.PRCode & tab & TBBUr.Version & tab & TBBUrw.ExtraObj & tab & TBBUrw.VECode & tab & TBBUrw.ArtCode & tab & TBBUrw.Sum & tab & k & nl);
+			end;
+		end;
+	End;
+	return;
+end;
+
+procedure HandleWebUploadBudgetsFact()
+begin
+	record INVc INr;
+	record MainVc Mainr;
+	record TRVc TRr;
+	row TRVc TRrw;
+	integer i,k,mtrw;
+	string 5 tab,nl;
+	
+	string 100 prj,found,suppl,exp,locat;
+	
+	tab = chr(9);
+	nl = chr(10) & chr(13);
+	
+	Mainr.TransDate = "";
+	while (loopkey("TransDate",Mainr,1,true)) begin
+		if (mid(Mainr.AccNumber,0,1)=="5") then begin
+			TRr.Number = Mainr.TransNr;
+			TRr.IntYc = Mainr.IntYc;
+			if (readfirstmain(TRr,2,true)) then begin
+				k = GetQuartal(TRr.TransDate);
+				mtrw = matrowcnt(TRr);
+				for (i=0;i<mtrw;i=i+1) begin
+					matrowget(TRr,i,TRrw);
+					if ((TRrw.ovst==0) and (TRrw.AccNumber==Mainr.AccNumber)) then begin
+						prj = "";
+						GetObjs("PRJ",TRrw.Objects,prj);
+						if nonblank(prj) then begin
+							prj = GetPrjCode(prj);
+						end;
+						found = "";
+						GetObjs("FOUND",TRrw.Objects,found);
+						suppl = "";
+						GetObjs("SUPPL",TRrw.Objects,suppl);
+						exp = "";
+						GetObjs("EXP",TRrw.Objects,exp);
+						locat = "";
+						GetObjs("LOCAT",TRrw.Objects,locat);
+						weboutstring(prj & tab & found & tab & suppl & tab & exp & tab & locat & tab & (TRrw.DebVal - TRrw.CredVal) & tab & k & nl);
+						
+					end;
+				end;
+			end;
+		end;
+	end;
+
+	return;
+end;
+
+procedure HandleWebUploadUniqStrs()
+begin
+	record TBBUVc TBBUr;
+	record ObjVc Objr;
+	string 5 tab,nl;
+	boolean TrHs;
+	
+	tab = chr(9);
+	nl = chr(10) & chr(13);
+	
+	TBBUr.PRCode = "";
+	while (LoopMain(TBBUr,1,true)) begin
+		weboutstring(TBBUr.PRCode & tab);
+	end;
+	weboutstring(nl);
+	Objr.OTCode = "FOUND";
+	TrHs = true;
+	while (LoopKey("OTCode",Objr,1,TrHs)) begin
+		if (Objr.OTCode != "FOUND") then begin
+			TrHs = false;
+		end;
+		if TrHs then begin
+			weboutstring(Objr.Code & tab);
+		end;
+	end;
+	weboutstring(nl);
+	ResetLoop(Objr);
+	Objr.OTCode = "LOCAT";
+	TrHs = true;
+	while (LoopKey("OTCode",Objr,1,TrHs)) begin
+		if (Objr.OTCode != "LOCAT") then begin
+			TrHs = false;
+		end;
+		if TrHs then begin
+			weboutstring(Objr.Code & tab);
+		end;
+	end;
+	weboutstring(nl);
+	ResetLoop(Objr);
+	Objr.OTCode = "SUPPL";
+	TrHs = true;
+	while (LoopKey("OTCode",Objr,1,TrHs)) begin
+		if (Objr.OTCode != "SUPPL") then begin
+			TrHs = false;
+		end;
+		if TrHs then begin
+			weboutstring(Objr.Code & tab);
+		end;
+	end;
+	weboutstring(nl);
+	ResetLoop(Objr);
+	Objr.OTCode = "EXP";
+	TrHs = true;
+	while (LoopKey("OTCode",Objr,1,TrHs)) begin
+		if (Objr.OTCode != "EXP") then begin
+			TrHs = false;
+		end;
+		if TrHs then begin
+			weboutstring(Objr.Code & tab);
+		end;
+	end;
+	weboutstring(nl);
+	return;
+end;
+
+global webpublic procedure WebUploadBudgets()
+begin
+	HandleWebUploadBudgets;
+	return;
+end;
+
+global webpublic procedure WebUploadBudgetsFact()
+begin
+	HandleWebUploadBudgetsFact;
+	return;
+end;
+
+global webpublic procedure WebUploadUniqStrs()
+begin
+	HandleWebUploadUniqStrs;
+	return;
+end;
+
+global
+webpublic updating procedure WebUploadExpenses()
+begin
+	area areceived,data;
+	LongInt i,alen;
+	string 5 c,ctemp,headersep,valssep;
+	boolean appendf,headerf;
+	string 255 fname,toname,vewarn,objstr;
+	record VIVc VIr,VI2r;
+	row VIVc VIrw;
+	integer nextv,tries;
+	string 100 supp,prj,fund,loc,exp,sum;
+	val ct;
+	
+	headersep = "!==!";
+	valssep = "@#@";
+	headerf = false;
+	nextv = 0;
+	fname = "PicForHansa.txt";
+	toname = "Invoice_Scan.jpg";
+	webgetpostdata(areceived);
+	alen = GetAreaLength(areceived);
+	
+	for (i=0;i<alen;i=i+1) begin
+		if (i<=alen) then begin
+			c = getstringfromarea(areceived,i,1);
+			ctemp = c;
+			appendf = false;
+			switch asc(c) begin
+				case 64: //@
+					if (headerf) then begin
+						c = getstringfromarea(areceived,i,len(valssep));
+						if (c==valssep) then begin
+							i = i + len(valssep)-1;
+							nextv = nextv + 1;
+						end else begin
+							c = ctemp;
+						end;
+					end else begin
+						appendf = true;
+					end;
+				case 33: //!
+					c = getstringfromarea(areceived,i,len(headersep));
+					if (c==headersep) then begin
+						headerf = !headerf;
+						i = i + len(headersep)-1;
+					end else begin
+						c = ctemp;
+						appendf = true;
+					end;
+				case 37: //%
+					c = getstringfromarea(areceived,i,3);
+					if (c=="%2B") then begin
+						c = "+";
+						appendf = true;
+					end;
+					i = i + 2;
+				case 00: //null
+					//
+				otherwise
+					appendf = true;
+			end;
+			if (appendf) then begin
+				if (headerf) then begin
+					switch nextv begin
+						case 1: prj = prj & c;
+						case 2: supp = supp & c;
+						case 3: fund = fund & c;
+						case 4: loc = loc & c;
+						case 5: exp = exp & c;
+						case 6: sum = sum & c;
+					end;
+				end else begin
+					AddTextToArea(c,data);
+				end;
+			end;
+		end;
+	end;
+	
+	//LogText(0,"prj=" & prj & " supp=" & supp & " fund=" & fund & " loc=" & loc & " exp=" & exp & " sum=" & sum);
+	
+	VIVcRecordDefaults(VIr,VI2r,0,0);
+	if (VIr.SerNr==-1) then begin
+		VIr.SerNr = NextSerNr("VIVc",VIr.InvDate,-1,false,"");
+	end;
+
+	VIr.PRCode = prj;
+	VIVc_PastePRCode(VIr,-1);
+	VIr.VECode = supp;
+	VIVc_PasteVECode(VIr,Rs_normal,true,true,vewarn);
+	objstr = loc & "," & fund & "," & exp;
+	AutoObj(objstr);
+	VIr.Objects = objstr;
+	ClearRow(VIr,VIrw,1);
+	VIrw.Item = exp;
+	VIrw.Sum = StringToVal(sum,M4Val);
+	MatRowPut(VIr,0,VIrw);
+	VICalcVals(VIr);
+	//VISumup(VIr,ct);
+	VIr.PayVal = VIrw.Sum;
+	
+	if (FileExists(toname)) then begin
+		Delete_File(toname);
+	end;
+
+	alen = GetAreaLength(data);
+	if (alen>0) then begin
+		WRITEAREATOFILE(data,fname,0);
+		if (WindowsMode==1) then begin
+			RunProgram("c:\\windows\\system32\\cmd.exe","/C \""& "certutil -decode " & fname & " " & toname & "\"");
+		end;
+		if (WindowsMode==0) then begin
+			RunProgram("/usr/bin/base64","-Di " & fname & " -o " & toname);
+		end;
+		millisleep(200);
+	end;
+	
+	tries = 1;
+	if (RECORDSTORE(VIr,false) and alen>0) then begin
+		SetDocumentFilename("#" & VIr.SerNr);
+		
+LWebUploadExpensesRepeat:; 
+	 
+		if (FileExists(toname)) then begin
+			RecordLinkFile(toname,0,VIr,CurrentCompany);
+		end else begin
+			if (tries<=3) then begin
+				millisleep(100);
+				goto LWebUploadExpensesRepeat;
+			end;
+			tries = tries + 1;
+		end;
+		SetDocumentFilename("");
+		
+		Delete_File(fname);
+		Delete_File(toname);
+	end;
+	
+LWebUploadExpenses:;
+	
+	WebOutString("#" & VIr.SerNr);
+
+	return;
+end;

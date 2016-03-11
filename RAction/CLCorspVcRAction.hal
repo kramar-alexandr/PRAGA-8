@@ -36,6 +36,9 @@ BEGIN
 			INr.Name = CLCorspr.Comment;
 			INr.Objects = CLCorspr.Objects;
 			ITr.Code = CLCorspr.Code;
+      if right(CLCorspr.Code,3)=="_16" then begin
+        ITr.Code = left(CLCorspr.Code,1) & "_16";
+      end;
 			ReadLastMain(ITr,1,false);
 			INr.Group = ITr.Code;
 			INr.CostAcc = CLCorspr.AccNumber;

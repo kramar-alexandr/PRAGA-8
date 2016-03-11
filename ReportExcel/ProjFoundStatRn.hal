@@ -26,32 +26,35 @@ BEGIN
 	
 	kw = 0;
 	while(loopmain(ITr,1,true)) begin
-		ArtArrayWithGroups[kw] = ITr.Code;
-		kw = kw + 1;
-		resetloop(INr);
-		INr.Group = ITr.Code;
-		TrHs = true;
-		while(loopkey("Group",INr,1,TrHs)) begin
-			testf = true;
-			if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
-			if (blank(INr.Objects)) then begin testf = false; end;
-			
-			if (testf) then begin
-				tstr = INr.Objects;
-				foundf = false;
-				for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
-					if (ArtArrayWithoutGroups[i]==tstr) then begin
-						foundf = true;
-					end;
-				end; 
-				if (!foundf) then begin
-					ArtArrayWithoutGroups[kwo] = INr.Objects;
-					kwo = kwo + 1;
-					ArtArrayWithGroups[kw] = INr.Objects;
-					kw = kw + 1;
-				end;
-			end;
-		end;
+    if (RepSpec.f2=="2016" and right(ITr.Code,3)=="_16") or (RepSpec.f2!="2016" and right(ITr.Code,3)!="_16") then begin
+      ArtArrayWithGroups[kw] = ITr.Code;
+      kw = kw + 1;
+      resetloop(INr);
+      INr.Group = ITr.Code;
+      TrHs = true;
+      while(loopkey("Group",INr,1,TrHs)) begin
+        testf = true;
+        if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
+        if (blank(INr.Objects)) then begin testf = false; end;
+        if (RepSpec.f2=="2016" and right(INr.Objects,3)!="_16") then begin testf = false; end;
+        if (RepSpec.f2!="2016" and right(INr.Objects,3)=="_16") then begin testf = false; end;
+        if (testf) then begin
+          tstr = INr.Objects;
+          foundf = false;
+          for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
+            if (ArtArrayWithoutGroups[i]==tstr) then begin
+              foundf = true;
+            end;
+          end; 
+          if (!foundf) then begin
+            ArtArrayWithoutGroups[kwo] = INr.Objects;
+            kwo = kwo + 1;
+            ArtArrayWithGroups[kw] = INr.Objects;
+            kw = kw + 1;
+          end;
+        end;
+      end;
+    end;
 	end;
 	
 	
@@ -89,7 +92,7 @@ procedure DataCollect(array string ArtArrayWithoutGroups, array string ProjArray
 BEGIN
 	record PRVc PRr,PR2r;
 	record TBBUVc TBBUr;
-	record ITVc ITr;
+	record INVc INr;
 	record TRVc TRr;
 	record MainVc Mainr;
 	record ObjVc Objr;
@@ -133,9 +136,9 @@ BEGIN
 						if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode) and TBBUrw.ExtraObj==RepSpec.f1 and (setinset(RepSpec.ObjStr,TBBUrw.Objects) or blank(RepSpec.ObjStr) or Objr.OTCode=="LOCAT"))) then begin
 							for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
 								if (setinset(ArtArrayWithoutGroups[j],TBBUrw.Objects)) then begin
-									ITr.Code = ArtArrayWithoutGroups[j];
-									ReadLastMain(ITr,1,false);
-									group = ITr.Code;
+									INr.Objects = ArtArrayWithoutGroups[j];
+                  ReadfirstKey("Objects",INr,1,true);
+                  group = INr.Group;
 									switch (k) begin
 										case 1:
 											Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
@@ -174,6 +177,7 @@ BEGIN
 //RepSpec.ObjStr - Location
 	record BaseCurBlock BCb;
 	record ITVc ITr;
+  record INVc INr;
 	record ObjVc Objr;
 	array string 255 ArtArrayWithoutGroups,ProjArray,ArtArrayWithGroups;
 	vector val Quart1Vect,Quart2Vect,Quart3Vect,Quart4Vect,TOTALVect,PrjTotVect;
@@ -457,19 +461,21 @@ BEGIN
 		EndRow(sheetnum,fileToSave,rownum);
 		rownum = rownum + 1;
 		
-		
-		
-		
-		
-		
-		
 		for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
-			ITr.Code = ArtArrayWithGroups[i+1];
-			ReadLastMain(ITr,1,false);
-			nextgroup = ITr.Code;
-			ITr.Code = ArtArrayWithGroups[i];
-			ReadLastMain(ITr,1,false);
-			group = ITr.Code;
+			INr.Objects = ArtArrayWithGroups[i+1];
+      if ReadfirstKey("Objects",INr,1,true) then begin
+      end else begin
+        nextgroup = ArtArrayWithGroups[i+1];
+      end;
+      INr.Objects = ArtArrayWithGroups[i];
+      ReadfirstKey("Objects",INr,1,true);
+      if ReadfirstKey("Objects",INr,1,true) then begin
+        ITr.Code = INr.Group;
+        ReadFirstMain(ITr,1,true);
+        group = ITr.Code;
+      end else begin
+        group = ArtArrayWithGroups[i];
+      end;
 			if ArtArrayWithGroups[i]==group then begin
 				rownum = rownum + 1;
 				colnum = 1;

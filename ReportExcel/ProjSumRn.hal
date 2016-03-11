@@ -44,31 +44,61 @@ BEGIN
 		end;
 	end;
 	k = 0;
-	ITr.Code = 4000;
-	if (readfirstmain(ITr,1,true)) begin
-		resetloop(INr);
-		INr.Group = ITr.Code;
-		TrHs = true;
-		while(loopkey("Group",INr,1,TrHs)) begin
-			testf = true;
-			if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
-			if (blank(INr.Objects)) then begin testf = false; end;
-			
-			if (testf) then begin
-				tstr = INr.Objects;
-				foundf = false;
-				for (i=0;i<ArtArray.length;i=i+1) begin
-					if (ArtArray[i]==tstr) then begin
-						foundf = true;
-					end;
-				end; 
-				if (!foundf) then begin
-					ArtArray[k] = INr.Objects;
-					k = k + 1;
-				end;
-			end;
-		end;
-	end;
+  if (RepSpec.f2=="2016") then begin
+    resetloop(ITr);
+    while(loopmain(ITr,1,true)) begin
+      if (right(ITr.Code,3)=="_16") then begin
+        resetloop(INr);
+        INr.Group = ITr.Code;
+        TrHs = true;
+        while(loopkey("Group",INr,1,TrHs)) begin
+          testf = true;
+          if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
+          if (blank(INr.Objects)) then begin testf = false; end;
+          if (right(INr.Objects,3)!="_16") then begin testf = false; end;
+          if (testf) then begin
+            tstr = INr.Objects;
+            foundf = false;
+            for (i=0;i<ArtArray.length;i=i+1) begin
+              if (ArtArray[i]==tstr) then begin
+                foundf = true;
+              end;
+            end; 
+            if (!foundf) then begin
+              ArtArray[k] = INr.Objects;
+              k = k + 1;
+            end;
+          end;
+        end;
+      end;
+    end;
+  end else begin
+    ITr.Code = 4000;
+    if (readfirstmain(ITr,1,true)) begin
+      resetloop(INr);
+      INr.Group = ITr.Code;
+      TrHs = true;
+      while(loopkey("Group",INr,1,TrHs)) begin
+        testf = true;
+        if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
+        if (blank(INr.Objects)) then begin testf = false; end;
+        if (right(INr.Objects,3)=="_16") then begin testf = false; end;
+        if (testf) then begin
+          tstr = INr.Objects;
+          foundf = false;
+          for (i=0;i<ArtArray.length;i=i+1) begin
+            if (ArtArray[i]==tstr) then begin
+              foundf = true;
+            end;
+          end; 
+          if (!foundf) then begin
+            ArtArray[k] = INr.Objects;
+            k = k + 1;
+          end;
+        end;
+      end;
+    end;
+  end;
 	
 	k = 0;
 	while(loopmain(PRr,1,true)) begin
@@ -299,7 +329,6 @@ BEGIN
 	vector string 100 Vect,ProjManager;
 	vector val Total;
 	integer i,j,k,Wi,PAi,FAi,Vi,prjInRow;
-	string 10 group;
 	val sum,sum1,sum2;
 	string 100 tstr;
 	array string 10 pm;

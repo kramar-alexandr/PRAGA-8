@@ -30,37 +30,40 @@ BEGIN
 	
 	if blank(RepSpec.f1) then begin
 		while(loopmain(ITr,1,true)) begin
-			ArtArrayWithGroups[kw] = ITr.Code;
-			kw = kw + 1;
-			GroupArray[k] = ITr.Code;
-			k = k + 1;
-			resetloop(INr);
-			j = 0;
-			INr.Group = ITr.Code;
-			TrHs = true;
-			while(loopkey("Group",INr,1,TrHs)) begin
-				testf = true;
-				if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
-				if (blank(INr.Objects)) then begin testf = false; end;
-				
-				if (testf) then begin
-					tstr = INr.Objects;
-					foundf = false;
-					for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
-						if (ArtArrayWithoutGroups[i]==tstr) then begin
-							foundf = true;
-						end;
-					end; 
-					if (!foundf) then begin
-						ArtArrayWithoutGroups[kwo] = INr.Objects;
-						kwo = kwo + 1;
-						ArtArrayWithGroups[kw] = INr.Objects;
-						kw = kw + 1;
-						j = j + 1;
-					end;
-				end;
-			end;
-			ArtInGroup[ITr.Code] = j;
+      if (RepSpec.f2=="2016" and right(ITr.Code,3)=="_16") or (RepSpec.f2!="2016" and right(ITr.Code,3)!="_16") then begin
+        ArtArrayWithGroups[kw] = ITr.Code;
+        kw = kw + 1;
+        GroupArray[k] = ITr.Code;
+        k = k + 1;
+        resetloop(INr);
+        j = 0;
+        INr.Group = ITr.Code;
+        TrHs = true;
+        while(loopkey("Group",INr,1,TrHs)) begin
+          testf = true;
+          if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
+          if (blank(INr.Objects)) then begin testf = false; end;
+          if (RepSpec.f2=="2016" and right(INr.Objects,3)!="_16") then begin testf = false; end;
+          if (RepSpec.f2!="2016" and right(INr.Objects,3)=="_16") then begin testf = false; end;
+          if (testf) then begin
+            tstr = INr.Objects;
+            foundf = false;
+            for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
+              if (ArtArrayWithoutGroups[i]==tstr) then begin
+                foundf = true;
+              end;
+            end; 
+            if (!foundf) then begin
+              ArtArrayWithoutGroups[kwo] = INr.Objects;
+              kwo = kwo + 1;
+              ArtArrayWithGroups[kw] = INr.Objects;
+              kw = kw + 1;
+              j = j + 1;
+            end;
+          end;
+        end;
+        ArtInGroup[ITr.Code] = j;
+      end;
 		end;
 	end else begin
 		ArtArrayWithGroups[kw] = RepSpec.f1;
@@ -75,7 +78,8 @@ BEGIN
 			testf = true;
 			if (INr.Group!=RepSpec.f1) then begin testf = false; TrHs = false; end;
 			if (blank(INr.Objects)) then begin testf = false; end;
-			
+			if (RepSpec.f2=="2016" and right(INr.Objects,3)!="_16") then begin testf = false; end;
+      if (RepSpec.f2!="2016" and right(INr.Objects,3)=="_16") then begin testf = false; end;
 			if (testf) then begin
 				tstr = INr.Objects;
 				foundf = false;
@@ -139,8 +143,9 @@ BEGIN
 	integer i,k,j,mtrw,PAi;
 	boolean TrHs,testf,kTestf;
 	string 20 group;
+  record INVc INr;
 	
-	TRr.TransDate = RepSpec.sStartDate;
+  TRr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
 	while (loopkey("TransDate",TRr,1,TrHs)) begin
 		if (TRr.TransDate > RepSpec.sEndDate) then begin
@@ -158,10 +163,10 @@ BEGIN
 							if(setinset(PRr.Objects,TRrw.Objects)) then begin
 								for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
 									if (setinset(ArtArrayWithoutGroups[j],TRrw.Objects)) then begin
-										ITr.Code = ArtArrayWithoutGroups[j];
-										ReadLastMain(ITr,1,false);
-										group = ITr.Code;
-										switch(k) begin
+										INr.Objects = ArtArrayWithoutGroups[j];
+										ReadfirstKey("Objects",INr,1,true);
+										group = INr.Group;
+                    switch(k) begin
 											case 1:
 												Quart1Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = Quart1Vect["Fact:" & ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
 												Quart1Vect["Fact:" & ArtArrayWithoutGroups[j] & ":TOTAL"] = Quart1Vect["Fact:" & ArtArrayWithoutGroups[j] & ":TOTAL"] - TRrw.CredVal + TRrw.DebVal;
@@ -210,6 +215,7 @@ procedure ProjectFactRn(record RcVc RepSpec,var area areatofile, var boolean Prj
 BEGIN
 	record BaseCurBlock BCb;
 	record ITVc ITr;
+  record INVc INr;
 	record ObjVc Objr;
 	array string 10 ArtArrayWithoutGroups,ProjArray,ArtArrayWithGroups,GroupArray;
 	vector integer ArtInGroup;
@@ -217,7 +223,7 @@ BEGIN
 	vector boolean isMotherProjVect;
 	vector string 255 ProjNamesVect;
 	integer i,j,k,g,quartCount;
-	string 10 group,nextgroup,tstr,tstr2;
+	string 10 tstr,tstr2;
 	string 21 mc1,mc2;
 	
 	array string 10 sheetNames;
@@ -343,9 +349,9 @@ BEGIN
 				colnum = 6;
 				BeginRow(sheetnum,fileToSave,rownum,0,25);
 					for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
-						ITr.Code = ArtArrayWithoutGroups[i];
-						ReadLastMain(ITr,1,false);
-						if (ITr.Code == GroupArray[g]) then begin
+						INr.Objects = ArtArrayWithoutGroups[i];
+            ReadfirstKey("Objects",INr,1,true);
+            if (INr.Group == GroupArray[g]) then begin
 							style = 31;
 							mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
 							Objr.Code = ArtArrayWithoutGroups[i];
@@ -383,9 +389,9 @@ BEGIN
 				colnum = 6;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 					for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
-						ITr.Code = ArtArrayWithoutGroups[i];
-						ReadLastMain(ITr,1,false);
-						if (ITr.Code == GroupArray[g]) then begin
+						INr.Objects = ArtArrayWithoutGroups[i];
+            ReadfirstKey("Objects",INr,1,true);
+            if (INr.Group == GroupArray[g]) then begin
 							style = 35;
 							mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
 							StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithoutGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -438,9 +444,9 @@ BEGIN
 				colnum = 6;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 					for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
-						ITr.Code = ArtArrayWithoutGroups[i];
-						ReadLastMain(ITr,1,false);
-						if (ITr.Code == GroupArray[g]) then begin
+						INr.Objects = ArtArrayWithoutGroups[i];
+            ReadfirstKey("Objects",INr,1,true);
+            if (INr.Group == GroupArray[g]) then begin
 							style = 9;
 							if (RepSpec.flags[1] == 1) then begin
 								StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -487,10 +493,10 @@ BEGIN
 						StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjNamesVect[ProjArray[j]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 						colnum = colnum + 1;
 						for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
-							ITr.Code = ArtArrayWithoutGroups[i];
-							ReadLastMain(ITr,1,false);
-							if (ITr.Code == GroupArray[g]) then begin
-								style = 4;
+							INr.Objects = ArtArrayWithoutGroups[i];
+              ReadfirstKey("Objects",INr,1,true);
+              if (INr.Group == GroupArray[g]) then begin
+                style = 4;
 								if (RepSpec.flags[1] == 1) then begin
 									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect["Fact:" & ArtArrayWithoutGroups[i] & ":" & ProjArray[j]]);
 									style = 3;
@@ -547,9 +553,9 @@ BEGIN
 					qtyOfEmpStr = 1;
 					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 					for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
-						ITr.Code = ArtArrayWithoutGroups[i];
-						ReadLastMain(ITr,1,false);
-						if (ITr.Code == GroupArray[g]) then begin
+						INr.Objects = ArtArrayWithoutGroups[i];
+            ReadfirstKey("Objects",INr,1,true);
+            if (INr.Group == GroupArray[g]) then begin
 							style = 16;
 							if (RepSpec.flags[1] == 1) then begin
 								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect["Fact:" & ArtArrayWithoutGroups[i] & ":TOTAL"]);

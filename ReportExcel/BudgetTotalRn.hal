@@ -107,14 +107,16 @@ BEGIN
 							kTestf = true;
 						end;
 						if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
-							for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin 
-								if (TBBUrw.ExtraObj==FoundArray[FAi]) then begin
-									FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-									FPVect["TOTAL:" & ProjArray[PAi]] = FPVect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-									FPVect[FoundArray[FAi] & ":TOTAL"] = FPVect[FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-									FPVect["TOTAL:TOTAL"] = FPVect["TOTAL:TOTAL"] + TBBUrw.Sum;
-								end;
-							end;
+							if (RepSpec.f2=="2016" and right(TBBUrw.ArtCode,3)=="_16") or (RepSpec.f2!="2016" and right(TBBUrw.ArtCode,3)!="_16") then begin
+                for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin 
+                  if (TBBUrw.ExtraObj==FoundArray[FAi]) then begin
+                    FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+                    FPVect["TOTAL:" & ProjArray[PAi]] = FPVect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
+                    FPVect[FoundArray[FAi] & ":TOTAL"] = FPVect[FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
+                    FPVect["TOTAL:TOTAL"] = FPVect["TOTAL:TOTAL"] + TBBUrw.Sum;
+                  end;
+                end;
+              end;
 						end;
 					end;
 				end;
