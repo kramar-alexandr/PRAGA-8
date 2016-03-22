@@ -343,6 +343,29 @@ begin
   return;
 end;
 
+function Boolean CLOutDClassExtrasEFAfter(Integer wn,Integer rownr,Integer changedf)
+begin
+  record CLOutVc CLOutr;
+  row CLOutVc CLOutrw;
+  record ObjVc Objr;
+  
+  if (changedf!=0) then begin  
+    GetWindowRecord(wn,CLOutr);
+    matrowget(CLOutr,rownr,CLOutrw);
+    if nonblank(CLOutrw.Extras) then begin
+      Objr.Code = CLOutrw.Extras;
+      ReadFirstMain(Objr,1,true);
+      CLOutrw.Comment = Objr.Comment;
+      MatRowPut(CLOutr,rownr,CLOutrw);
+    end else begin
+      CLOutVc_PasteCorspCode(CLOutr,rownr);
+    end;
+    PutWindowRecord(wn,CLOutr);
+  end;
+  CLOutDClassExtrasEFAfter = true;
+  return;
+end;
+
 function Boolean CLOutDClassCUCodeEFAfter(Integer wn,Integer fn,Integer rownr,Integer changedf)
 begin
   record CLOutVc CLOutr;
@@ -522,6 +545,7 @@ BEGIN
     case "Sum": res = CLOutDClassSumEFAfter(wn,rownr,changed);
     case "OrderNr": res = CLOutDClassOrderNrEFAfter(wn,rownr,changed);
     case "Type": res = CLOutDClassTypeEFAfter(wn,rownr,changed);
+    case "Extras": res = CLOutDClassExtrasEFAfter(wn,rownr,changed);
   end;
   CLOutDClassAfterEditField = res;
   RETURN;

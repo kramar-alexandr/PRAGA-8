@@ -26,7 +26,7 @@ BEGIN
 	if RepSpec.flags[5] == 1 then begin
 		ITr.Code = 4000;
     if (RepSpec.f2=="2016") then begin
-      ITr.Code = "4_16";
+      ITr.Code = "1_16";
     end;
 		if (readfirstmain(ITr,1,true)) begin
       if (RepSpec.f2=="2016" and right(ITr.Code,3)=="_16") or (RepSpec.f2!="2016" and right(ITr.Code,3)!="_16") then begin
@@ -125,6 +125,7 @@ BEGIN
 	record PRVc PRr,PR2r;
 	record TBBUVc TBBUr;
 	record ITVc ITr;
+  record INVc INr;
 	record TRVc TRr;
 	record MainVc Mainr;
 	record ObjVc Objr;
@@ -180,9 +181,14 @@ BEGIN
 							end;
 							for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
 								if (setinset(ArtArrayWithoutGroups[j],TBBUrw.Objects)) then begin
-									ITr.Code = ArtArrayWithoutGroups[j];
-									ReadLastMain(ITr,1,false);
-									group = ITr.Code;
+									INr.Objects = ArtArrayWithoutGroups[j];
+                  if ReadfirstKey("Objects",INr,1,true) then begin
+                    ITr.Code = INr.Group;
+                  end else begin
+                    ITr.Code = ArtArrayWithoutGroups[j];
+                  end;
+                  ReadFirstMain(ITr,1,true);
+                  group = ITr.Code;
 									switch (k) begin
 										case 1:
 											Quart1Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] + TBBUrw.Sum;
@@ -245,6 +251,7 @@ BEGIN
 //RepSpec.ObjStr - Location
 	record BaseCurBlock BCb;
 	record ITVc ITr;
+  record INVc INr;
 	record ObjVc Objr;
 	array string 10 ArtArrayWithoutGroups,ProjArray,ArtArrayWithGroups,ArtSuppl;
 	vector val Quart1Vect,Quart2Vect,Quart3Vect,Quart4Vect,TOTALVect,PrjTotVect;
@@ -542,12 +549,24 @@ BEGIN
 				end;
 			EndRow(sheetnum,fileToSave,rownum);
 			for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
-				ITr.Code = ArtArrayWithGroups[i+1];
-				ReadLastMain(ITr,1,false);
-				nextgroup = ITr.Code;
-				ITr.Code = ArtArrayWithGroups[i];
-				ReadLastMain(ITr,1,false);
-				group = ITr.Code;
+				INr.Objects = ArtArrayWithGroups[i+1];
+        if ReadfirstKey("Objects",INr,1,true) then begin
+          ITr.Code = INr.Group;
+          ReadFirstMain(ITr,1,true);
+          nextgroup = ITr.Code;
+        end else begin
+          nextgroup = ArtArrayWithGroups[i+1];
+        end;
+        INr.Objects = ArtArrayWithGroups[i];
+        if ReadfirstKey("Objects",INr,1,true) then begin
+          ITr.Code = INr.Group;
+          ReadFirstMain(ITr,1,true);
+          group = ITr.Code;
+        end else begin
+          ITr.Code = ArtArrayWithGroups[i];
+					ReadFirstMain(ITr,1,true);
+					group = ITr.Code;
+        end;
 				if ArtArrayWithGroups[i]==group then begin
 					colnum = 1;
 					BeginRow(sheetnum,fileToSave,rownum,0,blankval);
@@ -575,26 +594,6 @@ BEGIN
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[group & ":TOTAL"]);
 					EndRow(sheetnum,fileToSave,rownum);
 				end else begin
-					if ArtArrayWithGroups[i+1]==nextgroup then begin
-						colnum = 4;
-						BeginRow(sheetnum,fileToSave,rownum,0,10);
-							if (RepSpec.flags[6] == 0) then begin
-								style = 17;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								style = 12;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								style = 16;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							end;
-							colnum = colnum + 1;
-							style = 86;
-							qtyOfEmpStr = ProjArray.length + 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						EndRow(sheetnum,fileToSave,rownum);
-					end;
 					firstprintf = true;
 					for (k=0;k<ArtSuppl.length;k=k+1) begin
 						if (TOTALVect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] != blankval) and (TOTALVect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] != 0) then begin
@@ -651,20 +650,28 @@ BEGIN
 							EndRow(sheetnum,fileToSave,rownum);
 						end;
 					end;
+					if ArtArrayWithGroups[i+1]==nextgroup then begin
+						colnum = 4;
+						BeginRow(sheetnum,fileToSave,rownum,0,10);
+							if (RepSpec.flags[6] == 0) then begin
+								style = 17;
+								qtyOfEmpStr = 1;
+								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+								style = 12;
+								qtyOfEmpStr = 1;
+								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+								style = 16;
+								qtyOfEmpStr = 1;
+								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+							end;
+							colnum = colnum + 1;
+							style = 86;
+							qtyOfEmpStr = ProjArray.length + 1;
+							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+						EndRow(sheetnum,fileToSave,rownum);
+					end;
 				end;
 			end;
-			colnum = 4;
-			BeginRow(sheetnum,fileToSave,rownum,0,10);
-				if (RepSpec.flags[6] == 0) then begin
-					style = 87;
-					qtyOfEmpStr = 3;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-				colnum = colnum + 1;
-				style = 86;
-				qtyOfEmpStr = ProjArray.length + 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-			EndRow(sheetnum,fileToSave,rownum);
 			colnum = 2;
 			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 				style = 2;
@@ -931,12 +938,24 @@ BEGIN
 			suppCount1 = 0;
 			suppCount2 = 0;
 			for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
-				ITr.Code = ArtArrayWithGroups[i+1];
-				ReadLastMain(ITr,1,false);
-				nextgroup = ITr.Code;
-				ITr.Code = ArtArrayWithGroups[i];
-				ReadLastMain(ITr,1,false);
-				group = ITr.Code;
+				INr.Objects = ArtArrayWithGroups[i+1];
+        if ReadfirstKey("Objects",INr,1,true) then begin
+          ITr.Code = INr.Group;
+          ReadFirstMain(ITr,1,true);
+          nextgroup = ITr.Code;
+        end else begin
+          nextgroup = ArtArrayWithGroups[i+1];
+        end;
+        INr.Objects = ArtArrayWithGroups[i];
+        if ReadfirstKey("Objects",INr,1,true) then begin
+          ITr.Code = INr.Group;
+          ReadFirstMain(ITr,1,true);
+          group = ITr.Code;
+        end else begin
+          ITr.Code = ArtArrayWithGroups[i];
+					ReadFirstMain(ITr,1,true);
+					group = ITr.Code;
+        end;
 				if ArtArrayWithGroups[i]==group then begin
 					colnum = 1;
 					BeginRow(sheetnum,fileToSave,rownum,0,blankval);
@@ -1025,32 +1044,6 @@ BEGIN
 						end;
 					EndRow(sheetnum,fileToSave,rownum);
 				end else begin
-					if ArtArrayWithGroups[i+1]==nextgroup then begin
-						colnum = 4;
-						BeginRow(sheetnum,fileToSave,rownum,0,10);
-							if (RepSpec.flags[6] == 0) then begin
-								style = 17;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								style = 12;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								style = 16;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							end;
-							colnum = colnum + 1;
-							style = 86;
-							qtyOfEmpStr = ProjArray.length + 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							if quartCount > 1 then begin
-								colnum = colnum + 1;
-								style = 86;
-								qtyOfEmpStr = ProjArray.length + 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							end;
-						EndRow(sheetnum,fileToSave,rownum);
-					end;
 					firstprintf = true;
 					firstprint2f = true;
 					for (k=0;k<ArtSuppl.length;k=k+1) begin
@@ -1274,26 +1267,34 @@ BEGIN
 							EndRow(sheetnum,fileToSave,rownum);
 						end;
 					end;
+					if ArtArrayWithGroups[i+1]==nextgroup then begin
+						colnum = 4;
+						BeginRow(sheetnum,fileToSave,rownum,0,10);
+							if (RepSpec.flags[6] == 0) then begin
+								style = 17;
+								qtyOfEmpStr = 1;
+								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+								style = 12;
+								qtyOfEmpStr = 1;
+								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+								style = 16;
+								qtyOfEmpStr = 1;
+								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+							end;
+							colnum = colnum + 1;
+							style = 86;
+							qtyOfEmpStr = ProjArray.length + 1;
+							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+							if quartCount > 1 then begin
+								colnum = colnum + 1;
+								style = 86;
+								qtyOfEmpStr = ProjArray.length + 1;
+								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+							end;
+						EndRow(sheetnum,fileToSave,rownum);
+					end;
 				end;
 			end;
-			colnum = 4;
-			BeginRow(sheetnum,fileToSave,rownum,0,10);
-				if (RepSpec.flags[6] == 0) then begin
-					style = 87;
-					qtyOfEmpStr = 3;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-				colnum = colnum + 1;
-				style = 86;
-				qtyOfEmpStr = ProjArray.length + 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				if quartCount > 1 then begin
-					colnum = colnum + 1;
-					style = 86;
-					qtyOfEmpStr = ProjArray.length + 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-			EndRow(sheetnum,fileToSave,rownum);
 			colnum = 2;
 			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 				style = 2;
@@ -1645,12 +1646,24 @@ BEGIN
 				suppCount1 = 0;
 				suppCount2 = 0;
 				for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
-					ITr.Code = ArtArrayWithGroups[i+1];
-					ReadLastMain(ITr,1,false);
-					nextgroup = ITr.Code;
-					ITr.Code = ArtArrayWithGroups[i];
-					ReadLastMain(ITr,1,false);
-					group = ITr.Code;
+					INr.Objects = ArtArrayWithGroups[i+1];
+          if ReadfirstKey("Objects",INr,1,true) then begin
+            ITr.Code = INr.Group;
+            ReadFirstMain(ITr,1,true);
+            nextgroup = ITr.Code;
+          end else begin
+            nextgroup = ArtArrayWithGroups[i+1];
+          end;
+          INr.Objects = ArtArrayWithGroups[i];
+          if ReadfirstKey("Objects",INr,1,true) then begin
+            ITr.Code = INr.Group;
+            ReadFirstMain(ITr,1,true);
+            group = ITr.Code;
+          end else begin
+            ITr.Code = ArtArrayWithGroups[i];
+            ReadFirstMain(ITr,1,true);
+            group = ITr.Code;
+          end;
 					if ArtArrayWithGroups[i]==group then begin
 						colnum = 1;
 						BeginRow(sheetnum,fileToSave,rownum,0,blankval);
@@ -1739,32 +1752,6 @@ BEGIN
 							end;
 						EndRow(sheetnum,fileToSave,rownum);
 					end else begin
-						if ArtArrayWithGroups[i+1]==nextgroup then begin
-							colnum = 4;
-							BeginRow(sheetnum,fileToSave,rownum,0,10);
-								if (RepSpec.flags[6] == 0) then begin
-									style = 17;
-									qtyOfEmpStr = 1;
-									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-									style = 12;
-									qtyOfEmpStr = 1;
-									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-									style = 16;
-									qtyOfEmpStr = 1;
-									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								end;
-								colnum = colnum + 1;
-								style = 86;
-								qtyOfEmpStr = ProjArray.length + 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								if quartCount > 3 then begin
-									colnum = colnum + 1;
-									style = 86;
-									qtyOfEmpStr = ProjArray.length + 1;
-									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								end;
-							EndRow(sheetnum,fileToSave,rownum);
-						end;
 						firstprintf = true;
 						firstprint2f = true;
 						for (k=0;k<ArtSuppl.length;k=k+1) begin
@@ -1982,26 +1969,34 @@ BEGIN
 								EndRow(sheetnum,fileToSave,rownum);
 							end;
 						end;
+						if ArtArrayWithGroups[i+1]==nextgroup then begin
+							colnum = 4;
+							BeginRow(sheetnum,fileToSave,rownum,0,10);
+								if (RepSpec.flags[6] == 0) then begin
+									style = 17;
+									qtyOfEmpStr = 1;
+									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+									style = 12;
+									qtyOfEmpStr = 1;
+									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+									style = 16;
+									qtyOfEmpStr = 1;
+									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+								end;
+								colnum = colnum + 1;
+								style = 86;
+								qtyOfEmpStr = ProjArray.length + 1;
+								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+								if quartCount > 3 then begin
+									colnum = colnum + 1;
+									style = 86;
+									qtyOfEmpStr = ProjArray.length + 1;
+									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+								end;
+							EndRow(sheetnum,fileToSave,rownum);
+						end;
 					end;
 				end;
-				colnum = 4;
-				BeginRow(sheetnum,fileToSave,rownum,0,10);
-					if (RepSpec.flags[6] == 0) then begin
-						style = 87;
-						qtyOfEmpStr = 3;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					end;
-					colnum = colnum + 1;
-					style = 86;
-					qtyOfEmpStr = ProjArray.length + 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					if quartCount > 3 then begin
-						colnum = colnum + 1;
-						style = 86;
-						qtyOfEmpStr = ProjArray.length + 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					end;
-				EndRow(sheetnum,fileToSave,rownum);
 				colnum = 2;
 				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
 					style = 2;

@@ -96,3 +96,14 @@ begin
   ObjFoundSClassOnOpenWindow = false;
   return;
 end;
+
+global
+Function Boolean ExtSClassOnOpenWindow(Integer wn)
+begin
+  
+	SetWindowSubset(wn,"EXTRA");
+  
+  
+  ExtSClassOnOpenWindow = false;
+  return;
+end;

@@ -199,12 +199,19 @@ begin
   row TBBUVc TBBUrw;
   record GeneralOptionBlock GOb;
   string 255 inmsg;
+  record ObjVc Objr;
 
   if (changedf!=0) then begin
     GetWindowRecord(wn,TBBUr);
     if (TBBUVc_PasteArtCode(TBBUr,rownr,inmsg)) then begin
       MatRowGet(TBBUr,rownr,TBBUrw);
       if (nonblank(TBBUrw.ArtCode)) then begin //Edit-------------------Vitalii 16:26 10.02.2016
+        if nonblank(TBBUrw.Extras) then begin
+          Objr.Code = TBBUrw.Extras;
+          if (ReadFirstMain(Objr,1,true)) then begin
+            TBBUrw.Comment = Objr.Comment;
+          end;
+        end;
         TBBUrw.Qty = 1;
         if (nonblank(TBBUrw.Price)) then begin
           TBBUrw.MonthSum = TBBUrw.Price/3;
@@ -360,7 +367,6 @@ begin
   record CUVc CUr;
   record TBBUVc TBBUr;  
   row TBBUVc TBBUrw;
-  
   if (changedf) then begin
     GetWindowRecord(wn,TBBUr);
     MatRowGet(TBBUr,rownr,TBBUrw);
@@ -371,10 +377,45 @@ begin
       TBBUrw.VEName = CUr.Name;
       MatRowPut(TBBUr,rownr,TBBUrw);
       PutWindowRecord(wn,TBBUr);          
+    end else begin
+      TBBUrw.VEName = "";
+      MatRowPut(TBBUr,rownr,TBBUrw);
+      PutWindowRecord(wn,TBBUr);          
     end;
 
   end;  
   TBBUDClassVECodeEFAfter = true;
+  return;
+end;
+
+function Boolean TBBUDClassExtrasEFAfter(Integer wn,Integer rownr,Boolean changedf)
+begin  
+  record ObjVc Objr;
+  record TBBUVc TBBUr;  
+  row TBBUVc TBBUrw;
+  
+  if (changedf) then begin
+    GetWindowRecord(wn,TBBUr);
+    MatRowGet(TBBUr,rownr,TBBUrw);
+  
+    if nonblank(TBBUrw.Extras) then begin  
+      Objr.Code = TBBUrw.Extras;
+      ReadFirstMain(Objr,1,true);
+      TBBUrw.Comment = Objr.Comment;
+      MatRowPut(TBBUr,rownr,TBBUrw);
+      PutWindowRecord(wn,TBBUr);          
+    end else begin
+      if nonblank(TBBUrw.ArtCode) then begin
+        Objr.Code = TBBUrw.ArtCode;
+        ReadFirstMain(Objr,1,true);
+        TBBUrw.Comment = Objr.Comment;
+        MatRowPut(TBBUr,rownr,TBBUrw);
+        PutWindowRecord(wn,TBBUr); 
+      end;
+    end;
+  end;
+  
+  TBBUDClassExtrasEFAfter = true;
   return;
 end;
 
@@ -400,6 +441,7 @@ BEGIN
     case "TransDate": res = TBBUDClassCurncyCodeEFAfter(wn,changed!=0);
     case "VECode": res = TBBUDClassVECodeEFAfter(wn,rownr,changed!=0);
     case "MonthSum": res = TBBUDClassMonthSumEFAfter(wn,fn,rownr,changed);
+    case "Extras": res = TBBUDClassExtrasEFAfter(wn,rownr,changed);
   end;
   TBBUDClassAfterEditField = res;
   RETURN;
@@ -781,6 +823,9 @@ begin
   	BHistrw.RecipeQuant = TBBUrw.RecipeQuant;
 		BHistrw.VECode = TBBUrw.VECode;
 		BHistrw.ExtraObj = TBBUrw.ExtraObj;
+    BHistrw.Extras = TBBUrw.Extras;
+    BHistrw.MonthSum = TBBUrw.MonthSum;
+    BHistrw.VEName = TBBUrw.VEName;
 		MatRowPut(BHistr,i,BHistrw);
 
 	end;  

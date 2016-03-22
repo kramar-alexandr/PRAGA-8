@@ -122,6 +122,7 @@ begin
 		ArrayField(ExtraObj,M4Code,20,ObjVc);
     ArrayField(VEName,M4Str,200,0);
     ArrayField(MonthSum,M4Val,0,0);
+    ArrayField(Extras,M4Code,20,ObjVc);
 	EndRecordAdd;
 	
 	RecordAddBegin(CLCorspVc,"Myclcorsp");
@@ -210,7 +211,10 @@ begin
   ArrayField(MotherArtCode,M4Code,20,INVc);
   ArrayField(RecipeQuant,M4Qty,0,0);
 	ArrayField(VECode,M4Code,20,CUVc);
-	ArrayField(ExtraObj,M4Code,20,ObjVc);  
+	ArrayField(ExtraObj,M4Code,20,ObjVc);
+  ArrayField(Extras,M4UStr,60,ObjVc);
+  ArrayField(MonthSum,M4Val,0,0);
+  ArrayField(VEName,M4Str,200,0);
   EndArray;
   MainKeyBegin(MainKey,0);
   KeySegment(PRCode);
@@ -244,6 +248,7 @@ begin
 		ArrayField(Loc,M4UStr,60,ObjVc);
 		ArrayField(Found,M4UStr,60,ObjVc);
 		ArrayField(SupName,M4Str,100,0);
+    ArrayField(Extras,M4UStr,60,ObjVc);//Edit-------------------Vitalii 17:34 18.03.2016
 		SubsetKeyBegin2(SalesMan);	//Edit----------------------Dima  07.08.2015
   	StoreInBaseKey;
   	AppendFieldToKeyName(SalesGroup);
@@ -259,6 +264,7 @@ begin
 		ArrayField(Loc,M4UStr,60,ObjVc);
 		ArrayField(Found,M4UStr,60,ObjVc);
 		ArrayField(SupName,M4Str,100,0);
+    ArrayField(Extras,M4Code,20,ObjVc);
 	EndRecordAdd;
 	
 	RecordAddBegin(CLInVc,"myCLInVc");

@@ -501,17 +501,21 @@ BEGIN
 			for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
 				INr.Objects = ArtArrayWithGroups[i+1];
         if ReadfirstKey("Objects",INr,1,true) then begin
+          ITr.Code = INr.Group;
+          ReadFirstMain(ITr,1,true);
+          nextgroup = ITr.Code;
         end else begin
           nextgroup = ArtArrayWithGroups[i+1];
         end;
         INr.Objects = ArtArrayWithGroups[i];
-        ReadfirstKey("Objects",INr,1,true);
         if ReadfirstKey("Objects",INr,1,true) then begin
           ITr.Code = INr.Group;
           ReadFirstMain(ITr,1,true);
           group = ITr.Code;
         end else begin
-          group = ArtArrayWithGroups[i];
+          ITr.Code = ArtArrayWithGroups[i];
+					ReadFirstMain(ITr,1,true);
+					group = ITr.Code;
         end;
         if ArtArrayWithGroups[i]==group then begin
 					rownum = rownum + 1;
@@ -769,6 +773,9 @@ BEGIN
 			for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
 				INr.Objects = ArtArrayWithGroups[i+1];
         if ReadfirstKey("Objects",INr,1,true) then begin
+          ITr.Code = INr.Group;
+          ReadFirstMain(ITr,1,true);
+          nextgroup = ITr.Code;
         end else begin
           nextgroup = ArtArrayWithGroups[i+1];
         end;
@@ -779,7 +786,9 @@ BEGIN
           ReadFirstMain(ITr,1,true);
           group = ITr.Code;
         end else begin
-          group = ArtArrayWithGroups[i];
+          ITr.Code = ArtArrayWithGroups[i];
+					ReadFirstMain(ITr,1,true);
+					group = ITr.Code;
         end;
 				if ArtArrayWithGroups[i]==group then begin
 					rownum = rownum + 1;
@@ -1013,6 +1022,9 @@ BEGIN
 			for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
 				INr.Objects = ArtArrayWithGroups[i+1];
         if ReadfirstKey("Objects",INr,1,true) then begin
+          ITr.Code = INr.Group;
+          ReadFirstMain(ITr,1,true);
+          nextgroup = ITr.Code;
         end else begin
           nextgroup = ArtArrayWithGroups[i+1];
         end;
@@ -1023,7 +1035,9 @@ BEGIN
           ReadFirstMain(ITr,1,true);
           group = ITr.Code;
         end else begin
-          group = ArtArrayWithGroups[i];
+          ITr.Code = ArtArrayWithGroups[i];
+					ReadFirstMain(ITr,1,true);
+					group = ITr.Code;
         end;
 				if ArtArrayWithGroups[i]==group then begin
 					rownum = rownum + 1;
@@ -1257,6 +1271,9 @@ BEGIN
 			for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
 				INr.Objects = ArtArrayWithGroups[i+1];
         if ReadfirstKey("Objects",INr,1,true) then begin
+          ITr.Code = INr.Group;
+          ReadFirstMain(ITr,1,true);
+          nextgroup = ITr.Code;
         end else begin
           nextgroup = ArtArrayWithGroups[i+1];
         end;
@@ -1267,7 +1284,9 @@ BEGIN
           ReadFirstMain(ITr,1,true);
           group = ITr.Code;
         end else begin
-          group = ArtArrayWithGroups[i];
+          ITr.Code = ArtArrayWithGroups[i];
+					ReadFirstMain(ITr,1,true);
+					group = ITr.Code;
         end;
 				if ArtArrayWithGroups[i]==group then begin
 					rownum = rownum + 1;
@@ -1501,6 +1520,9 @@ BEGIN
 			for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
 				INr.Objects = ArtArrayWithGroups[i+1];
         if ReadfirstKey("Objects",INr,1,true) then begin
+          ITr.Code = INr.Group;
+          ReadFirstMain(ITr,1,true);
+          nextgroup = ITr.Code;
         end else begin
           nextgroup = ArtArrayWithGroups[i+1];
         end;
@@ -1511,7 +1533,9 @@ BEGIN
           ReadFirstMain(ITr,1,true);
           group = ITr.Code;
         end else begin
-          group = ArtArrayWithGroups[i];
+          ITr.Code = ArtArrayWithGroups[i];
+					ReadFirstMain(ITr,1,true);
+					group = ITr.Code;
         end;
 				if ArtArrayWithGroups[i]==group then begin
 					rownum = rownum + 1;

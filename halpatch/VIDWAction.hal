@@ -865,6 +865,44 @@ begin
   return;
 end;
 
+function Boolean VIDClassExtrasEFAfter(Integer wn,Integer rownr,Integer changedf)
+begin
+  record VIVc VIr;
+  row VIVc VIrw;
+  Integer rwcnt;
+  Boolean res;
+  string 255 objstr;
+	record ObjVc Objr;
+	
+  if (changedf!=0) then begin 
+    GetWindowRecord(wn,VIr);
+    if (rownr>-1) then begin
+      rwcnt = MatRowCnt(VIr);
+      if (rownr<rwcnt) then begin
+        MatRowGet(VIr,rownr,VIrw);
+        if nonblank(VIrw.Extras) then begin
+          Objr.Code = VIrw.Extras;
+          if(readfirstmain(Objr,1,true))then begin
+            VIrw.Comment = Objr.Comment;
+          end;
+          MatRowPut(VIr,rownr,VIrw);
+        end else begin
+          if nonblank(VIrw.Exp) then begin
+            Objr.Code = VIrw.Exp;
+            ReadFirstMain(Objr,1,true);
+            VIrw.Comment = Objr.Comment;
+            MatRowPut(VIr,rownr,VIrw);
+          end;
+        end;
+      end;
+    end;
+    PutWindowRecord(wn,VIr);
+    res = false;
+	end;
+  VIDClassExtrasEFAfter = res;
+  return;
+end;
+
 function Boolean VIDClassAfterEditField_stp1(Integer wn,var record VIVc VIr,string fieldname,Integer rownr,Integer changed)
 BEGIN
   Boolean res;
@@ -885,6 +923,7 @@ BEGIN
     case "Item": res = VIDClassItemEFAfter(wn,rownr,changed);   
     case "PRCode": res = VIDClassPRCodeEFAfter(wn,VIr,rownr,changed!=0);
     case "InventoryNr": res = VIDClassInventoryNrEFAfter(wn,VIr,rownr,changed!=0);
+    case "Extras": res = VIDClassExtrasEFAfter(wn,rownr,changed);
     otherwise res = false;
   end;   
   VIDClassAfterEditField_stp1 = res;     

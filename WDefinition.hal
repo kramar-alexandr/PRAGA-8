@@ -2023,8 +2023,8 @@ begin
   Integer tnr;
 
   WindowBegin("Project Budget",TBBUDClass,CGview,-);
-  SetWRect(20,80,640,410);
-  Sizeable(-1,-1,0,0);
+  SetWRect(20,80,900,410);
+  Sizeable(900,-1,0,0);
   UseView(TBBUVc);
   vs=20; h=100; h2=260; h1=50;
   Tile(0,90,false,"",PRCode);
@@ -2083,8 +2083,9 @@ begin
   MatText(t=18,30,"Quartal",true);// Edit ************************** Friday, 22 May 2015 10:12:52
   MatCol(t,100,"",0,Spec,false,0);// Edit ************************** Friday, 22 May 2015 10:13:17
   MatCol(1,30,"Item",0,ArtCode,false,CLCorspSClass);// Edit ************************** Thursday, 18 June 2015 17:57:24
-  MatCol(1,100,"Suppl",0,VECode,false,VESClass);
-  MatCol(1,150,"Name",0,VEName,false,0);
+  MatCol(1,100,"Extras",0,Extras,false,ExtSClass);
+  MatCol(1,150,"Suppl",0,VECode,false,VESClass);
+  MatCol(1,200,"Name",0,VEName,false,0);
   MatCol(1,h=-370,"Foundation",0,ExtraObj,true,ObjFoundSClass);
   MatCol(t=kInvoiceRowTypeStructuredItemComponent,30,"Item",0,ArtCode,false,INSClass);
   MatCol(t,100,"Person",0,EMCode,false,UserSClass);
@@ -2553,7 +2554,7 @@ begin
   Integer pos,tilenr,flipnr,f;
   
   WindowBegin("Cash Out",CLOutDClass,CGview,-);
-  SetWRect(20,80,950,550);// Edit ************************** Thursday, 17 September 2015 14:14:13
+  SetWRect(20,80,1000,550);// Edit ************************** Thursday, 17 September 2015 14:14:13
   UseView(CLOutVc);
   ActiveFieldOnNew("TransDate");
 //  Sizeable(-1,-1,0,0);
@@ -2580,6 +2581,7 @@ begin
   CheckBox(400,v,0,"Info on Trans.",ARonTR);
   EditField(h,v+=vs,120,"Expense A/C",Normal,CorspCode,false,CLCorspSClass);
   EditField(h2,v,-20,"Comment",Normal,CorspComment,false,0);
+  //EditField(h,v+=vs,120,"Extras",Normal,CorspCode,false,CLCorspSClass);
   if (HasModPL or HasModPO) then begin
     EditField(h,v+=vs,120,"#Supplier#",Normal,CUCode,false,VESClass);
   end;
@@ -2648,6 +2650,7 @@ begin
   
   MatCol(t=1,h=34,"Pay. Mode",Normal,PayMode,false,PMSClass);
   MatCol(t,h+=70,"Expense",Normal,CorspCode,false,CLCorspSClass);
+  MatCol(t,h+=70,"Extras",0,Extras,false,ExtSClass);
   MatCol(t,h+=70,"Project",Normal,Prj,false,ObjPrjSClass);
   MatCol(t,h+=70,"#Supplier#",0,Company,false,VESClass);
   MatCol(t,h+=70,"Foundation",0,Found,false,ObjFoundSClass);
@@ -3468,14 +3471,15 @@ begin
       if (HasObjects) then begin	
       	
         //MatCol(t,90,"Objects",0,Objects,false,ObjSClass);
-        MatCol(t,90,"Project",0,Prj,false,ObjPrjSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:18
-        MatCol(t,170,"Expences",0,Exp,false,ObjExpSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
-        MatCol(t,230,"Supplier",0,Supp,false,ObjSuppSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
-		MatCol(t,290,"Foundation",0,Found,false,ObjFoundSClass);//Edit---------------Vitalii 14:15 04.08.2015
-        MatCol(t,350,"Location",0,Loc,false,ObjLocSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
+        MatCol(t,90,"Extras",0,Extras,false,ExtSClass);
+        MatCol(t,150,"Project",0,Prj,false,ObjPrjSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:18
+        MatCol(t,230,"Expences",0,Exp,false,ObjExpSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
+        MatCol(t,290,"Supplier",0,Supp,false,ObjSuppSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
+        MatCol(t,350,"Foundation",0,Found,false,ObjFoundSClass);//Edit---------------Vitalii 14:15 04.08.2015
+        MatCol(t,410,"Location",0,Loc,false,ObjLocSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
       end;
-      MatCol(t,400,"Suppl. Name",0,SupName,false,0);
-      MatCol(t,540,"Description",0,Comment,false,0);
+      MatCol(t,470,"Suppl. Name",0,SupName,false,0);
+      MatCol(t,600,"Description",0,Comment,false,0);
       MatCol(t,-80,"Amount",0,Sum,true,0);// Edit ************************** Wednesday, 15 July 2015 10:15:50
       /*if (CYb.UseTaxTemplatesforTaxCalc!=0) then begin
         MatCol(t,-30,"T-Cd",0,TaxTemplateCode,false,TaxTemplateSClass);
@@ -3800,31 +3804,33 @@ begin
   MatCol(t,-70,"Cost",0,Cost,true,0);
   MatText(t=17,30,"Header",true);
   MatCol(t,100,"",0,Spec,false,0);
-  MatText(t=18,30,"Quartal",true);
-  MatCol(t,100,"",0,Spec,false,0);
-  MatCol(1,30,"Item",0,ArtCode,false,CLCorspSClass);
-  MatCol(1,100,"Suppl",0,VECode,false,VESClass);
-  MatCol(1,155,"Qty",0,Qty,true,0);
-  MatCol(1,200,"Foundation",0,ExtraObj,true,ObjFoundSClass);
-  MatCol(1,255,"Description",0,Comment,false,0);
+  MatText(t=18,30,"Quartal",true);// Edit ************************** Friday, 22 May 2015 10:12:52
+  MatCol(t,100,"",0,Spec,false,0);// Edit ************************** Friday, 22 May 2015 10:13:17
+  MatCol(1,30,"Item",0,ArtCode,false,CLCorspSClass);// Edit ************************** Thursday, 18 June 2015 17:57:24
+  MatCol(1,100,"Extras",0,Extras,false,ExtSClass);
+  MatCol(1,150,"Suppl",0,VECode,false,VESClass);
+  MatCol(1,200,"Name",0,VEName,false,0);
+  MatCol(1,h=-370,"Foundation",0,ExtraObj,true,ObjFoundSClass);
   MatCol(t=kInvoiceRowTypeStructuredItemComponent,30,"Item",0,ArtCode,false,INSClass);
   MatCol(t,100,"Person",0,EMCode,false,UserSClass);
-  MatCol(t,155,"Qty",0,Qty,true,0);
   MatCol(t,200,"Description",0,Comment,false,0);
+  MatCol(t=1,h+=60,"Description",0,Comment,false,0);
   Flip(1);
-  MatCol(t=1,-160,"Price",0,Price,true,0);
-  MatCol(t,-80,"Sum",0,Sum,true,0);
-
+  MatCol(t,-160,"Month Sum",0,MonthSum,true,0);
+  MatCol(t,-80,"Quart Sum",0,Price,true,0);
   MatCol(t=kInvoiceRowTypeStructuredItemComponent,-285,"Price",0,Price,true,0);
   MatCol(t,-215,"%",0,Discount,true,0);
   MatCol(t,-175,"Sum",0,Sum,true,0);
   MatCol(t,-100,"Phase",0,PRStage,false,PRStageSClass);
   MatCol(t,-50,"Sign",0,PRStageSign,false,UserSClass);
+  Flip(2);
+  MatCol(t=1,-110,"Qty",0,Qty,true,0);
+  MatCol(t,-80,"Sum",0,Sum,true,0);
   DeleteRowTest;
   EndMatrix;
   vs = 22;
   v = 18; VTab(-35,v,-16,v+vs,ToolFlip,1,"A");
-  //v=v+ vs; VTab(-35,v,-16,v+vs,ToolFlip,2,"B");
+  v=v+ vs; VTab(-35,v,-16,v+vs,ToolFlip,2,"B");
   if (IsEnterprise) then begin
     //v=v+ vs; VTab(-35,v,-16,v+vs,ToolFlip,5,"E");
     EditField(63,-25,40,"Currency",ViewOnly,CurncyCode,false,CurncyCodeSClass);
@@ -4771,4 +4777,24 @@ real h,v,vs,h1;
 		EditField(h,v+=vs,120,"Group",Normal,f1,false,ITSClass);
 		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunProjectFactRn","Run");
 	EndWindow;
+end;
+
+window ExtSClass:2
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer,iPad,iPhone")
+begin
+  real v;
+  Integer mwn;
+  Boolean contf;
+  
+  WindowBegin("Paste Object",ExtSClass,CGslist,ObjView);
+  DynamicWindow;
+  SpawnClass(ObjDClass);
+  UseView(ObjVc);
+  Sizeable(-1,-1,0,0);
+  SetWRect(220,80,600,298);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,1,    "Object",Code,false,ActSbstOTCode);
+  RlColKey(201,201,"Name",Comment,false,ActSbstComment);
+  SearchField("Search");
+  EndWindow;
 end;

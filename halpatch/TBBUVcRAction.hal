@@ -12,6 +12,7 @@ external procedure GetFullCurncyRate (var string,Date,var val,var val,var val,va
 external procedure GetSalesGroup(string,var string);
 external function string 60 AddObjectToObjectList(string,string);
 external procedure NormalizeObjstr(var string);
+external function string 60 RemoveObjectFromObjectList(string,string);
 
 
 
@@ -73,8 +74,9 @@ BEGIN
   record PRVc PRr;
   record UserVc Userr;
   record CUVc CUr;
+  record ObjVc Objr;
   record SalesGroupVc SalesGroupr;
-  row TBBUVc TBBUrw;
+  row TBBUVc TBBUrw,TBBU2rw;
   Integer insertmode,updatemode;
   Integer i,rwcnt,orwcnt;
   string 255 tstr;
@@ -148,15 +150,14 @@ BEGIN
     MatRowGet(TBBUr,i,TBBUrw);
      switch (TBBUrw.stp) begin
        case 1:
+          TBBUrw.Objects = "";
        	 if(blank(TBBUrw.ExtraObj))then begin// Edit ************************** Thursday, 23 April 2015 14:05:28
        	 		RecordCheckError(1854,"",i,"ExtraObj");     
             res = -1;
             goto LTBBUVcRecordCheck;
        	 end;
-       	 
+          
        	 	TBBUrw.Objects = AddObjectToObjectList(TBBUrw.Objects,TBBUrw.ExtraObj);// Edit ************************** Friday, 24 April 2015 12:04:00
-       	 	matrowput(TBBUr,i,TBBUrw);
-					NormalizeObjstr(TBBUrw.Objects);// Edit ************************** Friday, 24 April 2015 12:07:28
 					
        	 /*if(blank(TBBUrw.VECode))then begin// Edit ************************** Thursday, 23 April 2015 14:05:28
        	 		RecordCheckError(1854,"",i,"VECode");     
@@ -164,48 +165,73 @@ BEGIN
             goto LTBBUVcRecordCheck;
        	 end;*/
        	 
-       	 if(nonblank(TBBUrw.VECode))then begin
-					 CUr.Code = TBBUrw.VECode;
-					 if(ReadFirstMain(CUr,1,true)==false)then begin// Edit ************************** Thursday, 23 April 2015 14:07:26
-							RecordCheckError(1290,"",i,"VECode");      
-							res = -1;
-							goto LTBBUVcRecordCheck;
-					 end;
-					 CUr.Code = TBBUrw.VECode;
-					 if(ReadFirstMain(CUr,1,true))then begin// Edit ************************** Thursday, 23 April 2015 14:07:26
-							if(blank(CUr.VEObjects))then begin
-								RecordCheckError(1386," in Vendor card",i,"VECode");      
-								res = -1;
-								goto LTBBUVcRecordCheck;
-							end;
-					 end;
-       	 end;
+          if(nonblank(TBBUrw.VECode))then begin
+            CUr.Code = TBBUrw.VECode;
+            if(ReadFirstMain(CUr,1,true)==false)then begin// Edit ************************** Thursday, 23 April 2015 14:07:26
+              RecordCheckError(1290,"",i,"VECode");      
+              res = -1;
+              goto LTBBUVcRecordCheck;
+            end;
+            CUr.Code = TBBUrw.VECode;
+            if(ReadFirstMain(CUr,1,true))then begin// Edit ************************** Thursday, 23 April 2015 14:07:26
+              if(blank(CUr.VEObjects))then begin
+                RecordCheckError(1386," in Vendor card",i,"VECode");      
+                res = -1;
+                goto LTBBUVcRecordCheck;
+              end else begin
+                TBBUrw.Objects = AddObjectToObjectList(TBBUrw.Objects,CUr.VEObjects);//Edit-------------------Vitalii 16:56 18.03.2016
+              end;
+            end;
+          end;
        	 
        	 
-         if (nonblank(TBBUrw.ArtCode)) then begin
-           INr.Code = TBBUrw.ArtCode;
-           if (ReadFirstMain(INr,1,true)==false) then begin
-             RecordCheckError(1233,"",i,"ArtCode");      
-             res = -1;
-             goto LTBBUVcRecordCheck;
-           end;
-         end else begin
-           if (TBBUrw.Qty!=0) then begin
-             if (blank(TBBUrw.TimeClass)) then begin
-               RecordCheckError(1233,"",i,"ArtCode");      
-               res = -1;
-               goto LTBBUVcRecordCheck;
-             end;
-           end;
+        if (nonblank(TBBUrw.ArtCode)) then begin
+          INr.Code = TBBUrw.ArtCode;
+          if (ReadFirstMain(INr,1,true)==false) then begin
+            RecordCheckError(1233,"",i,"ArtCode");      
+            res = -1;
+            goto LTBBUVcRecordCheck;
+          end;
+          TBBUrw.Objects = AddObjectToObjectList(TBBUrw.Objects,TBBUrw.ArtCode);
+        end else begin
+          if (TBBUrw.Qty!=0) then begin
+            if (blank(TBBUrw.TimeClass)) then begin
+              RecordCheckError(1233,"",i,"ArtCode");      
+              res = -1;
+              goto LTBBUVcRecordCheck;
+            end;
+          end;
+          if nonblank(TBBUrw.Extras) then begin
+            RecordCheckError(1233,"",i,"ArtCode");      
+            res = -1;
+            goto LTBBUVcRecordCheck;
+          end;
         end;
         if (nonblank(TBBUrw.PRStageSign)) then begin
           Userr.Code = TBBUrw.PRStageSign;
           if (ReadFirstMain(Userr,1,true)==false) then begin
             RecordCheckError(20170," " & TBBUrw.PRStageSign, i, "PRStageSign");   
-            res = -1; 
+            res = -1;
             goto LTBBUVcRecordCheck;
           end;
-        end;        
+        end;
+        if nonblank(TBBUrw.Extras) then begin
+          Objr.Code = TBBUrw.Extras;
+          if (ReadFirstMain(Objr,1,true)==false) then begin
+            RecordCheckError(1043,"",i,"Extras");      
+            res = -1;
+            goto LTBBUVcRecordCheck;
+          end else begin
+            if Objr.OTCode!="EXTRA" then begin
+              RecordCheckError(1083,"EXTRA",i,"Extras");      
+              res = -1;
+              goto LTBBUVcRecordCheck;
+            end;
+          end;
+          TBBUrw.Objects = AddObjectToObjectList(TBBUrw.Objects,TBBUrw.Extras);
+        end;
+        NormalizeObjstr(TBBUrw.Objects);// Edit ************************** Friday, 24 April 2015 12:07:28
+        matrowput(TBBUr,i,TBBUrw);
      end;
   end;
 LTBBUVcRecordCheck:;

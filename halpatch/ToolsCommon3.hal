@@ -1722,42 +1722,53 @@ begin
 	row TBBUVc TBBUrw;
 	record CUVc CUr;
 	record CLCorspVc CLCorspr;
+  record ObjVc Objr;
 	integer rwcnt,i;
 	string 255 tmp;
   boolean chng;
 	
 	TBBUr.PRCode = "";
 	while (LoopMain(TBBUr,1,true)) begin
-    chng = false;
 		rwcnt = MatRowCnt(TBBUr);
 		for (i=0;i<rwcnt;i=i+1) begin
 			MatRowGet(TBBUr,i,TBBUrw);
-			if nonblank(TBBUrw.ArtCode) then begin
-				CLCorspr.Code = TBBUrw.ArtCode;
-				ReadFirstMain(CLCorspr,1,true);
-				tmp = CLCorspr.Objects & ",";
-			end;
-			if nonblank(TBBUrw.VECode) then begin
-				CUr.Code = TBBUrw.VECode;
-				ReadFirstMain(CUr,1,true);
-        if blank(TBBUrw.VEName) then begin
-          TBBUrw.VEName = CUr.Name;
+      if TBBUrw.stp==1 then begin
+        tmp = "";
+        chng = false;
+        if nonblank(TBBUrw.ArtCode) then begin
+          CLCorspr.Code = TBBUrw.ArtCode;
+          ReadFirstMain(CLCorspr,1,true);
+          tmp = tmp & CLCorspr.Objects & ",";
+        end;
+        if nonblank(TBBUrw.Extras) then begin
+          Objr.Code = TBBUrw.Extras;
+          if ReadFirstMain(Objr,1,true) then begin
+            tmp = tmp & Objr.Code & ",";
+          end;
+        end;
+        if nonblank(TBBUrw.VECode) then begin
+          CUr.Code = TBBUrw.VECode;
+          ReadFirstMain(CUr,1,true);
+          if blank(TBBUrw.VEName) then begin
+            TBBUrw.VEName = CUr.Name;
+            chng = true;
+          end;
+          tmp = tmp & CUr.VEObjects & ",";
+        end;
+        if nonblank(TBBUrw.ExtraObj) then begin
+          tmp = tmp & TBBUrw.ExtraObj & ",";
+        end;
+        if blank(TBBUrw.MonthSum) then begin
+          TBBUrw.MonthSum = TBBUrw.Price/3;
           chng = true;
         end;
-				tmp = tmp & CUr.VEObjects & ",";
-			end;
-			if nonblank(TBBUrw.ExtraObj) then begin
-				tmp = tmp & TBBUrw.ExtraObj;
-			end;
-      if blank(TBBUrw.MonthSum) then begin
-        TBBUrw.MonthSum = TBBUrw.Price/3;
-        chng = true;
+        tmp = left(tmp,len(tmp) - 1);
+        if (TBBUrw.Objects!=tmp) or chng then begin
+          logtext(0,TBBUr.PRCode & " " & i & " - " & TBBUrw.Objects & " - (new)" & tmp);
+          TBBUrw.Objects = tmp;
+          MatRowPut(TBBUr,i,TBBUrw);
+        end;
       end;
-			if (TBBUrw.Objects!=tmp) or chng then begin
-				logtext(0,TBBUr.PRCode & " " & i & " - " & TBBUrw.Objects & " - (new)" & tmp);
-				TBBUrw.Objects = tmp;
-				MatRowPut(TBBUr,i,TBBUrw);
-			end;
 		end;
 		RECORDSTORE(TBBUr,true);
 	end;
@@ -1816,9 +1827,9 @@ begin
   row VIVc VIrw;
   record INVc INr;
   record PRVc PRr;
-  Integer quart,rwcnt,i,j,AAi,PAi,SAi,FAi,CAi;
-  array string 20 ArtArr,ProjArr,SupplArr,FoundArr,CurArr;
-  vector boolean ArtInArr,ProjInArr,SupplInArr,FoundInArr,CurInArr;
+  Integer quart,rwcnt,i,j,AAi,PAi,SAi,FAi,CAi,EAi;
+  array string 20 ArtArr,ProjArr,SupplArr,FoundArr,CurArr,ExtArr;
+  vector boolean ArtInArr,ProjInArr,SupplInArr,FoundInArr,CurInArr,ExtInArr;
   vector val VIVect;
   vector string 255 CommentVect;
   string 255 vewarn,objstr;
@@ -1833,7 +1844,7 @@ begin
   end;
   quart = GetQuartal(RepSpec.d2);
   TBBUr.PRCode = "";
-	while (LoopMain(TBBUr,1,true)) begin
+  while (LoopMain(TBBUr,1,true)) begin
     PRr.Code = TBBUr.PRCode;
     ReadFirstMain(PRr,1,true);
     if (GetYear(PRr.StartDate)==GetYear(RepSpec.d2)) then begin
@@ -1849,8 +1860,8 @@ begin
                   SupplInArr[TBBUrw.VECode] = true;
                   SupplArr[SAi] = TBBUrw.VECode;
                   CommentVect[TBBUrw.VECode] = TBBUrw.VEName;
+                  SAi = SAi + 1;
                 end;
-                SAi = SAi + 1;
                 if !CurInArr[TBBUr.CurncyCode] then begin
                   CurInArr[TBBUr.CurncyCode] = true;
                   CurArr[CAi] = TBBUr.CurncyCode;
@@ -1859,8 +1870,14 @@ begin
                 if !ArtInArr[TBBUrw.ArtCode] then begin
                   ArtInArr[TBBUrw.ArtCode] = true;
                   ArtArr[AAi] = TBBUrw.ArtCode;
-                  CommentVect[TBBUrw.ArtCode] = TBBUrw.Comment;
                   AAi = AAi + 1;
+                end;
+                CommentVect[TBBUrw.ArtCode] = TBBUrw.Comment;
+                if !ExtInArr[TBBUrw.Extras] then begin
+                  ExtInArr[TBBUrw.Extras] = true;
+                  ExtArr[EAi] = TBBUrw.Extras;
+                  CommentVect[TBBUrw.Extras] = TBBUrw.Comment;
+                  EAi = EAi + 1;
                 end;
                 if !ProjInArr[TBBUr.PRCode] then begin
                   ProjInArr[TBBUr.PRCode] = true;
@@ -1872,7 +1889,7 @@ begin
                   FoundArr[FAi] = TBBUrw.ExtraObj;
                   FAi = FAi + 1;
                 end;
-                VIVect[TBBUrw.VECode & ":" & TBBUr.CurncyCode & ":" & TBBUrw.ArtCode & ":" & TBBUr.PRCode & ":" & TBBUrw.ExtraObj] = VIVect[TBBUrw.VECode & ":" & TBBUrw.ArtCode & ":" & TBBUr.PRCode & ":" & TBBUrw.ExtraObj] + TBBUrw.MonthSum;
+                VIVect[TBBUrw.VECode & ":" & TBBUr.CurncyCode & ":" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUr.PRCode & ":" & TBBUrw.ExtraObj] = VIVect[TBBUrw.VECode & ":" & TBBUr.CurncyCode & ":" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUr.PRCode & ":" & TBBUrw.ExtraObj] + TBBUrw.MonthSum;
               end;
             end else begin
               i = rwcnt;
@@ -1897,51 +1914,57 @@ begin
       VIr.PayDeal = "0";
       VIr.CurncyCode = CurArr[CAi];
       for (AAi=0;AAi<ArtArr.length;AAi=AAi+1) begin
-        for (PAi=0;PAi<ProjArr.length;PAi=PAi+1) begin
-          for (FAi=0;FAi<FoundArr.length;FAi=FAi+1) begin
-            if (VIVect[SupplArr[SAi] & ":" & CurArr[CAi] & ":" & ArtArr[AAi] & ":" & ProjArr[PAi] & ":" & FoundArr[FAi]]!=blankval) then begin
-              VIrw.stp = kInvoiceRowTypeNormal;
-              VIrw.Item = ArtArr[AAi];
-              if OTCodeMatch(ArtArr[AAi],"EXP") then begin
-                VIrw.Exp = ArtArr[AAi];
+        for (EAi=0;EAi<ExtArr.length;EAi=EAi+1) begin
+          for (PAi=0;PAi<ProjArr.length;PAi=PAi+1) begin
+            for (FAi=0;FAi<FoundArr.length;FAi=FAi+1) begin
+              if (VIVect[SupplArr[SAi] & ":" & CurArr[CAi] & ":" & ArtArr[AAi] & ":" & ExtArr[EAi] & ":" & ProjArr[PAi] & ":" & FoundArr[FAi]]!=blankval) then begin
+                VIrw.stp = kInvoiceRowTypeNormal;
+                VIrw.Item = ArtArr[AAi];
+                VIrw.Extras = ExtArr[EAi];
+                if OTCodeMatch(ArtArr[AAi],"EXP") then begin
+                  VIrw.Exp = ArtArr[AAi];
+                end;
+                PRr.Code = ProjArr[PAi];
+                ReadFirstMain(PRr,1,true);
+                GetObjs("PRJ",PRr.Objects,VIrw.Prj);
+                VIrw.PRCode = ProjArr[PAi];
+                VIrw.Supp = SupplArr[SAi];
+                VIrw.Found = FoundArr[FAi];
+                VIrw.SupName = CommentVect[SupplArr[SAi]];
+                VIrw.Comment = CommentVect[ArtArr[AAi]];
+                INr.Code = VIrw.Item;
+                ReadFirstMain(INr,1,true);
+                if (nonblank(INr.CostAcc)) then begin
+                  VIrw.AccNumber = INr.CostAcc;
+                end;
+                VIrw.Sum = VIVect[SupplArr[SAi] & ":" & CurArr[CAi] & ":" & ArtArr[AAi] & ":" & ExtArr[EAi] & ":" & ProjArr[PAi] & ":" & FoundArr[FAi]];
+                VIrw.qty = 1;
+                objstr = "";
+                if(nonblank(VIrw.Prj))then begin
+                  objstr = objstr & "," & VIrw.Prj;
+                end;
+                if(nonblank(VIrw.Loc))then begin
+                  objstr = objstr & "," & VIrw.Loc;
+                end;
+                if(nonblank(VIrw.Exp))then begin
+                  objstr = objstr & "," & VIrw.Exp;
+                end;
+                if(nonblank(VIrw.Extras))then begin
+                  objstr = objstr & "," & VIrw.Extras;
+                end;
+                if(nonblank(VIrw.Supp))then begin
+                  objstr = objstr & "," & VIrw.Supp;
+                end;
+                if(nonblank(VIrw.Found))then begin
+                  objstr = objstr & "," & VIrw.Found;
+                end;
+                NoDupObjs(objstr,objstr);
+                NormalizeObjstr(objstr);
+                VIrw.Objects = objstr;
+                MatRowPut(VIr,MatRowCnt(VIr),VIrw);
+                VIr.PayVal = VIr.PayVal + VIrw.Sum;
+                ClearRow(VIr,VIrw,VIrw.stp);
               end;
-              PRr.Code = ProjArr[PAi];
-              ReadFirstMain(PRr,1,true);
-              GetObjs("PRJ",PRr.Objects,VIrw.Prj);
-              VIrw.PRCode = ProjArr[PAi];
-              VIrw.Supp = SupplArr[SAi];
-              VIrw.Found = FoundArr[FAi];
-              VIrw.SupName = CommentVect[SupplArr[SAi]];
-              VIrw.Comment = CommentVect[ArtArr[AAi]];
-              INr.Code = VIrw.Item;
-              ReadFirstMain(INr,1,true);
-              if (nonblank(INr.CostAcc)) then begin
-                VIrw.AccNumber = INr.CostAcc;
-              end;
-              VIrw.Sum = VIVect[SupplArr[SAi] & ":" & CurArr[CAi] & ":" & ArtArr[AAi] & ":" & ProjArr[PAi] & ":" & FoundArr[FAi]];
-              VIrw.qty = 1;
-              objstr = "";
-              if(nonblank(VIrw.Prj))then begin
-              	objstr = objstr & "," & VIrw.Prj;
-              end;
-              if(nonblank(VIrw.Loc))then begin
-              	objstr = objstr & "," & VIrw.Loc;
-              end;
-              if(nonblank(VIrw.Exp))then begin
-              	objstr = objstr & "," & VIrw.Exp;
-              end;
-              if(nonblank(VIrw.Supp))then begin
-              	objstr = objstr & "," & VIrw.Supp;
-              end;
-              if(nonblank(VIrw.Found))then begin
-              	objstr = objstr & "," & VIrw.Found;
-              end;
-              NoDupObjs(objstr,objstr);
-              NormalizeObjstr(objstr);
-              VIrw.Objects = objstr;
-              MatRowPut(VIr,MatRowCnt(VIr),VIrw);
-              VIr.PayVal = VIr.PayVal + VIrw.Sum;
-              ClearRow(VIr,VIrw,VIrw.stp);
             end;
           end;
         end;

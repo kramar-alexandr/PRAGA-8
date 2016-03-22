@@ -18,6 +18,9 @@ string 200 objstr;
 		if(nonblank(CLOutrw.CorspCode))then begin
 			objstr = objstr & "," & CLOutrw.CorspCode;// Edit ************************** Wednesday, 15 July 2015 10:59:15
 		end;
+    if(nonblank(CLOutrw.Extras))then begin
+			objstr = objstr & "," & CLOutrw.Extras;//Edit-------------------Vitalii 14:11 21.03.2016
+		end;
 		if(nonblank(CLOutrw.Prj))then begin
 			objstr = objstr & "," & CLOutrw.Prj;// Edit ************************** Wednesday, 15 July 2015 10:59:15
 		end;
