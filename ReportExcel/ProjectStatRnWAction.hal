@@ -8,6 +8,7 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2016";
+  RepSpec.f3 = "5";
 	RepSpec.flags[5] = 1;
 	PutWindowRecord(wn,RepSpec);
 	
@@ -21,6 +22,8 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2016";
+  RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
 	PutWindowRecord(wn,RepSpec);
 
 	return;

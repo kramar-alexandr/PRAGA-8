@@ -12,89 +12,57 @@ external procedure EmptyCell(integer,string,var integer,integer,integer,integer)
 external procedure MergeCells(integer,string,array string,integer);
 external procedure FillSharedStrings(string,array string,integer,integer,array string);
 external procedure ConvertToXLSX(string);
+external function string 10 GetStringCellNum(integer,integer);
+external function string 255 StrReplace(string,string,string);
+external function integer GetQuartal(date);
+external procedure GetObjs(string,string,var string);
 
 procedure ArraysCollect(record RcVc RepSpec, var array string ArtArrayWithoutGroups, var array string ProjArray, var array string ArtArrayWithGroups, var boolean PrjFoundf, var vector boolean isMotherProjVect)
 BEGIN
 	record ITVc ITr;
 	record INVc INr;
 	record PRVc PRr;
+  record ObjVc Objr;
 	integer i,j,k,kw,kwo;
 	boolean TrHs,testf,foundf;
 	string 100 tstr;
 	
 	kw = 0;
-	if RepSpec.flags[5] == 1 then begin
-		ITr.Code = 4000;
-    if (RepSpec.f2=="2016") then begin
-      ITr.Code = "1_16";
-    end;
-		if (readfirstmain(ITr,1,true)) begin
-      if (RepSpec.f2=="2016" and right(ITr.Code,3)=="_16") or (RepSpec.f2!="2016" and right(ITr.Code,3)!="_16") then begin
-        ArtArrayWithGroups[kw] = ITr.Code;
-        kw = kw + 1;
-        resetloop(INr);
-        INr.Group = ITr.Code;
-        TrHs = true;
-        while(loopkey("Group",INr,1,TrHs)) begin
-          testf = true;
-          if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
-          if (blank(INr.Objects)) then begin testf = false; end;
-          if (RepSpec.f2=="2016" and right(INr.Objects,3)=="_16") or (RepSpec.f2!="2016") then begin testf = false; end;
-          if (testf) then begin
-            tstr = INr.Objects;
-            foundf = false;
-            for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
-              if (ArtArrayWithoutGroups[i]==tstr) then begin
-                foundf = true;
-              end;
-            end; 
-            if (!foundf) then begin
-              ArtArrayWithoutGroups[kwo] = INr.Objects;
-              kwo = kwo + 1;
-              ArtArrayWithGroups[kw] = INr.Objects;
-              kw = kw + 1;
+  while(loopmain(ITr,1,true)) begin
+    if (RepSpec.f2=="2016" and right(ITr.Code,3)=="_16") or (RepSpec.f2!="2016" and right(ITr.Code,3)!="_16") then begin
+      ArtArrayWithGroups[kw] = ITr.Code;
+      kw = kw + 1;
+      resetloop(INr);
+      INr.Group = ITr.Code;
+      TrHs = true;
+      while(loopkey("Group",INr,1,TrHs)) begin
+        testf = true;
+        if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
+        if (blank(INr.Objects)) then begin testf = false; end;
+        if (RepSpec.f2=="2016" and right(INr.Objects,3)!="_16") then begin testf = false; end;
+        if (testf) then begin
+          tstr = INr.Objects;
+          foundf = false;
+          for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
+            if (ArtArrayWithoutGroups[i]==tstr) then begin
+              foundf = true;
             end;
+          end; 
+          if (!foundf) then begin
+            ArtArrayWithoutGroups[kwo] = INr.Objects;
+            kwo = kwo + 1;
+            ArtArrayWithGroups[kw] = INr.Objects;
+            kw = kw + 1;
           end;
         end;
       end;
     end;
-	end else begin
-		while(loopmain(ITr,1,true)) begin
-      if (RepSpec.f2=="2016" and right(ITr.Code,3)=="_16") or (RepSpec.f2!="2016" and right(ITr.Code,3)!="_16") then begin
-        ArtArrayWithGroups[kw] = ITr.Code;
-        kw = kw + 1;
-        resetloop(INr);
-        INr.Group = ITr.Code;
-        TrHs = true;
-        while(loopkey("Group",INr,1,TrHs)) begin
-          testf = true;
-          if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
-          if (blank(INr.Objects)) then begin testf = false; end;
-          if (RepSpec.f2=="2016" and right(INr.Objects,3)!="_16") then begin testf = false; end;
-          if (testf) then begin
-            tstr = INr.Objects;
-            foundf = false;
-            for (i=0;i<ArtArrayWithoutGroups.length;i=i+1) begin
-              if (ArtArrayWithoutGroups[i]==tstr) then begin
-                foundf = true;
-              end;
-            end; 
-            if (!foundf) then begin
-              ArtArrayWithoutGroups[kwo] = INr.Objects;
-              kwo = kwo + 1;
-              ArtArrayWithGroups[kw] = INr.Objects;
-              kw = kw + 1;
-            end;
-          end;
-        end;
-      end;
-		end;
-	end;
+  end;
 	k = 0;
-	while(loopmain(PRr,1,true)) begin
-		if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
+  while(loopmain(PRr,1,true)) begin
+		if ((GetYear(PRr.StartDate) & ""==RepSpec.f2) or (GetYear(PRr.EndDate) & ""==RepSpec.f2)) then begin
 			ProjArray[k] = PRr.Code;
-			if blank(PRr.MotherCode) or (PRr.MotherCode == "") then begin
+			if blank(PRr.MotherCode) or (PRr.MotherCode=="") then begin
 				isMotherProjVect[ProjArray[k]] = true;
 			end else begin
 				isMotherProjVect[ProjArray[k]] = false;
@@ -102,6 +70,7 @@ BEGIN
 			k = k + 1;
 		end;
 	end;
+  
 	if (k==0) then begin
 		PrjFoundf = false;
 	end;
@@ -117,10 +86,8 @@ BEGIN
 	RETURN;
 END;
 
-procedure DataCollect(array string ArtArrayWithoutGroups, var array string ArtSuppl, array string ProjArray, record RcVc RepSpec,
-					var vector val Quart1Vect, var vector val Quart2Vect,
-					var vector val Quart3Vect, var vector val Quart4Vect,
-					var vector val TOTALVect)
+procedure DataCollect(array string ArtArrayWithoutGroups, array string ExtArr, var array string ArtSuppl, array string ProjArray, record RcVc RepSpec,
+					var vector val QuartVect, var vector val TOTALVect)
 BEGIN
 	record PRVc PRr,PR2r;
 	record TBBUVc TBBUr;
@@ -128,142 +95,223 @@ BEGIN
   record INVc INr;
 	record TRVc TRr;
 	record MainVc Mainr;
-	record ObjVc Objr;
 	row TBBUVc TBBUrw;
 	row TRVc TRrw;
-	integer i,k,j,mtrw,PAi,ASi;
+	integer i,k,j,mtrw,PAi,ASi,EAi;
 	boolean TrHs,testf,kTestf;
-	string 20 group;
-	vector boolean SupplInArr;
+	string 20 group,extras,suppl;
+  vector boolean SupplInArr,ExtInArr;
 	
 	ASi = 0;
 	ArtSuppl[ASi] = "";
+  SupplInArr[ArtSuppl[ASi]] = true;
 	ASi = ASi + 1;
-	Objr.Code = RepSpec.ObjStr;
-	readfirstmain(Objr,1,true);
+  EAi = 0;
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin 
 		PRr.Code = ProjArray[PAi];
 		if (ReadFirstMain(PRr,1,true)) then begin
-			if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
+      if ((GetYear(PRr.StartDate) & ""==RepSpec.f2) or (GetYear(PRr.EndDate) & ""==RepSpec.f2)) then begin
 				TBBUr.PRCode = PRr.Code;
 				if (readfirstmain(TBBUr,1,true)) then begin
 					mtrw = matrowcnt(TBBUr);
 					k = 0;
 					for (i=0;i<mtrw;i=i+1) begin
 						matrowget(TBBUr,i,TBBUrw);
-						if (RepSpec.flags[6] == 1) then begin
+						if (RepSpec.flags[6]==1) then begin
 							TBBUrw.VECode = "";
 						end;
 						if(TBBUrw.stp==18) then begin
 							k = TBBUrw.ItemType;
 						end;
+            if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
+              k = 1;
+            end;
 						kTestf = false;
-						if ((RepSpec.flags[1] == 1) and (k == 1)) then begin
+						if ((RepSpec.flags[1]==1) and (k==1)) then begin
 							kTestf = true;
 						end;
-						if ((RepSpec.flags[2] == 1) and (k == 2)) then begin
+						if ((RepSpec.flags[2]==1) and (k==2)) then begin
 							kTestf = true;
 						end;
-						if ((RepSpec.flags[3] == 1) and (k == 3)) then begin
+						if ((RepSpec.flags[3]==1) and (k==3)) then begin
 							kTestf = true;
 						end;
-						if ((RepSpec.flags[4] == 1) and (k == 4)) then begin
+						if ((RepSpec.flags[4]==1) and (k==4)) then begin
 							kTestf = true;
 						end;
-						if ((RepSpec.flags[1] == 1) and ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4))) then begin
+						if ((RepSpec.flags[1]==1) and ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4))) then begin
 							kTestf = true;
 						end;
-						if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode) and TBBUrw.ExtraObj==RepSpec.f1 and (setinset(RepSpec.ObjStr,TBBUrw.Objects) or blank(RepSpec.ObjStr) or Objr.OTCode=="LOCAT"))) then begin
+						if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode) and TBBUrw.ExtraObj==RepSpec.f1)) then begin
 							if nonblank(TBBUrw.VECode) and !SupplInArr[TBBUrw.VECode] then begin
 								SupplInArr[TBBUrw.VECode] = true;
 								ArtSuppl[ASi] = TBBUrw.VECode;
 								ASi = ASi + 1;
 							end;
-							for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
-								if (setinset(ArtArrayWithoutGroups[j],TBBUrw.Objects)) then begin
-									INr.Objects = ArtArrayWithoutGroups[j];
-                  if ReadfirstKey("Objects",INr,1,true) then begin
-                    ITr.Code = INr.Group;
-                  end else begin
-                    ITr.Code = ArtArrayWithoutGroups[j];
-                  end;
-                  ReadFirstMain(ITr,1,true);
-                  group = ITr.Code;
-									switch (k) begin
-										case 1:
-											Quart1Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart1Vect["TOTAL:" & ProjArray[PAi]] = Quart1Vect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart1Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":TOTAL"] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":TOTAL"] + TBBUrw.Sum;
-											Quart1Vect["TOTAL:TOTAL"] = Quart1Vect["TOTAL:TOTAL"] + TBBUrw.Sum;
-											Quart1Vect[group & ":" & ProjArray[PAi]] = Quart1Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart1Vect[group & ":TOTAL"] = Quart1Vect[group & ":TOTAL"] + TBBUrw.Sum;
-										case 2:
-											Quart2Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] = Quart2Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart2Vect["TOTAL:" & ProjArray[PAi]] = Quart2Vect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart2Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":TOTAL"] = Quart2Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":TOTAL"] + TBBUrw.Sum;
-											Quart2Vect["TOTAL:TOTAL"] = Quart2Vect["TOTAL:TOTAL"] + TBBUrw.Sum;
-											Quart2Vect[group & ":" & ProjArray[PAi]] = Quart2Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart2Vect[group & ":TOTAL"] = Quart2Vect[group & ":TOTAL"] + TBBUrw.Sum;
-										case 3:
-											Quart3Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] = Quart3Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart3Vect["TOTAL:" & ProjArray[PAi]] = Quart3Vect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart3Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":TOTAL"] = Quart3Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":TOTAL"] + TBBUrw.Sum;
-											Quart3Vect["TOTAL:TOTAL"] = Quart3Vect["TOTAL:TOTAL"] + TBBUrw.Sum;
-											Quart3Vect[group & ":" & ProjArray[PAi]] = Quart3Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart3Vect[group & ":TOTAL"] = Quart3Vect[group & ":TOTAL"] + TBBUrw.Sum;
-										case 4:
-											Quart4Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] = Quart4Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart4Vect["TOTAL:" & ProjArray[PAi]] = Quart4Vect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart4Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":TOTAL"] = Quart4Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":TOTAL"] + TBBUrw.Sum;
-											Quart4Vect["TOTAL:TOTAL"] = Quart4Vect["TOTAL:TOTAL"] + TBBUrw.Sum;
-											Quart4Vect[group & ":" & ProjArray[PAi]] = Quart4Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart4Vect[group & ":TOTAL"] = Quart4Vect[group & ":TOTAL"] + TBBUrw.Sum;
-										otherwise
-											Quart1Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart1Vect["TOTAL:" & ProjArray[PAi]] = Quart1Vect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart1Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":TOTAL"] = Quart1Vect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":TOTAL"] + TBBUrw.Sum;
-											Quart1Vect["TOTAL:TOTAL"] = Quart1Vect["TOTAL:TOTAL"] + TBBUrw.Sum;
-											Quart1Vect[group & ":" & ProjArray[PAi]] = Quart1Vect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-											Quart1Vect[group & ":TOTAL"] = Quart1Vect[group & ":TOTAL"] + TBBUrw.Sum;
-									end;
-									TOTALVect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] = TOTALVect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-									TOTALVect["TOTAL:" & ProjArray[PAi]] = TOTALVect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-									TOTALVect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":TOTAL"] = TOTALVect[ArtArrayWithoutGroups[j] & ":" & TBBUrw.VECode & ":TOTAL"] + TBBUrw.Sum;
-									TOTALVect["TOTAL:TOTAL"] = TOTALVect["TOTAL:TOTAL"] + TBBUrw.Sum;
-									TOTALVect[group & ":" & ProjArray[PAi]] = TOTALVect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-									TOTALVect[group & ":TOTAL"] = TOTALVect[group & ":TOTAL"] + TBBUrw.Sum;
-								end;
-							end; 
+              if nonblank(TBBUrw.Extras) and !ExtInArr[TBBUrw.Extras] then begin
+								ExtInArr[TBBUrw.Extras] = true;
+								ExtArr[EAi] = TBBUrw.Extras;
+								EAi = EAi + 1;
+							end;
+              INr.Objects = TBBUrw.ArtCode;
+              if ReadfirstKey("Objects",INr,1,true) then begin
+                ITr.Code = INr.Group;
+              end else begin
+                ITr.Code = TBBUrw.ArtCode;
+              end;
+              ReadFirstMain(ITr,1,true);
+              group = ITr.Code;
+              QuartVect[k & ":" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] = QuartVect[k & ":" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+              QuartVect[k & ":" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ":TOTAL"]             = QuartVect[k & ":" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ":TOTAL"] + TBBUrw.Sum;
+              QuartVect[k & ":" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]]                       = QuartVect[k & ":" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+              QuartVect[k & ":" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ":TOTAL"]                                   = QuartVect[k & ":" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ":TOTAL"] + TBBUrw.Sum;
+              QuartVect[k & ":TOTAL:" & ProjArray[PAi]]                                                              = QuartVect[k & ":TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
+              QuartVect[k & ":TOTAL:TOTAL"]                                                                          = QuartVect[k & ":TOTAL:TOTAL"] + TBBUrw.Sum;
+              QuartVect[k & ":" & group & ":" & ProjArray[PAi]]                                                      = QuartVect[k & ":" & group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+              QuartVect[k & ":" & group & ":TOTAL"]                                                                  = QuartVect[k & ":" & group & ":TOTAL"] + TBBUrw.Sum;
+              if nonblank(PRr.MotherCode) and (PRr.MotherCode!="") then begin
+                QuartVect[k & ":" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ":" & PRr.MotherCode] = QuartVect[k & ":" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ":" & PRr.MotherCode] + TBBUrw.Sum;
+                QuartVect[k & ":" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ":" & PRr.MotherCode]                       = QuartVect[k & ":" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ":" & PRr.MotherCode] + TBBUrw.Sum;
+                QuartVect[k & ":TOTAL:" & PRr.MotherCode]                                                              = QuartVect[k & ":TOTAL:" & PRr.MotherCode] + TBBUrw.Sum;
+                QuartVect[k & ":" & group & ":" & PRr.MotherCode]                                                      = QuartVect[k & ":" & group & ":" & PRr.MotherCode] + TBBUrw.Sum;
+              end;
+              TOTALVect[TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] = TOTALVect[TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+              TOTALVect[TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ":TOTAL"]             = TOTALVect[TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ":TOTAL"] + TBBUrw.Sum;
+              TOTALVect[TBBUrw.ArtCode & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]]                       = TOTALVect[TBBUrw.ArtCode & ":" & TBBUrw.VECode & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+              TOTALVect[TBBUrw.ArtCode & ":" & TBBUrw.VECode & ":TOTAL"]                                   = TOTALVect[TBBUrw.ArtCode & ":" & TBBUrw.VECode & ":TOTAL"] + TBBUrw.Sum;
+              TOTALVect["TOTAL:" & ProjArray[PAi]]                                                         = TOTALVect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
+              TOTALVect["TOTAL:TOTAL"]                                                                     = TOTALVect["TOTAL:TOTAL"] + TBBUrw.Sum;
+              TOTALVect[group & ":" & ProjArray[PAi]]                                                      = TOTALVect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+              TOTALVect[group & ":TOTAL"]                                                                  = TOTALVect[group & ":TOTAL"] + TBBUrw.Sum;
+              if nonblank(PRr.MotherCode) and (PRr.MotherCode!="") then begin
+                TOTALVect[TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ":" & PRr.MotherCode] = TOTALVect[TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ":" & PRr.MotherCode] + TBBUrw.Sum;
+                TOTALVect[TBBUrw.ArtCode & ":" & TBBUrw.VECode & ":" & PRr.MotherCode]                       = TOTALVect[TBBUrw.ArtCode & ":" & TBBUrw.VECode & ":" & PRr.MotherCode] + TBBUrw.Sum;
+                TOTALVect["TOTAL:" & PRr.MotherCode]                                                         = TOTALVect["TOTAL:" & PRr.MotherCode] + TBBUrw.Sum;
+                TOTALVect[group & ":" & PRr.MotherCode]                                                      = TOTALVect[group & ":" & PRr.MotherCode] + TBBUrw.Sum;
+              end;
 						end;
 					end; 
 				end;
 			end;
 		end;
 	end;
+  
+  TRr.TransDate = RepSpec.sStartDate;
+	TrHs = true;
+	while (loopkey("TransDate",TRr,1,TrHs)) begin
+		if (TRr.TransDate > RepSpec.sEndDate) then begin
+			TrHs = false;
+		end;
+		if (TrHs) then begin
+      k = 0;
+			k = GetQuartal(TRr.TransDate);
+      if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
+        k = 1;
+      end;
+			mtrw = matrowcnt(TRr);
+			for (i=0;i<mtrw;i=i+1) begin
+				matrowget(TRr,i,TRrw);
+				if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5") and setinset(RepSpec.f1,TRrw.Objects)) then begin
+					for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+            PRr.Code = ProjArray[PAi];
+            ReadFirstMain(PRr,1,true);
+            if(setinset(PRr.Objects,TRrw.Objects)) then begin
+							for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
+								if (setinset(ArtArrayWithoutGroups[j],TRrw.Objects)) then begin
+                  INr.Objects = ArtArrayWithoutGroups[j];
+                  ReadfirstKey("Objects",INr,1,true);
+                  group = INr.Group;
+									extras = "";
+                  GetObjs("EXTRA",TRrw.Objects,extras);
+                  if nonblank(extras) and !ExtInArr[extras] then begin
+                    ExtInArr[extras] = true;
+                    ExtArr[EAi] = extras;
+                    EAi = EAi + 1;
+                  end;
+                  suppl = "";
+                  if !(RepSpec.flags[6]==1) then begin
+                    GetObjs("SUPPL",TRrw.Objects,suppl);
+                    if nonblank(suppl) and !SupplInArr[suppl] then begin
+                      SupplInArr[suppl] = true;
+                      ArtSuppl[ASi] = suppl;
+                      ASi = ASi + 1;
+                    end;
+                  end;
+                  QuartVect[k & ":Fact:" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ":" & ProjArray[PAi]] = QuartVect[k & ":Fact:" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k & ":Fact:" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ":TOTAL"]             = QuartVect[k & ":Fact:" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ":TOTAL"] - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k & ":Fact:" & ArtArrayWithoutGroups[j] & ":" & suppl & ":" & ProjArray[PAi]]                = QuartVect[k & ":Fact:" & ArtArrayWithoutGroups[j] & ":" & suppl & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k & ":Fact:" & ArtArrayWithoutGroups[j] & ":" & suppl & ":TOTAL"]                            = QuartVect[k & ":Fact:" & ArtArrayWithoutGroups[j] & ":" & suppl & ":TOTAL"] - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k & ":Fact:TOTAL:" & ProjArray[PAi]]                                                         = QuartVect[k & ":Fact:TOTAL:" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k & ":Fact:TOTAL:TOTAL"]                                                                     = QuartVect[k & ":Fact:TOTAL:TOTAL"] - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k & ":Fact:" & group & ":" & ProjArray[PAi]]                                                 = QuartVect[k & ":Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k & ":Fact:" & group & ":TOTAL"]                                                             = QuartVect[k & ":Fact:" & group & ":TOTAL"] - TRrw.CredVal + TRrw.DebVal;
+                  if nonblank(PRr.MotherCode) and (PRr.MotherCode!="") then begin
+                    QuartVect[k & ":Fact:" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ":" & PRr.MotherCode] = QuartVect[k & ":Fact:" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ":" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & ":Fact:" & ArtArrayWithoutGroups[j] & ":" & suppl & ":" & PRr.MotherCode]                = QuartVect[k & ":Fact:" & ArtArrayWithoutGroups[j] & ":" & suppl & ":" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & ":Fact:TOTAL:" & PRr.MotherCode]                                                         = QuartVect[k & ":Fact:TOTAL:" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & ":Fact:" & group & ":" & PRr.MotherCode]                                                 = QuartVect[k & ":Fact:" & group & ":" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                  end;
+                  TOTALVect["Fact:" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ":" & ProjArray[PAi]] = TOTALVect["Fact:" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                  TOTALVect["Fact:" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ":TOTAL"]             = TOTALVect["Fact:" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ":TOTAL"] - TRrw.CredVal + TRrw.DebVal;
+                  TOTALVect["Fact:" & ArtArrayWithoutGroups[j] & ":" & suppl & ":" & ProjArray[PAi]]                = TOTALVect["Fact:" & ArtArrayWithoutGroups[j] & ":" & suppl & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                  TOTALVect["Fact:" & ArtArrayWithoutGroups[j] & ":" & suppl & ":TOTAL"]                            = TOTALVect["Fact:" & ArtArrayWithoutGroups[j] & ":" & suppl & ":TOTAL"] - TRrw.CredVal + TRrw.DebVal;
+                  TOTALVect["Fact:TOTAL:" & ProjArray[PAi]]                                                         = TOTALVect["Fact:TOTAL:" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                  TOTALVect["Fact:TOTAL:TOTAL"]                                                                     = TOTALVect["Fact:TOTAL:TOTAL"] - TRrw.CredVal + TRrw.DebVal;
+                  TOTALVect["Fact:" & group & ":" & ProjArray[PAi]]                                                 = TOTALVect["Fact:" & group & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                  TOTALVect["Fact:" & group & ":TOTAL"]                                                             = TOTALVect["Fact:" & group & ":TOTAL"] - TRrw.CredVal + TRrw.DebVal;
+                  if nonblank(PRr.MotherCode) and (PRr.MotherCode!="") then begin
+                TOTALVect["Fact:" & ArtArrayWithoutGroups[j]& ":" & extras & ":" & suppl & ":" & PRr.MotherCode] = TOTALVect["Fact:" & ArtArrayWithoutGroups[j]& ":" & extras & ":" & suppl & ":" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                TOTALVect["Fact:" & ArtArrayWithoutGroups[j]& ":" & suppl & ":" & PRr.MotherCode]                = TOTALVect["Fact:" & ArtArrayWithoutGroups[j]& ":" & suppl & ":" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                TOTALVect["Fact:TOTAL:" & PRr.MotherCode]                                                        = TOTALVect["Fact:TOTAL:" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                TOTALVect["Fact:" & group & ":" & PRr.MotherCode]                                                = TOTALVect["Fact:" & group & ":" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+              end;
+								end;
+							end;
+						end;
+					end;
+				end;
+			end;
+		end;
+	end;
+  ExtArr[EAi] = "";
+  EAi = EAi + 1;
 
 	RETURN;
 END;
 
 global
+function string 4 QuartalIntToStr(integer q)
+begin
+  string 5 tstr;
+  integer i;
+  
+  tstr = "Q";
+  for (i=0;i<q;i=i+1) begin
+    tstr = tstr & "I";
+  end;
+  tstr = StrReplace(tstr,"IIII","IV");
+  QuartalIntToStr = tstr;
+  return;
+end;
+
+global
 procedure FoundPeopleStatRn(record RcVc RepSpec,var area areatofile, var boolean PrjFoundf)
 BEGIN
 //RepSpec.f1 - Foundation
-//RepSpec.ObjStr - Location
 	record BaseCurBlock BCb;
 	record ITVc ITr;
   record INVc INr;
 	record ObjVc Objr;
-	array string 10 ArtArrayWithoutGroups,ProjArray,ArtArrayWithGroups,ArtSuppl;
-	vector val Quart1Vect,Quart2Vect,Quart3Vect,Quart4Vect,TOTALVect,PrjTotVect;
-	vector boolean isMotherProjVect;
-	integer i,j,k,quartCount;
+	array string 10 ArtArrayWithoutGroups,ProjArray,ArtArrayWithGroups,ArtSuppl,ExtArr;
+	vector val QuartVect,TOTALVect;
+	vector boolean isMotherProjVect,SupplInArr;
+	integer i,j,k,l,quartCount,Qi,TSi;
 	string 10 group,nextgroup;
-	val sum,sum1,sum2;
 	string 100 tstr;
 	integer suppCount1,suppCount2;
-	boolean firstprintf,firstprint2f;
+	boolean ExtPrinted;
 	array integer quartToPrint;
-	
+  
 	array string 10 sheetNames;
 	array val sheetColls;
 	array integer sheetCollsOutLvl;
@@ -278,9 +326,9 @@ BEGIN
 	
 	ArraysCollect(RepSpec,ArtArrayWithoutGroups,ProjArray,ArtArrayWithGroups,PrjFoundf,isMotherProjVect);
 	if (PrjFoundf) then begin
-		DataCollect(ArtArrayWithoutGroups,ArtSuppl,ProjArray,RepSpec,Quart1Vect,Quart2Vect,Quart3Vect,Quart4Vect,TOTALVect);
-
-		reportName = "FoundPeopleStatRn";
+		DataCollect(ArtArrayWithoutGroups,ExtArr,ArtSuppl,ProjArray,RepSpec,QuartVect,TOTALVect);
+    
+    reportName = "FoundPeopleStatRn";
 		if(windowsmode==1)then begin
 			fileToSave = "tmpxlsx.xlsx";
 		end else begin
@@ -288,13 +336,8 @@ BEGIN
 		end;
 		deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
 		BlockLoad(BCb);
-		sheetNames[0] = RepSpec.f1;
-		if nonblank(RepSpec.ObjStr) then begin
-			sheetNames[0] = sheetNames[0] & "-" & RepSpec.ObjStr;
-		end;
-		sheetNames[0] = sheetNames[0] & "-Projects-TOT";
-		qtyOfSheets = 1;
 		quartCount = RepSpec.flags[1] + RepSpec.flags[2] + RepSpec.flags[3] + RepSpec.flags[4];
+		qtyOfSheets = quartCount;
 		if (RepSpec.flags[4]==1) then begin
 			i = 4;
 		end;
@@ -311,39 +354,52 @@ BEGIN
 		i = 0;
 		for (i=1;i<quartCount;i=i+1) begin
 			quartToPrint[i] = quartToPrint[0] + i;
-		end;		
-		
-		colnum = 0;
-		sheetColls[colnum] = 5.28515625;
-		colnum = colnum + 1;
-		sheetColls[colnum] = 5.28515625;
-		colnum = colnum + 1;
-		sheetColls[colnum] = 37.42578125;
-		colnum = colnum + 1;
-		if (RepSpec.flags[6] == 0) then begin
-			sheetColls[colnum] = 5.28515625;
-			colnum = colnum + 1;
 		end;
-		sheetColls[colnum] = 13.42578125;
+    Qi = 0;
+    if qtyOfSheets>1 then begin
+      qtyOfSheets = qtyOfSheets + 1;
+      sheetNames[Qi] = RepSpec.f1;
+      sheetNames[Qi] = sheetNames[Qi] & "-Projects-TOT";
+      Qi = 1;
+    end;
+    for (i=0;i<quartCount;i=i+1) begin
+      sheetNames[i + Qi] = RepSpec.f1;
+      sheetNames[i + Qi] = sheetNames[i + Qi] & "-Projects-" & QuartalIntToStr(quartToPrint[i]);
+    end;
+    
+		colnum = 0;
+		sheetColls[colnum] = 1.85546875;
 		colnum = colnum + 1;
-		if (RepSpec.flags[6] == 0) then begin
+		sheetColls[colnum] = 3;
+		colnum = colnum + 1;
+    sheetColls[colnum] = 5.85546875;
+		colnum = colnum + 1;
+		sheetColls[colnum] = 31.5703125;
+		colnum = colnum + 1;
+		if (RepSpec.flags[6]==0) then begin
 			sheetColls[colnum] = 5.28515625;
 			colnum = colnum + 1;
-			sheetColls[colnum] = 0.85546875;
+      sheetColls[colnum] = 25.85546875;
 			colnum = colnum + 1;
+      sheetColls[colnum] = 5.28515625;
+			colnum = colnum + 1;
+      sheetColls[colnum] = 0.85546875;
+      colnum = colnum + 1;
 		end;
 		for (i=0;i<ProjArray.length + 1;i=i+1) begin
-			sheetColls[colnum] = 13.140625;
+			sheetColls[colnum] = 12;
+			colnum = colnum + 1;
+      sheetColls[colnum] = 12;
+      sheetCollsOutLvl[colnum] = 1;
 			colnum = colnum + 1;
 		end;
-		if quartCount > 1 then begin
-			sheetColls[colnum] = 2;
-			colnum = colnum + 1;
-			for (i=0;i<ProjArray.length + 1;i=i+1) begin
-				sheetColls[colnum] = 13.140625;
-				colnum = colnum + 1;
-			end;
-		end;
+    sheetColls[colnum] = 12;
+    sheetCollsOutLvl[colnum] = 1;
+    colnum = colnum + 1;
+    sheetColls[colnum] = 7;
+    sheetCollsOutLvl[colnum] = 1;
+    colnum = colnum + 1;
+		
 		colnum = 0;
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
@@ -351,1302 +407,230 @@ BEGIN
 		qtyMergeCell = 0;
 		XmlXlsxWorkBegin(fileToSave,reportName);
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,false);
-		SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
-		BeginSheetData(sheetnum,fileToSave);
-			rownum = 1;
-			colnum = 1;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				style = 1;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Project",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-			EndRow(sheetnum,fileToSave,rownum);
-			BeginRow(sheetnum,fileToSave,rownum,0,6);
-			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 1;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				style = 5;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Period",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				style = 6;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,": " & RepSpec.sStartDate & " - " & RepSpec.sEndDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-			EndRow(sheetnum,fileToSave,rownum);
-			BeginRow(sheetnum,fileToSave,rownum,0,6);
-			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 1;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				style = 7;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Currency",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				style = 8;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,": " & BCb.BaseCur1,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				style = 7;
-			EndRow(sheetnum,fileToSave,rownum);
-			BeginRow(sheetnum,fileToSave,rownum,0,6);
-			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 4;
-			BeginRow(sheetnum,fileToSave,rownum,0,30);
-				if (RepSpec.flags[6] == 0) then begin
-					style = 9;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 10;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 11;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-				colnum = colnum + 1;
-				tstr = RepSpec.f1 & " - Total";
-				if (RepSpec.flags[1]==1) then begin
-					tstr = tstr & "(Q1-";
-				end else begin
-					if (RepSpec.flags[2]==1) then begin
-						tstr = tstr & "(Q2-";
-					end else begin
-						if (RepSpec.flags[3]==1) then begin
-							tstr = tstr & "(Q3-";
-						end else begin
-							if (RepSpec.flags[4]==1) then begin
-								tstr = tstr & "(Q4-";
-							end;
-						end;
-					end;
-				end;
-				if (RepSpec.flags[4]==1) then begin
-					tstr = tstr & "Q4)";
-				end else begin
-					if (RepSpec.flags[3]==1) then begin
-						tstr = tstr & "Q3)";
-					end else begin
-						if (RepSpec.flags[2]==1) then begin
-							tstr = tstr & "Q2)";
-						end else begin
-							if (RepSpec.flags[1]==1) then begin
-								tstr = tstr & "Q1)";
-							end;
-						end;
-					end;
-				end;
-				style = 75;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				style = 76;
-				qtyOfEmpStr = ProjArray.length - 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				style = 77;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 4;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				if (RepSpec.flags[6] == 0) then begin
-					style = 13;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"H.No.",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 19;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Name",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 14;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-				colnum = colnum + 1;
-				for (i=0;i<ProjArray.length;i=i+1) begin
-					if isMotherProjVect[ProjArray[i]] then begin
-						if (i == 0) then begin
-							style = 21;
-						end else begin
-							if (i == (ProjArray.length - 1)) then begin
-								style = 25;
-							end else begin
-								style = 22;
-							end;
-						end;
-					end else begin
-						if (i == (ProjArray.length - 1)) then begin
-							if mod(StringToInt(right(ProjArray[i],1)),2) == 1 then begin
-								style = 82;
-							end else begin
-								style = 81;
-							end;
-						end else begin
-							if mod(StringToInt(right(ProjArray[i],1)),2) == 1 then begin
-								style = 24;
-							end else begin
-								style = 23;
-							end;
-						end;
-					end;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				end;
-				style = 83;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Grand",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 4;
-			BeginRow(sheetnum,fileToSave,rownum,0,4);
-				if (RepSpec.flags[6] == 0) then begin
-					style = 17;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 12;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 16;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-				colnum = colnum + 1;
-				style = 26;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				style = 27;
-				qtyOfEmpStr = ProjArray.length - 2;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				style = 28;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				style = 85;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 4;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				if (RepSpec.flags[6] == 0) then begin
-					style = 17;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 12;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 16;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-				colnum = colnum + 1;
-				style = 29;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				style = 30;
-				qtyOfEmpStr = ProjArray.length - 2;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				style = 31;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				style = 84;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 4;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				if (RepSpec.flags[6] == 0) then begin
-					style = 17;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 12;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 16;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-			EndRow(sheetnum,fileToSave,rownum);
-			for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
-				INr.Objects = ArtArrayWithGroups[i+1];
-        if ReadfirstKey("Objects",INr,1,true) then begin
-          ITr.Code = INr.Group;
-          ReadFirstMain(ITr,1,true);
-          nextgroup = ITr.Code;
-        end else begin
-          nextgroup = ArtArrayWithGroups[i+1];
-        end;
-        INr.Objects = ArtArrayWithGroups[i];
-        if ReadfirstKey("Objects",INr,1,true) then begin
-          ITr.Code = INr.Group;
-          ReadFirstMain(ITr,1,true);
-          group = ITr.Code;
-        end else begin
-          ITr.Code = ArtArrayWithGroups[i];
-					ReadFirstMain(ITr,1,true);
-					group = ITr.Code;
-        end;
-				if ArtArrayWithGroups[i]==group then begin
-					colnum = 1;
-					BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-						style = 2;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,group,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,ITr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						colnum = colnum + 1;
-						if (RepSpec.flags[6] == 0) then begin
-							style = 17;
-							qtyOfEmpStr = 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							style = 12;
-							qtyOfEmpStr = 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							style = 16;
-							qtyOfEmpStr = 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						end;
-						colnum = colnum + 1;
-						for (j=0;j<ProjArray.length;j=j+1) begin
-							style = 32;
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[group & ":" & ProjArray[j]]);
-						end;
-						style = 37;
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[group & ":TOTAL"]);
-					EndRow(sheetnum,fileToSave,rownum);
-				end else begin
-					firstprintf = true;
-					for (k=0;k<ArtSuppl.length;k=k+1) begin
-						if (TOTALVect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] != blankval) and (TOTALVect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] != 0) then begin
-							colnum = 1;
-							BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-								style = 4;
-								if (Right(ArtArrayWithGroups[i],1)=="0") or (Right(ArtArrayWithGroups[i],2)=="99") then begin
-									StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-									colnum = colnum + 1;
-								end else begin
-									colnum = colnum + 1;
-									StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-								end;
-								Objr.Code = ArtArrayWithGroups[i];
-								readfirstmain(Objr,1,true);
-								StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-								if (RepSpec.flags[6] == 0) then begin
-									if nonblank(ArtSuppl[k]) then begin
-										style = 17;
-										StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtSuppl[k],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-										Objr.Code = ArtSuppl[k];
-										readfirstmain(Objr,1,true);
-										style = 12;
-										StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-									end else begin
-										style = 17;
-										qtyOfEmpStr = 1;
-										EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-										style = 12;
-										qtyOfEmpStr = 1;
-										EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-									end;
-									style = 16;
-									qtyOfEmpStr = 1;
-									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								end;
-								colnum = colnum + 1;
-								if firstprintf then begin
-									firstprintf = false;
-									for (j=0;j<ProjArray.length;j=j+1) begin
-										style = 34;
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-									end;
-									style = 38;
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-								end else begin
-									for (j=0;j<ProjArray.length;j=j+1) begin
-										style = 35;
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-									end;
-									style = 39;
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-								end;
-							EndRow(sheetnum,fileToSave,rownum);
-						end;
-					end;
-					if ArtArrayWithGroups[i+1]==nextgroup then begin
-						colnum = 4;
-						BeginRow(sheetnum,fileToSave,rownum,0,10);
-							if (RepSpec.flags[6] == 0) then begin
-								style = 17;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								style = 12;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								style = 16;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							end;
-							colnum = colnum + 1;
-							style = 86;
-							qtyOfEmpStr = ProjArray.length + 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						EndRow(sheetnum,fileToSave,rownum);
-					end;
-				end;
-			end;
-			colnum = 2;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				style = 2;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL COST:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				if (RepSpec.flags[6] == 0) then begin
-					colnum = colnum + 5;
-				end else begin
-					colnum = colnum + 2;
-				end;
-				for (j=0;j<ProjArray.length;j=j+1) begin
-					style = 32;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["TOTAL:" & ProjArray[j]]);
-				end;
-				style = 33;
-				NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["TOTAL:TOTAL"]);
-			EndRow(sheetnum,fileToSave,rownum);
-			if (RepSpec.flags[6] == 0) then begin
-				BeginRow(sheetnum,fileToSave,rownum,0,10);
-				EndRow(sheetnum,fileToSave,rownum);
-				colnum = 2;
-				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-					style = 2;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"People Tot Number:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					if (RepSpec.flags[6] == 0) then begin
-						colnum = colnum + 5;
-					end else begin
-						colnum = colnum + 2;
-					end;
-					style = 41;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 42;
-					qtyOfEmpStr = ProjArray.length - 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 43;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,ArtSuppl.length - 1);
-				EndRow(sheetnum,fileToSave,rownum);
-				if (RepSpec.flags[6] == 0) then begin
-					colnum = 8;
-				end else begin
-					colnum = 5;
-				end;
-				BeginRow(sheetnum,fileToSave,rownum,0,2.5);
-					style = 44;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 45;
-					qtyOfEmpStr = ProjArray.length - 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 46;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				EndRow(sheetnum,fileToSave,rownum);
-			end;
-			rownum = rownum + 1;
-			if (RepSpec.flags[6] == 0) then begin
-				colnum = 8;
-			end else begin
-				colnum = 5;
-			end;
-			BeginRow(sheetnum,fileToSave,rownum,0,6);
-				style = 3;
-				if quartCount > 1 then begin
-					qtyOfEmpStr = (ProjArray.length + 1)*2 + 1;
-				end else begin
-					qtyOfEmpStr = ProjArray.length + 1;
-				end;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-			EndRow(sheetnum,fileToSave,rownum);
-			rownum = rownum + 1;
-			colnum = 4;
-			BeginRow(sheetnum,fileToSave,rownum,0,30);
-				if (RepSpec.flags[6] == 0) then begin
-					style = 9;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 10;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 11;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-				colnum = colnum + 1;
-				tstr = RepSpec.f1 & " - Budget";
-				style = 78;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				style = 79;
-				qtyOfEmpStr = ProjArray.length - 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				style = 80;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				if quartCount > 1 then begin
-					colnum = colnum + 1;
-					style = 78;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 79;
-					qtyOfEmpStr = ProjArray.length - 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 80;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 4;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				if (RepSpec.flags[6] == 0) then begin
-					style = 13;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"H.No.",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 19;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Name",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 14;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-				colnum = colnum + 1;
-				for (i=0;i<ProjArray.length;i=i+1) begin
-					if isMotherProjVect[ProjArray[i]] then begin
-						if (i == 0) then begin
-							style = 21;
-						end else begin
-							style = 22;
-						end;
-					end else begin
-						if mod(StringToInt(right(ProjArray[i],1)),2) == 1 then begin
-							style = 24;
-						end else begin
-							style = 23;
-						end;
-					end;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				end;
-				style = 48;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				if quartCount > 1 then begin
-					colnum = colnum + 1;
-					for (i=0;i<ProjArray.length;i=i+1) begin
-						if isMotherProjVect[ProjArray[i]] then begin
-							if (i == 0) then begin
-								style = 21;
-							end else begin
-								style = 22;
-							end;
-						end else begin
-							if mod(StringToInt(right(ProjArray[i],1)),2) == 1 then begin
-								style = 24;
-							end else begin
-								style = 23;
-							end;
-						end;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					end;
-					style = 48;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 4;
-			BeginRow(sheetnum,fileToSave,rownum,0,4);
-				if (RepSpec.flags[6] == 0) then begin
-					style = 17;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 12;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 16;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-				colnum = colnum + 1;
-				style = 49;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				style = 50;
-				qtyOfEmpStr = ProjArray.length - 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				style = 51;
-				qtyOfEmpStr = 1;
-				EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				if quartCount > 1 then begin
-					colnum = colnum + 1;
-					style = 49;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 50;
-					qtyOfEmpStr = ProjArray.length - 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 51;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 4;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				if (RepSpec.flags[6] == 0) then begin
-					style = 17;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 12;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 16;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-				colnum = colnum + 1;
-				switch quartToPrint[0] begin
-					case 1:
-						tstr = "QI";
-					case 2:
-						tstr = "QII";
-					case 3:
-						tstr = "QIII";
-					case 4:
-						tstr = "QIV";
-				end;
-				style = 52;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				style = 53;
-				for (i=0;i<(ProjArray.length - 1);i=i+1) begin
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				end;
-				style = 54;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				if quartCount > 1 then begin
-					colnum = colnum + 1;
-					switch quartToPrint[1] begin
-						case 1:
-							tstr = "QI";
-						case 2:
-							tstr = "QII";
-						case 3:
-							tstr = "QIII";
-						case 4:
-							tstr = "QIV";
-					end;
-					style = 52;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 53;
-					for (i=0;i<(ProjArray.length - 1);i=i+1) begin
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					end;
-					style = 54;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				end;
-			EndRow(sheetnum,fileToSave,rownum);
-			colnum = 4;
-			BeginRow(sheetnum,fileToSave,rownum,0,10);
-				if (RepSpec.flags[6] == 0) then begin
-					style = 17;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 12;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 16;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				end;
-			EndRow(sheetnum,fileToSave,rownum);
-			suppCount1 = 0;
-			suppCount2 = 0;
-			for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
-				INr.Objects = ArtArrayWithGroups[i+1];
-        if ReadfirstKey("Objects",INr,1,true) then begin
-          ITr.Code = INr.Group;
-          ReadFirstMain(ITr,1,true);
-          nextgroup = ITr.Code;
-        end else begin
-          nextgroup = ArtArrayWithGroups[i+1];
-        end;
-        INr.Objects = ArtArrayWithGroups[i];
-        if ReadfirstKey("Objects",INr,1,true) then begin
-          ITr.Code = INr.Group;
-          ReadFirstMain(ITr,1,true);
-          group = ITr.Code;
-        end else begin
-          ITr.Code = ArtArrayWithGroups[i];
-					ReadFirstMain(ITr,1,true);
-					group = ITr.Code;
-        end;
-				if ArtArrayWithGroups[i]==group then begin
-					colnum = 1;
-					BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-						style = 2;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,group,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,ITr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						colnum = colnum + 1;
-						if (RepSpec.flags[6] == 0) then begin
-							style = 17;
-							qtyOfEmpStr = 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							style = 12;
-							qtyOfEmpStr = 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							style = 16;
-							qtyOfEmpStr = 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						end;
-						colnum = colnum + 1;
-						for (j=0;j<ProjArray.length;j=j+1) begin
-							if isMotherProjVect[ProjArray[j]] then begin
-								style = 66;
-							end else begin
-								if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-									style = 69;
-								end else begin
-									style = 71;
-								end;
-							end;
-							switch quartToPrint[0] begin
-								case 1:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[group & ":" & ProjArray[j]]);
-								case 2:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[group & ":" & ProjArray[j]]);
-								case 3:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[group & ":" & ProjArray[j]]);
-								case 4:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[group & ":" & ProjArray[j]]);
-							end;
-						end;
-						style = 73;
-						switch quartToPrint[0] begin
-							case 1:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[group & ":TOTAL"]);
-							case 2:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[group & ":TOTAL"]);
-							case 3:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[group & ":TOTAL"]);
-							case 4:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[group & ":TOTAL"]);
-						end;
-						if quartCount > 1 then begin
-							colnum = colnum + 1;
-							for (j=0;j<ProjArray.length;j=j+1) begin
-									if isMotherProjVect[ProjArray[j]] then begin
-									style = 66;
-								end else begin
-									if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-										style = 69;
-									end else begin
-										style = 71;
-									end;
-								end;
-								switch quartToPrint[1] begin
-									case 1:
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[group & ":" & ProjArray[j]]);
-									case 2:
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[group & ":" & ProjArray[j]]);
-									case 3:
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[group & ":" & ProjArray[j]]);
-									case 4:
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[group & ":" & ProjArray[j]]);
-								end;
-							end;
-							style = 73;
-							switch quartToPrint[1] begin
-								case 1:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[group & ":TOTAL"]);
-								case 2:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[group & ":TOTAL"]);
-								case 3:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[group & ":TOTAL"]);
-								case 4:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[group & ":TOTAL"]);
-							end;
-						end;
-					EndRow(sheetnum,fileToSave,rownum);
-				end else begin
-					firstprintf = true;
-					firstprint2f = true;
-					for (k=0;k<ArtSuppl.length;k=k+1) begin
-						sum = 0;
-						sum1 = 0;
-						sum2 = 0;
-						switch quartToPrint[0] begin
-							case 1:
-								sum = sum + Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] + Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-								sum1 = sum1 + Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-								sum2 = sum2 + Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-							case 2:
-								sum = sum + Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] + Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-								sum1 = sum1 + Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-								sum2 = sum2 + Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-							case 3:
-								sum = sum + Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] + Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-								sum1 = sum1 + Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-								sum2 = sum2 + Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-							case 4:
-								sum = sum + Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-								sum1 = sum1 + Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-								sum2 = 0;
-						end;
-						if (sum != 0) then begin
-							colnum = 1;
-							BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-								style = 4;
-								if (Right(ArtArrayWithGroups[i],1) == "0") or (Right(ArtArrayWithGroups[i],2) == "99") then begin
-									StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-									colnum = colnum + 1;
-								end else begin
-									colnum = colnum + 1;
-									StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-								end;
-								Objr.Code = ArtArrayWithGroups[i];
-								readfirstmain(Objr,1,true);
-								StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-								if (RepSpec.flags[6] == 0) then begin
-									if nonblank(ArtSuppl[k]) then begin
-										style = 17;
-										StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtSuppl[k],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-										Objr.Code = ArtSuppl[k];
-										if sum1 != 0 then begin
-											suppCount1 = suppCount1 + 1;
-										end;
-										if sum2 != 0 then begin
-											suppCount2 = suppCount2 + 1;
-										end;
-										readfirstmain(Objr,1,true);
-										style = 12;
-										StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-									end else begin
-										style = 17;
-										qtyOfEmpStr = 1;
-										EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-										style = 12;
-										qtyOfEmpStr = 1;
-										EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-									end;
-									style = 16;
-									qtyOfEmpStr = 1;
-									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								end;
-								colnum = colnum + 1;
-								if firstprintf then begin
-									firstprintf = false;
-									for (j=0;j<ProjArray.length;j=j+1) begin
-										if isMotherProjVect[ProjArray[j]] then begin
-											if (j == 0) then begin
-												style = 65;
-											end else begin
-												style = 67;
-											end;
-										end else begin
-											if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-												style = 68;
-											end else begin
-												style = 70;
-											end;
-										end;
-										switch quartToPrint[0] begin
-											case 1:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-											case 2:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-											case 3:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-											case 4:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-										end;
-									end;
-									style = 72;
-									switch quartToPrint[0] begin
-										case 1:
-											NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-										case 2:
-											NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-										case 3:
-											NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-										case 4:
-											NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-									end;
-								end else begin
-									for (j=0;j<ProjArray.length;j=j+1) begin
-										if isMotherProjVect[ProjArray[j]] then begin
-											if (j == 0) then begin
-												style = 58;
-											end else begin
-												style = 55;
-											end;
-										end else begin
-											if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-												style = 56;
-											end else begin
-												style = 57;
-											end;
-										end;
-										switch quartToPrint[0] begin
-											case 1:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-											case 2:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-											case 3:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-											case 4:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-										end;
-									end;
-									style = 59;
-									switch quartToPrint[0] begin
-										case 1:
-											NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-										case 2:
-											NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-										case 3:
-											NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-										case 4:
-											NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-									end;
-								end;
-								if quartCount > 1 then begin
-									colnum = colnum + 1;
-									if firstprint2f then begin
-										firstprint2f = false;
-										for (j=0;j<ProjArray.length;j=j+1) begin
-											if isMotherProjVect[ProjArray[j]] then begin
-												if (j == 0) then begin
-													style = 65;
-												end else begin
-													style = 67;
-												end;
-											end else begin
-												if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-													style = 68;
-												end else begin
-													style = 70;
-												end;
-											end;
-											switch quartToPrint[1] begin
-												case 1:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												case 2:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												case 3:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												case 4:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-											end;
-										end;
-										style = 72;
-										switch quartToPrint[1] begin
-											case 1:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											case 2:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											case 3:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											case 4:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-										end;
-									end else begin
-										for (j=0;j<ProjArray.length;j=j+1) begin
-											if isMotherProjVect[ProjArray[j]] then begin
-												if (j == 0) then begin
-													style = 58;
-												end else begin
-													style = 55;
-												end;
-											end else begin
-												if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-													style = 56;
-												end else begin
-													style = 57;
-												end;
-											end;
-											switch quartToPrint[1] begin
-												case 1:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												case 2:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												case 3:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												case 4:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-											end;
-										end;
-										style = 59;
-										switch quartToPrint[1] begin
-											case 1:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											case 2:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											case 3:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											case 4:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-										end;
-									end;
-								end;
-							EndRow(sheetnum,fileToSave,rownum);
-						end;
-					end;
-					if ArtArrayWithGroups[i+1]==nextgroup then begin
-						colnum = 4;
-						BeginRow(sheetnum,fileToSave,rownum,0,10);
-							if (RepSpec.flags[6] == 0) then begin
-								style = 17;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								style = 12;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								style = 16;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							end;
-							colnum = colnum + 1;
-							style = 86;
-							qtyOfEmpStr = ProjArray.length + 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							if quartCount > 1 then begin
-								colnum = colnum + 1;
-								style = 86;
-								qtyOfEmpStr = ProjArray.length + 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							end;
-						EndRow(sheetnum,fileToSave,rownum);
-					end;
-				end;
-			end;
-			colnum = 2;
-			BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-				style = 2;
-				StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL COST:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				if (RepSpec.flags[6] == 0) then begin
-					colnum = colnum + 5;
-				end else begin
-					colnum = colnum + 2;
-				end;
-				for (j=0;j<ProjArray.length;j=j+1) begin
-					if isMotherProjVect[ProjArray[j]] then begin
-						style = 74;
-					end else begin
-						if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-							style = 69;
-						end else begin
-							style = 71;
-						end;
-					end;
-					switch quartToPrint[0] begin
-						case 1:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect["TOTAL:" & ProjArray[j]]);
-						case 2:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect["TOTAL:" & ProjArray[j]]);
-						case 3:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect["TOTAL:" & ProjArray[j]]);
-						case 4:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect["TOTAL:" & ProjArray[j]]);
-					end;
-				end;
-				style = 73;
-				switch quartToPrint[0] begin
-					case 1:
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect["TOTAL:TOTAL"]);
-					case 2:
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect["TOTAL:TOTAL"]);
-					case 3:
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect["TOTAL:TOTAL"]);
-					case 4:
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect["TOTAL:TOTAL"]);
-				end;
-				colnum = colnum + 1;
-				if quartCount > 1 then begin
-					for (j=0;j<ProjArray.length;j=j+1) begin
-						if isMotherProjVect[ProjArray[j]] then begin
-							style = 74;
-						end else begin
-							if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-								style = 69;
-							end else begin
-								style = 71;
-							end;
-						end;
-						switch quartToPrint[1] begin
-							case 1:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect["TOTAL:" & ProjArray[j]]);
-							case 2:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect["TOTAL:" & ProjArray[j]]);
-							case 3:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect["TOTAL:" & ProjArray[j]]);
-							case 4:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect["TOTAL:" & ProjArray[j]]);
-						end;
-					end;
-					style = 73;
-					switch quartToPrint[1] begin
-						case 1:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect["TOTAL:TOTAL"]);
-						case 2:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect["TOTAL:TOTAL"]);
-						case 3:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect["TOTAL:TOTAL"]);
-						case 4:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect["TOTAL:TOTAL"]);
-					end;
-				end;
-			EndRow(sheetnum,fileToSave,rownum);
-			if (RepSpec.flags[6] == 0) then begin
-				BeginRow(sheetnum,fileToSave,rownum,0,10);
-				EndRow(sheetnum,fileToSave,rownum);
-				colnum = 2;
-				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-					style = 2;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"People Tot Number:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					if (RepSpec.flags[6] == 0) then begin
-						colnum = colnum + 5;
-					end else begin
-						colnum = colnum + 2;
-					end;
-					style = 41;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 42;
-					qtyOfEmpStr = ProjArray.length - 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 43;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,suppCount1);
-					if quartCount > 1 then begin
-						colnum = colnum + 1;
-						style = 41;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 42;
-						qtyOfEmpStr = ProjArray.length - 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 43;
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,suppCount2);
-					end;
-				EndRow(sheetnum,fileToSave,rownum);
-				if (RepSpec.flags[6] == 0) then begin
-					colnum = 8;
-				end else begin
-					colnum = 5;
-				end;
-				BeginRow(sheetnum,fileToSave,rownum,0,2.5);
-					style = 44;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 45;
-					qtyOfEmpStr = ProjArray.length - 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 46;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					if quartCount > 1 then begin
-						colnum = colnum + 1;
-						style = 44;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 45;
-						qtyOfEmpStr = ProjArray.length - 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 46;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					end;
-				EndRow(sheetnum,fileToSave,rownum);
-			end;
-			if quartCount > 2 then begin
-				rownum = rownum + 1;
-				if (RepSpec.flags[6] == 0) then begin
-					colnum = 8;
-				end else begin
-					colnum = 5;
-				end;
-				BeginRow(sheetnum,fileToSave,rownum,0,6);
-					style = 3;
-					if quartCount > 3 then begin
-						qtyOfEmpStr = (ProjArray.length + 1)*2 + 1;
-					end else begin
-						qtyOfEmpStr = ProjArray.length + 1;
-					end;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-				EndRow(sheetnum,fileToSave,rownum);
-				rownum = rownum + 1;
-				colnum = 4;
-				BeginRow(sheetnum,fileToSave,rownum,0,30);
-					style = 9;
-					if (RepSpec.flags[6] == 0) then begin
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 10;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 11;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					end;
-					colnum = colnum + 1;
-					tstr = RepSpec.f1 & " - Budget";
-					style = 78;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 79;
-					qtyOfEmpStr = ProjArray.length - 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 80;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					if quartCount > 3 then begin
-						colnum = colnum + 1;
-						style = 78;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 79;
-						qtyOfEmpStr = ProjArray.length - 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 80;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					end;
-				EndRow(sheetnum,fileToSave,rownum);
-				colnum = 4;
-				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-					if (RepSpec.flags[6] == 0) then begin
-						style = 13;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"H.No.",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 19;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"Name",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 14;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					end;
-					colnum = colnum + 1;
-					for (i=0;i<ProjArray.length;i=i+1) begin
-						if isMotherProjVect[ProjArray[i]] then begin
-							if (i == 0) then begin
-								style = 21;
-							end else begin
-								style = 22;
-							end;
-						end else begin
-							if mod(StringToInt(right(ProjArray[i],1)),2) == 1 then begin
-								style = 24;
-							end else begin
-								style = 23;
-							end;
-						end;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					end;
-					style = 48;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					if quartCount > 3 then begin
-						colnum = colnum + 1;
-						for (i=0;i<ProjArray.length;i=i+1) begin
-							if isMotherProjVect[ProjArray[i]] then begin
-								if (i == 0) then begin
-									style = 21;
-								end else begin
-									style = 22;
-								end;
-							end else begin
-								if mod(StringToInt(right(ProjArray[i],1)),2) == 1 then begin
-									style = 24;
-								end else begin
-									style = 23;
-								end;
-							end;
-							StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						end;
-						style = 48;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					end;
-				EndRow(sheetnum,fileToSave,rownum);
-				colnum = 4;
-				BeginRow(sheetnum,fileToSave,rownum,0,4);
-					style = 17;
-					if (RepSpec.flags[6] == 0) then begin
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 12;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 16;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					end;
-					colnum = colnum + 1;
-					style = 49;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 50;
-					qtyOfEmpStr = ProjArray.length - 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					style = 51;
-					qtyOfEmpStr = 1;
-					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					if quartCount > 3 then begin
-						colnum = colnum + 1;
-						style = 49;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 50;
-						qtyOfEmpStr = ProjArray.length - 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 51;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					end;
-				EndRow(sheetnum,fileToSave,rownum);
-				colnum = 4;
-				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-					if (RepSpec.flags[6] == 0) then begin
-						style = 17;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 12;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 16;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					end;
-					colnum = colnum + 1;
-					switch quartToPrint[2] begin
-						case 1:
-							tstr = "QI";
-						case 2:
-							tstr = "QII";
-						case 3:
-							tstr = "QIII";
-						case 4:
-							tstr = "QIV";
-					end;
-					style = 52;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 53;
-					for (i=0;i<(ProjArray.length - 1);i=i+1) begin
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					end;
-					style = 54;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					if quartCount > 3 then begin
-						colnum = colnum + 1;
-						switch quartToPrint[3] begin
-							case 1:
-								tstr = "QI";
-							case 2:
-								tstr = "QII";
-							case 3:
-								tstr = "QIII";
-							case 4:
-								tstr = "QIV";
-						end;
-						style = 52;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 53;
-						for (i=0;i<(ProjArray.length - 1);i=i+1) begin
-							StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						end;
-						style = 54;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					end;
-				EndRow(sheetnum,fileToSave,rownum);
-				colnum = 4;
-				BeginRow(sheetnum,fileToSave,rownum,0,10);
-					if (RepSpec.flags[6] == 0) then begin
-						style = 17;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 12;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 16;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-					end;
-				EndRow(sheetnum,fileToSave,rownum);
-				suppCount1 = 0;
-				suppCount2 = 0;
-				for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
-					INr.Objects = ArtArrayWithGroups[i+1];
+    if quartCount>1 then begin
+      SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
+      BeginSheetData(sheetnum,fileToSave);
+        rownum = 1;
+        colnum = 1;
+        BeginRow(sheetnum,fileToSave,rownum,0,18.75);
+          style = 1;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Foundation People Statistics " & RepSpec.f2,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+        EndRow(sheetnum,fileToSave,rownum);
+        BeginRow(sheetnum,fileToSave,rownum,0,6);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 1;
+        BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+          style = 4;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Period",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 5;
+          qtyOfEmpStr = 2;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,": " & RepSpec.sStartDate & " - " & RepSpec.sEndDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+        EndRow(sheetnum,fileToSave,rownum);
+        BeginRow(sheetnum,fileToSave,rownum,0,6);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 1;
+        BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+          style = 6;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Currency",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 7;
+          qtyOfEmpStr = 2;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,": " & BCb.BaseCur1,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+        EndRow(sheetnum,fileToSave,rownum);
+        BeginRow(sheetnum,fileToSave,rownum,0,6);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 5;
+        BeginRow(sheetnum,fileToSave,rownum,0,30);
+          if (RepSpec.flags[6]==0) then begin
+            style = 8;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 27;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 9;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            colnum = colnum + 1;
+          end;
+          tstr = RepSpec.f1 & " - Total";
+          if (RepSpec.flags[1]==1) then begin
+            tstr = tstr & "(Q1-";
+          end else begin
+            if (RepSpec.flags[2]==1) then begin
+              tstr = tstr & "(Q2-";
+            end else begin
+              if (RepSpec.flags[3]==1) then begin
+                tstr = tstr & "(Q3-";
+              end else begin
+                if (RepSpec.flags[4]==1) then begin
+                  tstr = tstr & "(Q4-";
+                end;
+              end;
+            end;
+          end;
+          if (RepSpec.flags[4]==1) then begin
+            tstr = tstr & "Q4)";
+          end else begin
+            if (RepSpec.flags[3]==1) then begin
+              tstr = tstr & "Q3)";
+            end else begin
+              if (RepSpec.flags[2]==1) then begin
+                tstr = tstr & "Q2)";
+              end else begin
+                if (RepSpec.flags[1]==1) then begin
+                  tstr = tstr & "Q1)";
+                end;
+              end;
+            end;
+          end;
+          style = 38;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 39;
+          qtyOfEmpStr = ProjArray.length*2 + 3;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 71;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 5;
+        BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+          if (RepSpec.flags[6]==0) then begin
+            style = 10;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"H.No.",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            style = 10;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Name",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            style = 37;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            colnum = colnum + 1;
+          end;
+          for (i=0;i<ProjArray.length;i=i+1) begin
+            if isMotherProjVect[ProjArray[i]] then begin
+              if (i==0) then begin
+                style = 103;
+              end else begin
+                style = 104;
+              end;
+            end else begin
+              if mod(StringToInt(right(ProjArray[i],1)),2)==1 then begin
+                style = 105;
+              end else begin
+                style = 106;
+              end;
+            end;
+            mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            if isMotherProjVect[ProjArray[i]] then begin
+              style = 104;
+            end else begin
+              if mod(StringToInt(right(ProjArray[i],1)),2)==1 then begin
+                style = 105;
+              end else begin
+                style = 106;
+              end;
+            end;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
+            qtyMergeCell = qtyMergeCell + 1;
+          end;
+          mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+          style = 107;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Grand Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 108;
+          qtyOfEmpStr = 2;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 109;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
+          qtyMergeCell = qtyMergeCell + 1;
+          style = 71;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 5;
+        BeginRow(sheetnum,fileToSave,rownum,0,4);
+          if (RepSpec.flags[6]==0) then begin
+            style = 11;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 11;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 34;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            colnum = colnum + 1;
+          end;
+          style = 16;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 17;
+          qtyOfEmpStr = ProjArray.length*2 - 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 85;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 86;
+          qtyOfEmpStr = 3;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 71;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 5;
+        BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+          if (RepSpec.flags[6]==0) then begin
+            style = 11;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 11;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 34;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            colnum = colnum + 1;
+          end;
+          for (i=0;i<ProjArray.length;i=i+1) begin
+            style = 41;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 42;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          end;
+          style = 82;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 40;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 83;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Override",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 84;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 71;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 5;
+        BeginRow(sheetnum,fileToSave,rownum,0,9.95);
+          if (RepSpec.flags[6]==0) then begin
+            style = 11;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 11;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 34;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          end;
+        EndRow(sheetnum,fileToSave,rownum);
+        for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
+          INr.Objects = ArtArrayWithGroups[i+1];
           if ReadfirstKey("Objects",INr,1,true) then begin
             ITr.Code = INr.Group;
             ReadFirstMain(ITr,1,true);
@@ -1664,482 +648,709 @@ BEGIN
             ReadFirstMain(ITr,1,true);
             group = ITr.Code;
           end;
-					if ArtArrayWithGroups[i]==group then begin
-						colnum = 1;
-						BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-							style = 2;
-							StringCell(sheetnum,fileToSave,colnum,rownum,style,group,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-							StringCell(sheetnum,fileToSave,colnum,rownum,style,ITr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-							colnum = colnum + 1;
-							if (RepSpec.flags[6] == 0) then begin
-								style = 17;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								style = 12;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								style = 16;
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							end;
-							colnum = colnum + 1;
-							for (j=0;j<ProjArray.length;j=j+1) begin
-								if isMotherProjVect[ProjArray[j]] then begin
-									style = 66;
-								end else begin
-									if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-										style = 69;
-									end else begin
-										style = 71;
-									end;
-								end;
-								switch quartToPrint[2] begin
-									case 1:
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[group & ":" & ProjArray[j]]);
-									case 2:
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[group & ":" & ProjArray[j]]);
-									case 3:
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[group & ":" & ProjArray[j]]);
-									case 4:
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[group & ":" & ProjArray[j]]);
-								end;
-							end;
-							style = 73;
-							switch quartToPrint[2] begin
-								case 1:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[group & ":TOTAL"]);
-								case 2:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[group & ":TOTAL"]);
-								case 3:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[group & ":TOTAL"]);
-								case 4:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[group & ":TOTAL"]);
-							end;
-							if quartCount > 3 then begin
-								colnum = colnum + 1;
-								for (j=0;j<ProjArray.length;j=j+1) begin
-										if isMotherProjVect[ProjArray[j]] then begin
-										style = 66;
-									end else begin
-										if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-											style = 69;
-										end else begin
-											style = 71;
-										end;
-									end;
-									switch quartToPrint[3] begin
-										case 1:
-											NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[group & ":" & ProjArray[j]]);
-										case 2:
-											NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[group & ":" & ProjArray[j]]);
-										case 3:
-											NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[group & ":" & ProjArray[j]]);
-										case 4:
-											NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[group & ":" & ProjArray[j]]);
-									end;
-								end;
-								style = 73;
-								switch quartToPrint[3] begin
-									case 1:
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[group & ":TOTAL"]);
-									case 2:
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[group & ":TOTAL"]);
-									case 3:
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[group & ":TOTAL"]);
-									case 4:
-										NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[group & ":TOTAL"]);
-								end;
-							end;
-						EndRow(sheetnum,fileToSave,rownum);
-					end else begin
-						firstprintf = true;
-						firstprint2f = true;
-						for (k=0;k<ArtSuppl.length;k=k+1) begin
-							sum = 0;
-							switch quartToPrint[2] begin
-								case 2:
-									sum = sum + Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] + Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-									sum1 = sum1 + Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-									sum2 = sum2 + Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-								case 3:
-									sum = sum + Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] + Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-									sum1 = sum1 + Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-									sum2 = sum2 + Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-								case 4:
-									sum = sum + Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-									sum1 = sum1 + Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"];
-									sum2 = 0;
-							end;
-							if (sum != 0) then begin
-								colnum = 1;
-								BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-									style = 4;
-									if (Right(ArtArrayWithGroups[i],1) == "0") or (Right(ArtArrayWithGroups[i],2) == "99") then begin
-										StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-										colnum = colnum + 1;
-									end else begin
-										colnum = colnum + 1;
-										StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-									end;
-									Objr.Code = ArtArrayWithGroups[i];
-									readfirstmain(Objr,1,true);
-									StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-									if (RepSpec.flags[6] == 0) then begin
-										if nonblank(ArtSuppl[k]) then begin
-											style = 17;
-											StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtSuppl[k],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-											Objr.Code = ArtSuppl[k];
-											if sum1 != 0 then begin
-												suppCount1 = suppCount1 + 1;
-											end;
-											if sum2 != 0 then begin
-												suppCount2 = suppCount2 + 1;
-											end;
-											readfirstmain(Objr,1,true);
-											style = 12;
-											StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-										end else begin
-											style = 17;
-											qtyOfEmpStr = 1;
-											EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-											style = 12;
-											qtyOfEmpStr = 1;
-											EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-										end;
-										style = 16;
-										qtyOfEmpStr = 1;
-										EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-									end;
-									colnum = colnum + 1;
-									if firstprintf then begin
-										firstprintf = false;
-										for (j=0;j<ProjArray.length;j=j+1) begin
-											if isMotherProjVect[ProjArray[j]] then begin
-												if (j == 0) then begin
-													style = 65;
-												end else begin
-													style = 67;
-												end;
-											end else begin
-												if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-													style = 68;
-												end else begin
-													style = 70;
-												end;
-											end;
-											switch quartToPrint[2] begin
-												case 1:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												case 2:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												case 3:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												case 4:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-											end;
-										end;
-										style = 72;
-										switch quartToPrint[2] begin
-											case 1:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											case 2:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											case 3:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											case 4:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-										end;
-									end else begin
-										for (j=0;j<ProjArray.length;j=j+1) begin
-											if isMotherProjVect[ProjArray[j]] then begin
-												if (j == 0) then begin
-													style = 58;
-												end else begin
-													style = 55;
-												end;
-											end else begin
-												if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-													style = 56;
-												end else begin
-													style = 57;
-												end;
-											end;
-											switch quartToPrint[2] begin
-												case 1:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												case 2:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												case 3:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												case 4:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-											end;
-										end;
-										style = 59;
-										switch quartToPrint[2] begin
-											case 1:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											case 2:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											case 3:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											case 4:
-												NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-										end;
-									end;
-									if quartCount > 3 then begin
-										colnum = colnum + 1;
-										if firstprint2f then begin
-											firstprint2f = false;
-											for (j=0;j<ProjArray.length;j=j+1) begin
-												if isMotherProjVect[ProjArray[j]] then begin
-													if (j == 0) then begin
-														style = 65;
-													end else begin
-														style = 67;
-													end;
-												end else begin
-													if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-														style = 68;
-													end else begin
-														style = 70;
-													end;
-												end;
-												switch quartToPrint[3] begin
-													case 1:
-														NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-													case 2:
-														NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-													case 3:
-														NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-													case 4:
-														NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												end;
-											end;
-											style = 72;
-											switch quartToPrint[3] begin
-												case 1:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-												case 2:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-												case 3:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-												case 4:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											end;
-										end else begin
-											for (j=0;j<ProjArray.length;j=j+1) begin
-												if isMotherProjVect[ProjArray[j]] then begin
-													if (j == 0) then begin
-														style = 58;
-													end else begin
-														style = 55;
-													end;
-												end else begin
-													if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-														style = 56;
-													end else begin
-														style = 57;
-													end;
-												end;
-												switch quartToPrint[3] begin
-													case 1:
-														NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-													case 2:
-														NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-													case 3:
-														NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-													case 4:
-														NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
-												end;
-											end;
-											style = 59;
-											switch quartToPrint[3] begin
-												case 1:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-												case 2:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-												case 3:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-												case 4:
-													NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
-											end;
-										end;
-									end;
-								EndRow(sheetnum,fileToSave,rownum);
-							end;
-						end;
-						if ArtArrayWithGroups[i+1]==nextgroup then begin
-							colnum = 4;
-							BeginRow(sheetnum,fileToSave,rownum,0,10);
-								if (RepSpec.flags[6] == 0) then begin
-									style = 17;
-									qtyOfEmpStr = 1;
-									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-									style = 12;
-									qtyOfEmpStr = 1;
-									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-									style = 16;
-									qtyOfEmpStr = 1;
-									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								end;
-								colnum = colnum + 1;
-								style = 86;
-								qtyOfEmpStr = ProjArray.length + 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								if quartCount > 3 then begin
-									colnum = colnum + 1;
-									style = 86;
-									qtyOfEmpStr = ProjArray.length + 1;
-									EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-								end;
-							EndRow(sheetnum,fileToSave,rownum);
-						end;
-					end;
-				end;
-				colnum = 2;
-				BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-					style = 2;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL COST:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					if (RepSpec.flags[6] == 0) then begin
-						colnum = colnum + 5;
-					end else begin
-						colnum = colnum + 2;
-					end;
-					for (j=0;j<ProjArray.length;j=j+1) begin
-						if isMotherProjVect[ProjArray[j]] then begin
-							style = 74;
-						end else begin
-							if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-								style = 69;
-							end else begin
-								style = 71;
-							end;
-						end;
-						switch quartToPrint[2] begin
-							case 1:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect["TOTAL:" & ProjArray[j]]);
-							case 2:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect["TOTAL:" & ProjArray[j]]);
-							case 3:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect["TOTAL:" & ProjArray[j]]);
-							case 4:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect["TOTAL:" & ProjArray[j]]);
-						end;
-					end;
-					style = 73;
-					switch quartToPrint[2] begin
-						case 1:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect["TOTAL:TOTAL"]);
-						case 2:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect["TOTAL:TOTAL"]);
-						case 3:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect["TOTAL:TOTAL"]);
-						case 4:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect["TOTAL:TOTAL"]);
-					end;
-					colnum = colnum + 1;
-					if quartCount > 3 then begin
-						for (j=0;j<ProjArray.length;j=j+1) begin
-							if isMotherProjVect[ProjArray[j]] then begin
-								style = 74;
-							end else begin
-								if mod(StringToInt(right(ProjArray[j],1)),2) == 1 then begin
-									style = 69;
-								end else begin
-									style = 71;
-								end;
-							end;
-							switch quartToPrint[3] begin
-								case 1:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect["TOTAL:" & ProjArray[j]]);
-								case 2:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect["TOTAL:" & ProjArray[j]]);
-								case 3:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect["TOTAL:" & ProjArray[j]]);
-								case 4:
-									NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect["TOTAL:" & ProjArray[j]]);
-							end;
-						end;
-						style = 73;
-						switch quartToPrint[3] begin
-							case 1:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart1Vect["TOTAL:TOTAL"]);
-							case 2:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart2Vect["TOTAL:TOTAL"]);
-							case 3:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart3Vect["TOTAL:TOTAL"]);
-							case 4:
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,Quart4Vect["TOTAL:TOTAL"]);
-						end;
-					end;
-				EndRow(sheetnum,fileToSave,rownum);
-				if (RepSpec.flags[6] == 0) then begin
-					BeginRow(sheetnum,fileToSave,rownum,0,10);
-					EndRow(sheetnum,fileToSave,rownum);
-					colnum = 2;
-					BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-						style = 2;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"People Tot Number:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						if (RepSpec.flags[6] == 0) then begin
-							colnum = colnum + 5;
-						end else begin
-							colnum = colnum + 2;
-						end;
-						style = 41;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 42;
-						qtyOfEmpStr = ProjArray.length - 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 43;
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,suppCount1);
-						if quartCount > 3 then begin
-							colnum = colnum + 1;
-							style = 41;
-							qtyOfEmpStr = 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							style = 42;
-							qtyOfEmpStr = ProjArray.length - 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							style = 43;
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,suppCount2);
-						end;
-					EndRow(sheetnum,fileToSave,rownum);
-					if (RepSpec.flags[6] == 0) then begin
-						colnum = 8;
-					end else begin
-						colnum = 5;
-					end;
-					BeginRow(sheetnum,fileToSave,rownum,0,2.5);
-						style = 44;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 45;
-						qtyOfEmpStr = ProjArray.length - 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						style = 46;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						if quartCount > 3 then begin
-							colnum = colnum + 1;
-							style = 44;
-							qtyOfEmpStr = 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							style = 45;
-							qtyOfEmpStr = ProjArray.length - 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							style = 46;
-							qtyOfEmpStr = 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						end;
-					EndRow(sheetnum,fileToSave,rownum);
-				end;
-			end;
-			
-		EndSheetData(sheetnum,fileToSave);
-		MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
-		EndSheet(sheetnum,fileToSave,0);
+          if ArtArrayWithGroups[i]==group then begin
+            colnum = 1;
+            BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+              style = 81;
+              StringCell(sheetnum,fileToSave,colnum,rownum,style,StrReplace(group,"_16","000"),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+              colnum = colnum + 1;
+              StringCell(sheetnum,fileToSave,colnum,rownum,style,ITr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+              colnum = colnum + 1;
+              if (RepSpec.flags[6]==0) then begin
+                style = 11;
+                qtyOfEmpStr = 1;
+                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                style = 11;
+                qtyOfEmpStr = 1;
+                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                style = 34;
+                qtyOfEmpStr = 1;
+                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                colnum = colnum + 1;
+              end;
+              for (j=0;j<ProjArray.length;j=j+1) begin
+                style = 23;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[group & ":" & ProjArray[j]]);
+                style = 12;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["Fact:" & group & ":" & ProjArray[j]]);
+              end;
+              style = 43;
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[group & ":TOTAL"]);
+              style = 66;
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["Fact:" & group & ":TOTAL"]);
+              style = 63;
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["Fact:" & group & ":TOTAL"] - TOTALVect[group & ":TOTAL"]);
+              style = 91;
+              if (TOTALVect[group & ":TOTAL"] == 0) then begin
+                qtyOfEmpStr = 1;
+                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+              end else begin
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(TOTALVect["Fact:" & group & ":TOTAL"] - TOTALVect[group & ":TOTAL"])/TOTALVect[group & ":TOTAL"]);
+              end;
+              style = 71;
+              qtyOfEmpStr = 1;
+              EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            EndRow(sheetnum,fileToSave,rownum);
+          end else begin
+            for (k=0;k<ArtSuppl.length;k=k+1) begin
+              if ((TOTALVect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] != blankval) and (TOTALVect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] != 0)) or ((TOTALVect["Fact:" & ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] != blankval) and (TOTALVect["Fact:" & ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] != 0)) then begin
+                colnum = 1;
+                BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+                  style = 3;
+                  if (Right(ArtArrayWithGroups[i],1)=="0") or (Right(ArtArrayWithGroups[i],4)=="0_16") or (Right(ArtArrayWithGroups[i],2)=="99") or (Right(ArtArrayWithGroups[i],5)=="99_16") then begin
+                    StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                    colnum = colnum + 1;
+                  end else begin
+                    colnum = colnum + 1;
+                    StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                  end;
+                  colnum = colnum + 1;
+                  Objr.Code = ArtArrayWithGroups[i];
+                  readfirstmain(Objr,1,true);
+                  StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                  if (RepSpec.flags[6]==0) then begin
+                    style = 11;
+                    if nonblank(ArtSuppl[k]) then begin
+                      StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtSuppl[k],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                      Objr.Code = ArtSuppl[k];
+                      readfirstmain(Objr,1,true);
+                      StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                    end else begin
+                      qtyOfEmpStr = 1;
+                      EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                      qtyOfEmpStr = 1;
+                      EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                    end;
+                    style = 34;
+                    qtyOfEmpStr = 1;
+                    EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                    colnum = colnum + 1;
+                  end;
+                  for (j=0;j<ProjArray.length;j=j+1) begin
+                    style = 48;
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
+                    style = 49;
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["Fact:" & ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
+                  end;
+                  style = 53;
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
+                  style = 69;
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["Fact:" & ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
+                  style = 89;
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["Fact:" & ArtArrayWithGroups[i] & ":TOTAL"] - TOTALVect[ArtArrayWithGroups[i] & ":TOTAL"]);
+                  style = 93;
+                  if (TOTALVect[ArtArrayWithGroups[i] & ":TOTAL"] == 0) then begin
+                    qtyOfEmpStr = 1;
+                    EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                  end else begin
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(TOTALVect["Fact:" & ArtArrayWithGroups[i] & ":TOTAL"] - TOTALVect[ArtArrayWithGroups[i] & ":TOTAL"])/TOTALVect[ArtArrayWithGroups[i] & ":TOTAL"]);
+                  end;
+                  style = 71;
+                  qtyOfEmpStr = 1;
+                  EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                EndRow(sheetnum,fileToSave,rownum);
+              end;
+              ExtPrinted = false;
+              for (l=0;l<ExtArr.length;l=l+1) begin
+                if (blank(ExtArr[l]) and ExtPrinted) or nonblank(ExtArr[l]) then begin
+                  if TOTALVect[ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":" & ArtSuppl[k] & ":TOTAL"]!=0 or TOTALVect["Fact:" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":" & ArtSuppl[k] & ":TOTAL"]!=0 then begin
+                    ExtPrinted = true;
+                    colnum = 3;
+                    BeginRow(sheetnum,fileToSave,rownum,1,blankval);
+                      style = 102;
+                      StringCell(sheetnum,fileToSave,colnum,rownum,style,ExtArr[l],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                      Objr.Code = ExtArr[l];
+                      if ExtArr[l]=="" then begin
+                        Objr.Code = ArtArrayWithGroups[i];
+                      end;
+                      readfirstmain(Objr,1,true);
+                      StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                      if (RepSpec.flags[6]==0) then begin
+                        style = 36;
+                        if nonblank(ArtSuppl[k]) then begin
+                          StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtSuppl[k],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                          Objr.Code = ArtSuppl[k];
+                          readfirstmain(Objr,1,true);
+                          StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                        end else begin
+                          qtyOfEmpStr = 1;
+                          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                          qtyOfEmpStr = 1;
+                          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                        end;
+                        style = 35;
+                        qtyOfEmpStr = 1;
+                        EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                        colnum = colnum + 1;
+                      end;
+                      for (j=0;j<ProjArray.length;j=j+1) begin
+                        style = 46;
+                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
+                        style = 47;
+                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["Fact:" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
+                      end;
+                      style = 52;
+                      NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect[ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":" & ArtSuppl[k] & ":TOTAL"]);
+                      style = 68;
+                      NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["Fact:" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":" & ArtSuppl[k] & ":TOTAL"]);
+                      style = 95;
+                      NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["Fact:" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":TOTAL"] - TOTALVect[ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":TOTAL"]);
+                      style = 96;
+                      if (TOTALVect[ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":TOTAL"] == 0) then begin
+                        qtyOfEmpStr = 1;
+                        EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                      end else begin
+                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(TOTALVect["Fact:" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":TOTAL"] - TOTALVect[ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":TOTAL"])/TOTALVect[ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":TOTAL"]);
+                      end;
+                      style = 71;
+                      qtyOfEmpStr = 1;
+                      EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                    EndRow(sheetnum,fileToSave,rownum);
+                  end;
+                end;
+              end;
+            end;
+            if ArtArrayWithGroups[i+1]==nextgroup then begin
+              colnum = 5;
+              BeginRow(sheetnum,fileToSave,rownum,0,10);
+                if (RepSpec.flags[6]==0) then begin
+                  if nonblank(nextgroup) then begin
+                    style = 11;
+                  end else begin
+                    style = 80;
+                  end;
+                  qtyOfEmpStr = 1;
+                  EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                  qtyOfEmpStr = 1;
+                  EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                  if nonblank(nextgroup) then begin
+                    style = 34;
+                  end else begin
+                    style = 27;
+                  end;
+                  qtyOfEmpStr = 1;
+                  EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                  colnum = colnum + 1;
+                end;
+                style = 64;
+                qtyOfEmpStr = ProjArray.length*2 + 4;
+                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+              EndRow(sheetnum,fileToSave,rownum);
+            end;
+          end;
+        end;
+        colnum = 4;
+        BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+          style = 2;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL COST:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          if (RepSpec.flags[6]==0) then begin
+            colnum = colnum + 4;
+          end;
+          for (j=0;j<ProjArray.length;j=j+1) begin
+            style = 23;
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["TOTAL:" & ProjArray[j]]);
+            style = 12;
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["Fact:TOTAL:" & ProjArray[j]]);
+          end;
+          style = 43;
+          NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["TOTAL:TOTAL"]);
+          style = 100;
+          NumericCell(sheetnum,fileToSave,colnum,rownum,style,TOTALVect["Fact:TOTAL:TOTAL"]);
+        EndRow(sheetnum,fileToSave,rownum);
+        if (RepSpec.flags[6]==0) then begin
+          BeginRow(sheetnum,fileToSave,rownum,0,9.95);
+          EndRow(sheetnum,fileToSave,rownum);
+          colnum = 3;
+          BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+            style = 2;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"People Tot Number:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            colnum = colnum + 5;
+            style = 13;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 14;
+            qtyOfEmpStr = ProjArray.length*2 - 3;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 15;
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,ArtSuppl.length - 1);
+          EndRow(sheetnum,fileToSave,rownum);
+          colnum = 9;
+          BeginRow(sheetnum,fileToSave,rownum,0,2.5);
+            style = 30;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 31;
+            qtyOfEmpStr = ProjArray.length*2 - 3;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 32;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          EndRow(sheetnum,fileToSave,rownum);
+        end;
+      EndSheetData(sheetnum,fileToSave);
+      MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
+      EndSheet(sheetnum,fileToSave,0);
+      qtyMergeCell = 0;
+      sheetnum = sheetnum + 1;
+    end;
+    for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
+      TSi = 0;
+      ClearVector(SupplInArr)
+      SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
+      BeginSheetData(sheetnum,fileToSave);
+        rownum = 1;
+        colnum = 1;
+        BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+          style = 1;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Foundation People Statistics 2016",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+        EndRow(sheetnum,fileToSave,rownum);
+        BeginRow(sheetnum,fileToSave,rownum,0,6);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 1;
+        BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+          style = 4;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Period",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 5;
+          qtyOfEmpStr = 2;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,": " & RepSpec.sStartDate & " - " & RepSpec.sEndDate,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+        EndRow(sheetnum,fileToSave,rownum);
+        BeginRow(sheetnum,fileToSave,rownum,0,6);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 1;
+        BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+          style = 6;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Currency",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 7;
+          qtyOfEmpStr = 2;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,": " & BCb.BaseCur1,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+        EndRow(sheetnum,fileToSave,rownum);
+        BeginRow(sheetnum,fileToSave,rownum,0,6);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 5;
+        BeginRow(sheetnum,fileToSave,rownum,0,30);
+          if (RepSpec.flags[6]==0) then begin
+            style = 8;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 27;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 9;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            colnum = colnum + 1;
+          end;
+          tstr = RepSpec.f1 & " - Budget";
+          style = 25;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 26;
+          qtyOfEmpStr = ProjArray.length*2 + 3;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 71;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 5;
+        BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+          if (RepSpec.flags[6]==0) then begin
+            style = 10;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"H.No.",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Name",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            style = 37;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            colnum = colnum + 1;
+          end;
+          for (i=0;i<ProjArray.length;i=i+1) begin
+            if isMotherProjVect[ProjArray[i]] then begin
+              if (i==0) then begin
+                style = 103;
+              end else begin
+                style = 104;
+              end;
+            end else begin
+              if mod(StringToInt(right(ProjArray[i],1)),2)==1 then begin
+                style = 105;
+              end else begin
+                style = 106;
+              end;
+            end;
+            mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,ProjArray[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            if isMotherProjVect[ProjArray[i]] then begin
+              style = 104;
+            end else begin
+              if mod(StringToInt(right(ProjArray[i],1)),2)==1 then begin
+                style = 105;
+              end else begin
+                style = 106;
+              end;
+            end;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
+            qtyMergeCell = qtyMergeCell + 1;
+          end;
+          mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+          style = 60;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 58;
+          qtyOfEmpStr = 2;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 98;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
+          qtyMergeCell = qtyMergeCell + 1;
+          style = 71;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 5;
+        BeginRow(sheetnum,fileToSave,rownum,0,4);
+          if (RepSpec.flags[6]==0) then begin
+            style = 11;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 34;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            colnum = colnum + 1;
+          end;
+          style = 16;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 17;
+          qtyOfEmpStr = ProjArray.length*2 - 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 61;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 57;
+          qtyOfEmpStr = 2;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 99;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          style = 71;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 5;
+        BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+          if (RepSpec.flags[6]==0) then begin
+            style = 11;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 34;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            colnum = colnum + 1;
+          end;
+          for (i=0;i<ProjArray.length;i=i+1) begin
+            style = 41;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,QuartalIntToStr(quartToPrint[Qi]),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            style = 42;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          end;
+          style = 62;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 59;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 101;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Override",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 84;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 71;
+          qtyOfEmpStr = 1;
+          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+        EndRow(sheetnum,fileToSave,rownum);
+        colnum = 5;
+        BeginRow(sheetnum,fileToSave,rownum,0,9.95);
+          if (RepSpec.flags[6]==0) then begin
+            style = 11;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 34;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          end;
+        EndRow(sheetnum,fileToSave,rownum);
+        for (i=0;i<ArtArrayWithGroups.length;i=i+1) begin
+          INr.Objects = ArtArrayWithGroups[i+1];
+          if ReadfirstKey("Objects",INr,1,true) then begin
+            ITr.Code = INr.Group;
+            ReadFirstMain(ITr,1,true);
+            nextgroup = ITr.Code;
+          end else begin
+            nextgroup = ArtArrayWithGroups[i+1];
+          end;
+          INr.Objects = ArtArrayWithGroups[i];
+          if ReadfirstKey("Objects",INr,1,true) then begin
+            ITr.Code = INr.Group;
+            ReadFirstMain(ITr,1,true);
+            group = ITr.Code;
+          end else begin
+            ITr.Code = ArtArrayWithGroups[i];
+            ReadFirstMain(ITr,1,true);
+            group = ITr.Code;
+          end;
+          if ArtArrayWithGroups[i]==group then begin
+            colnum = 1;
+            BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+              style = 81;
+              StringCell(sheetnum,fileToSave,colnum,rownum,style,StrReplace(group,"_16","000"),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+              colnum = colnum + 1;
+              style = 2;
+              StringCell(sheetnum,fileToSave,colnum,rownum,style,ITr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+              colnum = colnum + 1;
+              if (RepSpec.flags[6]==0) then begin
+                style = 11;
+                qtyOfEmpStr = 1;
+                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                qtyOfEmpStr = 1;
+                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                style = 34;
+                qtyOfEmpStr = 1;
+                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                colnum = colnum + 1;
+              end;
+              style = 22;
+              for (j=0;j<ProjArray.length;j=j+1) begin
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":" & group & ":" & ProjArray[j]]);
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":Fact:" & group & ":" & ProjArray[j]]);
+              end;
+              style = 23;
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":" & group & ":TOTAL"]);
+              style = 50;
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":Fact:" & group & ":TOTAL"]);
+              style = 63;
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":Fact:" & group & ":TOTAL"] - QuartVect[quartToPrint[Qi] & ":" & group & ":TOTAL"]);
+              style = 91;
+              if (QuartVect[quartToPrint[Qi] & ":" & group & ":TOTAL"] == 0) then begin
+                qtyOfEmpStr = 1;
+                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+              end else begin
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(QuartVect[quartToPrint[Qi] & ":Fact:" & group & ":TOTAL"] - QuartVect[quartToPrint[Qi] & ":" & group & ":TOTAL"])/QuartVect[quartToPrint[Qi] & ":" & group & ":TOTAL"]);
+              end;
+              style = 71;
+              qtyOfEmpStr = 1;
+              EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            EndRow(sheetnum,fileToSave,rownum);
+          end else begin
+            for (k=0;k<ArtSuppl.length;k=k+1) begin
+              if ((QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] != blankval) and (QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] != 0)) or ((QuartVect[quartToPrint[Qi] & ":Fact:" & ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] != blankval) and (QuartVect[quartToPrint[Qi] & ":Fact:" & ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"] != 0)) then begin
+                if nonblank(ArtSuppl[k]) and !SupplInArr[ArtSuppl[k]] then begin
+                    SupplInArr[ArtSuppl[k]] = true;
+                    TSi = TSi + 1;
+                  end;
+                colnum = 1;
+                BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+                  style = 3;
+                  if (Right(ArtArrayWithGroups[i],1)=="0") or (Right(ArtArrayWithGroups[i],4)=="0_16") or (Right(ArtArrayWithGroups[i],2)=="99") or (Right(ArtArrayWithGroups[i],5)=="99_16") then begin
+                    StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                    colnum = colnum + 1;
+                  end else begin
+                    colnum = colnum + 1;
+                    StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                  end;
+                  colnum = colnum + 1;
+                  Objr.Code = ArtArrayWithGroups[i];
+                  readfirstmain(Objr,1,true);
+                  StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                  if (RepSpec.flags[6]==0) then begin
+                    style = 11;
+                    if nonblank(ArtSuppl[k]) then begin
+                      StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtSuppl[k],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                      Objr.Code = ArtSuppl[k];
+                      readfirstmain(Objr,1,true);
+                      StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                    end else begin
+                      qtyOfEmpStr = 1;
+                      EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                      qtyOfEmpStr = 1;
+                      EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                    end;
+                    style = 34;
+                    qtyOfEmpStr = 1;
+                    EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                    colnum = colnum + 1;
+                  end;
+                  for (j=0;j<ProjArray.length;j=j+1) begin
+                    style = 20;
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
+                    style = 18;
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":Fact:" & ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
+                  end;
+                  style = 78;
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
+                  style = 72;
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":Fact:" & ArtArrayWithGroups[i] & ":" & ArtSuppl[k] & ":TOTAL"]);
+                  style = 89;
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":Fact:" & ArtArrayWithGroups[i] & ":TOTAL"] - QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":TOTAL"]);
+                  style = 93;
+                  if (QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":TOTAL"] == 0) then begin
+                    qtyOfEmpStr = 1;
+                    EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                  end else begin
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(QuartVect[quartToPrint[Qi] & ":Fact:" & ArtArrayWithGroups[i] & ":TOTAL"] - QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":TOTAL"])/QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":TOTAL"]);
+                  end;
+                  style = 71;
+                  qtyOfEmpStr = 1;
+                  EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                EndRow(sheetnum,fileToSave,rownum);
+              end;
+              ExtPrinted = false;
+              for (l=0;l<ExtArr.length;l=l+1) begin
+                if (blank(ExtArr[l]) and ExtPrinted) or nonblank(ExtArr[l]) then begin
+                  if QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":" & ArtSuppl[k] & ":TOTAL"]!=0 or QuartVect[quartToPrint[Qi] & ":Fact:" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":" & ArtSuppl[k] & ":TOTAL"]!=0 then begin
+                    ExtPrinted = true;
+                    colnum = 3;
+                    BeginRow(sheetnum,fileToSave,rownum,1,blankval);
+                      style = 102;
+                      StringCell(sheetnum,fileToSave,colnum,rownum,style,ExtArr[l],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                      Objr.Code = ExtArr[l];
+                      if ExtArr[l]=="" then begin
+                        Objr.Code = ArtArrayWithGroups[i];
+                      end;
+                      readfirstmain(Objr,1,true);
+                      style = 33;
+                      StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                      if (RepSpec.flags[6]==0) then begin
+                        style = 36;
+                        if nonblank(ArtSuppl[k]) then begin
+                          StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtSuppl[k],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                          Objr.Code = ArtSuppl[k];
+                          readfirstmain(Objr,1,true);
+                          StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                        end else begin
+                          qtyOfEmpStr = 1;
+                          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                          qtyOfEmpStr = 1;
+                          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                        end;
+                        style = 35;
+                        qtyOfEmpStr = 1;
+                        EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                        colnum = colnum + 1;
+                      end;
+                      for (j=0;j<ProjArray.length;j=j+1) begin
+                        style = 65;
+                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
+                        style = 19;
+                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":Fact:" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":" & ArtSuppl[k] & ":" & ProjArray[j]]);
+                      end;
+                      style = 77;
+                      NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":" & ArtSuppl[k] & ":TOTAL"]);
+                      style = 73;
+                      NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":Fact:" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":" & ArtSuppl[k] & ":TOTAL"]);
+                      style = 95;
+                      NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":Fact:" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":TOTAL"] - QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":TOTAL"]);
+                      style = 96;
+                      if (QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":TOTAL"] == 0) then begin
+                        qtyOfEmpStr = 1;
+                        EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                      end else begin
+                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(QuartVect[quartToPrint[Qi] & ":Fact:" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":TOTAL"] - QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":TOTAL"])/QuartVect[quartToPrint[Qi] & ":" & ArtArrayWithGroups[i] & ":" & ExtArr[l] & ":TOTAL"]);
+                      end;
+                      style = 71;
+                      qtyOfEmpStr = 1;
+                      EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                    EndRow(sheetnum,fileToSave,rownum);
+                  end;
+                end;
+              end;
+            end;
+            if ArtArrayWithGroups[i+1]==nextgroup then begin
+              colnum = 5;
+              BeginRow(sheetnum,fileToSave,rownum,0,10);
+                if (RepSpec.flags[6]==0) then begin
+                  if nonblank(nextgroup) then begin
+                    style = 11;
+                  end else begin
+                    style = 80;
+                  end;
+                  qtyOfEmpStr = 2;
+                  EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                  if nonblank(nextgroup) then begin
+                    style = 34;
+                  end else begin
+                    style = 27;
+                  end;
+                  qtyOfEmpStr = 1;
+                  EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                  colnum = colnum + 1;
+                end;
+                style = 64;
+                qtyOfEmpStr = ProjArray.length*2 + 4;
+                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+              EndRow(sheetnum,fileToSave,rownum);
+            end;
+          end;
+        end;
+        colnum = 4;
+        BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+          style = 2;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL COST:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          if (RepSpec.flags[6]==0) then begin
+            colnum = colnum + 4;
+          end;
+          style = 24;
+          for (j=0;j<ProjArray.length;j=j+1) begin
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":TOTAL:" & ProjArray[j]]);
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":Fact:TOTAL:" & ProjArray[j]]);
+          end;
+          style = 23;
+          NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":TOTAL:TOTAL"]);
+          style = 12;
+          NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ":Fact:TOTAL:TOTAL"]);
+        EndRow(sheetnum,fileToSave,rownum);
+        if (RepSpec.flags[6]==0) then begin
+          BeginRow(sheetnum,fileToSave,rownum,0,9.95);
+          EndRow(sheetnum,fileToSave,rownum);
+          colnum = 4;
+          BeginRow(sheetnum,fileToSave,rownum,0,blankval);
+            style = 2;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"People Tot Number:",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            colnum = colnum + 4;
+            style = 13;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 14;
+            qtyOfEmpStr = ProjArray.length*2 - 3;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 15;
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,TSi);
+          EndRow(sheetnum,fileToSave,rownum);
+          colnum = 9;
+          BeginRow(sheetnum,fileToSave,rownum,0,2.5);
+            style = 30;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 31;
+            qtyOfEmpStr = ProjArray.length*2 - 3;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 32;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          EndRow(sheetnum,fileToSave,rownum);
+        end;
+      EndSheetData(sheetnum,fileToSave);
+      MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
+      EndSheet(sheetnum,fileToSave,0);
+      sheetnum = sheetnum + 1;
+      qtyMergeCell = 0;
+    end;
+
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
 		ConvertToXLSX(fileToSave);
 		

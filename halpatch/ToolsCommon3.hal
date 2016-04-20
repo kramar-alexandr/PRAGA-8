@@ -1977,3 +1977,75 @@ begin
   
 return;
 end;
+
+global 
+updating procedure FixVIVcDateRn(record RcVc RepSpec)
+begin
+	record VIVc VIr;
+	row VIVc VIrw;
+  record TRVc TRr;
+	Integer rwcnt,i,j,j2,k,k2;
+	boolean foundf,notallf;
+  array string 10 edited,notedited;
+
+	VIr.SerNr = -1;
+	while (LoopMain(VIr,1,true)) begin
+    if (GetDay(VIr.InvDate)==1) then begin
+      rwcnt = MatRowCnt(VIr);
+      foundf = false;
+      notallf = false;
+      for (i=0;i<rwcnt;i=i+1) begin
+        MatRowGet(VIr,i,VIrw);
+        if VIrw.Item=="1010_16" then begin
+          foundf = true;
+        end else begin
+          notallf = true;
+        end;
+      end;
+      if foundf then begin
+        if notallf then begin
+          notedited[k] = VIr.SerNr;
+          k = k + 1;
+        end else begin
+          edited[j] = VIr.SerNr;
+          j = j + 1;
+          VIr.InvDate = AddDay(VIr.InvDate,-1);
+          VIr.TransDate = AddDay(VIr.TransDate,-1);
+          TRr.Number = VIr.SerNr;
+          TRr.IntYc = VIYc;
+          if (ReadFirstMain(TRr,2,true)) then begin
+            TRr.TransDate = VIr.TransDate;
+            RECORDSTORE(TRr,true);
+          end;
+          RECORDSTORE(VIr,true);
+        end;
+      end;
+    end;
+	end;
+  
+  startreportnoheaderjob("Test");
+    startformat(15);
+      outstring(0,0,"Not edited:",false);
+    endformat;
+    for (k2=0;k2<k;k2=k2+3) begin
+      startformat(15);
+        outstring(0,"DblVIVc",notedited[k2],false);
+        outstring(50,"DblVIVc",notedited[k2+1],false);
+        outstring(100,"DblVIVc",notedited[k2+2],false);
+      endformat;
+    end;
+    startformat(15);
+    endformat;
+    startformat(15);
+      outstring(0,0,"Edited:",false);
+    endformat;
+    for (j2=0;j2<j;j2=j2+3) begin
+      startformat(15);
+        outstring(0,"DblVIVc",edited[j2],false);
+        outstring(50,"DblVIVc",edited[j2+1],false);
+        outstring(100,"DblVIVc",edited[j2+2],false);
+      endformat;
+    end;
+  endjob;
+return;
+end;

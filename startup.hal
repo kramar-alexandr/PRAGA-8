@@ -24,7 +24,8 @@ begin
 	Maintenance("Update Objects in Budgets",FixTBBUrwObjectsVClass,FixTBBUrwObjectsMn,modDBMain); //Edit---------------Vitalii 15:49 23.09.2015
 	Maintenance("Update Suppliers",FixSuppliersVClass,FixSuppliersMn,modDBMain); //Edit-------------------Vitalii 13:08 25.09.2015
 	Maintenance("Create Purchase Invoices from Project Budgets for month",CreateVIfromTBBUVClass,CreateVIfromTBBUMn,modPL); //Edit-------------------Vitalii 13:08 25.09.2015
-	
+	Report("Change date in Purch.Inv.",FixVIVcDateRClass,FixVIVcDateRn,0,modDBMain);
+  
 	SString(31000,"Object with this name but with other type already exists");
 	SString(31001,"Current document should be saved");
 	SString(31002,"You should approve this budget before updating");
