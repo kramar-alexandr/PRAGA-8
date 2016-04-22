@@ -1,5 +1,6 @@
 remote procedure BudgetsObjectsArea(LongInt,var area);
 remote procedure BudgetsObjectsRn(record RcVc);
+remote function boolean OTCodeMatch(string,string);
 remote function boolean isProject(string);
 
 global
@@ -12,6 +13,8 @@ begin
 	LongInt tick;
 	boolean testf;
 	string 10 tmpDate;
+  record ObjVc Objr;
+  record PRVc PRr;
 	
 	wn = curwindow;
 	deselectwindow(wn,true);
@@ -38,7 +41,32 @@ begin
 		if !isProject(RepSpec.f2) then begin
 			testf = false;
 			MessageBox(0,"Incorrect Project!");
-		end;
+		end else begin
+      PRr.Code = RepSpec.f2;
+      readfirstmain(PRr,1,true);
+      if ((GetYear(PRr.StartDate) & ""!=RepSpec.f3) and (GetYear(PRr.EndDate) & ""!=RepSpec.f3)) then begin
+        testf = false;
+        MessageBox(0,"Project does not match year!");
+      end;
+    end;
+	end;
+  if (nonblank(RepSpec.f1) and testf) then begin
+    Objr.Code = RepSpec.f1;
+    if (readfirstmain(Objr,1,true)) then begin
+      if OTCodeMatch(RepSpec.f1,"EXP") then begin
+        if (RepSpec.f3=="2016" and right(RepSpec.f1,3)!="_16") or (RepSpec.f3!="2016" and right(RepSpec.f1,3)=="_16") then begin
+          testf = false;
+          MessageBox(0,"Object with type " & chr(34) & "EXP" & chr(34) & " does not match year!");
+        end;
+      end;
+      if OTCodeMatch(RepSpec.f1,"PRJ") then begin
+        testf = false;
+        MessageBox(0,"Input object with type " & chr(34) & "PRJ" & chr(34) & " in another field!");
+      end;
+    end else begin
+      testf = false;
+      MessageBox(0,"Object does not exist!");
+    end;
 	end;
 	if testf then begin
 		tmpDate = "";

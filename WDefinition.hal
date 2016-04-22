@@ -4625,7 +4625,7 @@ real h,v,vs,h1;
 		CheckBox(h+70,v,0,"III",flags[3]);
 		CheckBox(h+105,v,0,"IV",flags[4]);
 		EditField(h,v+=20,120,"Objects",Normal,f1,false,ObjSClass);
-		EditField(h,v+=20,120,"Projects",Normal,f2,false,PRSClass);
+		EditField(h,v+=20,120,"Project",Normal,f2,false,PRSClass);
 		CheckBox(h+140,v,0,"without vendors",flags[5]);
 		HalPushButton(h=50,v+=20,h+110,v+=20,"RunBudgetObjectsRn","Run Budgets' Objects");
 	EndWindow;
