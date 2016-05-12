@@ -359,7 +359,7 @@ BEGIN
 		if (windowsmode==1) then begin
 			fileToSave = "tmpxlsx.xlsx";
 		end else begin
-			fileToSave = "/tmpxlsx1.xlsx";
+			fileToSave = "/tmpxlsx.xlsx";
 		end;
 		deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
 		BlockLoad(BCb);
@@ -1446,8 +1446,7 @@ BEGIN
       end;
     end;
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
-		fileToSave = "/tmpxlsx.xlsx";
-    ConvertToXLSX(fileToSave);
+		ConvertToXLSX(fileToSave);
 		logtext(0,"ConvertToXLSX");
 		MilliSleep(2000);
     logtext(0,"MilliSleep");
