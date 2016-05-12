@@ -1442,14 +1442,19 @@ BEGIN
         EndSheetData(sheetnum,fileToSave);
         MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
         EndSheet(sheetnum,fileToSave,0);
+        logtext(0,"EndSheet");
       end;
     end;
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
 		ConvertToXLSX(fileToSave);
-		
+		logtext(0,"ConvertToXLSX");
 		MilliSleep(2000);
+    logtext(0,"MilliSleep");
 		addfiletoarea(fileToSave,areatofile,false);
+    logtext(0,"addfiletoarea");
 		delete_file(fileToSave);
+    logtext(0,"delete_file");
 	end;
+  logtext(0,"END");
 	RETURN;
 END;
