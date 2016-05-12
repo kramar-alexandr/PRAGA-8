@@ -5,6 +5,9 @@ external function Boolean VIVc_PasteVECode(var record VIVc,Integer,Boolean,Boole
 external function boolean OTCodeMatch(string,string);
 external procedure NormalizeObjstr(var string);
 external procedure NoDupObjs(string,var string);
+external function LongInt TBBUVcRecordCheck(var record TBBUVc,record TBBUVc,LongInt,LongInt);
+external procedure TBBUDchrsum(var record TBBUVc,Integer,Boolean,Integer);
+external procedure TBBUSumup(var record TBBUVc);
 
 global
 procedure GetPayModeAccNumber(string paymode,var string res)
@@ -1775,7 +1778,259 @@ begin
 
 return;
 end;
-
+global 
+updating procedure testextraMn(record RcVc RepSpec)
+begin
+	record ObjVc Objr;
+  integer i,r;
+  record TBBUVc TBBUr,TBBU2r;
+  row TBBUVc TBBUrw;
+  record INVc INr;
+  array string 4 f;
+  record GeneralOptionBlock GenOptRec;
+  
+  BlockLoad(GenOptRec);
+  
+  f[0] = "8010";
+  f[1] = "8020";
+  f[2] = "8030";
+  f[3] = "8040";
+  f[4] = "8050";
+  f[5] = "8090";
+  randomize;
+  TBBUr.PRCode = "2016.002";
+  ReadFirstMain(TBBUr,1,true);
+  
+  ClearRow(TBBUr,TBBUrw,18);
+  TBBUrw.Spec = "I";
+  TBBUrw.ItemType = 1;
+  TBBUrw.stp = 18;
+  MatRowInsert(TBBUr,0,TBBUrw);
+  for (i=1;i<249;i=i+1) begin
+    ClearRow(TBBUr,TBBUrw,1);
+    INr.Code = Random(1001,9999) & "";
+    readfirstmain(INr,1,false);
+    TBBUrw.ArtCode = INr.Code;
+    if TBBUrw.ArtCode=="DONATION-CTC(LTD)" then begin
+      TBBUrw.ArtCode = "1010";
+    end;
+    while true begin
+      r = Random(0,998);
+      if r<100 then begin
+        Objr.Code = "0" & r;
+      end;
+      if r<10 then begin
+        Objr.Code = "00" & r;
+      end;
+      Objr.Code = "E0" & r;
+      readfirstmain(Objr,1,false);
+      if Objr.OTCode=="EXTRA" then begin goto l1; end;
+    end;
+    l1:;
+    TBBUrw.Extras = Objr.Code;
+    TBBUrw.Comment = Objr.Comment;
+    while true begin
+      r = Random(0,843);
+      if r<100 then begin
+        Objr.Code = "0" & r;
+      end;
+      if r<10 then begin
+        Objr.Code = "00" & r;
+      end;
+      if Objr.Code=="014" then begin
+        Objr.Code = "015";
+      end;
+      readfirstmain(Objr,1,false);
+      if Objr.OTCode=="SUPPL" then begin goto l2; end;
+    end;
+    l2:;
+    TBBUrw.VECode = Objr.Code;
+    TBBUrw.VEName = Objr.Comment;
+    TBBUrw.Price = Random(0,1000000)/100;
+    TBBUrw.MonthSum = TBBUrw.Price/3;
+    TBBUrw.Qty = 1;
+    TBBUrw.ExtraObj = f[Random(0,5)];
+    MatRowInsert(TBBUr,i,TBBUrw);
+    TBBUDchrsum(TBBUr,i,true,GenOptRec.UseDiscount);
+    TBBUSumup(TBBUr);
+  end;
+  randomize;
+  ClearRow(TBBUr,TBBUrw,18);
+  TBBUrw.Spec = "II";
+  TBBUrw.ItemType = 2;
+  TBBUrw.stp = 18;
+  MatRowInsert(TBBUr,249,TBBUrw);
+  for (i=250;i<499;i=i+1) begin
+    ClearRow(TBBUr,TBBUrw,1);
+    INr.Code = Random(1001,9999) & "";
+    readfirstmain(INr,1,false);
+    TBBUrw.ArtCode = INr.Code;
+    if TBBUrw.ArtCode=="DONATION-CTC(LTD)" then begin
+      TBBUrw.ArtCode = "1010";
+    end;
+    while true begin
+      r = Random(0,998);
+      if r<100 then begin
+        Objr.Code = "0" & r;
+      end;
+      if r<10 then begin
+        Objr.Code = "00" & r;
+      end;
+      Objr.Code = "E0" & r;
+      readfirstmain(Objr,1,false);
+      if Objr.OTCode=="EXTRA" then begin goto l3; end;
+    end;
+    l3:;
+    TBBUrw.Extras = Objr.Code;
+    TBBUrw.Comment = Objr.Comment;
+    while true begin
+      r = Random(0,843);
+      if r<100 then begin
+        Objr.Code = "0" & r;
+      end;
+      if r<10 then begin
+        Objr.Code = "00" & r;
+      end;
+      if Objr.Code=="014" then begin
+        Objr.Code = "015";
+      end;
+      readfirstmain(Objr,1,false);
+      if Objr.OTCode=="SUPPL" then begin goto l4; end;
+    end;
+    l4:;
+    TBBUrw.VECode = Objr.Code;
+    TBBUrw.VEName = Objr.Comment;
+    TBBUrw.Price = Random(0,1000000)/100;
+    TBBUrw.MonthSum = TBBUrw.Price/3;
+    TBBUrw.Qty = 1;
+    TBBUrw.ExtraObj = f[Random(0,5)];
+    MatRowInsert(TBBUr,i,TBBUrw);
+    TBBUDchrsum(TBBUr,i,true,GenOptRec.UseDiscount);
+    TBBUSumup(TBBUr);
+  end;
+  
+  randomize;
+  ClearRow(TBBUr,TBBUrw,18);
+  TBBUrw.Spec = "III";
+  TBBUrw.ItemType = 3;
+  TBBUrw.stp = 18;
+  MatRowInsert(TBBUr,499,TBBUrw);
+  for (i=500;i<749;i=i+1) begin
+    ClearRow(TBBUr,TBBUrw,1);
+    INr.Code = Random(1001,9999) & "";
+    readfirstmain(INr,1,false);
+    TBBUrw.ArtCode = INr.Code;
+    if TBBUrw.ArtCode=="DONATION-CTC(LTD)" then begin
+      TBBUrw.ArtCode = "1010";
+    end;
+    while true begin
+      r = Random(0,998);
+      if r<100 then begin
+        Objr.Code = "0" & r;
+      end;
+      if r<10 then begin
+        Objr.Code = "00" & r;
+      end;
+      Objr.Code = "E0" & r;
+      readfirstmain(Objr,1,false);
+      if Objr.OTCode=="EXTRA" then begin goto l5; end;
+    end;
+    l5:;
+    TBBUrw.Extras = Objr.Code;
+    TBBUrw.Comment = Objr.Comment;
+    while true begin
+      r = Random(0,843);
+      if r<100 then begin
+        Objr.Code = "0" & r;
+      end;
+      if r<10 then begin
+        Objr.Code = "00" & r;
+      end;
+      if Objr.Code=="014" then begin
+        Objr.Code = "015";
+      end;
+      readfirstmain(Objr,1,false);
+      if Objr.OTCode=="SUPPL" then begin goto l6; end;
+    end;
+    l6:;
+    TBBUrw.VECode = Objr.Code;
+    TBBUrw.VEName = Objr.Comment;
+    TBBUrw.Price = Random(0,1000000)/100;
+    TBBUrw.MonthSum = TBBUrw.Price/3;
+    TBBUrw.Qty = 1;
+    TBBUrw.ExtraObj = f[Random(0,5)];
+    MatRowInsert(TBBUr,i,TBBUrw);
+    TBBUDchrsum(TBBUr,i,true,GenOptRec.UseDiscount);
+    TBBUSumup(TBBUr);
+  end;
+  
+  randomize;
+  ClearRow(TBBUr,TBBUrw,18);
+  TBBUrw.Spec = "VI";
+  TBBUrw.ItemType = 4;
+  TBBUrw.stp = 18;
+  MatRowInsert(TBBUr,749,TBBUrw);
+  for (i=750;i<999;i=i+1) begin
+    ClearRow(TBBUr,TBBUrw,1);
+    INr.Code = Random(1001,9999) & "";
+    readfirstmain(INr,1,false);
+    TBBUrw.ArtCode = INr.Code;
+    if TBBUrw.ArtCode=="DONATION-CTC(LTD)" then begin
+      TBBUrw.ArtCode = "1010";
+    end;
+    while true begin
+      r = Random(0,998);
+      if r<100 then begin
+        Objr.Code = "0" & r;
+      end;
+      if r<10 then begin
+        Objr.Code = "00" & r;
+      end;
+      Objr.Code = "E0" & r;
+      readfirstmain(Objr,1,false);
+      if Objr.OTCode=="EXTRA" then begin goto l7; end;
+    end;
+    l7:;
+    TBBUrw.Extras = Objr.Code;
+    TBBUrw.Comment = Objr.Comment;
+    while true begin
+      r = Random(0,843);
+      if r<100 then begin
+        Objr.Code = "0" & r;
+      end;
+      if r<10 then begin
+        Objr.Code = "00" & r;
+      end;
+      if Objr.Code=="014" then begin
+        Objr.Code = "015";
+      end;
+      readfirstmain(Objr,1,false);
+      if Objr.OTCode=="SUPPL" then begin goto l8; end;
+    end;
+    l8:;
+    TBBUrw.VECode = Objr.Code;
+    TBBUrw.VEName = Objr.Comment;
+    TBBUrw.Price = Random(0,1000000)/100;
+    TBBUrw.MonthSum = TBBUrw.Price/3;
+    TBBUrw.Qty = 1;
+    TBBUrw.ExtraObj = f[Random(0,5)];
+    MatRowInsert(TBBUr,i,TBBUrw);
+    TBBUDchrsum(TBBUr,i,true,GenOptRec.UseDiscount);
+    TBBUSumup(TBBUr);
+  end;
+  recordcopy(TBBU2r,TBBUr);
+  TBBUVcRecordCheck(TBBUr,TBBU2r,0,0);
+  RECORDSTORE(TBBUr,true);
+	
+  /*for (i=115;i<999;i=i+1) begin
+    RecordNew(Objr);
+    Objr.Code = "E0" & i;
+    Objr.OTCode = "EXTRA";
+    Objr.Comment = "test " & Objr.Code;
+    RECORDSTORE(Objr,true);
+	end;*/
+  return;
+end;
 global
 updating procedure FixSuppliersMn(record RcVc RepSpec)
 begin

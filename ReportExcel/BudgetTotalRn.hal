@@ -13,6 +13,7 @@ external procedure MergeCells(integer,string,array string,integer);
 external procedure FillSharedStrings(string,array string,integer,integer,array string);
 external procedure ConvertToXLSX(string);
 external function string 10 GetStringCellNum(integer,integer);
+external procedure GetObjs(string,string,var string);
 
 procedure ArraysCollect(record RcVc RepSpec, var array string FoundArray, var array string ProjArray, var vector string ProjNamesVect, var vector string FoundNamesVect)
 BEGIN
@@ -42,7 +43,6 @@ BEGIN
 	end;
 	k = 0;
 	while(loopmain(PRr,1,true)) begin
-		//if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
 		if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
 			if blank(PRr.MotherCode) then begin
 				ProjArray[k] = PRr.Code;
@@ -73,17 +73,18 @@ BEGIN
 	row TRVc TRrw;
 	integer i,k,j,mtrw,PAi,FAi;
 	boolean TrHs,testf,kTestf;
-	array string 20 prjobjs;
+	//array string 20 prjobjs;
+  string 20 prj
 	
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
 		PRr.Code = ProjArray[PAi];
 		if (ReadFirstMain(PRr,1,true)) then begin
-			prjobjs[PAi] = PRr.Objects;
-			//if ((PRr.StartDate<RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sStartDate and PRr.EndDate<=RepSpec.sEndDate) or (PRr.StartDate>=RepSpec.sStartDate and PRr.StartDate<=RepSpec.sEndDate) or (PRr.StartDate<=RepSpec.sStartDate and nonblank(PRr.EndDate) and PRr.EndDate>=RepSpec.sEndDate))then begin
+			//prjobjs[PAi] = PRr.Objects;
 			if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
 				TBBUr.PRCode = PRr.Code;
 				if (ReadFirstMain(TBBUr,1,true)) then begin
 					mtrw = matrowcnt(TBBUr);
+						
 					k = 0;
 					for (i=0;i<mtrw;i=i+1) begin
 						matrowget(TBBUr,i,TBBUrw);
@@ -109,11 +110,11 @@ BEGIN
 						if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
 							if (RepSpec.f2=="2016" and right(TBBUrw.ArtCode,3)=="_16") or (RepSpec.f2!="2016" and right(TBBUrw.ArtCode,3)!="_16") then begin
                 for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin 
-                  if (TBBUrw.ExtraObj==FoundArray[FAi]) then begin
+                  if setinset(FoundArray[FAi],TBBUrw.Objects) then begin
                     FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-                    FPVect["TOTAL:" & ProjArray[PAi]] = FPVect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-                    FPVect[FoundArray[FAi] & ":TOTAL"] = FPVect[FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-                    FPVect["TOTAL:TOTAL"] = FPVect["TOTAL:TOTAL"] + TBBUrw.Sum;
+                    FPVect["TOTAL:" & ProjArray[PAi]]              = FPVect["TOTAL:" & ProjArray[PAi]]              + TBBUrw.Sum;
+                    FPVect[FoundArray[FAi] & ":TOTAL"]             = FPVect[FoundArray[FAi] & ":TOTAL"]             + TBBUrw.Sum;
+                    FPVect["TOTAL:TOTAL"]                          = FPVect["TOTAL:TOTAL"]                          + TBBUrw.Sum;
                   end;
                 end;
               end;
@@ -122,25 +123,23 @@ BEGIN
 				end;
 			end;
 			
+      resetloop(PR2r);
 			PR2r.MotherCode = PRr.Code;
-			TrHs = true;
+      TrHs = true;
 			while(loopkey("MotherCode",PR2r,1,TrHs)) begin
 				testf = true;
 				if (PR2r.MotherCode!=PRr.Code) then begin
 					TrHs = false;
 					testf = false;
 				end;
-				//if ((PR2r.StartDate<RepSpec.sStartDate and nonblank(PR2r.EndDate) and PR2r.EndDate>=RepSpec.sStartDate and PR2r.EndDate<=RepSpec.sEndDate) or (PR2r.StartDate>=RepSpec.sStartDate and PR2r.StartDate<=RepSpec.sEndDate) or (PR2r.StartDate<=RepSpec.sStartDate and nonblank(PR2r.EndDate) and PR2r.EndDate>=RepSpec.sEndDate)) then begin
-				if ((GetYear(PR2r.StartDate) & "" == RepSpec.f2) or (GetYear(PR2r.EndDate) & "" == RepSpec.f2)) then begin
-					testf = true;
-				end else begin
+				if ((GetYear(PR2r.StartDate) & "" != RepSpec.f2) and (GetYear(PR2r.EndDate) & "" != RepSpec.f2)) then begin
 					testf = false;
 				end;
 				if (testf) then begin
-					TBBUr.PRCode = PR2r.Code;
+          TBBUr.PRCode = PR2r.Code;
 					if (readfirstmain(TBBUr,1,true)) then begin
 						mtrw = matrowcnt(TBBUr);
-						k = 0;
+            k = 0;
 						for (i=0;i<mtrw;i=i+1) begin
 							matrowget(TBBUr,i,TBBUrw);
 							if(TBBUrw.stp==18) then begin
@@ -164,7 +163,7 @@ BEGIN
 							end;
 							if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
 								for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin
-									if (TBBUrw.ExtraObj==FoundArray[FAi]) then begin
+									if setinset(FoundArray[FAi],TBBUrw.Objects) then begin
 										FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
 										FPVect["TOTAL:" & ProjArray[PAi]] = FPVect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
 										FPVect[FoundArray[FAi] & ":TOTAL"] = FPVect[FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
@@ -178,8 +177,11 @@ BEGIN
 			end;
 		end;
 	end;
+  
+	
 	TRr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
+  resetloop(TRr);
 	while (loopkey("TransDate",TRr,1,TrHs)) begin
 		if (TRr.TransDate > RepSpec.sEndDate) then begin
 			TrHs = false;
@@ -191,10 +193,31 @@ BEGIN
 				if ((TRrw.ovst == 0) and ((mid(TRrw.AccNumber,0,1)=="5")) and (setinset(RepSpec.ObjStr,TRrw.Objects) or blank(RepSpec.ObjStr))) then begin
 					for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin
 						if setinset(FoundArray[FAi],TRrw.Objects) then begin
-							for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
-								if setinset(prjobjs[PAi],TRrw.Objects) then begin
-									FPVect["Fact:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Fact:" & FoundArray[FAi] & ":" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-									FPVect["Fact:TOTAL:" & ProjArray[PAi]] = FPVect["Fact:TOTAL:" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+							GetObjs("PRJ",TRrw.Objects,prj);
+              PRr.Objects = prj;
+              if (ReadFirstKey("Objects",PRr,1,true)) then begin
+                testf = false;
+                if nonblank(PRr.MotherCode) then begin
+                  for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+                    if ProjArray[PAi]==PRr.MotherCode then begin
+                      testf = true;
+                      prj = PRr.MotherCode;
+                      PAi = ProjArray.length;
+                    end;
+                  end;
+                end;
+                if !testf then begin
+                  for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+                    if ProjArray[PAi]==PRr.Code then begin
+                      testf = true;
+                      prj = PRr.Code;
+                      PAi = ProjArray.length;
+                    end;
+                  end;
+                end;
+                if testf then begin
+                  FPVect["Fact:" & FoundArray[FAi] & ":" & prj] = FPVect["Fact:" & FoundArray[FAi] & ":" & prj] - TRrw.CredVal + TRrw.DebVal;
+									FPVect["Fact:TOTAL:" & prj] = FPVect["Fact:TOTAL:" & prj] - TRrw.CredVal + TRrw.DebVal;
 									FPVect["Fact:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Fact:" & FoundArray[FAi] & ":TOTAL"] - TRrw.CredVal + TRrw.DebVal;
 									FPVect["Fact:TOTAL:TOTAL"] = FPVect["Fact:TOTAL:TOTAL"] - TRrw.CredVal + TRrw.DebVal;
 								end;

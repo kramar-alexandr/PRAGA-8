@@ -3963,6 +3963,17 @@ begin
   EndWindow;
 end;
 
+window testextraVClass:1
+  wtag("language","RUS"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs;
+  WindowBegin("testextraVClass",testextraVClass,CGMnt,RcType);
+  SetWRect(20,80,400,240);
+  vs = 20;h = 130; v = 26;
+  
+  EndWindow;
+end;
+
 window FixSuppliersVClass:1
   wtag("language","RUS"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin

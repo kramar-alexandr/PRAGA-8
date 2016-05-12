@@ -103,15 +103,20 @@ begin
 		tstr = tstr & "-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
 		filename = SaveFileDialog(tstr,"","xlsx");
 		if ((filename!=tstr) and nonblank(filename)) then begin
-			ProjectStatRn(RepSpec,fileToSave,PrjFoundf);
+			logtext(0,"remote call");
+      ProjectStatRn(RepSpec,fileToSave,PrjFoundf);
+      logtext(0,"remote call end");
 			if (PrjFoundf) then begin
-				if(fileexists(filename))then begin
+				logtext(0,"PrjFoundf = true");
+        if(fileexists(filename))then begin
 					delete_file(filename);
 				end;
 				writeareatofile(fileToSave,filename,0);
+        logtext(0,"writeareatofile");
 				CloseWindow(wn);
 				MessageBox(0,"Done!");
 			end else begin
+        logtext(0,"PrjFoundf = false");
 				if nonblank(RepSpec.f1) then begin
 					MessageBox(0,"Project " & chr(34) & RepSpec.f1 & chr(34) & " is not included in the specified period!");
 				end else begin

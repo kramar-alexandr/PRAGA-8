@@ -61,10 +61,10 @@ begin
 		MessageBox(0,"Incorrect selection of Quartals!");
 		testf = false;
 	end;
-	if (blank(RepSpec.f1) and testf) then begin
+	/*if (blank(RepSpec.f1) and testf) then begin
 		MessageBox(0,"Input Foundation!");
 		testf = false;
-	end;
+	end;*/
 	if (nonblank(RepSpec.f1) and testf) then begin
 		if !OTCodeMatch(RepSpec.f1,"FOUND") then begin
 			testf = false;
@@ -109,7 +109,11 @@ begin
 		end;
 		tmpDate = tmpDate & RepSpec.f2;
 		RepSpec.sEndDate = StringToDate(tmpDate);
-		tstr = RepSpec.f1;
+		if nonblank(RepSpec.f1) then begin
+      tstr = RepSpec.f1;
+    end else begin
+      tstr = "All foundations";
+    end;
 		if nonblank(RepSpec.ObjStr) then begin
 			tstr = tstr & "-" & RepSpec.ObjStr;
 		end;
