@@ -1443,6 +1443,7 @@ BEGIN
         EndSheetData(sheetnum,fileToSave);
         MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
         EndSheet(sheetnum,fileToSave,0);
+        logtext(0,"EndSheet");
       end;
     end;
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
@@ -1453,6 +1454,7 @@ BEGIN
     fnserv = fileToSave;
     //delete_file(fileToSave);
 	end;
+  logtext(0,"END");
 	RETURN;
 END;
 
@@ -1465,14 +1467,18 @@ BEGIN
   setareazerosize(resarea);
   res = false;
   addfiletoarea(filename,filearea,false);
+  logtext(0,"filearea = " & getarealength(filearea));
   if getarealength(filearea)<=arealen then begin
     res = true;
     resarea = filearea;
     arealen = 0;
     delete_file(filename);
+    logtext(0,"resarea = " & getarealength(resarea));
   end else begin
     GetAreaFromArea(filearea,0,arealen,resarea);
     GetAreaFromArea(filearea,arealen,getarealength(filearea)-(arealen),tmparea2);
+    
+    logtext(0,"resarea = " & getarealength(resarea) &  " " & "tmparea2 = " & getarealength(tmparea2));
     if getarealength(tmparea2)<arealen then begin
       arealen = getarealength(tmparea2);
     end;
