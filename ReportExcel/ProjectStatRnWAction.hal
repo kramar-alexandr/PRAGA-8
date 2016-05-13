@@ -110,7 +110,7 @@ begin
 			  if(fileexists(filename))then begin
 					delete_file(filename);
 				end;
-			  arealen = 102 400;
+			  arealen = 102400;
         while (!EOF) begin
           EOF = GetPartFileToArea(fnserv,arealen,tmparea);
           writeareatofile(tmparea,filename,1);
