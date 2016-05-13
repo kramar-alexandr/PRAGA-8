@@ -37,7 +37,7 @@ begin
 	record OTVc OTr;
 	string 250 filename,tstr,fnserv;
 	string 10 tmpDate;
-	area tmparea,tmparea2;
+	area tmparea;
 	record RcVc RepSpec;
 	integer wn;
 	boolean PrjFoundf,testf,EOF;
@@ -110,13 +110,11 @@ begin
 			  if(fileexists(filename))then begin
 					delete_file(filename);
 				end;
-			  arealen = 1300000;
+			  arealen = 1048576;
         while (!EOF) begin
           EOF = GetPartFileToArea(fnserv,arealen,tmparea);
-          insertareabeforearea(tmparea2,tmparea);
-          tmparea2 = tmparea;
+          writeareatofile(tmparea,filename,1);
         end;
-        writeareatofile(tmparea2,filename,1);
       	CloseWindow(wn);
 				MessageBox(0,"Done!");
 			end else begin
