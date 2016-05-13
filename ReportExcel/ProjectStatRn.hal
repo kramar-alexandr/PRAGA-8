@@ -1470,9 +1470,9 @@ BEGIN
   logtext(0,"filearea = " & getarealength(filearea));
   if getarealength(filearea)<=arealen then begin
     res = true;
-    resarea = filearea;
-    arealen = 0;
-    delete_file(filename);
+    //resarea = filearea;
+    //arealen = 0;
+    //delete_file(filename);
     logtext(0,"resarea = " & getarealength(resarea));
   end else begin
     GetAreaFromArea(filearea,0,arealen,resarea);
