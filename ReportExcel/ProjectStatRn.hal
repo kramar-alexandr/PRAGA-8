@@ -325,7 +325,7 @@ BEGIN
 END;
 
 global
-procedure ProjectStatRn(record RcVc RepSpec,var area areatofile, var boolean PrjFoundf)
+procedure ProjectStatRn(record RcVc RepSpec, var string fnserv, var LongInt arealen, var boolean PrjFoundf)
 BEGIN
 	record BaseCurBlock BCb;
 	record ITVc ITr;
@@ -350,6 +350,7 @@ BEGIN
 	integer numOfUniqueSharedStrings,numOfSharedStrings,qtyMergeCell;
 	string 16 reportName;
 	array string 225 mas;
+  area areatofile;
 	
 	ArraysCollect(RepSpec,ArtArrayWithoutGroups,ProjArray,ProjNamesVect,ArtArrayWithGroups,PrjFoundf,isMotherProjVect);
 	if (PrjFoundf) then begin
@@ -1442,19 +1443,43 @@ BEGIN
         EndSheetData(sheetnum,fileToSave);
         MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
         EndSheet(sheetnum,fileToSave,0);
-        logtext(0,"EndSheet");
       end;
     end;
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
 		ConvertToXLSX(fileToSave);
-		logtext(0,"ConvertToXLSX");
 		MilliSleep(2000);
-    logtext(0,"MilliSleep");
-		addfiletoarea(fileToSave,areatofile,false);
-    logtext(0,"addfiletoarea");
-		delete_file(fileToSave);
-    logtext(0,"delete_file");
+    //addfiletoarea(fileToSave,areatofile,false);
+    //arealen = getarealength(areatofile);
+    fnserv = fileToSave;
+    //delete_file(fileToSave);
 	end;
-  logtext(0,"END");
 	RETURN;
+END;
+
+global
+function boolean GetPartFileToArea(string filename,var longint arealen, var area resarea)
+BEGIN
+  area filearea,tmparea2;
+  boolean res;
+  
+  setareazerosize(resarea);
+  res = false;
+  addfiletoarea(filename,filearea,false);
+  if getarealength(filearea)<=arealen then begin
+    res = true;
+    resarea = filearea;
+    arealen = 0;
+    delete_file(filename);
+  end else begin
+    GetAreaFromArea(filearea,0,arealen,resarea);
+    GetAreaFromArea(filearea,arealen,getarealength(filearea)-(arealen),tmparea2);
+    if getarealength(tmparea2)<arealen then begin
+      arealen = getarealength(tmparea2);
+    end;
+    writeareatofile(tmparea2,filename,0);
+  end;
+  
+  getpartfiletoarea = res;
+  
+  RETURN;
 END;
