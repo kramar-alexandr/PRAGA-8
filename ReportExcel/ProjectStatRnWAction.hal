@@ -110,15 +110,17 @@ begin
 			  if(fileexists(filename))then begin
 					delete_file(filename);
 				end;
-			  arealen = 1048576;
+			  arealen = 102 400;
         while (!EOF) begin
           EOF = GetPartFileToArea(fnserv,arealen,tmparea);
           writeareatofile(tmparea,filename,1);
+          logtext(0,getarealength(tmparea));
         end;
-      	CloseWindow(wn);
+        logtext(0,"writeareatofile");
+				CloseWindow(wn);
 				MessageBox(0,"Done!");
 			end else begin
-      	if nonblank(RepSpec.f1) then begin
+        if nonblank(RepSpec.f1) then begin
 					MessageBox(0,"Project " & chr(34) & RepSpec.f1 & chr(34) & " is not included in the specified period!");
 				end else begin
 					MessageBox(0,"Projects for specified period not found!");
