@@ -1471,7 +1471,9 @@ BEGIN
   if getarealength(filearea)<=arealen then begin
     res = true;
     //resarea = filearea;
-    //arealen = 0;
+    setareazerosize(resarea);
+    getareafromarea(filearea,0,getarealength(filearea),resarea);
+    arealen = 0;
     //delete_file(filename);
     logtext(0,"resarea = " & getarealength(resarea));
   end else begin
@@ -1485,7 +1487,7 @@ BEGIN
     writeareatofile(tmparea2,filename,0);
   end;
   
-  getpartfiletoarea = res;
+  GetPartFileToArea = res;
   
   RETURN;
 END;
