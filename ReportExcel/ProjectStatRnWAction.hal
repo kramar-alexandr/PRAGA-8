@@ -114,9 +114,7 @@ begin
         while (!EOF) begin
           EOF = GetPartFileToArea(fnserv,arealen,tmparea);
           writeareatofile(tmparea,filename,1);
-          logtext(0,getarealength(tmparea));
         end;
-        logtext(0,"writeareatofile");
 				CloseWindow(wn);
 				MessageBox(0,"Done!");
 			end else begin
