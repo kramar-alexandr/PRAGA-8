@@ -2006,7 +2006,7 @@ real h,v,vs,h1;
 end;
 
 window ExcelUploadTClass:1
-  wtag("language","RUS"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   real h,v,vs;
   WindowBegin("Uploading a file to MS Excel",ExcelUploadTClass,CGother,RcType);
@@ -3927,7 +3927,7 @@ end;
 
 
 window ImportIClass:1		// added ************ Dima, 19.11.2014
-  wtag("language","RUS"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
 real h,v,vs;
 Integer i;
@@ -3942,7 +3942,7 @@ Integer i;
 end;
 
 window FixVIVcVClass:1
-  wtag("language","RUS"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   real h,v,vs;
   WindowBegin("Update Purch.Inv. Supplier Name",FixVIVcVClass,CGMnt,RcType);
@@ -3953,7 +3953,7 @@ begin
 end;
 
 window FixTBBUrwObjectsVClass:1
-  wtag("language","RUS"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   real h,v,vs;
   WindowBegin("Update Objects in Budgets",FixTBBUrwObjectsVClass,CGMnt,RcType);
@@ -3964,7 +3964,7 @@ begin
 end;
 
 window testextraVClass:1
-  wtag("language","RUS"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   real h,v,vs;
   WindowBegin("testextraVClass",testextraVClass,CGMnt,RcType);
@@ -3975,7 +3975,7 @@ begin
 end;
 
 window FixSuppliersVClass:1
-  wtag("language","RUS"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   real h,v,vs;
   WindowBegin("Update Suppliers",FixSuppliersVClass,CGMnt,RcType);
@@ -4090,7 +4090,7 @@ begin
     Tile(0,95,false,"",Code);
   end;
   v = 6; h = 130; l=223; vs = 20; h1=410; h2 = 350; h3 = 430; h4 = 580; h5 = 460;
-  EditField(h,v ,   95,"No.",Normal,Code,false,TSerSClass);
+  EditField(h,v ,   95,"No.",Normal,Code,false,NSCUSClass);
   EditField(h1,v,50,"Customer Category",Normal,CustCat,false,CCatSClass);
   //EditField(h,v+=vs,95,"Short",Normal,SearchKey,false,0);
   EditField(h1,v+=vs,50,"#Supplier# Category",Normal,VECat,false,VGSClass);
@@ -4606,7 +4606,7 @@ begin
 end;
 
 window CreateVIfromTBBUVClass:1
-  wtag("language","RUS"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   real h,v,vs;
   WindowBegin("Create Purchase Invoices from Project Budgets for month",CreateVIfromTBBUVClass,CGMnt,RcType);
@@ -4811,31 +4811,112 @@ begin
   EndWindow;
 end;
 
-window ProjectFactRClass:1
-	wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
-begin
-real h,v,vs,h1;
-	WindowBegin("Projects Facts",ProjectFactRClass,CGother,RcType);
-		SetWRect(20,80,400,250);
-		v = 20; vs = 20; h = 120;
-		EditField(h,v,120,"Year",Normal,f2,false,0);
-		StaticText(h-6,v+32,"Quartals",true);
-		CheckBox(h,v+=vs,0,"I",flags[1]);
-		CheckBox(h+35,v,0,"II",flags[2]);
-		CheckBox(h+70,v,0,"III",flags[3]);
-		CheckBox(h+105,v,0,"IV",flags[4]);
-		EditField(h,v+=vs,120,"Group",Normal,f1,false,ITSClass);
-		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunProjectFactRn","Run");
-	EndWindow;
-end;
 
 window FixVIVcDateRClass:1
-  wtag("language","RUS"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
   real h,v,vs;
   WindowBegin("Change date in Purch.Inv.",FixVIVcDateRClass,CGRcW,RcType);
     SetWRect(20,80,400,240);
     vs = 20;h = 130; v = 26;
   
+  EndWindow;
+end;
+
+window BOLClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  Integer pos;
+
+  WindowBegin("BOVc",BOLClass,CGmlist,-);
+  SetWRect(20,80,300,350);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(BODClass);
+  UseView(BOVc);
+  RecordList(4,17,-21,-39);
+
+  RlColKey(4,4,"Project",Project,false,Project);
+  RlColKey(70,70,"Item",Item,false,Item);
+  RlColKey(140,140,"Supp",Supp,false,Supp);
+	RlCol(210,210,"Extras",Extras,false);
+	
+  SearchField("Search");
+  EndWindow;
+end;
+
+
+window BODClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,h2,h3,hs,v,vs;
+
+  h = 50;
+  h2 = 270;
+  h3 = 450;
+  vs = 25;
+  hs = 160;
+  WindowBegin("BOVc",BODClass,CGview,-);
+  SetWRect(20,80,600,200);
+	UseView(BOVc);
+	
+  EditField(h,v=6,100,"SerNr",St_i,SerNr,false,0);
+	EditField(h,v+=vs,100,"Project",Normal,Project,false,0);
+	EditField(h,v+=vs,100,"Item",Normal,Item,false,0);
+  CheckBox(h+110,v,0,"GroupFlag",GroupFlag);
+  EditField(h,v+=vs,100,"Supp",Normal,Supp,false,0);
+  EditField(h,v+=vs,100,"Extras",Normal,Extras,false,0);
+
+  EditField(h2,v=6,100,"Year",Normal,Year,false,0);
+  EditField(h2,v+=vs,100,"Q1",Normal,Q1,false,0);
+  EditField(h2,v+=vs,100,"Q2",Normal,Q2,false,0);
+  EditField(h2,v+=vs,100,"Q3",Normal,Q3,false,0);
+  EditField(h2,v+=vs,100,"Q4",Normal,Q4,false,0);
+  EditField(h3,v=6+vs,100,"Q1Fact",Normal,Q1Fact,false,0);
+  EditField(h3,v+=vs,100,"Q2Fact",Normal,Q2Fact,false,0);
+  EditField(h3,v+=vs,100,"Q3Fact",Normal,Q3Fact,false,0);
+  EditField(h3,v+=vs,100,"Q4Fact",Normal,Q4Fact,false,0);
+  v = v + vs*3;
+  EditField(h,v,100,"Total",Normal,Total,false,0);
+  EditField(h+=155,v,100,"TotalFact",Normal,TotalFact,false,0);
+  EditField(h+=150,v,100,"Overrun",Normal,Overrun,false,0);
+  EditField(h+=140,v,50,"proc",Normal,proc,false,0);
+  
+  
+	EndWindow;
+end;
+
+window FillBOVClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs;
+  WindowBegin("Fill BOVc",FillBOVClass,CGMnt,RcType);
+  SetWRect(20,80,400,240);
+  vs = 20;h = 130; v = 26;
+  CheckBox(h,v,0,"Delete",flags[1]);
+  EndWindow;
+end;
+
+window CUSerTClass:2
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs;
+  WindowBegin("Number Series - Contacts",CUSerTClass,CGHbl,HBlRecType);
+  SetBlid(NSCUBlock);
+  SetWRect(20,80,400,400);
+  h = 8; v = 20;
+  MatrixBegin(h,v,-25,-1,-,99);
+  MatCol(1,24,"Name",0,Name,false,0);
+  MatCol(1,154,"Prefix",0,Prefix,false,0);
+  MatCol(1,194,"Last No.",0,LastNo,false,0);
+  EndMatrix;
+  EndWindow;
+end;
+
+window NSCUSClass:2
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Paste Serial Number",NSCUSClass,CGother,RcType);
+  SetWRect(240,80,500,298);
+  StringList(9,9,200,209);
   EndWindow;
 end;

@@ -1,22 +1,22 @@
-remote procedure BudgetsObjectsArea(LongInt,var area);
-remote procedure BudgetsObjectsRn(record RcVc);
+remote procedure BudgetsObjectsRn(record RcVc, var string);
 remote function boolean OTCodeMatch(string,string);
 remote function boolean isProject(string);
+remote function boolean GetPartFileToArea(string,var longint,var area);
 
 global
 procedure RunBudgetObjectsRn()
 begin
-	string 255 filename,tstr;
-	area fileToSave;
+	string 255 filename,tstr,fnserv;
+	area tmparea;
 	record RcVc RepSpec;
 	integer wn;
-	LongInt tick;
-	boolean testf;
+	boolean testf,EOF;
 	string 10 tmpDate;
   record ObjVc Objr;
   record PRVc PRr;
+  LongInt arealen;
 	
-	wn = curwindow;
+  wn = curwindow;
 	deselectwindow(wn,true);
 	getwindowrecord(wn,RepSpec);
 	testf = true;
@@ -110,17 +110,16 @@ begin
 		tstr = tstr & " filled in on " & DateToString(CurrentDate,"DD MM YYYY");
 		filename = SaveFileDialog(tstr,"","xlsx");
 		if ((filename!=tstr) and nonblank(filename)) then begin
-			tick = GetCurTick;
-			RepSpec.FirstVer = tick;
-			RepSpec.repname = "BudgetsObjectsRn";
-			BudgetsObjectsRn(RepSpec);
-			//RunReport(RepSpec,0);
-			BudgetsObjectsArea(tick,fileToSave);
+			BudgetsObjectsRn(RepSpec,fnserv);
 			if(fileexists(filename))then begin
 				delete_file(filename);
 			end;
-			writeareatofile(fileToSave,filename,0);
-			CloseWindow(wn);
+			arealen = 102400;
+      while (!EOF) begin
+        EOF = GetPartFileToArea(fnserv,arealen,tmparea);
+        writeareatofile(tmparea,filename,1);
+      end;
+      CloseWindow(wn);
 			Messagebox(0,"Done!");
 		end;
 	end;

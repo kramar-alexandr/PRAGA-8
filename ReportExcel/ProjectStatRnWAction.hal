@@ -1,4 +1,4 @@
-remote procedure ProjectStatRn(record RcVc,var string,var LongInt,var boolean);
+remote procedure ProjectStatRn(record RcVc,var string,var boolean);
 remote function boolean OTCodeMatch(string,string);
 remote function boolean GetPartFileToArea(string,var longint,var area);
 
@@ -35,7 +35,7 @@ procedure RunProjectStatRn()
 begin
 	record ObjVc Objr;
 	record OTVc OTr;
-	string 250 filename,tstr,fnserv;
+	string 255 filename,tstr,fnserv;
 	string 10 tmpDate;
 	area tmparea;
 	record RcVc RepSpec;
@@ -105,7 +105,7 @@ begin
 		tstr = tstr & "-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
 		filename = SaveFileDialog(tstr,"","xlsx");
 		if ((filename!=tstr) and nonblank(filename)) then begin
-			ProjectStatRn(RepSpec,fnserv,arealen,PrjFoundf);
+			ProjectStatRn(RepSpec,fnserv,PrjFoundf);
       if (PrjFoundf) then begin
 			  if(fileexists(filename))then begin
 					delete_file(filename);

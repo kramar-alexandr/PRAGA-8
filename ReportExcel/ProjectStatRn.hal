@@ -174,13 +174,13 @@ BEGIN
                 QuartVect[k & ";" & group &         ";" & PRr.MotherCode]                 = QuartVect[k & ";" & group &         ";" & PRr.MotherCode]                 + TBBUrw.Sum;
                 QuartVect[k & ";" &                "T;" & PRr.MotherCode]                 = QuartVect[k & ";" &                "T;" & PRr.MotherCode]                 + TBBUrw.Sum;
               end;
-              if (ProjArray[PAi]=="2016.004") or (ProjArray[PAi]=="2016.007") then begin
-                QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";sT1"] = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";sT1"] + TBBUrw.Sum;
-                QuartVect[k & ";" & TBBUrw.ArtCode & ";sT1"]                      = QuartVect[k & ";" & TBBUrw.ArtCode & ";sT1"]                      + TBBUrw.Sum;
-                QuartVect[k & ";" & group &         ";sT1"]                      = QuartVect[k & ";" & group &         ";sT1"]                      + TBBUrw.Sum;
-                QuartVect[k & ";" &                "T;sT1"]                      = QuartVect[k & ";" &                "T;sT1"]                      + TBBUrw.Sum;
-              end else begin
-                if (RepSpec.f2=="2016") then begin
+              if (RepSpec.f2=="2016") then begin
+                if (ProjArray[PAi]=="2016.004") or (ProjArray[PAi]=="2016.007") then begin
+                  QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";sT1"] = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";sT1"] + TBBUrw.Sum;
+                  QuartVect[k & ";" & TBBUrw.ArtCode & ";sT1"]                      = QuartVect[k & ";" & TBBUrw.ArtCode & ";sT1"]                      + TBBUrw.Sum;
+                  QuartVect[k & ";" & group &         ";sT1"]                      = QuartVect[k & ";" & group &         ";sT1"]                      + TBBUrw.Sum;
+                  QuartVect[k & ";" &                "T;sT1"]                      = QuartVect[k & ";" &                "T;sT1"]                      + TBBUrw.Sum;
+                end else begin
                   QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";sT2"] = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";sT2"] + TBBUrw.Sum;
                   QuartVect[k & ";" & TBBUrw.ArtCode & ";sT2"]                      = QuartVect[k & ";" & TBBUrw.ArtCode & ";sT2"]                      + TBBUrw.Sum;
                   QuartVect[k & ";" & group &         ";sT2"]                      = QuartVect[k & ";" & group &         ";sT2"]                      + TBBUrw.Sum;
@@ -240,13 +240,13 @@ BEGIN
                     QuartVect[k & "F;" & group &                   ";" & PRr.MotherCode]                = QuartVect[k & "F;" & group &                   ";" & PRr.MotherCode]                - TRrw.CredVal + TRrw.DebVal;
                     QuartVect[k &                               "F;T;" & PRr.MotherCode]                = QuartVect[k &                               "F;T:" & PRr.MotherCode]                - TRrw.CredVal + TRrw.DebVal;
                   end;
-								  if (ProjArray[PAi]=="2016.004") or (ProjArray[PAi]=="2016.007") then begin
-                    QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";sT1"] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";sT1"] - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";sT1"]                     = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";sT1"]               - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[k & "F;" & group &                   ";sT1"]                     = QuartVect[k & "F;" & group &                   ";sT1"]               - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[k &                               "F;T;sT1"]                     = QuartVect[k &                               "F;T;sT1"]               - TRrw.CredVal + TRrw.DebVal;
-                  end else begin
-                    if (RepSpec.f2!="2016") then begin
+                  if (RepSpec.f2=="2016") then begin
+                    if (ProjArray[PAi]=="2016.004") or (ProjArray[PAi]=="2016.007") then begin
+                      QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";sT1"] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";sT1"] - TRrw.CredVal + TRrw.DebVal;
+                      QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";sT1"]                     = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";sT1"]               - TRrw.CredVal + TRrw.DebVal;
+                      QuartVect[k & "F;" & group &                   ";sT1"]                     = QuartVect[k & "F;" & group &                   ";sT1"]               - TRrw.CredVal + TRrw.DebVal;
+                      QuartVect[k &                               "F;T;sT1"]                     = QuartVect[k &                               "F;T;sT1"]               - TRrw.CredVal + TRrw.DebVal;
+                    end else begin
                       QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";sT2"] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";sT2"] - TRrw.CredVal + TRrw.DebVal;
                       QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";sT2"]                     = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";sT2"]                     - TRrw.CredVal + TRrw.DebVal;
                       QuartVect[k & "F;" & group &                   ";sT2"]                     = QuartVect[k & "F;" & group &                   ";sT2"]                     - TRrw.CredVal + TRrw.DebVal;
@@ -286,7 +286,7 @@ BEGIN
 END;
 
 global
-procedure ProjectStatRn(record RcVc RepSpec, var string fnserv, var LongInt arealen, var boolean PrjFoundf)
+procedure ProjectStatRn(record RcVc RepSpec, var string fnserv, var boolean PrjFoundf)
 BEGIN
 	record BaseCurBlock BCb;
 	record ITVc ITr;
@@ -316,8 +316,9 @@ BEGIN
 	string 16 reportName;
 	array string 225 mas;
   area areatofile;
-  
+
   longint t,t1;
+  
   t1 = getcurtick;
 	ArraysCollect(RepSpec,ArtArrayWithoutGroups,ProjArray,ProjNamesVect,ArtArrayWithGroups,PrjFoundf,isMotherProjVect);
 	if (PrjFoundf) then begin

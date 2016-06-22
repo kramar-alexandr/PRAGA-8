@@ -239,7 +239,7 @@ BEGIN
 END;
 
 global
-procedure BudgetTotalRn(record RcVc RepSpec,var area areatofile)
+procedure BudgetTotalRn(record RcVc RepSpec, var string fnserv, var area areatofile)
 BEGIN
 	array string 255 FoundArray,ProjArray;
 	vector string 255 ProjNamesVect,FoundNamesVect;
@@ -630,7 +630,6 @@ BEGIN
 		ConvertToXLSX(fileToSave);
 	end;
 	MilliSleep(2000);
-	addfiletoarea(fileToSave,areatofile,false);
-	delete_file(fileToSave);
+	fnserv = fileToSave;
 	RETURN;
 END;

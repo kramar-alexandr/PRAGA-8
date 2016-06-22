@@ -5,6 +5,8 @@ begin
 	
 	Register("Budgets History","Budgets History",BudgetsHistVc,modTS);		//Edit----------------------Dima  13.07.2015
 	Register("Contracts","Contracts",ContractsVc,modPL);		//Edit----------------------Dima  09.02.2016
+  //registers for Excel reports
+  Register("BOVc","BOVc",BOVc,modTS);
 
 	Report("TEST",TESTRClass,TESTRn,0,modTS);
 	Report("TEST2",TEST2RClass,TEST2Rn,0,modTS);
@@ -17,7 +19,10 @@ begin
 	Report("Project Summary 2016",PrjSumRClass,PrjSumRn,0,modTS);
 	Report("Project Statistics 2016",ProjectStatRClass,ProjectStatRn,0,modTS);
 	Report("Projects Facts",ProjectFactRClass,ProjectFactRn,0,modTS);
+  
 	Setting("Uploading a file to MS Excel",ExcelUploadTClass,modTS);
+  Setting("Number Series - Contacts",CUSerTClass,modSL);
+  //Setting("Number Series - Contacts",NSCUTClass,modSL);
 	
 	Import("Set salesman in purchase invoices from history",ImportIClass,SetSalesmanToVIVcIn,modPL);
 	Maintenance("Update Purch.Inv. Supplier Name",FixVIVcVClass,FixVIVcMn,modDBMain); //Edit---------------Vitalii 15:36 10.08.2015
@@ -25,6 +30,8 @@ begin
   Maintenance("test extra",testextraVClass,testextraMn,modDBMain); //Edit---------------Vitalii 15:49 23.09.2015
 	Maintenance("Update Suppliers",FixSuppliersVClass,FixSuppliersMn,modDBMain); //Edit-------------------Vitalii 13:08 25.09.2015
 	Maintenance("Create Purchase Invoices from Project Budgets for month",CreateVIfromTBBUVClass,CreateVIfromTBBUMn,modPL); //Edit-------------------Vitalii 13:08 25.09.2015
+  
+  Maintenance("Fill BOVc",FillBOVClass,FillBOMn,modTS);
 	Report("Change date in Purch.Inv.",FixVIVcDateRClass,FixVIVcDateRn,0,modDBMain);
   
 	SString(31000,"Object with this name but with other type already exists");

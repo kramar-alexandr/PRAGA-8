@@ -323,6 +323,67 @@ begin
   RecordField(RoutNum,M4Str,255,0);
  EndRecordAdd;
  
+ RecordBegin(BOVc,-,"");//Edit-------------------Vitalii 14:18 14.06.2016
+	RecordField(SerNr,M4Long,0,0);
+  RecordField(Year,M4Str,4,0);
+  RecordField(Project,M4Code,20,0);
+  RecordField(Item,M4Code,20,0);
+  RecordField(GroupFlag,M4Mark,0,0);
+  RecordField(Supp,M4Code,20,0);
+  RecordField(Extras,M4Code,20,0);
+  
+  RecordField(Q1,M4Val,0,0);
+  RecordField(Q2,M4Val,0,0);
+	RecordField(Q3,M4Val,0,0);
+  RecordField(Q4,M4Val,0,0);
+  RecordField(Q1Fact,M4Val,0,0);
+  RecordField(Q2Fact,M4Val,0,0);
+	RecordField(Q3Fact,M4Val,0,0);
+  RecordField(Q4Fact,M4Val,0,0);
+  RecordField(Total,M4Val,0,0);
+  RecordField(TotalFact,M4Val,0,0);
+  RecordField(Overrun,M4Val,0,0);
+  RecordField(proc,M4Val,0,0);
+  
+  MainKeyBegin(SerNr,0);
+  KeySegment(SerNr);
+  
+  KeyBegin(Year);
+  KeySegment(Year);
+	KeySegment(SerNr);
+  
+  KeyBegin(Project);
+  KeySegment(Project);
+	KeySegment(SerNr);
+  
+  KeyBegin(Item);
+  KeySegment(Item);
+  KeySegment(GroupFlag);
+	KeySegment(SerNr);
+  
+  KeyBegin(Supp);
+  KeySegment(Supp);
+	KeySegment(SerNr);
+  
+  KeyBegin(YearProjectItemSuppExtras);
+  KeySegment(Year);
+  KeySegment(Project);
+	KeySegment(Item);
+	KeySegment(Supp);
+  KeySegment(Extras);
+	KeySegment(SerNr);
+  
+ EndRecord;
+ 
+ BlockBegin(NSCUBlock,-,"");
+  RecordField(Math,M4Matrix,0,0);
+  ArrayBegin(Math,-,1);
+  ArrayField(Name,M4Str,250,0);
+  ArrayField(Prefix,M4Code,5,0);
+  ArrayField(LastNo,M4Int,0,0)
+  EndArray;
+ EndBlock;
+ 
 return;  
 end;
 

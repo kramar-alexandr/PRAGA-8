@@ -60,6 +60,23 @@ begin
 end;
 
 global
+function boolean isOpenObj(string ObjCode)
+begin
+	boolean res;
+	record ObjVc Objr;
+	
+	res = false;
+	Objr.Code = ObjCode;
+	if (readfirstmain(Objr,1,true)) then begin
+    if (Objr.TerminateFlag==0) then begin
+			res = true;
+		end;
+	end;
+	isOpenObj = res;
+	return;
+end;
+
+global
 function boolean isProject(string PrjCode)
 begin
 	record PRVc PRr;
@@ -178,7 +195,7 @@ BEGIN
 	row TRVc TRrw;
 	integer i,k,j,mtrw,PAi,ASi,EAi;
 	boolean TrHs,testf,kTestf;
-	string 20 group,extras,suppl,prj;
+	string 20 group,extras,suppl,prj,found;
   vector boolean SupplInArr,ExtInArr;
 	
 	ASi = 0;
@@ -233,15 +250,16 @@ BEGIN
             end;
             ReadFirstMain(ITr,1,true);
             group = ITr.Code;
-            // проверка закрыт ли объект
-            QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & ProjArray[PAi]] = QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & ProjArray[PAi]] + TBBUrw.Sum;
-            QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & "T"] = QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & "T"] + TBBUrw.Sum;
-            QuartVect[k & "T;" & ProjArray[PAi]] = QuartVect[k & "T;" & ProjArray[PAi]] + TBBUrw.Sum;
-            QuartVect[k & "T;T"] = QuartVect[k & "T;T"] + TBBUrw.Sum;
-            QuartVect[k & group & ";" & ProjArray[PAi]] = QuartVect[k & group & ";" & ProjArray[PAi]] + TBBUrw.Sum;
-            QuartVect[k & group & ";T"] = QuartVect[k & group & ";T"] + TBBUrw.Sum;
-            QuartVect[TBBUrw.ArtCode & ";" & ProjArray[PAi]] = QuartVect[TBBUrw.ArtCode & ";" & ProjArray[PAi]] + TBBUrw.Sum;
-            QuartVect[TBBUrw.ArtCode & ";T"] = QuartVect[TBBUrw.ArtCode & ";T"] + TBBUrw.Sum;
+            if isOpenObj(TBBUrw.ExtraObj) then begin
+              QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & ProjArray[PAi]] = QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & ProjArray[PAi]] + TBBUrw.Sum;
+              QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & "T"] = QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & "T"] + TBBUrw.Sum;
+              QuartVect[k & "T;" & ProjArray[PAi]] = QuartVect[k & "T;" & ProjArray[PAi]] + TBBUrw.Sum;
+              QuartVect[k & "T;T"] = QuartVect[k & "T;T"] + TBBUrw.Sum;
+              QuartVect[k & group & ";" & ProjArray[PAi]] = QuartVect[k & group & ";" & ProjArray[PAi]] + TBBUrw.Sum;
+              QuartVect[k & group & ";T"] = QuartVect[k & group & ";T"] + TBBUrw.Sum;
+              QuartVect[TBBUrw.ArtCode & ";" & ProjArray[PAi]] = QuartVect[TBBUrw.ArtCode & ";" & ProjArray[PAi]] + TBBUrw.Sum;
+              QuartVect[TBBUrw.ArtCode & ";T"] = QuartVect[TBBUrw.ArtCode & ";T"] + TBBUrw.Sum;
+            end;
           end;
         end; 
       end;
@@ -298,14 +316,16 @@ BEGIN
               end;
               ReadFirstMain(ITr,1,true);
               group = ITr.Code;
-              QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & PR2r.MotherCode] = QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & PR2r.MotherCode] + TBBUrw.Sum;
-              QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & "T"] = QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & "T"] + TBBUrw.Sum;
-              QuartVect[k & "T;" & PR2r.MotherCode] = QuartVect[k & "T;" & PR2r.MotherCode] + TBBUrw.Sum;
-              QuartVect[k & "T;T"] = QuartVect[k & "T;T"] + TBBUrw.Sum;
-              QuartVect[k & group & ";" & PR2r.MotherCode] = QuartVect[k & group & ";" & PR2r.MotherCode] + TBBUrw.Sum;
-              QuartVect[k & group & ";T"] = QuartVect[k & group & ";T"] + TBBUrw.Sum;
-              QuartVect[TBBUrw.ArtCode & ";" & TBBUrw.VECode & PR2r.MotherCode] = QuartVect[TBBUrw.ArtCode & ";" & TBBUrw.VECode & PR2r.MotherCode] + TBBUrw.Sum;
-              QuartVect[TBBUrw.ArtCode & ";" & TBBUrw.VECode & "T"] = QuartVect[TBBUrw.ArtCode & ";" & TBBUrw.VECode & "T"] + TBBUrw.Sum;
+              if isOpenObj(TBBUrw.ExtraObj) then begin
+                QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & PR2r.MotherCode] = QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & PR2r.MotherCode] + TBBUrw.Sum;
+                QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & "T"] = QuartVect[k & TBBUrw.ArtCode & ";" & TBBUrw.VECode & "T"] + TBBUrw.Sum;
+                QuartVect[k & "T;" & PR2r.MotherCode] = QuartVect[k & "T;" & PR2r.MotherCode] + TBBUrw.Sum;
+                QuartVect[k & "T;T"] = QuartVect[k & "T;T"] + TBBUrw.Sum;
+                QuartVect[k & group & ";" & PR2r.MotherCode] = QuartVect[k & group & ";" & PR2r.MotherCode] + TBBUrw.Sum;
+                QuartVect[k & group & ";T"] = QuartVect[k & group & ";T"] + TBBUrw.Sum;
+                QuartVect[TBBUrw.ArtCode & ";" & TBBUrw.VECode & PR2r.MotherCode] = QuartVect[TBBUrw.ArtCode & ";" & TBBUrw.VECode & PR2r.MotherCode] + TBBUrw.Sum;
+                QuartVect[TBBUrw.ArtCode & ";" & TBBUrw.VECode & "T"] = QuartVect[TBBUrw.ArtCode & ";" & TBBUrw.VECode & "T"] + TBBUrw.Sum;
+              end;
 						end;
 					end; 
 				end;
@@ -361,21 +381,25 @@ BEGIN
                   if (RepSpec.flags[5]==0) then begin
                     GetObjs("SUPPL",TRrw.Objects,suppl);
                   end;
+                  found = "";
+                  GetObjs("FOUND",TRrw.Objects,found);
                   if nonblank(suppl) and !SupplInArr[suppl] then begin
                     SupplInArr[suppl] = true;
                     ArtSuppl[ASi] = suppl;
                     ASi = ASi + 1;
                   end;
-                  QuartVect[k & "Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & prj] = QuartVect[k & "Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & prj] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[k & "Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & "T"] = QuartVect[k & "Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & "T"] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[k & "FactT;" & prj] = QuartVect[k & "FactT;" & prj] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[k & "FactT;T"] = QuartVect[k & "FactT;T"] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[k & "Fact" & group & ";" & prj] = QuartVect[k & "Fact" & group & ";" & prj] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[k & "Fact" & group & ";T"] = QuartVect[k & "Fact" & group & ";T"] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect["Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & prj] = QuartVect["Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & prj] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect["Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & "T"] = QuartVect["Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & "T"] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect["FactT;T"] = QuartVect["FactT;T"] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect["Fact" & group & ";T"] = QuartVect["Fact" & group & ";T"] - TRrw.CredVal + TRrw.DebVal;
+                  if isOpenObj(found) then begin
+                    QuartVect[k & "Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & prj] = QuartVect[k & "Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & prj] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & "T"] = QuartVect[k & "Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & "T"] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "FactT;" & prj] = QuartVect[k & "FactT;" & prj] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "FactT;T"] = QuartVect[k & "FactT;T"] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "Fact" & group & ";" & prj] = QuartVect[k & "Fact" & group & ";" & prj] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "Fact" & group & ";T"] = QuartVect[k & "Fact" & group & ";T"] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect["Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & prj] = QuartVect["Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & prj] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect["Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & "T"] = QuartVect["Fact" & ArtArrayWithoutGroups[j] & ";" & suppl & "T"] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect["FactT;T"] = QuartVect["FactT;T"] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect["Fact" & group & ";T"] = QuartVect["Fact" & group & ";T"] - TRrw.CredVal + TRrw.DebVal;
+                  end;
                 end;
               end;
             end;
@@ -390,7 +414,7 @@ BEGIN
 END;
 
 global
-procedure BudgetsObjectsRn(record RcVc RepSpec)
+procedure BudgetsObjectsRn(record RcVc RepSpec, var string fnserv)
 BEGIN
 	record BaseCurBlock BCb;
 	record ITVc ITr;
@@ -439,10 +463,10 @@ BEGIN
     end;
     reportName = "BudgetsObjectsRn";
     if(windowsmode==1)then begin
-      fileToSave = RepSpec.FirstVer & ".xlsx";
-    end else begin
-      fileToSave = "/" & RepSpec.FirstVer & ".xlsx";
-    end;
+      fileToSave = "tmpxlsx.xlsx";
+		end else begin
+			fileToSave = "/tmpxlsx.xlsx";
+		end;
     deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
     BlockLoad(BCb);
     
@@ -912,27 +936,8 @@ BEGIN
     end;
     FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
 		ConvertToXLSX(fileToSave);
-  
-  
-  
-  
-  
+    MilliSleep(2000);
+    fnserv = fileToSave;
   end;
-	RETURN;
-END;
-global
-procedure BudgetsObjectsArea(LongInt tick,var area areatofile)
-BEGIN
-	string 255 fileToSave;
-
-	if(windowsmode==1)then begin
-		fileToSave = tick & ".xlsx";
-	end else begin
-		fileToSave = "/" & tick & ".xlsx";
-	end;
-	MilliSleep(2000);
-	addfiletoarea(fileToSave,areatofile,false);
-	logtext(0,"BudgetsObjectsRn FILE " & fileToSave & " SENT TO CLIENT");
-	delete_file(fileToSave);
 	RETURN;
 END;

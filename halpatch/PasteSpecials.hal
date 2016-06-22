@@ -136,6 +136,9 @@ external procedure OffHireVc_DelAddrSClass(Integer,Integer);
 external procedure SVOVc_DelAddrSClass(Integer,Integer);
 external procedure CustRouteVc_DelAddrSClass(Integer,Integer);
 external procedure CourtesyTitlesSClassArrayOnOpen(var Array string,var Integer);
+external function string 255 StringFromSysList(Integer,Integer);
+external procedure WindowFieldGotoForTouchScreen(Integer,Integer,string,Boolean);
+external procedure PasteFromWn(Integer,string);
 
 global
 Function Boolean OcupResSClassOnOpenWindow(Integer wn)
@@ -1249,5 +1252,54 @@ begin
     SetListString(wn,len(astr[i]),astr[i],false);    
   end;
   CourtesyTitlesSClassOnOpenWindow = false;
+  return;
+end;
+
+
+global
+function Boolean NSCUSClassOnOpenWindow(Integer wn)
+begin
+  string 100 tstr;
+  Integer acnt,i,j,cnt;
+  record NSCUBlock NSCUBb;
+  row NSCUBlock NSCUBrw;
+  
+  BlockLoad(NSCUBb);
+  acnt = MatRowCnt(NSCUBb);
+  for (i=0;i<acnt;i=i+1) begin
+    MatRowGet(NSCUBb,i,NSCUBrw);
+    tstr = NSCUBrw.LastNo;
+    tstr = tstr & chr(9) & chr(9);
+    tstr = tstr & NSCUBrw.Name;
+    SetListString(wn,len(tstr),tstr,false);
+  end;      
+  NSCUSClassOnOpenWindow = false;
+  return;
+end;
+
+global
+function Boolean NSCUSClassOnOKWindow(Integer wn)
+begin
+  Integer line,mwn,rwcnt,i;
+  string 255 tstr,serial,name;
+  record NSCUBlock NSCUBb;
+  row NSCUBlock NSCUBrw;
+  longint pos;
+  
+  BlockLoad(NSCUBb);
+  mwn = MotherWindow(wn);
+  tstr = StringFromSysList(wn,200);
+  GetNextSubstring(tstr,pos,chr(9),serial);
+  name = right(tstr,len(tstr) - (len(serial) + 2));
+  rwcnt = MatRowCnt(NSCUBb);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(NSCUBb,i,NSCUBrw);
+    if NSCUBrw.Name==name then begin
+      serial = NSCUBrw.Prefix & (NSCUBrw.LastNo + 1);
+      i = rwcnt;
+    end;
+  end;
+  PasteFromWn(wn,serial);
+  NSCUSClassOnOKWindow = true;
   return;
 end;

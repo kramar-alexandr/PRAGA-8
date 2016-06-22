@@ -13,6 +13,7 @@ external procedure MergeCells(integer,string,array string,integer);
 external procedure FillSharedStrings(string,array string,integer,integer,array string);
 external procedure ConvertToXLSX(string);
 external function string 10 GetStringCellNum(integer,integer);
+external function string 4 QuartalIntToStr(integer);
 
 procedure ArraysCollect(record RcVc RepSpec, var array string FoundArray, var array string ProjArray, var vector string ProjNamesVect, var vector string FoundNamesVect, var vector boolean isMotherProjVect)
 BEGIN
@@ -104,42 +105,18 @@ BEGIN
 						end;
 						if ((RepSpec.flags[1] == 1) and ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4))) then begin
 							kTestf = true;
+              k = 1;
 						end;
 						if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
               if (RepSpec.f2=="2016" and right(TBBUrw.ArtCode,3)=="_16") or (RepSpec.f2!="2016" and right(TBBUrw.ArtCode,3)!="_16") then begin
                 for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin 
                   if (TBBUrw.ExtraObj==FoundArray[FAi]) then begin
-                    switch (k) begin
-                      case 1:
-                        FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-                        FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-                        FPVect["Q1:TOTAL:" & ProjArray[PAi]] = FPVect["Q1:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-                        FPVect["Q1:TOTAL:TOTAL"] = FPVect["Q1:TOTAL:TOTAL"] + TBBUrw.Sum;
-                      case 2:
-                        FPVect["Q2:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q2:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-                        FPVect["Q2:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q2:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-                        FPVect["Q2:TOTAL:" & ProjArray[PAi]] = FPVect["Q2:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-                        FPVect["Q2:TOTAL:TOTAL"] = FPVect["Q2:TOTAL:TOTAL"] + TBBUrw.Sum;
-                      case 3:
-                        FPVect["Q3:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q3:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-                        FPVect["Q3:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q3:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-                        FPVect["Q3:TOTAL:" & ProjArray[PAi]] = FPVect["Q3:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-                        FPVect["Q3:TOTAL:TOTAL"] = FPVect["Q3:TOTAL:TOTAL"] + TBBUrw.Sum;
-                      case 4:
-                        FPVect["Q4:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q4:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-                        FPVect["Q4:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q4:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-                        FPVect["Q4:TOTAL:" & ProjArray[PAi]] = FPVect["Q4:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-                        FPVect["Q4:TOTAL:TOTAL"] = FPVect["Q4:TOTAL:TOTAL"] + TBBUrw.Sum;
-                      otherwise
-                        FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
-                        FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-                        FPVect["Q1:TOTAL:" & ProjArray[PAi]] = FPVect["Q1:TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-                        FPVect["Q1:TOTAL:TOTAL"] = FPVect["Q1:TOTAL:TOTAL"] + TBBUrw.Sum;
-                    end;
+                    FPVect[k & ":" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[k & ":" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+                    FPVect[k & ":" & FoundArray[FAi] & ":TOTAL"] = FPVect[k & ":" & FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
+                    FPVect[k & ":TOTAL:" & ProjArray[PAi]] = FPVect[k & ":TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
+                    FPVect[k & ":TOTAL:TOTAL"] = FPVect[k & ":TOTAL:TOTAL"] + TBBUrw.Sum;
                     FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
                     FPVect["TOTAL:" & ProjArray[PAi]] = FPVect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
-                    FPVect[FoundArray[FAi] & ":TOTAL"] = FPVect[FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
-                    FPVect["TOTAL:TOTAL"] = FPVect["TOTAL:TOTAL"] + TBBUrw.Sum;
                   end;
                 end;
               end;
@@ -149,44 +126,20 @@ BEGIN
 			end;
 		end;
 	end;
-	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
-		for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin 
-			FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q1:" & FoundArray[FAi] & ":" & ProjArray[PAi]]/1000;
-			FPVect["Q2:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q2:" & FoundArray[FAi] & ":" & ProjArray[PAi]]/1000;
-			FPVect["Q3:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q3:" & FoundArray[FAi] & ":" & ProjArray[PAi]]/1000;
-			FPVect["Q4:" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect["Q4:" & FoundArray[FAi] & ":" & ProjArray[PAi]]/1000;
-			FPVect[		   FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[		FoundArray[FAi] & ":" & ProjArray[PAi]]/1000;
-		end;
-		FPVect["Q1:TOTAL:" & ProjArray[PAi]] = FPVect["Q1:TOTAL:" & ProjArray[PAi]]/1000;
-		FPVect["Q2:TOTAL:" & ProjArray[PAi]] = FPVect["Q2:TOTAL:" & ProjArray[PAi]]/1000;
-		FPVect["Q3:TOTAL:" & ProjArray[PAi]] = FPVect["Q3:TOTAL:" & ProjArray[PAi]]/1000;
-		FPVect["Q4:TOTAL:" & ProjArray[PAi]] = FPVect["Q4:TOTAL:" & ProjArray[PAi]]/1000;
-		FPVect[   "TOTAL:" & ProjArray[PAi]] = FPVect[   "TOTAL:" & ProjArray[PAi]]/1000;
-	end;
-	for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin 
-		FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q1:" & FoundArray[FAi] & ":TOTAL"]/1000;
-		FPVect["Q2:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q2:" & FoundArray[FAi] & ":TOTAL"]/1000;
-		FPVect["Q3:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q3:" & FoundArray[FAi] & ":TOTAL"]/1000;
-		FPVect["Q4:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Q4:" & FoundArray[FAi] & ":TOTAL"]/1000;
-		FPVect[		   FoundArray[FAi] & ":TOTAL"] = FPVect[		FoundArray[FAi] & ":TOTAL"]/1000;
-	end;
-	FPVect["Q1:TOTAL:TOTAL"] = FPVect["Q1:TOTAL:TOTAL"]/1000;
-	FPVect["Q2:TOTAL:TOTAL"] = FPVect["Q2:TOTAL:TOTAL"]/1000;
-	FPVect["Q3:TOTAL:TOTAL"] = FPVect["Q3:TOTAL:TOTAL"]/1000;
-	FPVect["Q4:TOTAL:TOTAL"] = FPVect["Q4:TOTAL:TOTAL"]/1000;
-	FPVect[   "TOTAL:TOTAL"] = FPVect[	 "TOTAL:TOTAL"]/1000;
 	RETURN;
 END;
 
 global
-procedure BudTotFoundRn(record RcVc RepSpec,var area areatofile)
+procedure BudTotFoundRn(record RcVc RepSpec, var string fnserv)
 BEGIN
 	record BaseCurBlock BCb;
 	array string 255 FoundArray,ProjArray;
 	vector string 255 ProjNamesVect,FoundNamesVect;
 	vector boolean isMotherProjVect;
-	integer i,j,k;
+	integer i,j,k,Qi;
 	vector val FPVect;
+  array integer quartToPrint;
+  val value,tot;
 	
 	array string 10 sheetNames;
 	array val sheetColls;
@@ -222,6 +175,22 @@ BEGIN
 	sheetnum = 1;
 	qtyMergeCell = 0;
 	quartCount = RepSpec.flags[1] + RepSpec.flags[2] + RepSpec.flags[3] + RepSpec.flags[4];
+  if (RepSpec.flags[4]==1) then begin
+    i = 4;
+  end;
+  if (RepSpec.flags[3]==1) then begin
+    i = 3;
+  end;
+  if (RepSpec.flags[2]==1) then begin
+    i = 2;
+  end;
+  if (RepSpec.flags[1]==1) then begin
+    i = 1;
+  end;
+  quartToPrint[0] = i;
+  for (i=1;i<quartCount;i=i+1) begin
+    quartToPrint[i] = quartToPrint[0] + i;
+  end;
 	sheetColls[colnum] = 1.85546875;
 	colnum = colnum + 1;
 	sheetColls[colnum] = 10;
@@ -473,30 +442,33 @@ BEGIN
 						style5 = 77;
 					end;
 				end;
-				for (i=0;i<ProjArray.length;i=i+1) begin
+				tot = 0;
+        for (i=0;i<ProjArray.length;i=i+1) begin
+          value = FPVect[FoundArray[j] & ":" & ProjArray[i]]/1000;
+          tot = tot + value;
 					if (i == 0) then begin
 						style = style1;
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":" & ProjArray[i]]);
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 					end else begin
 						if (i == (ProjArray.length - 1)) then begin
 							if (mod((i + 1),(quartCount + 1)) == 0) and (((FoundArray.length + 1)*(quartCount + 2) - 1) >= colnum) then begin
 								style = style3;
 								mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":" & ProjArray[i]]);
-								style = style5;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
+                style = style5;
 								qtyOfEmpStr = 1;
 								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 								mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
 								qtyMergeCell = qtyMergeCell + 1;
 							end else begin
 								style = style2;
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":" & ProjArray[i]]);
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 							end;
 						end else begin
 							if (mod((i + 1),(quartCount + 1)) == 0) and (((FoundArray.length + 1)*(quartCount + 2) - 1) >= colnum) then begin
 								style = style3;
 								mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":" & ProjArray[i]]);
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 								style = style4;
 								qtyOfEmpStr = 1;
 								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -504,7 +476,7 @@ BEGIN
 								qtyMergeCell = qtyMergeCell + 1;
 							end else begin
 								style = style2;
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":" & ProjArray[i]]);
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 							end;
 						end;
 					end;
@@ -518,7 +490,7 @@ BEGIN
 						style = 39;
 					end;
 				end;
-				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":TOTAL"]);
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,tot);
 			EndRow(sheetnum,fileToSave,rownum);
 		end;
 		BeginRow(sheetnum,fileToSave,rownum,0,10);
@@ -533,16 +505,19 @@ BEGIN
 			style = 7;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			colnum = colnum + 1;
-			for (i=0;i<ProjArray.length;i=i+1) begin
-				if (i == 0) then begin
+			tot = 0;
+      for (i=0;i<ProjArray.length;i=i+1) begin
+				value = FPVect["TOTAL:" & ProjArray[i]]/1000;
+        tot = tot + value;
+        if (i == 0) then begin
 					style = style1;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]);
+          NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 				end else begin
 					if (i == (ProjArray.length - 1)) then begin
 						if (mod((i + 1),(quartCount + 1)) == 0) and (((FoundArray.length + 1)*(quartCount + 2) - 1) >= colnum) then begin
 							style = style3;
 							mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]);
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 							style = style5;
 							qtyOfEmpStr = 1;
 							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -550,13 +525,13 @@ BEGIN
 							qtyMergeCell = qtyMergeCell + 1;
 						end else begin
 							style = style2;
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]);
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 						end;
 					end else begin
 						if (mod((i + 1),(quartCount + 1)) == 0) and (((FoundArray.length + 1)*(quartCount + 2) - 1) >= colnum) then begin
 							style = style3;
 							mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]);
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 							style = style4;
 							qtyOfEmpStr = 1;
 							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -564,13 +539,13 @@ BEGIN
 							qtyMergeCell = qtyMergeCell + 1;
 						end else begin
 							style = style2;
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]);
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 						end;
 					end;
 				end;
 			end;
 			style = 41;
-			NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:TOTAL"]);
+			NumericCell(sheetnum,fileToSave,colnum,rownum,style,tot);
 		EndRow(sheetnum,fileToSave,rownum);
 		BeginRow(sheetnum,fileToSave,rownum,0,10);
 		EndRow(sheetnum,fileToSave,rownum);
@@ -580,15 +555,16 @@ BEGIN
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Tot %",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			colnum = colnum + 1;
 			for (i=0;i<ProjArray.length;i=i+1) begin
+        value = FPVect["TOTAL:" & ProjArray[i]]/tot*100000;
 				if (i == 0) then begin
 					style = style1;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]/FPVect["TOTAL:TOTAL"]*100);
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 				end else begin
 					if (i == (ProjArray.length - 1)) then begin
 						if (mod((i + 1),(quartCount + 1)) == 0) and (((FoundArray.length + 1)*(quartCount + 2) - 1) >= colnum) then begin
 							style = style3;
 							mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]/FPVect["TOTAL:TOTAL"]*100);
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 							style = style5;
 							qtyOfEmpStr = 1;
 							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -596,13 +572,13 @@ BEGIN
 							qtyMergeCell = qtyMergeCell + 1;
 						end else begin
 							style = style2;
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]/FPVect["TOTAL:TOTAL"]*100);
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 						end;
 					end else begin
 						if (mod((i + 1),(quartCount + 1)) == 0) and (((FoundArray.length + 1)*(quartCount + 2) - 1) >= colnum) then begin
 							style = style3;
 							mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]/FPVect["TOTAL:TOTAL"]*100);
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 							style = style4;
 							qtyOfEmpStr = 1;
 							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -610,7 +586,7 @@ BEGIN
 							qtyMergeCell = qtyMergeCell + 1;
 						end else begin
 							style = style2;
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]/FPVect["TOTAL:TOTAL"]*100);
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 						end;
 					end;
 				end;
@@ -697,70 +673,24 @@ BEGIN
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Projects",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			colnum = colnum + 1;
 			for (j=0;j<FoundArray.length;j=j+1) begin
-				switch quartCount begin
-					case 1:
-						style = 18;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 21;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					case 2:
-						style = 18;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 20;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 21;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					case 3:
-						style = 18;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 19;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 20;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIII",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 21;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					case 4:
-						style = 18;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 19;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 19;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIII",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 20;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIV",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-						style = 21;
-						StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				end;
+				style = 18;
+        for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
+          if (Qi!=0) and (Qi==quartCount - 1) then begin
+            style = 20;
+          end;
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,QuartalIntToStr(quartToPrint[Qi]),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          style = 19;
+        end;
+        style = 21;
+        StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				colnum = colnum + 1;
 			end;
-			switch quartCount begin
-				case 1:
-					style = 23;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 24;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Grand Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				case 2:
-					style = 23;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 24;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Grand Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				case 3:
-					style = 23;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIII",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 24;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Grand Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-				case 4:
-					style = 23;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QI",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QII",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIII",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"QIV",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 24;
-					StringCell(sheetnum,fileToSave,colnum,rownum,style,"Grand Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-			end;
+      style = 23;
+      for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
+        StringCell(sheetnum,fileToSave,colnum,rownum,style,QuartalIntToStr(quartToPrint[Qi]),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+      end;
+      style = 24;
+      StringCell(sheetnum,fileToSave,colnum,rownum,style,"Grand Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 		EndRow(sheetnum,fileToSave,rownum);
 		colnum = 2;
 		BeginRow(sheetnum,fileToSave,rownum,0,10);
@@ -795,98 +725,48 @@ BEGIN
 				colnum = colnum + 1;
 				for (j=0;j<FoundArray.length;j=j+1) begin
 					style = style1;
-					switch quartCount begin
-						case 1:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:" & FoundArray[j] & ":" & ProjArray[i]]);
-						case 2:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:" & FoundArray[j] & ":" & ProjArray[i]]);
-							style = style2;
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q2:" & FoundArray[j] & ":" & ProjArray[i]]);
-						case 3:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:" & FoundArray[j] & ":" & ProjArray[i]]);
-							style = style2;
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q2:" & FoundArray[j] & ":" & ProjArray[i]]);
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q3:" & FoundArray[j] & ":" & ProjArray[i]]);
-						case 4:
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:" & FoundArray[j] & ":" & ProjArray[i]]);
-							style = style2;
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q2:" & FoundArray[j] & ":" & ProjArray[i]]);
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q3:" & FoundArray[j] & ":" & ProjArray[i]]);
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q4:" & FoundArray[j] & ":" & ProjArray[i]]);
-					end;
-					style = style3;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":" & ProjArray[i]]);
+					for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[quartToPrint[Qi] & ":" & FoundArray[j] & ":" & ProjArray[i]]/1000);
+            style = style2;
+          end;
+          style = style3;
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":" & ProjArray[i]]/1000);
 					colnum = colnum + 1;
 				end;
 				style = style1;
-				switch quartCount begin
-					case 1:
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:TOTAL:" & ProjArray[i]]);
-					case 2:
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:TOTAL:" & ProjArray[i]]);
-						style = style2;
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q2:TOTAL:" & ProjArray[i]]);
-					case 3:
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:TOTAL:" & ProjArray[i]]);
-						style = style2;
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q2:TOTAL:" & ProjArray[i]]);
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q3:TOTAL:" & ProjArray[i]]);
-					case 4:
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:TOTAL:" & ProjArray[i]]);
-						style = style2;
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q2:TOTAL:" & ProjArray[i]]);
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q3:TOTAL:" & ProjArray[i]]);
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q4:TOTAL:" & ProjArray[i]]);
-				end;
-				style = style4;
-				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]);
+				for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
+          NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[quartToPrint[Qi] & ":TOTAL:" & ProjArray[i]]/1000)
+          style = style2;
+        end;
+        style = style4;
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:" & ProjArray[i]]/1000);
 			EndRow(sheetnum,fileToSave,rownum);
 		end;
 		BeginRow(sheetnum,fileToSave,rownum,0,10);
 		EndRow(sheetnum,fileToSave,rownum);
 		colnum = 4;
 		BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-			for (j=0;j<FoundArray.length;j=j+1) begin
+			tot = 0;
+      for (j=0;j<FoundArray.length;j=j+1) begin
 				style = 45;
-				switch quartCount begin
-					case 1:
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:" & FoundArray[j] & ":TOTAL"]);
-					case 2:
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:" & FoundArray[j] & ":TOTAL"]);
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q2:" & FoundArray[j] & ":TOTAL"]);
-					case 3:
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:" & FoundArray[j] & ":TOTAL"]);
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q2:" & FoundArray[j] & ":TOTAL"]);
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q3:" & FoundArray[j] & ":TOTAL"]);
-					case 4:
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:" & FoundArray[j] & ":TOTAL"]);
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q2:" & FoundArray[j] & ":TOTAL"]);
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q3:" & FoundArray[j] & ":TOTAL"]);
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q4:" & FoundArray[j] & ":TOTAL"]);
-				end;
-				style = 46;
-				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":TOTAL"]);
+				for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
+          value = FPVect[quartToPrint[Qi] & ":" & FoundArray[j] & ":TOTAL"]/1000;
+          tot = tot + value;
+          NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
+        end;
+        style = 46;
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,tot);
 				colnum = colnum + 1;
 			end;
 			style = 45;
-			switch quartCount begin
-				case 1:
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:TOTAL:TOTAL"]);
-				case 2:
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:TOTAL:TOTAL"]);
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q2:TOTAL:TOTAL"]);
-				case 3:
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:TOTAL:TOTAL"]);
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q2:TOTAL:TOTAL"]);
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q3:TOTAL:TOTAL"]);
-				case 4:
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q1:TOTAL:TOTAL"]);
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q2:TOTAL:TOTAL"]);
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q3:TOTAL:TOTAL"]);
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["Q4:TOTAL:TOTAL"]);
-			end;
-			style = 50;
-			NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:TOTAL"]);
+			tot = 0;
+      for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
+        value = FPVect[quartToPrint[Qi] & ":TOTAL:TOTAL"]/1000;
+        tot = tot + value;
+        NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
+      end;
+      style = 50;
+			NumericCell(sheetnum,fileToSave,colnum,rownum,style,tot);
 		EndRow(sheetnum,fileToSave,rownum);
 	EndSheetData(sheetnum,fileToSave);
 	MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
@@ -894,7 +774,7 @@ BEGIN
 	FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
 	ConvertToXLSX(fileToSave);
 	MilliSleep(2000);
-	addfiletoarea(fileToSave,areatofile,false);
-	delete_file(fileToSave);
-	RETURN;
+	fnserv = fileToSave;
+  
+  RETURN;
 END;

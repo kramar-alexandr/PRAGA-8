@@ -8,7 +8,7 @@ external procedure NoDupObjs(string,var string);
 external function LongInt TBBUVcRecordCheck(var record TBBUVc,record TBBUVc,LongInt,LongInt);
 external procedure TBBUDchrsum(var record TBBUVc,Integer,Boolean,Integer);
 external procedure TBBUSumup(var record TBBUVc);
-
+external function boolean isOpenObj(string);
 global
 procedure GetPayModeAccNumber(string paymode,var string res)
 BEGIN
@@ -2316,5 +2316,181 @@ begin
     Objr.Comment = "test " & Objr.Code;
     RECORDSTORE(Objr,true);
 	end;*/
+  return;
+end;
+
+global 
+updating procedure BOFindNAdd(string y, string prj, string item, string supp, string ext, integer k, val sum, boolean isFact)
+begin
+  record BOVc BOr;
+  record ITVc ITr;
+	
+  BOr.Year = GetYear(y);
+  BOr.Project = prj;
+  BOr.Item = item;
+  BOr.Supp = supp;
+  BOr.Extras = ext;
+  if !readfirstkey("YearProjectItemSuppExtras",BOr,4,true) then begin
+    RecordNew(BOr);
+    BOr.Year = GetYear(y);
+    BOr.Project = prj;
+    BOr.Item = item;
+    ITr.Code = item;
+    if ReadFirstMain(ITr,1,true) then begin
+      BOr.GroupFlag = 1;
+    end;
+    BOr.Supp = supp;
+    BOr.Extras = ext;
+  end;
+  if isFact then begin
+    switch (k) begin
+      case 1: BOr.Q1Fact = BOr.Q1Fact + sum;
+      case 2: BOr.Q2Fact = BOr.Q2Fact + sum;
+      case 3: BOr.Q3Fact = BOr.Q3Fact + sum;
+      case 4: BOr.Q4Fact = BOr.Q4Fact + sum;
+    end;
+  end else begin
+    switch (k) begin
+      case 1: BOr.Q1 = BOr.Q1 + sum;
+      case 2: BOr.Q2 = BOr.Q2 + sum;
+      case 3: BOr.Q3 = BOr.Q3 + sum;
+      case 4: BOr.Q4 = BOr.Q4 + sum;
+    end;
+  end;
+  RECORDSTORE(BOr,true);
+  return;
+end;
+
+global 
+updating procedure FillBOMn(record RcVc RepSpec)
+begin
+	record PRVc PRr,PR2r;
+	record TBBUVc TBBUr;
+	record ITVc ITr;
+  record INVc INr;
+	record TRVc TRr;
+	record MainVc Mainr;
+  record BOVc BOr;
+  row TBBUVc TBBUrw;
+	row TRVc TRrw;
+	integer i,k,j,mtrw,PAi;
+	boolean TrHs,testf,foundf;
+	string 20 item,group,extras,suppl,prj,found;
+  longint t;
+  
+  t = getcurtick;
+  if RepSpec.flags[1]==1 then begin
+    while (LoopMain(BOr,1,true)) begin
+      RecordDelete(BOr);
+      stepback(BOr);
+    end;
+  end else begin
+    while (LoopMain(PRr,1,true)) begin
+      TBBUr.PRCode = PRr.Code;
+      if (readfirstmain(TBBUr,1,true)) then begin
+        mtrw = matrowcnt(TBBUr);
+        k = 0;
+        for (i=0;i<mtrw;i=i+1) begin
+          matrowget(TBBUr,i,TBBUrw);
+          if(TBBUrw.stp==18) then begin
+            k = TBBUrw.ItemType;
+          end;
+          if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
+            k = 1;
+          end;
+          if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode)) then begin
+            INr.Objects = TBBUrw.ArtCode;
+            if ReadfirstKey("Objects",INr,1,true) then begin
+              ITr.Code = INr.Group;
+            end else begin
+              ITr.Code = TBBUrw.ArtCode;
+            end;
+            ReadFirstMain(ITr,1,true);
+            group = ITr.Code;
+            if isOpenObj(TBBUrw.ExtraObj) then begin
+              BOFindNAdd(PRr.StartDate,PRr.Code,TBBUrw.ArtCode,TBBUrw.VECode,"",k,TBBUrw.Sum,false);
+              BOFindNAdd(PRr.StartDate,PRr.Code,"","","",k,TBBUrw.Sum,false);
+              BOFindNAdd(PRr.StartDate,PRr.Code,group,"","",k,TBBUrw.Sum,false);
+              BOFindNAdd(PRr.StartDate,"",TBBUrw.ArtCode,TBBUrw.VECode,"",k,TBBUrw.Sum,false);
+              BOFindNAdd(PRr.StartDate,"",group,"","",k,TBBUrw.Sum,false);
+            end;
+          end;
+        end; 
+      end;
+    end;
+    PR2r.MotherCode = PRr.Code;
+    TrHs = true;
+    resetloop(PR2r);
+    while(loopkey("MotherCode",PR2r,1,TrHs)) begin
+      testf = true;
+      if(PR2r.MotherCode!=PRr.Code)then begin TrHs = false; testf = false; end;
+      if(testf)then begin
+        TBBUr.PRCode = PR2r.Code;
+        if (readfirstmain(TBBUr,1,true)) then begin
+          mtrw = matrowcnt(TBBUr);
+          k = 0;
+          for (i=0;i<mtrw;i=i+1) begin
+            matrowget(TBBUr,i,TBBUrw);
+            if(TBBUrw.stp==18) then begin
+              k = TBBUrw.ItemType;
+            end;
+            if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
+              k = 1;
+            end;
+            if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode)) then begin
+              INr.Objects = TBBUrw.ArtCode;
+              if ReadfirstKey("Objects",INr,1,true) then begin
+                ITr.Code = INr.Group;
+              end else begin
+                ITr.Code = TBBUrw.ArtCode;
+              end;
+              ReadFirstMain(ITr,1,true);
+              group = ITr.Code;
+              if isOpenObj(TBBUrw.ExtraObj) then begin
+                BOFindNAdd(PR2r.StartDate,PR2r.MotherCode,TBBUrw.ArtCode,TBBUrw.VECode,"",k,TBBUrw.Sum,false);
+                BOFindNAdd(PR2r.StartDate,"",TBBUrw.ArtCode,TBBUrw.VECode,"",k,TBBUrw.Sum,false);
+                BOFindNAdd(PR2r.StartDate,PR2r.MotherCode,"","","",k,TBBUrw.Sum,false);
+                BOFindNAdd(PR2r.StartDate,PR2r.MotherCode,group,"","",k,TBBUrw.Sum,false);
+                BOFindNAdd(PR2r.StartDate,"",group,"","",k,TBBUrw.Sum,false);
+              end;
+            end;
+          end; 
+        end;
+      end;
+    end;
+
+    while (loopmain(TRr,1,TrHs)) begin
+      k = 0;
+      k = GetQuartal(TRr.TransDate);
+      if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
+        k = 1;
+      end;
+      mtrw = matrowcnt(TRr);
+      for (i=0;i<mtrw;i=i+1) begin
+        matrowget(TRr,i,TRrw);
+        if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5")) then begin
+          GetObjs("PRJ",TRrw.Objects,prj);
+          GetObjs("EXP",TRrw.Objects,item);
+          GetObjs("SUPPL",TRrw.Objects,suppl);
+          GetObjs("FOUND",TRrw.Objects,found);
+          PRr.Objects = prj;
+          ReadFirstKey("Objects",PRr,1,true);
+          prj = PRr.Code;
+          INr.Objects = item;
+          ReadfirstKey("Objects",INr,1,true);
+          group = INr.Group;
+          if isOpenObj(found) then begin
+            BOFindNAdd(TRr.TransDate,prj,item,suppl,"",k,TRrw.DebVal - TRrw.CredVal,true);
+            BOFindNAdd(TRr.TransDate,"",item,suppl,"",k,TRrw.DebVal - TRrw.CredVal,true);
+            BOFindNAdd(TRr.TransDate,prj,"","","",k,TRrw.DebVal - TRrw.CredVal,true);
+            BOFindNAdd(TRr.TransDate,prj,group,"","",k,TRrw.DebVal - TRrw.CredVal,true);
+            BOFindNAdd(TRr.TransDate,"",group,"","",k,TRrw.DebVal - TRrw.CredVal,true);
+          end;
+        end;
+      end;
+    end;
+  end;
+  logtext(0,(getcurtick - t)/60000 & " minutes!!!!!!!!!!!!!!!!!!!");
+  
   return;
 end;

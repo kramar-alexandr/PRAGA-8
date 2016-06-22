@@ -1,0 +1,36 @@
+external function boolean OTCodeMatch(string,string);
+
+global
+function LongInt BOVcRecordDefaults(var record BOVc BOr,record BOVc BO2r,LongInt stat,LongInt long4)
+BEGIN
+  LongInt res;
+  record UserVc Userr;
+
+	BOr.SerNr = NextSerNr("BOVc",CurrentDate,-1,false,"");
+
+  BOVcRecordDefaults = res; 
+  RETURN;
+END;
+
+global updating
+function LongInt BOVcRecordCheck(var record BOVc BOr,record BOVc BO2r,LongInt stat,LongInt long4)
+BEGIN
+	LongInt res;
+  
+  res = 0;   
+  if BOr.SerNr==-1 then begin
+    BOr.SerNr = NextSerNr("BOVc",currentdate,-1,false,"");
+  end;
+  BOr.Total = BOr.Q1 + BOr.Q2 + BOr.Q3 + BOr.Q4;
+  BOr.TotalFact = BOr.Q1Fact + BOr.Q2Fact + BOr.Q3Fact + BOr.Q4Fact;
+  BOr.Overrun = BOr.TotalFact - BOr.Total;
+  if (BOr.Total != 0) then begin
+    BOr.proc = 100*(BOr.TotalFact - BOr.Total)/BOr.Total;
+  end else begin
+    BOr.proc = blankval;
+  end;
+  
+LBOVcRecordCheck:;
+	BOVcRecordCheck = res;
+	RETURN;
+END;
