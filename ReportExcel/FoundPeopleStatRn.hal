@@ -63,6 +63,12 @@ BEGIN
 	k = 0;
   while(loopmain(PRr,1,true)) begin
 		if ((GetYear(PRr.StartDate) & ""==RepSpec.f2) or (GetYear(PRr.EndDate) & ""==RepSpec.f2)) then begin
+      switch (PRr.Code) begin
+        case "2016.998":
+          if (RepSpec.flags[5]==0) then begin
+            goto L1;
+          end;
+      end;
 			ProjArray[k] = PRr.Code;
 			if blank(PRr.MotherCode) or (PRr.MotherCode=="") then begin
 				isMotherProjVect[ProjArray[k]] = true;
@@ -70,7 +76,7 @@ BEGIN
 				isMotherProjVect[ProjArray[k]] = false;
 			end;
 			k = k + 1;
-		end;
+L1:	end;
 	end;
   
 	if (k==0) then begin

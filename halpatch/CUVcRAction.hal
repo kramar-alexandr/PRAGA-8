@@ -28,26 +28,23 @@ external function Boolean IsVATCodeDefined(string);
 external function Boolean ValidateBrazilianVATNr(string,string,Integer);
 external procedure AutoMails_StoreAct(string,string,string,var Longint);
 
-function Boolean NSCUTest(string sernr,Date tdp,var Boolean gentrans)
+updating function Boolean FindRowInNSCUBlock(string sernr, var row NSCUBlock r, var string prefix, var string serial, integer inc)
 begin
-  Boolean res,prefixendf,foundf;
+  boolean res,prefixendf,foundf;
   record NSCUBlock NSCUBb;
-  row NSCUBlock NSCUBrw;
   Integer i,rwcnt;
-  string 5 prefix,ch;
-  string 20 serial;
+  string 5 ch;
   
-  gentrans = true;
   res = true;
   if blank(sernr) then begin
     res = false;
-    goto LNSCUTest;
+    goto L1;
   end;
   BlockLoad(NSCUBb);
   rwcnt = MatRowCnt(NSCUBb);
   if (rwcnt==0) then begin
     res = false;
-    goto LNSCUTest;
+    goto L1;
   end;
   for (i=0;i<len(sernr);i=i+1) begin
     ch = mid(sernr,i,1);
@@ -65,26 +62,45 @@ begin
       otherwise
         if prefixendf then begin
           res = false;
-          goto LNSCUTest;
+          goto L1;
         end;
         prefix = prefix & ch;
     end;
   end;
   for (i=0;i<rwcnt;i=i+1) begin
-    MatRowGet(NSCUBb,i,NSCUBrw);
-    if NSCUBrw.Prefix==prefix then begin
-      if NSCUBrw.LastNo!=(StringToInt(serial) - 1) then begin
-        res = false;
-        goto LNSCUTest;
-      end;
-      i = rwcnt;
-      foundf = true;
+    MatRowGet(NSCUBb,i,r);
+    if r.Prefix==prefix then begin
+      goto L1;
     end;
   end;
-  if !foundf then begin
+
+L1:;
+  if ((inc!=0) and res) then begin
+    r.LastNo = r.LastNo + inc;
+    MatRowPut(NSCUBb,i,r);
+    BlockStore(NSCUBb);
+  end;
+  FindRowInNSCUBlock = res;
+  return;
+end;
+
+updating function Boolean NSCUTest(string sernr)
+begin
+  Boolean res;
+  row NSCUBlock NSCUrw;
+  string 5 prefix;
+  string 20 serial;
+  
+  res = true;
+  if !FindRowInNSCUBlock(sernr,NSCUrw,prefix,serial,0) then begin
     res = false;
     goto LNSCUTest;
   end;
+  if NSCUrw.LastNo!=(StringToInt(serial) - 1) then begin
+    res = false;
+    goto LNSCUTest;
+  end;
+  
 LNSCUTest:;
   NSCUTest = res;
   return;
@@ -739,9 +755,12 @@ global
 updating function LongInt CUVcRecordRemove(var record CUVc CUr,record CUVc CU2r,LongInt long3,LongInt long4)
 BEGIN
   LongInt res;
+  row NSCUBlock NSCUrw;
+  string 10 prefix,serial;
   
   RemoveContactRelations(CUr);      
   RemoveNormalizedNumbers(CUr);
+  FindRowInNSCUBlock(CUr.Code,NSCUrw,prefix,serial,-1);
   CUVcRecordRemove = res; 
   RETURN;
 END;
@@ -820,7 +839,9 @@ BEGIN
   record SRBlock SRRec;
   string 255 lastcustr,curcustr;
   LongInt lastcunr,curcunr;
-
+  row NSCUBlock NSCUrw;
+  string 10 prefix,serial;
+  
   BlockLoad(SRRec);
   SplitAlphaDigit(SRRec.LastCustCode,lastcustr,lastcunr);
   SplitAlphaDigit(CUr.Code,curcustr,curcunr);
@@ -837,6 +858,7 @@ BEGIN
 //  RemoveNormalizedNumbers(CUr); // No need when saving...
   StoreNormalizedNumbers(CUr,CurrentCompany);
 //  CreateAutoMailAct(CUr);
+  FindRowInNSCUBlock(CUr.Code,NSCUrw,prefix,serial,1);
 
   CUVcRecordSaveAfter = res;
   RETURN;
@@ -846,7 +868,7 @@ global
 updating function LongInt CUVcRecordUpdateAfter(var record CUVc CUr,record CUVc CU2r,LongInt stat,LongInt long4)
 BEGIN
   LongInt res;
-
+  
   RemoveNormalizedNumbers(CUr);
   StoreNormalizedNumbers(CUr,CurrentCompany);
   CUVcRecordUpdateAfter = res;
@@ -1486,7 +1508,7 @@ begin
 end;
 
 global
-function LongInt CUVcRecordCheck(var record CUVc CUr,record CUVc CU2r,LongInt stat,LongInt long4)
+updating function LongInt CUVcRecordCheck(var record CUVc CUr,record CUVc CU2r,LongInt stat,LongInt long4)
 BEGIN
   LongInt res;
   string 255 tstr,gotofield,oldnr;
@@ -1506,6 +1528,7 @@ BEGIN
   record BankFileBlock bfr;
   record CUUserLabelBlock CUUerLb;
   record TaxTemplateVc TTr;
+  record ObjVc Objr;
 
   BlockLoad(bfr);
   BlockLoad(CUUerLb);
@@ -1513,14 +1536,15 @@ BEGIN
   BlockLoad(CSb);
   oldnr = CUr.Code;
   if (blank(CUr.Code)) then begin
-    if (GetNextCustNr(tstr)) then begin end;
-    CUr.Code = tstr;
-    lCUr.Code = CUr.Code;
-    if (ReadFirstMain(lCUr,1,true)) then begin
-      RecordCheckError(1547,CUr.Code,-1,"Code");      
+    //if (GetNextCustNr(tstr)) then begin end;
+    //CUr.Code = tstr;
+    //lCUr.Code = CUr.Code;
+    //if (ReadFirstMain(lCUr,1,true)) then begin
+    //  RecordCheckError(1547,CUr.Code,-1,"Code");      
+      RecordCheckError(1557,"",-1,"Code");
       res = -1; 
       goto LCUVcRecordCheck;
-    end;
+    //end;
   end;
   if (blank(CUr.Name)) then begin
     if (HasJewelleryInterface) then begin
@@ -1573,7 +1597,7 @@ BEGIN
         goto LCUVcRecordCheck;
       end;
     end;
-    if (NSCUTest(CUr.Code,CurrentDate,gentrans)==false) then begin
+    if (NSCUTest(CUr.Code)==false) then begin
       RecordCheckError(1557,"",-1,"Code");      
       res = -1; 
       goto LCUVcRecordCheck;
@@ -1986,6 +2010,27 @@ BEGIN
       end;
     end;   
   end;
+  if (CUr.VEType > 0) then begin
+    Objr.Code = CUr.Code;
+    if(ReadFirstMain(Objr,1,true)) then begin
+      if (Objr.OTCode!="SUPPL") then begin
+        RecordCheckError(31000,"",-1,"Code");      
+        res = -1;
+        goto LCUVcRecordCheck;
+      end else begin
+        Objr.Comment = CUr.Name;
+        Objr.OTCode = "SUPPL";
+        RecordStore(Objr,true);
+      end;
+    end else begin
+      RecordNew(OBjr);
+      Objr.Code = CUr.Code;
+      Objr.Comment = CUr.Name;
+      Objr.OTCode = "SUPPL";
+      RecordStore(Objr,true);
+    end;
+    CUr.VEObjects = Objr.Code;
+		end;
 LCUVcRecordCheck:;
   if (res!=0) then begin CUr.Code = oldnr; end;
   CUVcRecordCheck = res;

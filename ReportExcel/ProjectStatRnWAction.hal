@@ -103,6 +103,9 @@ begin
 			tstr = "Projects";
 		end;
 		tstr = tstr & "-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
+    if (RepSpec.flags[6]==1) then begin
+			tstr = tstr & "(all projects)";
+		end;
 		filename = SaveFileDialog(tstr,"","xlsx");
 		if ((filename!=tstr) and nonblank(filename)) then begin
 			ProjectStatRn(RepSpec,fnserv,PrjFoundf);

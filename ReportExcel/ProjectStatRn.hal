@@ -63,6 +63,12 @@ BEGIN
 	end;
 	k = 0;
 	while(loopmain(PRr,1,true)) begin
+		switch (PRr.Code) begin
+      case "2016.998":
+        if (RepSpec.flags[6]==0) then begin
+          goto L1;
+        end;
+    end;
 		if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) and ((nonblank(RepSpec.f1) and (RepSpec.f1 == PRr.Code)) or blank(RepSpec.f1)) then begin
 			ProjArray[k] = PRr.Code;
 			ProjNamesVect[PRr.Code] = PRr.Name;
@@ -83,7 +89,7 @@ BEGIN
 				isMotherProjVect[PRr.Code] = false;
 			end;
 		end;
-	end;
+L1:end;
 	if (k==0) then begin
 		PrjFoundf = false;
 	end;
@@ -116,6 +122,7 @@ BEGIN
   array string 20 prjobjs;
   vector boolean ExtInArr;
   array string 10 tempProjArray;
+  string 5 tstr;
 	
   EAi = 0;
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin 
@@ -175,17 +182,20 @@ BEGIN
                 QuartVect[k & ";" &                "T;" & PRr.MotherCode]                 = QuartVect[k & ";" &                "T;" & PRr.MotherCode]                 + TBBUrw.Sum;
               end;
               if (RepSpec.f2=="2016") then begin
-                if (ProjArray[PAi]=="2016.004") or (ProjArray[PAi]=="2016.007") then begin
-                  QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";sT1"] = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";sT1"] + TBBUrw.Sum;
-                  QuartVect[k & ";" & TBBUrw.ArtCode & ";sT1"]                      = QuartVect[k & ";" & TBBUrw.ArtCode & ";sT1"]                      + TBBUrw.Sum;
-                  QuartVect[k & ";" & group &         ";sT1"]                      = QuartVect[k & ";" & group &         ";sT1"]                      + TBBUrw.Sum;
-                  QuartVect[k & ";" &                "T;sT1"]                      = QuartVect[k & ";" &                "T;sT1"]                      + TBBUrw.Sum;
-                end else begin
-                  QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";sT2"] = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";sT2"] + TBBUrw.Sum;
-                  QuartVect[k & ";" & TBBUrw.ArtCode & ";sT2"]                      = QuartVect[k & ";" & TBBUrw.ArtCode & ";sT2"]                      + TBBUrw.Sum;
-                  QuartVect[k & ";" & group &         ";sT2"]                      = QuartVect[k & ";" & group &         ";sT2"]                      + TBBUrw.Sum;
-                  QuartVect[k & ";" &                "T;sT2"]                      = QuartVect[k & ";" &                "T;sT2"]                      + TBBUrw.Sum;
+                switch (ProjArray[PAi]) begin
+                  case "2016.004":
+                    tstr = "sT2";
+                  case "2016.007":
+                    tstr = "sT2";
+                  case "2016.998":
+                    tstr = "sT1";
+                  otherwise
+                    tstr = "sT3";
                 end;
+                QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";" & tstr] = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";" & tstr] + TBBUrw.Sum;
+                QuartVect[k & ";" & TBBUrw.ArtCode & ";" & tstr]                      = QuartVect[k & ";" & TBBUrw.ArtCode & ";" & tstr]                      + TBBUrw.Sum;
+                QuartVect[k & ";" & group &         ";" & tstr]                      = QuartVect[k & ";" & group &         ";" & tstr]                      + TBBUrw.Sum;
+                QuartVect[k & ";" &                "T;" & tstr]                      = QuartVect[k & ";" &                "T;" & tstr]                      + TBBUrw.Sum;
               end;
 						end;
 					end; 
@@ -241,17 +251,20 @@ BEGIN
                     QuartVect[k &                               "F;T;" & PRr.MotherCode]                = QuartVect[k &                               "F;T:" & PRr.MotherCode]                - TRrw.CredVal + TRrw.DebVal;
                   end;
                   if (RepSpec.f2=="2016") then begin
-                    if (ProjArray[PAi]=="2016.004") or (ProjArray[PAi]=="2016.007") then begin
-                      QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";sT1"] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";sT1"] - TRrw.CredVal + TRrw.DebVal;
-                      QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";sT1"]                     = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";sT1"]               - TRrw.CredVal + TRrw.DebVal;
-                      QuartVect[k & "F;" & group &                   ";sT1"]                     = QuartVect[k & "F;" & group &                   ";sT1"]               - TRrw.CredVal + TRrw.DebVal;
-                      QuartVect[k &                               "F;T;sT1"]                     = QuartVect[k &                               "F;T;sT1"]               - TRrw.CredVal + TRrw.DebVal;
-                    end else begin
-                      QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";sT2"] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";sT2"] - TRrw.CredVal + TRrw.DebVal;
-                      QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";sT2"]                     = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";sT2"]                     - TRrw.CredVal + TRrw.DebVal;
-                      QuartVect[k & "F;" & group &                   ";sT2"]                     = QuartVect[k & "F;" & group &                   ";sT2"]                     - TRrw.CredVal + TRrw.DebVal;
-                      QuartVect[k &                               "F;T;sT2"]                     = QuartVect[k &                               "F;T;sT2"]                     - TRrw.CredVal + TRrw.DebVal;
+                    switch (ProjArray[PAi]) begin
+                      case "2016.004":
+                        tstr = "sT2";
+                      case "2016.007":
+                        tstr = "sT2";
+                      case "2016.998":
+                        tstr = "sT1";
+                      otherwise
+                        tstr = "sT3";
                     end;
+                    QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";" & tstr] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";" & tstr] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & tstr]                     = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & tstr]                     - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "F;" & group &                   ";" & tstr]                     = QuartVect[k & "F;" & group &                   ";" & tstr]                     - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k &                               "F;T;" & tstr]                     = QuartVect[k &                               "F;T;" & tstr]                     - TRrw.CredVal + TRrw.DebVal;
                   end;
                 end;
 							end;
@@ -268,19 +281,34 @@ BEGIN
   end;
   if blank(RepSpec.f1) and (RepSpec.f2=="2016") then begin
     PAi = 0;
+    if (RepSpec.flags[6]==1) then begin
+      ProjArray[PAi] = "2016.998";
+      PAi = PAi + 1;
+      ProjArray[PAi] = "sT1";
+      PAi = PAi + 1;
+    end;
     ProjArray[PAi] = "2016.004";
     PAi = PAi + 1;
     ProjArray[PAi] = "2016.007";
     PAi = PAi + 1;
-    ProjArray[PAi] = "sT1";
+    ProjArray[PAi] = "sT2";
     PAi = PAi + 1;
     for (i=0;i<ProjArray2.length;i=i+1) begin
-      if (ProjArray2[i]!="2016.004") and (ProjArray2[i]!="2016.007") then begin
+      testf = true;
+      switch (ProjArray2[i]) begin
+        case "2016.004":
+          testf = false;
+        case "2016.007":
+          testf = false;
+        case "2016.998":
+          testf = false;
+      end;
+      if (testf) then begin
         ProjArray[PAi] = ProjArray2[i];
         PAi = PAi + 1;
       end;
     end;
-    ProjArray[PAi] = "sT2";
+    ProjArray[PAi] = "sT3";
   end;
 	RETURN;
 END;

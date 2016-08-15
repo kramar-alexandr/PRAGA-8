@@ -43,14 +43,18 @@ BEGIN
 	end;
 	k = 0;
 	while(loopmain(PRr,1,true)) begin
+    switch (PRr.Code) begin
+      case "2016.998":
+        goto L1;
+    end;
 		if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
-			if blank(PRr.MotherCode) then begin
+      if blank(PRr.MotherCode) then begin
 				ProjArray[k] = PRr.Code;
 				ProjNamesVect[ProjArray[k]] = PRr.Name;
 				k = k + 1;
 			end;
-		end;
-	end;
+    end;
+L1:end;
 	for (j=0;j<ProjArray.length-1;j=j+1) begin
 		for (i=0;i<ProjArray.length-1;i=i+1) begin
 			if (ProjArray[i] > ProjArray[i+1]) then begin

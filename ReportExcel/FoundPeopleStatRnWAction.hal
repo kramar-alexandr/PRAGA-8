@@ -9,7 +9,7 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2016";
-	RepSpec.flags[5] = 1;
+	//RepSpec.flags[5] = 1;
 	PutWindowRecord(wn,RepSpec);
 	
 	return;
@@ -22,7 +22,7 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2016";
-	RepSpec.flags[5] = 1;
+	//RepSpec.flags[5] = 1;
 	PutWindowRecord(wn,RepSpec);
 
 	return;
@@ -120,8 +120,8 @@ begin
 			tstr = tstr & "-" & RepSpec.ObjStr;
 		end;
 		tstr = tstr & "-Projects-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
-		if RepSpec.flags[5] != 1 then begin
-			tstr = tstr & " (all groups)";
+		if RepSpec.flags[5] != 0 then begin
+			tstr = tstr & " (all projects)";
 		end;
 		if RepSpec.flags[6] == 1 then begin
 			tstr = tstr & " (without vendors)";
