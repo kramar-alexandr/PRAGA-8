@@ -1,22 +1,27 @@
-remote procedure ProjectFactRn(record RcVc,var area,var boolean);
+remote procedure ProjectFactRn(record RcVc,var string,var string,var boolean);
+remote function boolean GetPartFileToArea(string,var area);
+remote procedure DeleteXLSXJunk(string);
+remote procedure BackupXLSX(string);
+remote procedure RecoverXLSX(string);
 
 global
 procedure RunProjectFactRn()
 begin
 	record ObjVc Objr;
 	record OTVc OTr;
-	string 250 filename,tstr,tstr2;
+	string 250 filename,tstr,tstr2,fnserv,md5strServ,md5strCli;
 	string 10 tmpDate;
-	area fileToSave;
+	area tmparea;
 	record RcVc RepSpec;
-	integer wn;
-	boolean PrjFoundf,testf;
+	integer wn,transCNT;
+	boolean PrjFoundf,testf,EOF,err;
 	
-	testf = true;
+	transCNT = 5;
 	wn = curwindow;
 	deselectwindow(wn,true);
 	getwindowrecord(wn,RepSpec);
 	PrjFoundf = true;
+  testf = true;
 	if (blank(RepSpec.f2)) then begin
 		MessageBox(0,"Input Year!");
 		testf = false;
@@ -106,14 +111,38 @@ begin
 		tstr = tstr & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
 		filename = SaveFileDialog(tstr,"","xlsx");
 		if ((filename!=tstr) and nonblank(filename)) then begin
-			ProjectFactRn(RepSpec,fileToSave,PrjFoundf);
+			ProjectFactRn(RepSpec,fnserv,md5strServ,PrjFoundf);
 			if (PrjFoundf) then begin
 				if(fileexists(filename))then begin
 					delete_file(filename);
 				end;
-				writeareatofile(fileToSave,filename,0);
-				CloseWindow(wn);
-				MessageBox(0,"Done!");
+				BackupXLSX(fnserv);
+        testf = true;
+        err = false;
+        while (testf) begin
+          while (!EOF) begin
+            EOF = GetPartFileToArea(fnserv,tmparea);
+            writeareatofile(tmparea,filename,1);
+          end;
+          md5strCli = GetFileMD5(filename);
+          if (md5strCli!=md5strServ) then begin
+            err = true;
+            RecoverXLSX(fnserv);
+            transCNT = transCNT - 1;
+            if (transCNT==0) then begin
+              testf = false;
+            end;
+          end else begin
+            testf = false;
+          end;
+        end;
+        DeleteXLSXJunk(fnserv);
+        CloseWindow(wn);
+        if (err) then begin 
+          Messagebox(0,"Communication problems! Try again later.");
+        end else begin
+          Messagebox(0,"Done!");
+        end;
 			end else begin
 				MessageBox(0,"Projects for specified period not found!");
 			end;

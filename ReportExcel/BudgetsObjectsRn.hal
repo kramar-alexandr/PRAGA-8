@@ -17,6 +17,7 @@ external function string 4 QuartalIntToStr(integer);
 external function string 255 StrReplace(string,string,string);
 external procedure ExtractObj(string,var Integer,var string);
 external procedure GetObjs(string,string,var string);
+external function string 50 TimeToString(time,string,boolean);
 
 global
 function integer GetQuartal(date tmpDate)
@@ -418,7 +419,7 @@ BEGIN
 END;
 
 global
-procedure BudgetsObjectsRn(record RcVc RepSpec, var string fnserv)
+procedure BudgetsObjectsRn(record RcVc RepSpec, var string fnserv, var string md5str)
 BEGIN
 	record BaseCurBlock BCb;
 	record ITVc ITr;
@@ -467,11 +468,10 @@ BEGIN
     end;
     reportName = "BudgetsObjectsRn";
     if(windowsmode==1)then begin
-      fileToSave = "tmpxlsx.xlsx";
+      fileToSave = DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
 		end else begin
-			fileToSave = "/tmpxlsx.xlsx";
+			fileToSave = "/" & DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
 		end;
-    deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
     BlockLoad(BCb);
     
     quartCount = RepSpec.flags[1] + RepSpec.flags[2] + RepSpec.flags[3] + RepSpec.flags[4];
@@ -896,7 +896,6 @@ BEGIN
                       style = 15;
                       NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[j] & "Fact" & ArtArrayWithGroups[i] & ";" & ArtSuppl[k] & PRCode]);
                     end;
-                    
                     style = 7;
                     NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalrowbud);
                     style = 16;
@@ -942,6 +941,7 @@ BEGIN
 		ConvertToXLSX(fileToSave);
     MilliSleep(2000);
     fnserv = fileToSave;
+    md5str = GetFileMD5(fnserv);
   end;
 	RETURN;
 END;

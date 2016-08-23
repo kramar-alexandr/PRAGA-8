@@ -40,8 +40,13 @@ external function string 20 FindWithHoldAcc(string,string);
 external function Boolean IsDigit(string);
 external function Boolean UserCanChangePendingRecord(Integer);
 external function Boolean HasObjects();
-remote procedure ExcelVIRn(record VIVc,var area);//Edit-------------------Vitalii 16:27 09.02.2016
-remote procedure AcceptDelVI(record VIVc,var area);//Edit-------------------Vitalii 15:56 16.02.2016
+remote procedure ExcelVIRn(record VIVc,var string,var string);//Edit-------------------Vitalii 16:27 09.02.2016
+remote procedure AcceptDelVI(record VIVc,var string,var string);//Edit-------------------Vitalii 15:56 16.02.2016
+remote function boolean GetPartFileToArea(string,var area);
+remote procedure DeleteXLSXJunk(string);
+remote procedure BackupXLSX(string);
+remote procedure RecoverXLSX(string);
+
 
 function Boolean VIDClassFrRateEFAfter(Integer wn,Boolean changedf)
 begin
@@ -1566,22 +1571,47 @@ global //Edit-------------------Vitalii 16:26 09.02.2016
 procedure ExcelVIDsm()
 BEGIN
   record VIVc VIr;
-  Integer wn;
-  string 255 filename,tstr;
-	area fileToSave;
+  Integer wn,transCNT;
+  string 255 filename,tstr,fnserv,md5strServ,md5strCli;
+	area tmparea;
+  boolean testf,EOF,err;
   
+  transCNT = 5;
   wn = CurWindow;
   GetWindowRecord(wn,VIr);
-  
   tstr = "Invoice No " & VIr.SerNr;
   filename = SaveFileDialog(tstr,"","xlsx");
   if ((filename!=tstr) and nonblank(filename)) then begin
-    ExcelVIRn(VIr,fileToSave);
+    ExcelVIRn(VIr,fnserv,md5strServ);
     if(fileexists(filename))then begin
       delete_file(filename);
     end;
-    writeareatofile(fileToSave,filename,0);
-    Messagebox(0,"Done!");
+    BackupXLSX(fnserv);
+    testf = true;
+    err = false;
+    while (testf) begin
+      while (!EOF) begin
+        EOF = GetPartFileToArea(fnserv,tmparea);
+        writeareatofile(tmparea,filename,1);
+      end;
+      md5strCli = GetFileMD5(filename);
+      if (md5strCli!=md5strServ) then begin
+        err = true;
+        RecoverXLSX(fnserv);
+        transCNT = transCNT - 1;
+        if (transCNT==0) then begin
+          testf = false;
+        end;
+      end else begin
+        testf = false;
+      end;
+    end;
+    DeleteXLSXJunk(fnserv);
+    if (err) then begin 
+      Messagebox(0,"Communication problems! Try again later.");
+    end else begin
+      Messagebox(0,"Done!");
+    end;
   end;
   
   RETURN;
@@ -1591,22 +1621,48 @@ global //Edit-------------------Vitalii 14:41 16.02.2016
 procedure AcceptDelVIDsm()
 BEGIN
   record VIVc VIr;
-  Integer wn;
-  string 255 filename,tstr;
-	area fileToSave;
+  Integer wn,transCNT;
+  string 255 filename,tstr,fnserv,md5strServ,md5strCli;
+	area tmparea;
+  boolean testf,EOF,err;
   
+  transCNT = 5;
   wn = CurWindow;
   GetWindowRecord(wn,VIr);
   
   tstr = "Report by Invoice No " & VIr.SerNr;
   filename = SaveFileDialog(tstr,"","xlsx");
   if ((filename!=tstr) and nonblank(filename)) then begin
-    AcceptDelVI(VIr,fileToSave);
+    AcceptDelVI(VIr,fnserv,md5strServ);
     if(fileexists(filename))then begin
       delete_file(filename);
     end;
-    writeareatofile(fileToSave,filename,0);
-    Messagebox(0,"Done!");
+    BackupXLSX(fnserv);
+    testf = true;
+    err = false;
+    while (testf) begin
+      while (!EOF) begin
+        EOF = GetPartFileToArea(fnserv,tmparea);
+        writeareatofile(tmparea,filename,1);
+      end;
+      md5strCli = GetFileMD5(filename);
+      if (md5strCli!=md5strServ) then begin
+        err = true;
+        RecoverXLSX(fnserv);
+        transCNT = transCNT - 1;
+        if (transCNT==0) then begin
+          testf = false;
+        end;
+      end else begin
+        testf = false;
+      end;
+    end;
+    DeleteXLSXJunk(fnserv);
+    if (err) then begin 
+      Messagebox(0,"Communication problems! Try again later.");
+    end else begin
+      Messagebox(0,"Done!");
+    end;
   end;
   
   RETURN;

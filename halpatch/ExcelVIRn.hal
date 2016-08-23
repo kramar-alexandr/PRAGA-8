@@ -17,6 +17,7 @@ external procedure FillSharedStrings(string,array string,integer,integer,array s
 external procedure ConvertToXLSX(string);
 external function string 10 GetStringCellNum(integer,integer);
 external function string 255 MonthName(Date);
+external function string 50 TimeToString(time,string,boolean);
 
 function string 255 MonthNameRus(Date d)
 begin
@@ -42,7 +43,7 @@ end;
 
 
 global
-procedure ExcelVIRn(record VIVc VIr,var area areatofile)
+procedure ExcelVIRn(record VIVc VIr,var string fnserv, var string md5str)
 BEGIN
 	integer i;
 	string 100 tstr;
@@ -85,12 +86,11 @@ BEGIN
   ReadFirstMain(CUr,1,true);
   
   reportName = "ExcelVIRn";
-  if (windowsmode==1) then begin
-    fileToSave = "tmpxlsx.xlsx";
+  if(windowsmode==1)then begin
+    fileToSave = DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
   end else begin
-    fileToSave = "/tmpxlsx.xlsx";
+    fileToSave = "/" & DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
   end;
-  deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
   qtyOfSheets = 1;
   sheetNames[0] = "Sheet1";
   
@@ -387,13 +387,13 @@ BEGIN
   FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
   ConvertToXLSX(fileToSave);
   MilliSleep(2000);
-  addfiletoarea(fileToSave,areatofile,false);
-  delete_file(fileToSave);
+  fnserv = fileToSave;
+  md5str = GetFileMD5(fnserv);
 	RETURN;
 END;
 
 global
-procedure AcceptDelVI(record VIVc VIr,var area areatofile)
+procedure AcceptDelVI(record VIVc VIr,var string fnserv, var string md5str)
 BEGIN
 	integer i,rwcnt;
 	string 255 tstr,tstr2;
@@ -438,12 +438,11 @@ BEGIN
   ReadFirstMain(CUr,1,true);
   
   reportName = "AcceptDelVI";
-  if (windowsmode==1) then begin
-    fileToSave = "tmpxlsx.xlsx";
+  if(windowsmode==1)then begin
+    fileToSave = DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
   end else begin
-    fileToSave = "/tmpxlsx.xlsx";
+    fileToSave = "/" & DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
   end;
-  deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
   qtyOfSheets = 1;
   sheetNames[0] = "Sheet1";
   
@@ -555,7 +554,11 @@ BEGIN
     EndRow(sheetnum,fileToSave,rownum);
     mas[maslen] = "<rPr><b/><sz val=" & Chr(34) & "11" & Chr(34) & "/><color theme=" & Chr(34) & "1" & Chr(34) & "/><rFont val=" & Chr(34) & "Times New Roman" & Chr(34) & "/><family val=" & Chr(34) & "1" & Chr(34) & "/><charset val=" & Chr(34) & "204" & Chr(34) & "/></rPr><t>";
     maslen = maslen + 1;
-    mas[maslen] = CUr.NameinDocument;
+    //if nonblank(CUr.NameinDocument) then begin
+      mas[maslen] = CUr.NameinDocument;
+    /*end else begin
+      mas[maslen] = "_";
+    end;*/
     maslen = maslen + 1;
     mas[maslen] = "</t></r><r><rPr><sz val=" & Chr(34) & "11" & Chr(34) & "/><color rgb=" & Chr(34) & "FF000000" & Chr(34) & "/><rFont val=" & Chr(34) & "Times New Roman" & Chr(34) & "/><family val=" & Chr(34) & "1" & Chr(34) & "/><charset val=" & Chr(34) & "204" & Chr(34) & "/></rPr><t xml:space=" & Chr(34) & "preserve" & Chr(34) & ">";
     maslen = maslen + 1;
@@ -721,7 +724,7 @@ BEGIN
   FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
   ConvertToXLSX(fileToSave);
   MilliSleep(2000);
-  addfiletoarea(fileToSave,areatofile,false);
-  delete_file(fileToSave);
+  fnserv = fileToSave;
+  md5str = GetFileMD5(fnserv);
 	RETURN;
 END;

@@ -17,6 +17,7 @@ external function string 255 StrReplace(string,string,string);
 external function integer GetQuartal(date);
 external procedure GetObjs(string,string,var string);
 external procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
+external function string 50 TimeToString(time,string,boolean);
 
 procedure ArraysCollect(record RcVc RepSpec, var array string ArtArrayWithoutGroups, var array string ProjArray, var array string ArtArrayWithGroups, var boolean PrjFoundf, var vector boolean isMotherProjVect)
 BEGIN
@@ -320,7 +321,7 @@ begin
 end;
 
 global
-procedure FoundPeopleStatRn(record RcVc RepSpec, var string fnserv, var boolean PrjFoundf)
+procedure FoundPeopleStatRn(record RcVc RepSpec, var string fnserv, var string md5str, var boolean PrjFoundf)
 BEGIN
 //RepSpec.f1 - Foundation
 	record BaseCurBlock BCb;
@@ -352,16 +353,11 @@ BEGIN
 	string 16 reportName;
   array string 225 mas;
 	
-  longint t;
   
-  logtext(0,"FoundPeopleStatRn BEGIN");
-  t = getcurtick;
   
   ArraysCollect(RepSpec,ArtArrayWithoutGroups,ProjArray,ArtArrayWithGroups,PrjFoundf,isMotherProjVect);
 	if (PrjFoundf) then begin
 		DataCollect(ArtArrayWithoutGroups,ExtArr,ArtSuppl,ProjArray,RepSpec,QuartVect);
-    logtext(0,"DataCollect end - " & getcurtick-t);
-    t = getcurtick;
     GetVectorTags(QuartVect,combarr);
     combcnt = combarr.length; 
     for (i=0;i<combcnt;i=i+1) begin
@@ -373,11 +369,10 @@ BEGIN
     
     reportName = "FoundPeopleStatRn";
 		if(windowsmode==1)then begin
-			fileToSave = "tmpxlsx.xlsx";
+			fileToSave = DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
 		end else begin
-			fileToSave = "/tmpxlsx.xlsx";
+			fileToSave = "/" & DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
 		end;
-		deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
 		BlockLoad(BCb);
 		quartCount = RepSpec.flags[1] + RepSpec.flags[2] + RepSpec.flags[3] + RepSpec.flags[4];
 		qtyOfSheets = quartCount;
@@ -453,7 +448,6 @@ BEGIN
 		XmlXlsxWorkBegin(fileToSave,reportName);
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,false);
     if quartCount>1 then begin
-      t = getcurtick;
       SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
       BeginSheetData(sheetnum,fileToSave);
         rownum = 1;
@@ -1003,13 +997,11 @@ BEGIN
       EndSheetData(sheetnum,fileToSave);
       MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
       EndSheet(sheetnum,fileToSave,0);
-      logtext(0,"sheet "& sheetnum & " end - " & getcurtick - t);
       qtyMergeCell = 0;
       sheetnum = sheetnum + 1;
     end;
     for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
       TSi = 0;
-      t = getcurtick;
       ClearVector(SupplInArr)
       SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
       BeginSheetData(sheetnum,fileToSave);
@@ -1523,16 +1515,15 @@ BEGIN
       EndSheetData(sheetnum,fileToSave);
       MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
       EndSheet(sheetnum,fileToSave,0);
-      logtext(0,"sheet "& sheetnum & " end - " & getcurtick - t);
       sheetnum = sheetnum + 1;
       qtyMergeCell = 0;
     end;
 
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
 		ConvertToXLSX(fileToSave);
-		
 		MilliSleep(2000);
 		fnserv = fileToSave;
+    md5str = GetFileMD5(fnserv);
 	end;
 	RETURN;
 END;

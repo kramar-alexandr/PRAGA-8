@@ -15,6 +15,7 @@ external procedure ConvertToXLSX(string);
 external function string 10 GetStringCellNum(integer,integer);
 external function integer GetQuartal(date);
 external function string 4 QuartalIntToStr(integer);
+external function string 50 TimeToString(time,string,boolean);
 
 procedure ArraysCollect(record RcVc RepSpec, var array string ArtArrayWithoutGroups, var array string ProjArray, var array string ArtArrayWithGroups, var boolean PrjFoundf, var vector boolean isMotherProjVect)
 BEGIN
@@ -160,7 +161,7 @@ BEGIN
 END;
 
 global
-procedure ProjFoundStatRn(record RcVc RepSpec, var string fnserv, var boolean PrjFoundf)
+procedure ProjFoundStatRn(record RcVc RepSpec, var string fnserv, var string md5str, var boolean PrjFoundf)
 BEGIN
 //RepSpec.f1 - Foundation
 //RepSpec.ObjStr - Location
@@ -195,11 +196,10 @@ BEGIN
 
 		reportName = "ProjFoundStatRn";
 		if(windowsmode==1)then begin
-			fileToSave = "tmpxlsx.xlsx";
+      fileToSave = DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
 		end else begin
-			fileToSave = "/tmpxlsx.xlsx";
+			fileToSave = "/" & DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
 		end;
-		deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
 		BlockLoad(BCb);
 		sheetNames[0] = RepSpec.f1;
 		if nonblank(RepSpec.ObjStr) then begin
@@ -647,6 +647,7 @@ BEGIN
 		
 		MilliSleep(2000);
 		fnserv = fileToSave;
+    md5str = GetFileMD5(fnserv);
 	end;
 	RETURN;
 END;

@@ -15,6 +15,7 @@ external procedure ConvertToXLSX(string);
 external function string 10 GetStringCellNum(integer,integer);
 external function integer GetQuartal(date);
 external function string 255 StrReplace(string,string,string);
+external function string 50 TimeToString(time,string,boolean);
 
 procedure ArraysCollect(record RcVc RepSpec, var array string ArtArrayWithoutGroups, var array string ProjArray, var vector string ProjNamesVect, var array string ArtArrayWithGroups, var boolean PrjFoundf, var vector boolean isMotherProjVect, var array string GroupArray, var vector integer ArtInGroup)
 BEGIN
@@ -215,7 +216,7 @@ BEGIN
 END;
 
 global
-procedure ProjectFactRn(record RcVc RepSpec,var area areatofile, var boolean PrjFoundf)
+procedure ProjectFactRn(record RcVc RepSpec, var string fnserv, var string md5str, var boolean PrjFoundf)
 BEGIN
 	record BaseCurBlock BCb;
 	record ITVc ITr;
@@ -246,12 +247,11 @@ BEGIN
 		DataCollect(ArtArrayWithoutGroups,ProjArray,RepSpec,Quart1Vect,Quart2Vect,Quart3Vect,Quart4Vect,TOTALVect);
 
 		reportName = "ProjectFactRn";
-		if (windowsmode==1) then begin
-			fileToSave = "tmpxlsx.xlsx";
+		if(windowsmode==1)then begin
+      fileToSave = DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
 		end else begin
-			fileToSave = "/tmpxlsx.xlsx";
+			fileToSave = "/" & DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
 		end;
-		deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
 		BlockLoad(BCb);
 		quartCount = RepSpec.flags[1] + RepSpec.flags[2] + RepSpec.flags[3] + RepSpec.flags[4];
 		if (RepSpec.flags[4] == 1) then begin
@@ -603,10 +603,9 @@ BEGIN
 		EndSheet(sheetnum,fileToSave,0);
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
 		ConvertToXLSX(fileToSave);
-		
 		MilliSleep(2000);
-		addfiletoarea(fileToSave,areatofile,false);
-		delete_file(fileToSave);
+		fnserv = fileToSave;
+    md5str = GetFileMD5(fnserv);
 	end;
 	RETURN;
 END;

@@ -15,6 +15,7 @@ external procedure ConvertToXLSX(string);
 external function string 10 GetStringCellNum(integer,integer);
 external function integer GetQuartal(date);
 external function string 4 QuartalIntToStr(integer);
+external function string 50 TimeToString(time,string,boolean);
 
 procedure ArraysCollect(record RcVc RepSpec, var array string ArtArrayWithoutGroups, var array string ProjArray, var array string ArtArrayWithGroups, var boolean PrjFoundf, var string AccStr)
 BEGIN
@@ -270,7 +271,7 @@ BEGIN
 END;
 
 global
-procedure ProjectFoundRn(record RcVc RepSpec, var string fnserv, var boolean PrjFoundf)
+procedure ProjectFoundRn(record RcVc RepSpec, var string fnserv, var string md5str, var boolean PrjFoundf)
 BEGIN
 //RepSpec.f1 - Foundation
 //RepSpec.ObjStr - Location
@@ -298,22 +299,16 @@ BEGIN
 	string 16 reportName;
 	array string 225 mas;
   
-  //longint t;
-  
-  //logtext(0,"ProjectFoundRn BEGIN");
-  //t = getcurtick;
   ArraysCollect(RepSpec,ArtArrayWithoutGroups,ProjArray,ArtArrayWithGroups,PrjFoundf,AccStr);
 	
 	if (PrjFoundf) then begin
 		DataCollect(ArtArrayWithoutGroups,ProjArray,RepSpec,QuartVect,AccStr);
-    //logtext(0,"DataCollect end - " & getcurtick-t);
-    //t = getcurtick;
     
 		reportName = "ProjectFoundRn";
 		if(windowsmode==1)then begin
-			fileToSave = "tmpxlsx.xlsx";
+      fileToSave = DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
 		end else begin
-			fileToSave = "/tmpxlsx.xlsx";
+			fileToSave = "/" & DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
 		end;
 		deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
 		BlockLoad(BCb);
@@ -356,8 +351,7 @@ BEGIN
 		
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
-    //logtext(0,"XmlXlsxWorkBegin begin - ");
-		XmlXlsxWorkBegin(fileToSave,reportName);
+    XmlXlsxWorkBegin(fileToSave,reportName);
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,false);
 		sheetnum = 0;
 		qtyMergeCell = 0;
@@ -384,8 +378,7 @@ BEGIN
 			colnum = colnum + 1;
 			sheetColls[colnum] = 7.28515625;
 			sheetnum = sheetnum + 1;
-      //t = getcurtick;
-			SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
+      SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 			BeginSheetData(sheetnum,fileToSave);
 			rownum = 1;
 			colnum = 1;
@@ -631,7 +624,6 @@ BEGIN
 			EndSheetData(sheetnum,fileToSave);
 			MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
 			EndSheet(sheetnum,fileToSave,0);
-      //logtext(0,"sheet "& sheetnum & " end - " & getcurtick - t);
 		end;
 		
 		colnum = 0;
@@ -660,7 +652,6 @@ BEGIN
 		for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
 			qtyMergeCell = 0;
 			sheetnum = sheetnum + 1;
-      //t = getcurtick;
 			SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 			BeginSheetData(sheetnum,fileToSave);
 			rownum = 1;
@@ -905,13 +896,13 @@ BEGIN
 			EndSheetData(sheetnum,fileToSave);
 			MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
 			EndSheet(sheetnum,fileToSave,0);
-      //logtext(0,"sheet "& sheetnum & " end - " & getcurtick - t);
 		end;
 		
 		FillSharedStrings(fileToSave,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings,mas);
 		ConvertToXLSX(fileToSave);
 		MilliSleep(2000);
     fnserv = fileToSave;
+    md5str = GetFileMD5(fnserv);
 	end;
 	RETURN;
 END;

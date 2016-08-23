@@ -14,6 +14,7 @@ external procedure FillSharedStrings(string,array string,integer,integer,array s
 external procedure ConvertToXLSX(string);
 external function string 10 GetStringCellNum(integer,integer);
 external procedure GetObjs(string,string,var string);
+external function string 50 TimeToString(time,string,boolean);
 
 procedure ArraysCollect(record RcVc RepSpec, var array string FoundArray, var array string ProjArray, var vector string ProjNamesVect, var vector string FoundNamesVect)
 BEGIN
@@ -243,7 +244,7 @@ BEGIN
 END;
 
 global
-procedure BudgetTotalRn(record RcVc RepSpec, var string fnserv, var area areatofile)
+procedure BudgetTotalRn(record RcVc RepSpec, var string fnserv, var string md5str)
 BEGIN
 	array string 255 FoundArray,ProjArray;
 	vector string 255 ProjNamesVect,FoundNamesVect;
@@ -265,11 +266,11 @@ BEGIN
 	ArraysCollect(RepSpec,FoundArray,ProjArray,ProjNamesVect,FoundNamesVect);
 	DataCollect(FoundArray,ProjArray,RepSpec,FPVect);
 	reportName = "BudgetTotalRn";
-	if (windowsmode==1) then begin
-		fileToSave = "tmpxlsx.xlsx";
-	end else begin
-		fileToSave = "/tmpxlsx.xlsx";
-	end;
+	if(windowsmode==1)then begin
+    fileToSave = DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
+  end else begin
+    fileToSave = "/" & DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
+  end;
 	deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
 	sheetNames[0] = "Total " & DateToString(RepSpec.sStartDate,"DD.MM.YYYY") & "-" & DateToString(RepSpec.sEndDate,"DD.MM.YYYY");
 	qtyOfSheets = 1;
@@ -635,5 +636,6 @@ BEGIN
 	end;
 	MilliSleep(2000);
 	fnserv = fileToSave;
+  md5str = GetFileMD5(fnserv);
 	RETURN;
 END;

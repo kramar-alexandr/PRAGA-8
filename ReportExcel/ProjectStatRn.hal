@@ -18,6 +18,7 @@ external function integer GetQuartal(date);
 external procedure GetObjs(string,string,var string);
 external function string 4 QuartalIntToStr(integer);
 external procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
+external function string 50 TimeToString(time,string,boolean);
 
 procedure ArraysCollect(record RcVc RepSpec, var array string ArtArrayWithoutGroups, var array string ProjArray, var vector string ProjNamesVect, var array string ArtArrayWithGroups, var boolean PrjFoundf, var vector boolean isMotherProjVect)
 BEGIN
@@ -314,7 +315,7 @@ BEGIN
 END;
 
 global
-procedure ProjectStatRn(record RcVc RepSpec, var string fnserv, var boolean PrjFoundf)
+procedure ProjectStatRn(record RcVc RepSpec, var string fnserv, var string md5str, var boolean PrjFoundf)
 BEGIN
 	record BaseCurBlock BCb;
 	record ITVc ITr;
@@ -345,13 +346,9 @@ BEGIN
 	array string 225 mas;
   area areatofile;
 
-  longint t,t1;
-  
-  t1 = getcurtick;
-	ArraysCollect(RepSpec,ArtArrayWithoutGroups,ProjArray,ProjNamesVect,ArtArrayWithGroups,PrjFoundf,isMotherProjVect);
+  ArraysCollect(RepSpec,ArtArrayWithoutGroups,ProjArray,ProjNamesVect,ArtArrayWithGroups,PrjFoundf,isMotherProjVect);
 	if (PrjFoundf) then begin
-		t = getcurtick;
-    DataCollect(ArtArrayWithoutGroups,ExtArr,ProjArray,ProjArray2,RepSpec,QuartVect);
+		DataCollect(ArtArrayWithoutGroups,ExtArr,ProjArray,ProjArray2,RepSpec,QuartVect);
     
     GetVectorTags(QuartVect,combarr);
     combcnt = combarr.length; 
@@ -363,10 +360,10 @@ BEGIN
     end;
 		
     reportName = "ProjectStatRn";
-		if (windowsmode==1) then begin
-			fileToSave = "tmpxlsx.xlsx";
+		if(windowsmode==1)then begin
+      fileToSave = DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
 		end else begin
-			fileToSave = "/tmpxlsx.xlsx";
+			fileToSave = "/" & DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
 		end;
 		deletefolder(Left(fileToSave,(len(fileToSave) - 5)));
 		BlockLoad(BCb);
@@ -448,7 +445,6 @@ BEGIN
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,false);
 		SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
 		BeginSheetData(sheetnum,fileToSave);
-      t = getcurtick;
       Wi = 0;
       rownum = 1;
       colnum = 1;
@@ -1219,7 +1215,6 @@ BEGIN
         sheetnum = sheetnum + 1;
         cleararray(mergeCell);
         qtyMergeCell = 0;
-        t = getcurtick;
         SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);
         BeginSheetData(sheetnum,fileToSave);
           rownum = 1;
@@ -1547,6 +1542,7 @@ BEGIN
 		ConvertToXLSX(fileToSave);
 		MilliSleep(2000);
     fnserv = fileToSave;
+    md5str = GetFileMD5(fnserv);
 	end;
   RETURN;
 END;
