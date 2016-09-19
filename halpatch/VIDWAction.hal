@@ -45,7 +45,7 @@ remote procedure AcceptDelVI(record VIVc,var string,var string);//Edit----------
 remote function boolean GetPartFileToArea(string,var area);
 remote procedure DeleteXLSXJunk(string);
 remote procedure BackupXLSX(string);
-remote procedure RecoverXLSX(string);
+remote procedure RecoverXLSX(string,string);
 
 
 function Boolean VIDClassFrRateEFAfter(Integer wn,Boolean changedf)
@@ -1597,7 +1597,7 @@ BEGIN
       md5strCli = GetFileMD5(filename);
       if (md5strCli!=md5strServ) then begin
         err = true;
-        RecoverXLSX(fnserv);
+        RecoverXLSX(fnserv,"ExcelVI");
         transCNT = transCNT - 1;
         if (transCNT==0) then begin
           testf = false;
@@ -1648,7 +1648,7 @@ BEGIN
       md5strCli = GetFileMD5(filename);
       if (md5strCli!=md5strServ) then begin
         err = true;
-        RecoverXLSX(fnserv);
+        RecoverXLSX(fnserv,"AcceptDelVI");
         transCNT = transCNT - 1;
         if (transCNT==0) then begin
           testf = false;

@@ -2,7 +2,8 @@ remote procedure BudTotFoundRn(record RcVc,var string,var string);
 remote function boolean GetPartFileToArea(string,var area);
 remote procedure DeleteXLSXJunk(string);
 remote procedure BackupXLSX(string);
-remote procedure RecoverXLSX(string);
+remote procedure RecoverXLSX(string,string);
+external function integer GetMonthNum(string);
 
 global
 procedure BudTotFoundRClassReportDefaults(integer wn)
@@ -52,46 +53,59 @@ begin
 			testf = false;
 		end;
 	end;
-	if ((RepSpec.flags[1]==0) and (RepSpec.flags[2]==0) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==0) and testf) then begin
-		MessageBox(0,"Select at least one Quartal!");
-		testf = false;
-	end;
-	if ((((RepSpec.flags[1]==1) and (RepSpec.flags[2]==0) and ((RepSpec.flags[3]==1) or (RepSpec.flags[4]==1))) or (((RepSpec.flags[1]==1) or (RepSpec.flags[2]==1)) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==1))) and testf) then begin
-		MessageBox(0,"Incorrect selection of Quartals!");
-		testf = false;
-	end;
-	if testf then begin
-		tmpDate = "";
-		if (RepSpec.flags[4]==1) then begin
-			tmpDate = "1/10/";
-		end;
-		if (RepSpec.flags[3]==1) then begin
-			tmpDate = "1/7/";
-		end;
-		if (RepSpec.flags[2]==1) then begin
-			tmpDate = "1/4/";
-		end;
-		if (RepSpec.flags[1]==1) then begin
-			tmpDate = "1/1/";
-		end;
-		tmpDate = tmpDate & RepSpec.f2;
-		RepSpec.sStartDate = StringToDate(tmpDate);
-		
-		tmpDate = "";
-		if (RepSpec.flags[1]==1) then begin
-			tmpDate = "31/3/";
-		end;
-		if (RepSpec.flags[2]==1) then begin
-			tmpDate = "30/6/";
-		end;
-		if (RepSpec.flags[3]==1) then begin
-			tmpDate = "30/9/";
-		end;
-		if (RepSpec.flags[4]==1) then begin
-			tmpDate = "31/12/";
-		end;
-		tmpDate = tmpDate & RepSpec.f2;
-		RepSpec.sEndDate = StringToDate(tmpDate);
+  if nonblank(RepSpec.f1) then begin
+    RepSpec.f1 = GetMonthNum(RepSpec.f1);
+    if (RepSpec.f1=="0") then begin
+      MessageBox(0,"Incorrect month!");
+      testf = false;
+    end else begin
+      RepSpec.sStartDate = StringToDate("1/" & RepSpec.f1 & "/" & RepSpec.f2);
+      RepSpec.sEndDate = StringToDate(DaysInMonth(StringToInt(RepSpec.f2),StringToInt(RepSpec.f1)) & "/" & RepSpec.f1 & "/" & RepSpec.f2);
+    end;
+  end else begin
+    if ((RepSpec.flags[1]==0) and (RepSpec.flags[2]==0) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==0) and testf) then begin
+      MessageBox(0,"Select at least one quartal or month!");
+      testf = false;
+    end;
+    if ((((RepSpec.flags[1]==1) and (RepSpec.flags[2]==0) and ((RepSpec.flags[3]==1) or (RepSpec.flags[4]==1))) or (((RepSpec.flags[1]==1) or (RepSpec.flags[2]==1)) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==1))) and testf) then begin
+      MessageBox(0,"Incorrect selection of Quartals!");
+      testf = false;
+    end;
+    if testf then begin
+      tmpDate = "";
+      if (RepSpec.flags[4]==1) then begin
+        tmpDate = "1/10/";
+      end;
+      if (RepSpec.flags[3]==1) then begin
+        tmpDate = "1/7/";
+      end;
+      if (RepSpec.flags[2]==1) then begin
+        tmpDate = "1/4/";
+      end;
+      if (RepSpec.flags[1]==1) then begin
+        tmpDate = "1/1/";
+      end;
+      tmpDate = tmpDate & RepSpec.f2;
+      RepSpec.sStartDate = StringToDate(tmpDate);
+      
+      tmpDate = "";
+      if (RepSpec.flags[1]==1) then begin
+        tmpDate = "31/3/";
+      end;
+      if (RepSpec.flags[2]==1) then begin
+        tmpDate = "30/6/";
+      end;
+      if (RepSpec.flags[3]==1) then begin
+        tmpDate = "30/9/";
+      end;
+      if (RepSpec.flags[4]==1) then begin
+        tmpDate = "31/12/";
+      end;
+      tmpDate = tmpDate & RepSpec.f2;
+      RepSpec.sEndDate = StringToDate(tmpDate);
+    end;
+  end;
+  if testf then begin
 		tstr = tstr & "Foundations Budgets Total 2016 Report";
 		tstr = tstr & " filled in on " & DateToString(CurrentDate,"DD MM YYYY");
 		filename = SaveFileDialog(tstr,"","xlsx");
@@ -111,7 +125,7 @@ begin
         md5strCli = GetFileMD5(filename);
         if (md5strCli!=md5strServ) then begin
           err = true;
-          RecoverXLSX(fnserv);
+          RecoverXLSX(fnserv,"BudTotFound");
           transCNT = transCNT - 1;
           if (transCNT==0) then begin
             testf = false;

@@ -139,6 +139,8 @@ external procedure CourtesyTitlesSClassArrayOnOpen(var Array string,var Integer)
 external function string 255 StringFromSysList(Integer,Integer);
 external procedure WindowFieldGotoForTouchScreen(Integer,Integer,string,Boolean);
 external procedure PasteFromWn(Integer,string);
+external function string 255 MonthName(Date);
+external procedure PasteFromSysList(Integer ,Integer);
 
 global
 Function Boolean OcupResSClassOnOpenWindow(Integer wn)
@@ -1301,5 +1303,42 @@ begin
   end;
   PasteFromWn(wn,serial);
   NSCUSClassOnOKWindow = true;
+  return;
+end;
+
+global
+function Boolean myMonthSClassOnOpenWindow(Integer wn)
+begin
+  Integer i;
+  Date d;
+  string 20 s;
+  
+  d = StringToDate("1/1/16");
+  for (i=0;i<12;i=i+1) begin
+    s = MonthName(d);
+    SetListString(wn,len(s),s,false);
+    d = AddMonth(d,1);
+  end;      
+  myMonthSClassOnOpenWindow = false;
+  return;
+end;
+
+global
+function Boolean myMonthSClassOnOKWindow(Integer wn)
+begin
+  Integer mwn;
+  Integer line;
+  string 255 tstr;
+  record IVCashVc IVCashr;
+  longint pos;
+  string 255 tstrserial;
+
+  mwn = MotherWindow(wn);
+  
+  tstr = StringFromSysList(wn,200);
+  pos = 0;
+  GetNextSubstring(tstr,pos," ",tstrserial);
+  PasteFromSysList(wn,len(tstrserial));
+  myMonthSClassOnOKWindow = false;
   return;
 end;

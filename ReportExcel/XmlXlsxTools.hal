@@ -527,8 +527,7 @@ BEGIN
   boolean res;
   longint arealen;
   
-  logtext(0,"try GetPartFileToArea");
-	arealen = 102400;
+  arealen = 102400;
   setareazerosize(resarea);
   res = false;
   addfiletoarea(filename,filearea,false);
@@ -575,9 +574,9 @@ BEGIN
 END;
 
 global
-procedure RecoverXLSX(string filename)
+procedure RecoverXLSX(string filename, string rep)
 BEGIN
-  logtext(0,"RecoverXLSX");
+  logtext(0,"XLSX RECOVER: " & rep);
   delete_file(filename);
 	CopyFile(PathCorrection(filename) & "_backup.xlsx",filename);
   RETURN;

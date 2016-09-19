@@ -2,7 +2,7 @@ remote procedure ProjectFactRn(record RcVc,var string,var string,var boolean);
 remote function boolean GetPartFileToArea(string,var area);
 remote procedure DeleteXLSXJunk(string);
 remote procedure BackupXLSX(string);
-remote procedure RecoverXLSX(string);
+remote procedure RecoverXLSX(string,string);
 
 global
 procedure RunProjectFactRn()
@@ -127,7 +127,7 @@ begin
           md5strCli = GetFileMD5(filename);
           if (md5strCli!=md5strServ) then begin
             err = true;
-            RecoverXLSX(fnserv);
+            RecoverXLSX(fnserv,"ProjectFact");
             transCNT = transCNT - 1;
             if (transCNT==0) then begin
               testf = false;

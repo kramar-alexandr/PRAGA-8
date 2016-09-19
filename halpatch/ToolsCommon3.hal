@@ -2494,3 +2494,73 @@ begin
   
   return;
 end;
+
+global
+procedure MyBIRun()
+begin
+  string 255 url;
+  integer compnr;
+  record ProgramStatusBlock PSb;
+	record CompaniesBlock Cb;
+	row CompaniesBlock Cbrw;
+
+	blockload(PSb);
+	blockload(Cb);
+
+	compnr = currentcompany;
+	matrowget(Cb,compnr-1,Cbrw);
+  if blank(Cbrw.TCPIP) then begin
+    Cbrw.TCPIP = "localhost";
+  end;
+	url = "http://" & Cbrw.TCPIP & ":" & PSb.httpPort & "/SaleStat.html?param=" & MD5String(GetHour(CurrentTime) & ":" & GetMinute(CurrentTime));
+  OpenWebBrowser(url);
+
+	return;
+end;
+
+global
+function string 255 ChangeCaseStr(string source, integer format) //Edit-------------------Vitalii 11:02 13.09.2016
+begin
+/*
+format =
+1 - UpperCase
+2 - LowerCase
+3 - Like sentence
+4 - First big in all words
+*/
+	string 255 res;
+  integer i;
+  
+  switch (format) begin
+    case 1:
+      res = UpperCase(source);
+    case 2:
+      res = LowerCase(source);
+    case 3:
+      res = UpperCase(left(source,1)) & LowerCase(right(source,(len(source) - 1)));
+    case 4:
+      for(i=0;i<=len(source);i=i+1) begin
+        if (i==0) or
+           (Mid(source,i-1,1) == " ") or (Mid(source,i-1,1) == ",") or
+           (Mid(source,i-1,1) == "_") or (Mid(source,i-1,1) == ".") or
+           (Mid(source,i-1,1) == ";") or (Mid(source,i-1,1) == ":") or
+           (Mid(source,i-1,1) == "(") or (Mid(source,i-1,1) == ")") or
+           (Mid(source,i-1,1) == "[") or (Mid(source,i-1,1) == "]") or
+           (Mid(source,i-1,1) == "{") or (Mid(source,i-1,1) == "}") or
+           (Mid(source,i-1,1) == "/") or (Mid(source,i-1,1) == "\\") or
+           (Mid(source,i-1,1) == "'") or (Mid(source,i-1,1) == "\"") or
+           (Mid(source,i-1,1) == "-") or (Mid(source,i-1,1) == "+") or
+           (Mid(source,i-1,1) == "=") or (Mid(source,i-1,1) == "?") or
+           (Mid(source,i-1,1) == "&") or (Mid(source,i-1,1) == "!") or
+           (Mid(source,i-1,1) == "@") or (Mid(source,i-1,1) == "#") or
+           (Mid(source,i-1,1) == "$") or (Mid(source,i-1,1) == "%") or
+           (Mid(source,i-1,1) == "^") or (Mid(source,i-1,1) == "*") then begin
+          res = res & UpperCase(Mid(source,i,1));
+        end else begin
+          res = res & LowerCase(Mid(source,i,1));
+        end;
+      end;
+	end;
+	ChangeCaseStr = res;
+return;
+end;

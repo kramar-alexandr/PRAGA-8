@@ -1,0 +1,222 @@
+external procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
+external function roundmode SetRoundModeD(Integer);
+external function Boolean LoggedInTest();
+external function string 255 ChangeCaseStr(string,integer);
+
+
+webpublic
+global procedure WebSalesBILogIn()
+begin
+  Time checkTime;
+  array string 5 checkTimeStr;
+  string 255 sentMD5,checkMD5,link;
+  integer deltaMin,i,cti;
+  boolean isLogedIn;
+  
+  deltaMin = 2;
+  sentMD5 = WebGetArg("param");
+  link = WebGetArg("link");
+  checkTime = CurrentTime;
+  cti = 0;
+  checkTimeStr[cti] = GetHour(checkTime) & ":" & GetMinute(checkTime);
+  cti = cti + 1;
+  for (i=1;i<deltaMin;i=i+1) begin
+    checkTimeStr[cti] = GetHour(checkTime) & ":" & (GetMinute(checkTime) + i);
+    cti = cti + 1;
+    checkTimeStr[cti] = GetHour(checkTime) & ":" & (GetMinute(checkTime) - i);
+    cti = cti + 1;
+  end;
+  isLogedIn = LoggedInTest();
+  for (i=0;i<checkTimeStr.length;i=i+1) begin
+    checkMD5 = MD5String(checkTimeStr[i]);
+    if (sentMD5==checkMD5) then begin
+      isLogedIn = true;
+      i = checkTimeStr.length;
+    end;
+  end;
+  if isLogedIn then begin
+    WebOutString(MD5String(GetHour(checkTime) & ":" & GetMinute(checkTime)));
+  end;
+  return;
+end;
+
+webpublic
+global procedure WebSalesBI()
+begin
+	record INVc INr;
+	record PRVc PRr;
+	integer i,j,pos;
+	boolean TrHs,testf,foundf;
+	string 100 tstr;
+  string 10 year,nl,tab;
+
+	record TBBUVc TBBUr;
+  record TRVc TRr;
+  row TBBUVc TBBUrw;
+  row TRVc TRrw;
+  integer mtrw,PAi;
+  array string 20 prjobjs;
+  
+  Date mydate,startD,endD;
+  Time checkTime;
+  array string 5 checkTimeStr;
+  string 255 sentMD5,checkMD5,art,proj;
+  integer deltaMin;
+  boolean isLogedIn;
+  array string 10 ArtArray,ProjArray,ProjArrayTmp;
+  vector val vSum,ProjSum;
+  array string 50 aTags;
+  vector boolean vTagExist,ProjInArr;
+
+	mydate = StringToDate("01/08/2016");
+        year = GetYear(mydate) & "";
+        startD = StringToDate("01/01/" & GetYear(mydate));
+        endD = StringToDate("31/12/" & GetYear(mydate));
+  deltaMin = 2;
+  sentMD5 = WebGetArg("param");
+  checkTime = CurrentTime;
+  j = 0;
+  checkTimeStr[j] = GetHour(checkTime) & ":" & GetMinute(checkTime);
+  j = j + 1;
+  for (i=1;i<deltaMin;i=i+1) begin
+    checkTimeStr[j] = GetHour(checkTime) & ":" & (GetMinute(checkTime) + i);
+    j = j + 1;
+    checkTimeStr[j] = GetHour(checkTime) & ":" & (GetMinute(checkTime) - i);
+    j = j + 1;
+  end;
+  isLogedIn = false;
+  for (i=0;i<checkTimeStr.length;i=i+1) begin
+    checkMD5 = MD5String(checkTimeStr[i]);
+    if (sentMD5==checkMD5) then begin
+      isLogedIn = true;
+      i = checkTimeStr.length;
+    end;
+  end;
+  if isLogedIn then begin
+  
+    resetloop(INr);
+    j = 0;
+    TrHs = true;
+    while(loopmain(INr,1,TrHs)) begin
+      testf = true;
+      if (blank(INr.Objects)) then begin testf = false; end;
+      if (year=="2016" and right(INr.Objects,3)!="_16") then begin testf = false; end;
+      if (year!="2016" and right(INr.Objects,3)=="_16") then begin testf = false; end;
+      if (testf) then begin
+        tstr = INr.Objects;
+        foundf = false;
+        for (i=0;i<ArtArray.length;i=i+1) begin
+          if (ArtArray[i]==tstr) then begin
+            foundf = true;
+          end;
+        end; 
+        if (!foundf) then begin
+          ArtArray[j] = INr.Objects;
+          j = j + 1;
+        end;
+      end;
+    end;
+    i = 0;
+    while(loopmain(PRr,1,true)) begin
+      if ((GetYear(PRr.StartDate) & "" == year) or (GetYear(PRr.EndDate) & "" == year)) then begin
+        ProjArray[i] = PRr.Code;
+        i = i + 1;
+      end;
+    end;
+    
+    //nl = "<br>";
+    //tab = " | ";
+    nl = chr(13) & chr(10);
+    tab = ",";
+    WebOutString("Brand" & tab & "Type" & tab & "Sum" & nl);
+    
+    for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin 
+      PRr.Code = ProjArray[PAi];
+      if (ReadFirstMain(PRr,1,true)) then begin
+        prjobjs[PAi] = PRr.Objects;
+        if ((GetYear(PRr.StartDate) & "" == year) or (GetYear(PRr.EndDate) & "" == year)) then begin
+          TBBUr.PRCode = PRr.Code;
+          if (readfirstmain(TBBUr,1,true)) then begin
+            mtrw = matrowcnt(TBBUr);
+            for (i=0;i<mtrw;i=i+1) begin
+              matrowget(TBBUr,i,TBBUrw);
+              if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode)) then begin
+                INr.Objects = TBBUrw.ArtCode;
+                ReadfirstKey("Objects",INr,1,true);
+                vSum[TBBUrw.ArtCode & ";" & ProjArray[PAi]] = vSum[TBBUrw.ArtCode & ";" & ProjArray[PAi]] + TBBUrw.Sum;
+                if nonblank(PRr.MotherCode) and (PRr.MotherCode!="") then begin
+                  vSum[TBBUrw.ArtCode & ";" & PRr.MotherCode] = vSum[TBBUrw.ArtCode & ";" & PRr.MotherCode] + TBBUrw.Sum;
+                  ProjSum[TBBUrw.ArtCode] = ProjSum[TBBUrw.ArtCode]+ TBBUrw.Sum;
+                end;
+              end;
+            end; 
+          end;
+        end;
+      end;
+    end;
+    
+    /*TRr.TransDate = startD;
+    TrHs = true;
+    while (loopkey("TransDate",TRr,1,TrHs)) begin
+      if (TRr.TransDate > endD) then begin
+        TrHs = false;
+      end;
+      if (TrHs) then begin
+        mtrw = matrowcnt(TRr);
+        for (i=0;i<mtrw;i=i+1) begin
+          matrowget(TRr,i,TRrw);
+          if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5")) then begin
+            for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+              PRr.Code = ProjArray[PAi];
+              ReadFirstMain(PRr,1,true);
+              if(setinset(prjobjs[PAi],TRrw.Objects)) then begin
+                for (j=0;j<ArtArray.length;j=j+1) begin
+                  if (setinset(ArtArray[j],TRrw.Objects)) then begin
+                    INr.Objects = ArtArray[j];
+                    ReadfirstKey("Objects",INr,1,true);
+                    vSum["F;" & ArtArray[j] & ";" & ProjArray[PAi]] = vSum["F;" & ArtArray[j] & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                    if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
+                      vSum["F;" & ArtArray[j] & ";" & PRr.MotherCode] = vSum["F;" & ArtArray[j] & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                    end;
+                  end;
+                end;
+              end;
+            end;
+          end;
+        end;
+      end;
+    end;*/
+    
+    GetVectorTags(vSum,aTags);
+    for (i=0;i<aTags.length;i=i+1) begin
+      vTagExist[aTags[i]] = true;
+    end;
+    for (j=0;j<ProjArray.length-1;j=j+1) begin
+      for (i=0;i<ProjArray.length-1;i=i+1) begin
+        if (ProjSum[ProjArray[i]] < ProjSum[ProjArray[i+1]]) then begin
+          tstr = ProjArray[i+1];
+          ProjArray[i+1] = ProjArray[i];
+          ProjArray[i] = tstr;
+        end;
+      end;
+    end;
+    for (i=0;i<ProjArray.length;i=i+1) begin
+      ProjArrayTmp[i] = ProjArray[i];
+      ProjInArr[ProjArray[i]] = false;
+    end;
+    ClearArray(ProjArray);
+    for (i=0;i<10;i=i+1) begin
+      ProjArray[i] = ProjArrayTmp[i];
+      ProjInArr[ProjArray[i]] = true;
+    end;
+    for (i=0;i<aTags.length;i=i+1) begin
+      pos = 0;
+      ExtractObjWithSeparator(";",aTags[i],true,pos,art);
+      ExtractObjWithSeparator(";",aTags[i],true,pos,proj);
+      if ProjInArr[proj] then begin
+        WebOutString(ChangeCaseStr(art,4) & tab & ChangeCaseStr(proj,4) & tab & vSum[aTags[i]] & nl);
+      end;
+    end;
+  end;
+  return;
+end;

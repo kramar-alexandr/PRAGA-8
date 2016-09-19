@@ -837,3 +837,37 @@ begin
   VARsubSClassArrayOnOpenRemote(RepSpec.AccStr,RepSpec.f6,RepSpec.FirstAcc,RepSpec.LastAcc,fn,astr,acnt);  
   return;
 end;
+
+global
+function integer GetMonthNum(string montname)
+begin
+  switch(montname) begin
+      case "January":
+				GetMonthNum = 1;
+      case "February":
+				GetMonthNum = 2;
+      case "March":
+				GetMonthNum = 3;
+      case "April":
+				GetMonthNum = 4;
+      case "May":
+				GetMonthNum = 4;
+      case "June":
+				GetMonthNum = 6;
+      case "July":
+				GetMonthNum = 7;
+      case "August":
+				GetMonthNum = 8;
+      case "September":
+				GetMonthNum = 9;
+      case "October":
+				GetMonthNum = 10;
+      case "November":
+				GetMonthNum = 11;
+      case "December":
+				GetMonthNum = 12;
+      otherwise
+        GetMonthNum = 0;
+    end;
+  return;
+end;
