@@ -4938,12 +4938,12 @@ end;
 window MyBIRClass:1
   wtag("language","UKR"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer") 
 begin
-  real h,v,vs;
   
   WindowBegin("Web Statistics DEMO",MyBIRClass,CGother,-);  
   SetWRect(20,80,400,250);
   UseView(RcVc);
-  HalPushButton(h=50,20,h+110,40,"MyBIRun","Run");
+  EditField(100,6,80,"Quantity",Normal,f1,false,0);
+  HalPushButton(50,30,150,50,"MyBIRun","Run");
   
   EndWindow;
 end;

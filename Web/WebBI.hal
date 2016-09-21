@@ -2,7 +2,7 @@ external procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var
 external function roundmode SetRoundModeD(Integer);
 external function Boolean LoggedInTest();
 external function string 255 ChangeCaseStr(string,integer);
-
+external function string 255 StrReplace(string,string,string);
 
 webpublic
 global procedure WebSalesBILogIn()
@@ -56,10 +56,10 @@ begin
   string 10 year,exp,proj;
 	integer i,j,k,pos,mtrw;
   
-  array string 10 aExp,aProj,aExpTmp,aProjObj;
+  array string 10 aExp,aProj,aExpTmp;
   array string 255 aTags;
-  vector string 255 aExpName,aProjName;
-  vector val vSum,aExpSum;
+  vector string 255 vExpName,vProjName,vProjObj;
+  vector val vSum,vExpSum;
   vector boolean vTagExist,vExpInArr;
 
   Date mydate,startD,endD;
@@ -117,7 +117,7 @@ begin
           aExp[j] = INr.Objects;
           Objr.Code = aExp[j];
           ReadFirstMain(Objr,1,true);
-          aExpName[aExp[j]] = Objr.Comment;
+          vExpName[aExp[j]] = Objr.Comment;
           j = j + 1;
         end;
       end;
@@ -126,7 +126,7 @@ begin
     while(loopmain(PRr,1,true)) begin
       if ((GetYear(PRr.StartDate) & "" == year) or (GetYear(PRr.EndDate) & "" == year)) then begin
         aProj[i] = PRr.Code;
-        aProjName[aProj[i]] = PRr.Name;
+        vProjName[aProj[i]] = PRr.Name;
         i = i + 1;
       end;
     end;
@@ -140,7 +140,7 @@ begin
     for (k=0;k<aProj.length;k=k+1) begin 
       PRr.Code = aProj[k];
       if (ReadFirstMain(PRr,1,true)) then begin
-        aProjObj[k] = PRr.Objects;
+        vProjObj[k] = PRr.Objects;
         if ((GetYear(PRr.StartDate) & "" == year) or (GetYear(PRr.EndDate) & "" == year)) then begin
           TBBUr.PRCode = PRr.Code;
           if (readfirstmain(TBBUr,1,true)) then begin
@@ -150,11 +150,12 @@ begin
               if (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode)) then begin
                 INr.Objects = TBBUrw.ArtCode;
                 ReadfirstKey("Objects",INr,1,true);
-                vSum[TBBUrw.ArtCode & ";" & aProj[k]] = vSum[TBBUrw.ArtCode & ";" & aProj[k]] + TBBUrw.Sum;
                 if nonblank(PRr.MotherCode) and (PRr.MotherCode!="") then begin
                   vSum[TBBUrw.ArtCode & ";" & PRr.MotherCode] = vSum[TBBUrw.ArtCode & ";" & PRr.MotherCode] + TBBUrw.Sum;
-                  aExpSum[TBBUrw.ArtCode] = aExpSum[TBBUrw.ArtCode]+ TBBUrw.Sum;
+                end else begin
+                  vSum[TBBUrw.ArtCode & ";" & aProj[k]] = vSum[TBBUrw.ArtCode & ";" & aProj[k]] + TBBUrw.Sum;
                 end;
+                vExpSum[TBBUrw.ArtCode] = vExpSum[TBBUrw.ArtCode] + TBBUrw.Sum;
               end;
             end; 
           end;
@@ -176,15 +177,17 @@ begin
             for (k=0;k<aProj.length;k=k+1) begin
               PRr.Code = aProj[k];
               ReadFirstMain(PRr,1,true);
-              if(setinset(aProjObj[k],TRrw.Objects)) then begin
+              if(setinset(vProjObj[k],TRrw.Objects)) then begin
                 for (j=0;j<aExp.length;j=j+1) begin
                   if (setinset(aExp[j],TRrw.Objects)) then begin
                     INr.Objects = aExp[j];
                     ReadfirstKey("Objects",INr,1,true);
-                    vSum["F;" & aExp[j] & ";" & aProj[k]] = vSum["F;" & aExp[j] & ";" & aProj[k]] - TRrw.CredVal + TRrw.DebVal;
                     if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
                       vSum["F;" & aExp[j] & ";" & PRr.MotherCode] = vSum["F;" & aExp[j] & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                    end else begin
+                      vSum["F;" & aExp[j] & ";" & aProj[k]] = vSum["F;" & aExp[j] & ";" & aProj[k]] - TRrw.CredVal + TRrw.DebVal;
                     end;
+                    vExpSum["F;" & aExp[j]] = vExpSum["F;" & aExp[j]] - TRrw.CredVal + TRrw.DebVal;
                   end;
                 end;
               end;
@@ -200,7 +203,7 @@ begin
     end;
     for (j=0;j<aExp.length-1;j=j+1) begin
       for (i=0;i<aExp.length-1;i=i+1) begin
-        if (aExpSum[aExp[i]] < aExpSum[aExp[i+1]]) then begin
+        if (vExpSum[aExp[i]] < vExpSum[aExp[i+1]]) then begin
           tstr = aExp[i+1];
           aExp[i+1] = aExp[i];
           aExp[i] = tstr;
@@ -221,7 +224,7 @@ begin
       ExtractObjWithSeparator(";",aTags[i],true,pos,exp);
       ExtractObjWithSeparator(";",aTags[i],true,pos,proj);
       if vExpInArr[exp] then begin
-        WebOutString(ChangeCaseStr(aExpName[exp],4) & tab & ChangeCaseStr(aProjName[proj],4) & tab & vSum[aTags[i]] & nl);
+        WebOutString(StrReplace(ChangeCaseStr(vExpName[exp],4),",","&#044;") & tab & StrReplace(ChangeCaseStr(vProjName[proj],4),",","&#044;") & tab & vSum[aTags[i]] & nl);
       end;
     end;
   end;

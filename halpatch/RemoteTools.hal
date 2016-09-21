@@ -1,0 +1,6 @@
+global
+function Time GetCurTimeOnServ()
+begin
+  GetCurTimeOnServ = CurrentTime;
+  return;
+end;;

@@ -9,6 +9,8 @@ external function LongInt TBBUVcRecordCheck(var record TBBUVc,record TBBUVc,Long
 external procedure TBBUDchrsum(var record TBBUVc,Integer,Boolean,Integer);
 external procedure TBBUSumup(var record TBBUVc);
 external function boolean isOpenObj(string);
+remote function Time GetCurTimeOnServ();
+
 global
 procedure GetPayModeAccNumber(string paymode,var string res)
 BEGIN
@@ -2499,20 +2501,24 @@ global
 procedure MyBIRun()
 begin
   string 255 url;
-  integer compnr;
+  integer compnr,wn;
   record ProgramStatusBlock PSb;
 	record CompaniesBlock Cb;
 	row CompaniesBlock Cbrw;
+  record RcVc RepSpec;
 
 	blockload(PSb);
 	blockload(Cb);
-
+  
+  wn = curwindow;
+	deselectwindow(wn,true);
+	getwindowrecord(wn,RepSpec);
 	compnr = currentcompany;
 	matrowget(Cb,compnr-1,Cbrw);
   if blank(Cbrw.TCPIP) then begin
     Cbrw.TCPIP = "localhost";
   end;
-	url = "http://" & Cbrw.TCPIP & ":" & PSb.httpPort & "/SaleStat.html?param=" & MD5String(GetHour(CurrentTime) & ":" & GetMinute(CurrentTime));
+	url = "http://" & Cbrw.TCPIP & ":" & PSb.httpPort & "/SaleStat.html?param=" & MD5String(GetHour(GetCurTimeOnServ) & ":" & GetMinute(GetCurTimeOnServ)) & "&qty=" & RepSpec.f1;
   OpenWebBrowser(url);
 
 	return;
