@@ -2,6 +2,58 @@ remote procedure PrjSumRn(record RcVc,var area,var boolean);
 remote function boolean OTCodeMatch(string,string);
 
 global
+procedure PrjSumRClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2016";
+	//RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
+function Boolean PrjSumRClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2016";
+	//RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+procedure PrjSum2017RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2017";
+	//RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
+function Boolean PrjSum2017RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2017";
+	//RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
 procedure RunPrjSumRn()
 begin
 	record ObjVc Objr;
@@ -13,7 +65,6 @@ begin
 	integer wn;
 	boolean PrjFoundf,testf;
 	
-	logtext(0,"RunPrjSumRn is runing");
 	testf = true;
 	wn = curwindow;
 	deselectwindow(wn,true);

@@ -384,24 +384,26 @@ global
 procedure StringCell(integer SheetNum, string pathToXLSX, var integer ColNum, integer RowNum, integer style, string str, var array string SharedStrings, var integer numOfUniqueSharedStrings, var integer numOfSharedStrings)
 BEGIN
 	area tempArea;
-	string 225 path;
+	string 225 path,tstr;
 	string 10 r;
 	integer i, foundStr;
 	
 	if blank(str) then begin
 		EmptyCell(SheetNum,pathToXLSX,ColNum,RowNum,style,1);
 	end else begin
-		numOfSharedStrings = numOfSharedStrings + 1;
+    tstr = ConvertXml(str);
+    //tstr = StrReplace(tstr,"&","&" & "amp" & ";");
+    numOfSharedStrings = numOfSharedStrings + 1;
 		r = GetStringCellNum(ColNum, RowNum);
 
 		foundStr = -1;
 		for (i=0;i<numOfUniqueSharedStrings;i=i+1) begin
-			if (SharedStrings[i] == str) then begin
+			if (SharedStrings[i] == tstr) then begin
 				foundStr = i;
 			end;
 		end;
 		if (foundStr == -1) then begin
-			SharedStrings[numOfUniqueSharedStrings] = ConvertXml(str);
+			SharedStrings[numOfUniqueSharedStrings] = tstr;
 			foundStr = numOfUniqueSharedStrings;
 			numOfUniqueSharedStrings = numOfUniqueSharedStrings + 1;
 		end;
@@ -459,7 +461,7 @@ global
 procedure FillSharedStrings(string pathToXLSX, array string SharedStrings, integer numOfUniqueSharedStrings, integer numOfSharedStrings, array string mas)
 BEGIN
 	area tempArea;
-	string 225 path;
+	string 225 path,tstr;
 	integer i,first,last,mi;
   boolean boldf;
   
@@ -482,7 +484,9 @@ BEGIN
         AddTextToArea("<t>",tempArea);
       end;
       for (mi=first;mi<last;mi=mi+1) begin
-        AddTextToArea(mas[mi],tempArea);
+        //tstr = ConvertXml(mas[mi]);
+        tstr = StrReplace(mas[mi],"&","&" & "amp" & ";");
+        AddTextToArea(tstr,tempArea);
       end;
       first = mi;
       if boldf then begin

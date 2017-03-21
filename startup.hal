@@ -14,10 +14,15 @@ begin
 	Report("Project Foundation Statistics",ProjectFoundRClass,ProjectFoundRn,0,modTS);
 	Report("Budget Total",BudgetTotalRClass,BudgetTotalRn,0,modTS);
 	Report("Budget Total by Foundations 2016",BudTotFoundRClass,BudTotFoundRn,0,modTS);
+  Report("Budget Total by Foundations 2017",BudTotFound2017RClass,BudTotFoundRn,0,modTS);
 	Report("Foundation People Statistics 2016",FoundPeopleStatRClass,FoundPeopleStatRn,0,modTS);
+  Report("Foundation People Statistics 2017",FoundPeopleStat2017RClass,FoundPeopleStatRn,0,modTS);
 	Report("Project Foundation Statistics 2016",ProjFoundStatRClass,ProjFoundStatRn,0,modTS);
+  Report("Project Foundation Statistics 2017",ProjFoundStat2017RClass,ProjFoundStatRn,0,modTS);
 	Report("Project Summary 2016",PrjSumRClass,PrjSumRn,0,modTS);
+	Report("Project Summary 2017",PrjSum2017RClass,PrjSumRn,0,modTS);
 	Report("Project Statistics 2016",ProjectStatRClass,ProjectStatRn,0,modTS);
+  Report("Project Statistics 2017",ProjectStat2017RClass,ProjectStatRn,0,modTS);
 	Report("Projects Facts",ProjectFactRClass,ProjectFactRn,0,modTS);
   Report("Web Statistics DEMO",MyBIRClass,MyBIRn,0,modTS);//Edit-------------------Vitalii 11:30 14:48 19.09.2016
   

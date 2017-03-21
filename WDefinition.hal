@@ -4699,6 +4699,24 @@ real h,v,vs,h1;
 	EndWindow;
 end;
 
+window BudTotFound2017RClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+real h,v,vs,h1;
+	WindowBegin("Foundations Budgets Total 2017",BudTotFound2017RClass,CGother,RcType);
+		SetWRect(20,80,400,250);
+		v = 20; vs = 20; h = 120;
+		EditField(h,v,120,"Year",ViewOnly,f2,false,0);
+		StaticText(h-6,v+32,"Quartals",true);
+		CheckBox(h,v+=vs,0,"I",flags[1]);
+		CheckBox(h+35,v,0,"II",flags[2]);
+		CheckBox(h+70,v,0,"III",flags[3]);
+		CheckBox(h+105,v,0,"IV",flags[4]);
+    //EditField(h,v+=vs,120,"or Month",Normal,f1,false,myMonthSClass);
+		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunBudTotFoundRn","Run");
+	EndWindow;
+end;
+
 window FoundPeopleStatRClass:1
 	wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
@@ -4720,11 +4738,50 @@ real h,v,vs,h1;
 	EndWindow;
 end;
 
+window FoundPeopleStat2017RClass:1
+	wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+real h,v,vs,h1;
+	WindowBegin("Foundation People Statistics 2017",FoundPeopleStat2017RClass,CGother,RcType);
+		SetWRect(20,80,400,250);
+		v = 20; vs = 20; h = 120;
+		EditField(h,v,120,"Year",ViewOnly,f2,false,0);
+		StaticText(h-6,v+32,"Quartals",true);
+		CheckBox(h,v+=vs,0,"I",flags[1]);
+		CheckBox(h+35,v,0,"II",flags[2]);
+		CheckBox(h+70,v,0,"III",flags[3]);
+		CheckBox(h+105,v,0,"IV",flags[4]);
+    EditField(h,v+=vs,120,"or Month",Normal,f4,false,myMonthSClass);
+		EditField(h,v+=vs,120,"Foundation",Normal,f1,false,ObjFoundSClass);
+		CheckBox(h+140,v,0,"without suppliers",flags[6]);
+		//CheckBox(h,v+=vs,0,"with " & chr(34) & "2016.998" & chr(34) & " project",flags[5]);
+		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunFoundPeopleStatRn","Run");
+	EndWindow;
+end;
+
 window ProjFoundStatRClass:1
 	wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
 real h,v,vs,h1;
 	WindowBegin("Project Foundation Statistics 2016",ProjFoundStatRClass,CGother,RcType);
+		SetWRect(20,80,400,250);
+		v = 20; vs = 20; h = 120;
+		EditField(h,v,120,"Year",Normal,f2,false,0);
+		StaticText(h-6,v+32,"Quartals",true);
+		CheckBox(h,v+=vs,0,"I",flags[1]);
+		CheckBox(h+35,v,0,"II",flags[2]);
+		CheckBox(h+70,v,0,"III",flags[3]);
+		CheckBox(h+105,v,0,"IV",flags[4]);
+		EditField(h,v+=vs,120,"Foundation",Normal,f1,false,ObjFoundSClass);
+		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunProjFoundStatRn","Run");
+	EndWindow;
+end;
+
+window ProjFoundStat2017RClass:1
+	wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+real h,v,vs,h1;
+	WindowBegin("Project Foundation Statistics 2017",ProjFoundStat2017RClass,CGother,RcType);
 		SetWRect(20,80,400,250);
 		v = 20; vs = 20; h = 120;
 		EditField(h,v,120,"Year",Normal,f2,false,0);
@@ -4755,6 +4812,23 @@ real h,v,vs,h1;
 	EndWindow;
 end;
 
+window PrjSum2017RClass:1
+	wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+real h,v,vs,h1;
+	WindowBegin("Project Summary 2017",PrjSumRClass,CGother,RcType);
+		SetWRect(20,80,400,250);
+		v = 20; vs = 20; h = 120;
+		EditField(h,v,120,"Year",Normal,f2,false,0);
+		StaticText(h-6,v+32,"Quartals",true);
+		CheckBox(h,v+=vs,0,"I",flags[1]);
+		CheckBox(h+35,v,0,"II",flags[2]);
+		CheckBox(h+70,v,0,"III",flags[3]);
+		CheckBox(h+105,v,0,"IV",flags[4]);
+		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunPrjSumRn","Run");
+	EndWindow;
+end;
+
 window ProjectStatRClass:1
 	wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
@@ -4773,6 +4847,28 @@ real h,v,vs,h1;
 		//CheckBox(h+140,v,0,"for print",flags[5]);
     EditField(h+100,v+=vs,20,"Number of projects in one line",Normal,f3,false,0);
     CheckBox(h,v+=vs,0,"with " & chr(34) & "2016.998" & chr(34) & " project",flags[6]);
+		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunProjectStatRn","Run");
+	EndWindow;
+end;
+
+window ProjectStat2017RClass:1
+	wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+real h,v,vs,h1;
+	WindowBegin("Project Statistics 2017",ProjectStat2017RClass,CGother,RcType);
+		SetWRect(20,80,400,250);
+		v = 20; vs = 20; h = 120;
+		EditField(h,v,120,"Year",Normal,f2,false,0);
+		StaticText(h-6,v+32,"Quartals",true);
+		CheckBox(h,v+=vs,0,"I",flags[1]);
+		CheckBox(h+35,v,0,"II",flags[2]);
+		CheckBox(h+70,v,0,"III",flags[3]);
+		CheckBox(h+105,v,0,"IV",flags[4]);
+    EditField(h,v+=vs,120,"or Month",Normal,f4,false,myMonthSClass);
+		EditField(h,v+=vs,120,"Project",Normal,f1,false,PRSClass);
+		//CheckBox(h+140,v,0,"for print",flags[5]);
+    EditField(h+100,v+=vs,20,"Number of projects in one line",Normal,f3,false,0);
+    //CheckBox(h,v+=vs,0,"with " & chr(34) & "2016.998" & chr(34) & " project",flags[6]);
 		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunProjectStatRn","Run");
 	EndWindow;
 end;

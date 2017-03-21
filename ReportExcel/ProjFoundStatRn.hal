@@ -28,7 +28,12 @@ BEGIN
 	
 	kw = 0;
 	while(loopmain(ITr,1,true)) begin
-    if (RepSpec.f2=="2016" and right(ITr.Code,3)=="_16") or (RepSpec.f2!="2016" and right(ITr.Code,3)!="_16") then begin
+    testf = true;
+    if ((RepSpec.f2=="2016" and right(ITr.Code,3)!="_16") or
+        (RepSpec.f2=="2017" and right(ITr.Code,3)!="_17")) then begin testf = false; end;
+    if ((RepSpec.f2!="2016" and right(ITr.Code,3)=="_16") or
+        (RepSpec.f2!="2017" and right(ITr.Code,3)=="_17")) then begin testf = false; end;
+    if (testf) then begin
       ArtArrayWithGroups[kw] = ITr.Code;
       kw = kw + 1;
       resetloop(INr);
@@ -38,8 +43,10 @@ BEGIN
         testf = true;
         if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
         if (blank(INr.Objects)) then begin testf = false; end;
-        if (RepSpec.f2=="2016" and right(INr.Objects,3)!="_16") then begin testf = false; end;
-        if (RepSpec.f2!="2016" and right(INr.Objects,3)=="_16") then begin testf = false; end;
+        if ((RepSpec.f2=="2016" and right(INr.Objects,3)!="_16") or
+            (RepSpec.f2=="2017" and right(INr.Objects,3)!="_17")) then begin testf = false; end;
+        if ((RepSpec.f2!="2016" and right(INr.Objects,3)=="_16") or
+            (RepSpec.f2!="2017" and right(INr.Objects,3)=="_17")) then begin testf = false; end;
         if (testf) then begin
           tstr = INr.Objects;
           foundf = false;

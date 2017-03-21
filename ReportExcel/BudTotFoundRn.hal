@@ -113,7 +113,10 @@ BEGIN
               k = 1;
 						end;
 						if (kTestf and (TBBUrw.stp==1 and TBBUrw.Sum!=0 and nonblank(TBBUrw.ArtCode))) then begin
-              if (RepSpec.f2=="2016" and right(TBBUrw.ArtCode,3)=="_16") or (RepSpec.f2!="2016" and right(TBBUrw.ArtCode,3)!="_16") then begin
+              if ((RepSpec.f2=="2016" and right(TBBUrw.ArtCode,3)=="_16") or
+                  (RepSpec.f2!="2016" and right(TBBUrw.ArtCode,3)!="_16") or
+                  (RepSpec.f2=="2017" and right(TBBUrw.ArtCode,3)=="_17") or
+                  (RepSpec.f2!="2017" and right(TBBUrw.ArtCode,3)!="_17")) then begin
                 for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin 
                   if (TBBUrw.ExtraObj==FoundArray[FAi]) then begin
                     FPVect[k & ":" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[k & ":" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
@@ -262,6 +265,9 @@ BEGIN
 				qtyOfEmpStr = ProjArray.length + 1 + FoundArray.length - 2;
 			end else begin
 				qtyOfEmpStr = ProjArray.length + 1 + (ProjArray.length + 1 - mod((ProjArray.length + 1),(quartCount + 1)))/(quartCount + 1) - 2;
+        if ((quartCount==1) or (quartCount==4)) then begin
+          qtyOfEmpStr = qtyOfEmpStr - 1;
+        end;
 			end;
 			EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 			style = 68;
@@ -560,7 +566,7 @@ BEGIN
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Tot %",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			colnum = colnum + 1;
 			for (i=0;i<ProjArray.length;i=i+1) begin
-        value = FPVect["TOTAL:" & ProjArray[i]]/tot*100000;
+        value = FPVect["TOTAL:" & ProjArray[i]]/tot/10;
 				if (i == 0) then begin
 					style = style1;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
@@ -751,8 +757,8 @@ BEGIN
 		EndRow(sheetnum,fileToSave,rownum);
 		colnum = 4;
 		BeginRow(sheetnum,fileToSave,rownum,0,blankval);
-			tot = 0;
       for (j=0;j<FoundArray.length;j=j+1) begin
+        tot = 0;
 				style = 45;
 				for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
           value = FPVect[quartToPrint[Qi] & ":" & FoundArray[j] & ":TOTAL"]/1000;

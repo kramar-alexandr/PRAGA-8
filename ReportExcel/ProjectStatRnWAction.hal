@@ -36,6 +36,34 @@ begin
 end;
 
 global
+procedure ProjectStat2017RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2017";
+  RepSpec.f3 = "5";
+	RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
+function Boolean ProjectStat2017RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2017";
+  RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
 procedure RunProjectStatRn()
 begin
 	record ObjVc Objr;

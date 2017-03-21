@@ -6,6 +6,29 @@ remote procedure RecoverXLSX(string,string);
 external function integer GetMonthNum(string);
 
 global
+procedure BudTotFound2017RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2017";
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
+function Boolean BudTotFound2017RClassOnOpenWindow(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2017";
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+global
 procedure BudTotFoundRClassReportDefaults(integer wn)
 begin
 	record RcVc RepSpec;
@@ -106,7 +129,7 @@ begin
     end;
   end;
   if testf then begin
-		tstr = tstr & "Foundations Budgets Total 2016 Report";
+		tstr = tstr & "Foundations Budgets Total " & RepSpec.f2 & " Report";
 		tstr = tstr & " filled in on " & DateToString(CurrentDate,"DD MM YYYY");
 		filename = SaveFileDialog(tstr,"","xlsx");
 		if ((filename!=tstr) and nonblank(filename)) then begin
