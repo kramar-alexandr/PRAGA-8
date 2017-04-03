@@ -72,6 +72,8 @@ BEGIN
 		switch (PRr.Code) begin
       case "2016.998":
         goto L1;
+      case "2017.998":
+        goto L1;
     end;
 		if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
 			ProjArray[k] = PRr.Code;

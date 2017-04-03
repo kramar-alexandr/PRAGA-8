@@ -74,6 +74,10 @@ BEGIN
           if (RepSpec.flags[5]==0) then begin
             goto L1;
           end;
+        case "2017.998":
+        if (RepSpec.flags[5]==0) then begin
+          goto L1;
+        end;
       end;
 			ProjArray[k] = PRr.Code;
 			if blank(PRr.MotherCode) or (PRr.MotherCode=="") then begin
