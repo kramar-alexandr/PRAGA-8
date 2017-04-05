@@ -4000,7 +4000,7 @@ begin
 
   RlColKey(4,4,"Code",SerNr,false,MainKey);
   RlColKey(70,70,"Supplier",VECode,false,VECode);
-  RlColKey(120,120,"Name",VEName,false,VEName);
+  RlCol(120,120,"Name",VEName,false);
   RlColKey(-420,-420,"Number",Number,false,Number);
 	RlCol(-340,-340,"StartDate",StartDate,false);
 	RlCol(-270,-270,"EndDate",EndDate,false);
