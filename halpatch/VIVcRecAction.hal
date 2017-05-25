@@ -50,6 +50,7 @@ external procedure VICalcVals(var record VIVc);// Edit *************************
 external procedure NormalizeObjstr(var string);// Edit ************************** Wednesday, 15 July 2015 11:04:06
 external procedure NoDupObjs(string,var string);// Edit ************************** Wednesday, 15 July 2015 12:10:47
 external procedure GetSalesGroup(string,var string);// Edit ************************** Friday, 6 November 2015 09:29:04
+remote procedure ClientMessageBox(string);//Edit-------------------Vitalii 16:48 25.05.2017
 
 
 function Boolean CheckPrepaymentAmount(record VIVc VIp,Integer rwcnt)
@@ -246,6 +247,7 @@ BEGIN
   record SMVc gSMp;
   record OPPVc APPayr;
   record OPPVc APPay2r;
+  record ContractsVc Conr;
   row VIVc VIrw;
   row VIVc VI2rw;
   Integer cashres,prstat,errcode;
@@ -1256,6 +1258,13 @@ LVIVcRecordCheck_GenTrans:;
           end;   
         end;  
       end;  
+    end;
+  end;
+  Conr.VECode = VIp.VECode;
+  if (ReadFirstKey("VECode",Conr,1,true)) then begin
+    if (Conr.EndDate<CurrentDate) then begin
+      ClientMessageBox(USetStr(31009) & Conr.SerNr);
+      goto L99VIVcRecordCheck;
     end;
   end;
 L99VIVcRecordCheck:;

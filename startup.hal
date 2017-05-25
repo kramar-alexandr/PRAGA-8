@@ -49,7 +49,7 @@ begin
 	SString(31006,"You should create Expense Account. Object will be created automatically"); //Edit---------------Vitalii 12:37 13.10.2015
 	SString(31007,"Invalid period. Check dates");
   SString(31008,"You should create Expense Account. Item will be created automatically"); //Edit---------------Vitalii 12:37 13.10.2015
-	
+  SString(31009,"	The contract with this provider has expired. Contract No. ");
 	
   StrSetAdd(3);
   StrSetText(UpdateBudget,"Allow creation new budget version");

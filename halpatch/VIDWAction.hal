@@ -423,6 +423,7 @@ function Boolean VIDClassVECodeEFAfter(Integer wn,Integer changedf)
 begin
   record VIVc VIr;
   string 255 vewarn;
+  record ContractsVc Conr;
 
   if (changedf!=0) then begin  
     GetWindowRecord(wn,VIr);
@@ -433,6 +434,13 @@ begin
       MessageBox(0,vewarn);
     end;
     PutWindowRecord(wn,VIr);
+  end;
+  
+  Conr.VECode = VIr.VECode;
+  if (ReadFirstKey("VECode",Conr,1,true)) then begin
+    if (Conr.EndDate<CurrentDate) then begin
+      MessageBox(0,USetStr(31009) & Conr.SerNr);
+    end;
   end;
   VIDClassVECodeEFAfter = true;
   return;
@@ -1667,3 +1675,10 @@ BEGIN
   
   RETURN;
 END;
+
+global
+procedure ClientMessageBox(string mes)
+begin
+  Messagebox(0,mes);
+  return;
+end;
