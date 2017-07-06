@@ -126,7 +126,15 @@ BEGIN
                     FPVect[k & ":TOTAL:" & ProjArray[PAi]] = FPVect[k & ":TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
                     FPVect[k & ":TOTAL:TOTAL"] = FPVect[k & ":TOTAL:TOTAL"] + TBBUrw.Sum;
                     FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+                    FPVect[FoundArray[FAi] & ":TOTAL"] = FPVect[FoundArray[FAi] & ":TOTAL"] + TBBUrw.Sum;
                     FPVect["TOTAL:" & ProjArray[PAi]] = FPVect["TOTAL:" & ProjArray[PAi]] + TBBUrw.Sum;
+                    FPVect["TOTAL:TOTAL"] = FPVect["TOTAL:TOTAL"] + TBBUrw.Sum;
+                    if (nonblank(PRr.MotherCode)) then begin
+                      FPVect[k & ":" & FoundArray[FAi] & ":" & PRr.MotherCode] = FPVect[k & ":" & FoundArray[FAi] & ":" & PRr.MotherCode] + TBBUrw.Sum;
+                      FPVect[k & ":TOTAL:" & PRr.MotherCode] = FPVect[k & ":TOTAL:" & PRr.MotherCode] + TBBUrw.Sum;
+                      FPVect[FoundArray[FAi] & ":" & PRr.MotherCode] = FPVect[FoundArray[FAi] & ":" & PRr.MotherCode] + TBBUrw.Sum;
+                      FPVect["TOTAL:" & PRr.MotherCode] = FPVect["TOTAL:" & PRr.MotherCode] + TBBUrw.Sum;
+                    end;
                   end;
                 end;
               end;
@@ -149,7 +157,7 @@ BEGIN
 	integer i,j,k,Qi;
 	vector val FPVect;
   array integer quartToPrint;
-  val value,tot;
+  val value;
 	
 	array string 10 sheetNames;
 	array val sheetColls;
@@ -455,11 +463,9 @@ BEGIN
 						style5 = 77;
 					end;
 				end;
-				tot = 0;
-        for (i=0;i<ProjArray.length;i=i+1) begin
+				for (i=0;i<ProjArray.length;i=i+1) begin
           value = FPVect[FoundArray[j] & ":" & ProjArray[i]]/1000;
-          tot = tot + value;
-					if (i == 0) then begin
+          if (i == 0) then begin
 						style = style1;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
 					end else begin
@@ -503,7 +509,7 @@ BEGIN
 						style = 39;
 					end;
 				end;
-				NumericCell(sheetnum,fileToSave,colnum,rownum,style,tot);
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":TOTAL"]/1000);
 			EndRow(sheetnum,fileToSave,rownum);
 		end;
 		BeginRow(sheetnum,fileToSave,rownum,0,10);
@@ -518,10 +524,8 @@ BEGIN
 			style = 7;
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			colnum = colnum + 1;
-			tot = 0;
-      for (i=0;i<ProjArray.length;i=i+1) begin
+			for (i=0;i<ProjArray.length;i=i+1) begin
 				value = FPVect["TOTAL:" & ProjArray[i]]/1000;
-        tot = tot + value;
         if (i == 0) then begin
 					style = style1;
           NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
@@ -558,7 +562,7 @@ BEGIN
 				end;
 			end;
 			style = 41;
-			NumericCell(sheetnum,fileToSave,colnum,rownum,style,tot);
+			NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:TOTAL"]/1000);
 		EndRow(sheetnum,fileToSave,rownum);
 		BeginRow(sheetnum,fileToSave,rownum,0,10);
 		EndRow(sheetnum,fileToSave,rownum);
@@ -568,7 +572,7 @@ BEGIN
 			StringCell(sheetnum,fileToSave,colnum,rownum,style,"Sub Tot %",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 			colnum = colnum + 1;
 			for (i=0;i<ProjArray.length;i=i+1) begin
-        value = FPVect["TOTAL:" & ProjArray[i]]/tot/10;
+        value = FPVect["TOTAL:" & ProjArray[i]]/FPVect["TOTAL:TOTAL"]*100;
 				if (i == 0) then begin
 					style = style1;
 					NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
@@ -760,26 +764,22 @@ BEGIN
 		colnum = 4;
 		BeginRow(sheetnum,fileToSave,rownum,0,blankval);
       for (j=0;j<FoundArray.length;j=j+1) begin
-        tot = 0;
 				style = 45;
 				for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
           value = FPVect[quartToPrint[Qi] & ":" & FoundArray[j] & ":TOTAL"]/1000;
-          tot = tot + value;
           NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
         end;
         style = 46;
-				NumericCell(sheetnum,fileToSave,colnum,rownum,style,tot);
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect[FoundArray[j] & ":TOTAL"]/1000);
 				colnum = colnum + 1;
 			end;
 			style = 45;
-			tot = 0;
-      for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
+			for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
         value = FPVect[quartToPrint[Qi] & ":TOTAL:TOTAL"]/1000;
-        tot = tot + value;
         NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
       end;
       style = 50;
-			NumericCell(sheetnum,fileToSave,colnum,rownum,style,tot);
+			NumericCell(sheetnum,fileToSave,colnum,rownum,style,FPVect["TOTAL:TOTAL"]/1000);
 		EndRow(sheetnum,fileToSave,rownum);
 	EndSheetData(sheetnum,fileToSave);
 	MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);

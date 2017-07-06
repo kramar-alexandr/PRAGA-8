@@ -157,6 +157,16 @@ BEGIN
                   QuartVect[k & ";" & group & ":" & ProjArray[PAi]] = QuartVect[k & ";" & group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
 									QuartVect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] = QuartVect[ArtArrayWithoutGroups[j] & ":" & ProjArray[PAi]] + TBBUrw.Sum;
 									QuartVect[group & ":" & ProjArray[PAi]] = QuartVect[group & ":" & ProjArray[PAi]] + TBBUrw.Sum;
+                  QuartVect[k & ";" & ArtArrayWithoutGroups[j] & ":TOTAL"] = QuartVect[k & ";" & ArtArrayWithoutGroups[j] & ":TOTAL"] + TBBUrw.Sum;
+                  QuartVect[k & ";" & group & ":TOTAL"] = QuartVect[k & ";" & group & ":TOTAL"] + TBBUrw.Sum;
+                  QuartVect[ArtArrayWithoutGroups[j] & ":TOTAL"] = QuartVect[ArtArrayWithoutGroups[j] & ":TOTAL"] + TBBUrw.Sum;
+									QuartVect[group & ":TOTAL"] = QuartVect[group & ":TOTAL"] + TBBUrw.Sum;
+                  if (nonblank(PRr.MotherCode)) then begin
+                    QuartVect[k & ";" & ArtArrayWithoutGroups[j] & ":" & PRr.MotherCode] = QuartVect[k & ";" & ArtArrayWithoutGroups[j] & ":" & PRr.MotherCode] + TBBUrw.Sum;
+                    QuartVect[k & ";" & group & ":" & PRr.MotherCode] = QuartVect[k & ";" & group & ":" & PRr.MotherCode] + TBBUrw.Sum;
+                    QuartVect[ArtArrayWithoutGroups[j] & ":" & PRr.MotherCode] = QuartVect[ArtArrayWithoutGroups[j] & ":" & PRr.MotherCode] + TBBUrw.Sum;
+                    QuartVect[group & ":" & PRr.MotherCode] = QuartVect[group & ":" & PRr.MotherCode] + TBBUrw.Sum;
+                  end;
 								end;
 							end; 
 						end;
@@ -165,7 +175,6 @@ BEGIN
 			end;
 		end;
 	end;
-	
 	RETURN;
 END;
 
@@ -183,7 +192,6 @@ BEGIN
 	vector boolean isMotherProjVect;
 	integer i,j,quartCount,Qi;
 	string 100 group,nextgroup;
-	val totrow,facttotrow,value;
 	string 10 tstr;
 	
 	array string 10 sheetNames;
@@ -455,34 +463,24 @@ BEGIN
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,ITr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					colnum = colnum + 1;
 					for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
-						totrow = 0;
-						facttotrow = 0;
 						for (j=0;j<ProjArray.length;j=j+1) begin
 							style = 22;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":" & ProjArray[j]]);
-							totrow = totrow + QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":" & ProjArray[j]];
-							facttotrow = facttotrow + QuartVect[quartToPrint[Qi] & ";" & "Fact:" & ArtArrayWithGroups[i] & ":" & ProjArray[j]];
 							PrjTotVect[quartToPrint[Qi] & ";" & ProjArray[j]] = PrjTotVect[quartToPrint[Qi] & ";" & ProjArray[j]] + QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":" & ProjArray[j]];
 						end;
 						style = 23;
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totrow);
-						colnum = colnum + 1;
-						PrjTotVect[quartToPrint[Qi] & ";TOTAL"] = PrjTotVect[quartToPrint[Qi] & ";TOTAL"] + totrow;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":TOTAL"]);
+            colnum = colnum + 1;
+						PrjTotVect[quartToPrint[Qi] & ";TOTAL"] = PrjTotVect[quartToPrint[Qi] & ";TOTAL"] + QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":TOTAL"];
 					end;
-					totrow = 0;
-					facttotrow = 0;
 					for (j=0;j<ProjArray.length;j=j+1) begin
 						style = 36;
-            value = QuartVect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,value);
-						totrow = totrow + value;
-            value = QuartVect["Fact:" & ArtArrayWithGroups[i] & ":" & ProjArray[j]];
-						facttotrow = facttotrow + value;
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[ArtArrayWithGroups[i] & ":" & ProjArray[j]]);
 						PrjTotVect["TOTAL:" & ProjArray[j]] = PrjTotVect["TOTAL:" & ProjArray[j]] + QuartVect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
 					end;
 					style = 37;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totrow);
-					PrjTotVect["TOTAL:TOTAL"] = PrjTotVect["TOTAL:TOTAL"] + totrow;
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":TOTAL"]);
+					PrjTotVect["TOTAL:TOTAL"] = PrjTotVect["TOTAL:TOTAL"] + QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":TOTAL"];
 				EndRow(sheetnum,fileToSave,rownum);
 			end else begin
 				style1 = 28;
@@ -522,8 +520,6 @@ BEGIN
 					readfirstmain(Objr,1,true);
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
-						totrow = 0;
-						facttotrow = 0;
 						for (j=0;j<ProjArray.length;j=j+1) begin
 							if (j==0) then begin
 								style = style1;
@@ -535,23 +531,17 @@ BEGIN
 								end;
 							end;
 							NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":" & ProjArray[j]]);
-							totrow = totrow + QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":" & ProjArray[j]];
-							facttotrow = facttotrow + QuartVect[quartToPrint[Qi] & ";" & "Fact:" & ArtArrayWithGroups[i] & ":" & ProjArray[j]];
 						end;
 						style = style4;
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totrow);
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":TOTAL"]);
 						colnum = colnum + 1;
 					end;
-					totrow = 0;
-					facttotrow = 0;
 					for (j=0;j<ProjArray.length;j=j+1) begin
 						style = style5;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[ArtArrayWithGroups[i] & ":" & ProjArray[j]]);
-						totrow = totrow + QuartVect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
-						facttotrow = facttotrow + QuartVect["Fact:" & ArtArrayWithGroups[i] & ":" & ProjArray[j]];
 					end;
 					style = style6;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,totrow);
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[ArtArrayWithGroups[i] & ":TOTAL"]);
 				EndRow(sheetnum,fileToSave,rownum);
 			end;
 		end;
