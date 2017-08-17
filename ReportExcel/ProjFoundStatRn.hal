@@ -479,8 +479,8 @@ BEGIN
 						PrjTotVect["TOTAL:" & ProjArray[j]] = PrjTotVect["TOTAL:" & ProjArray[j]] + QuartVect[ArtArrayWithGroups[i] & ":" & ProjArray[j]];
 					end;
 					style = 37;
-					NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":TOTAL"]);
-					PrjTotVect["TOTAL:TOTAL"] = PrjTotVect["TOTAL:TOTAL"] + QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":TOTAL"];
+					NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[ArtArrayWithGroups[i] & ":TOTAL"]);
+					PrjTotVect["TOTAL:TOTAL"] = PrjTotVect["TOTAL:TOTAL"] + QuartVect[ArtArrayWithGroups[i] & ":TOTAL"];
 				EndRow(sheetnum,fileToSave,rownum);
 			end else begin
 				style1 = 28;

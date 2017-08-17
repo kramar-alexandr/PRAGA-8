@@ -268,18 +268,18 @@ BEGIN
                     EAi = EAi + 1;
                   end;
                   QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";" & ProjArray[PAi]] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";T"]            = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";T"]            - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & ProjArray[PAi]]                = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & ProjArray[PAi]]                - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[k & "F;" & group &                   ";" & ProjArray[PAi]]                = QuartVect[k & "F;" & group &                   ";" & ProjArray[PAi]]                - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[k &                               "F;T;" & ProjArray[PAi]]                = QuartVect[k &                               "F;T;" & ProjArray[PAi]]                - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";T"]                                = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";T"]                                - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[k & "F;" & group &                   ";T"]                                = QuartVect[k & "F;" & group &                   ";T"]                                - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[k &                               "F;T;T"]                                = QuartVect[k &                               "F;T;T"]                                - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";T"]                 = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";T"]                 - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k & "F;" & ArtArrayWithoutGroups[j] &                ";" & ProjArray[PAi]] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] &                ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k & "F;" & group &                                   ";" & ProjArray[PAi]] = QuartVect[k & "F;" & group &                                   ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k &                                               "F;T;" & ProjArray[PAi]] = QuartVect[k &                                               "F;T;" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k & "F;" & ArtArrayWithoutGroups[j] &                ";T"]                 = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] &                ";T"]                 - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k & "F;" & group &                                   ";T"]                 = QuartVect[k & "F;" & group &                                   ";T"]                 - TRrw.CredVal + TRrw.DebVal;
+                  QuartVect[k &                                               "F;T;T"]                 = QuartVect[k &                                               "F;T;T"]                 - TRrw.CredVal + TRrw.DebVal;
                   if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
                     QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";" & PRr.MotherCode] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & PRr.MotherCode]                = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & PRr.MotherCode]                - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[k & "F;" & group &                   ";" & PRr.MotherCode]                = QuartVect[k & "F;" & group &                   ";" & PRr.MotherCode]                - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[k &                               "F;T;" & PRr.MotherCode]                = QuartVect[k &                               "F;T:" & PRr.MotherCode]                - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "F;" & ArtArrayWithoutGroups[j] &                ";" & PRr.MotherCode] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] &                ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "F;" & group &                                   ";" & PRr.MotherCode] = QuartVect[k & "F;" & group &                                   ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k &                                               "F;T;" & PRr.MotherCode] = QuartVect[k &                                               "F;T;" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
                   end;
                   if (RepSpec.f2=="2016") then begin
                     switch (ProjArray[PAi]) begin
@@ -293,9 +293,9 @@ BEGIN
                         tstr = "sT3";
                     end;
                     QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";" & tstr] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";" & tstr] - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & tstr]                     = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & tstr]                     - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[k & "F;" & group &                   ";" & tstr]                     = QuartVect[k & "F;" & group &                   ";" & tstr]                     - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[k &                               "F;T;" & tstr]                     = QuartVect[k &                               "F;T;" & tstr]                     - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & tstr]                = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] &                ";" & tstr] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "F;" & group &                    ";" & tstr]                = QuartVect[k & "F;" & group &                                   ";" & tstr] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k &                                "F;T;" & tstr]                = QuartVect[k &                                               "F;T;" & tstr] - TRrw.CredVal + TRrw.DebVal;
                   end;
                   if (RepSpec.f2=="2017") then begin
                     switch (ProjArray[PAi]) begin
@@ -305,9 +305,9 @@ BEGIN
                         tstr = "sT3";
                     end;
                     QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";" & tstr] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";" & tstr] - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & tstr]                     = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & tstr]                     - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[k & "F;" & group &                   ";" & tstr]                     = QuartVect[k & "F;" & group &                   ";" & tstr]                     - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[k &                               "F;T;" & tstr]                     = QuartVect[k &                               "F;T;" & tstr]                     - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & tstr]                = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & tstr]                - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "F;" & group &                    ";" & tstr]                = QuartVect[k & "F;" & group &                    ";" & tstr]                - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k &                                "F;T;" & tstr]                = QuartVect[k &                                "F;T;" & tstr]                - TRrw.CredVal + TRrw.DebVal;
                   end;
                 end;
 							end;
