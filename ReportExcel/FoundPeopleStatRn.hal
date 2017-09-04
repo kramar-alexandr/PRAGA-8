@@ -460,8 +460,7 @@ BEGIN
 		numOfSharedStrings = 0;
 		sheetnum = 1;
 		qtyMergeCell = 0;
-    logtext(0,"XmlXlsxWorkBegin begin - ");
-		XmlXlsxWorkBegin(fileToSave,reportName);
+    XmlXlsxWorkBegin(fileToSave,reportName);
 		CreateSheetsXLSX(qtyOfSheets,sheetNames,fileToSave,0,false);
     if quartCount>1 then begin
       SetSheetsCols(sheetnum,sheetColls,sheetCollsOutLvl,fileToSave);

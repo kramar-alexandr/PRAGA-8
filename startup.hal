@@ -24,6 +24,7 @@ begin
 	Report("Project Statistics 2016",ProjectStatRClass,ProjectStatRn,0,modTS);
   Report("Project Statistics 2017",ProjectStat2017RClass,ProjectStatRn,0,modTS);
 	Report("Projects Facts",ProjectFactRClass,ProjectFactRn,0,modTS);
+  Report("Total Report - All Companies",AllPrjAllCompRClass,AllPrjAllCompRn,0,modTS);
   Report("Web Statistics DEMO",MyBIRClass,MyBIRn,0,modTS);//Edit-------------------Vitalii 11:30 14:48 19.09.2016
   
 	Setting("Uploading a file to MS Excel",ExcelUploadTClass,modTS);

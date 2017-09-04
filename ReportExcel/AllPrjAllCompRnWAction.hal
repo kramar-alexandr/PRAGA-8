@@ -1,0 +1,170 @@
+remote procedure AllPrjAllCompRn(record RcVc,var string,var string,var boolean);
+remote function boolean OTCodeMatch(string,string);
+remote function boolean GetPartFileToArea(string,var area);
+remote procedure DeleteXLSXJunk(string);
+remote procedure BackupXLSX(string);
+remote procedure RecoverXLSX(string,string);
+remote function integer GetQuartal(date);
+external function integer GetMonthNum(string);
+
+global
+procedure AllPrjAllCompRClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2017";
+  PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
+function Boolean AllPrjAllCompRClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2017";
+  PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+procedure RunAllPrjAllCompRn()
+begin
+	record ObjVc Objr;
+	record OTVc OTr;
+	string 255 filename,tstr,fnserv,md5strServ,md5strCli;
+	string 10 tmpDate;
+	area tmparea;
+	record RcVc RepSpec;
+	integer wn,transCNT;
+	boolean PrjFoundf,testf,EOF,err;
+	
+	transCNT = 5;
+	wn = curwindow;
+	deselectwindow(wn,true);
+	getwindowrecord(wn,RepSpec);
+  testf = true;
+	PrjFoundf = true;
+	if (blank(RepSpec.f2)) then begin
+		MessageBox(0,"Input Year!");
+		testf = false;
+	end else begin
+		if len(RepSpec.f2)!=4 then  begin
+			MessageBox(0,"Incorrect Year!");
+			testf = false;
+		end;
+	end;
+  if nonblank(RepSpec.f4) then begin
+    RepSpec.f4 = GetMonthNum(RepSpec.f4);
+    if (RepSpec.f4=="0") then begin
+      MessageBox(0,"Incorrect month!");
+      testf = false;
+    end else begin
+      RepSpec.sStartDate = StringToDate("1/" & RepSpec.f4 & "/" & RepSpec.f2);
+      RepSpec.sEndDate = StringToDate(DaysInMonth(StringToInt(RepSpec.f2),StringToInt(RepSpec.f4)) & "/" & RepSpec.f4 & "/" & RepSpec.f2);
+      RepSpec.flags[1] = 0;
+      RepSpec.flags[2] = 0;
+      RepSpec.flags[3] = 0;
+      RepSpec.flags[4] = 0;
+      switch GetQuartal(RepSpec.sStartDate) begin
+        case 1: RepSpec.flags[1] = 1;
+        case 2: RepSpec.flags[2] = 1;
+        case 3: RepSpec.flags[3] = 1;
+        case 4: RepSpec.flags[4] = 1;
+      end;
+    end;
+  end else begin
+    if ((RepSpec.flags[1]==0) and (RepSpec.flags[2]==0) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==0) and testf) then begin
+      MessageBox(0,"Select at least one Quartal!");
+      testf = false;
+    end;
+    if ((((RepSpec.flags[1]==1) and (RepSpec.flags[2]==0) and ((RepSpec.flags[3]==1) or (RepSpec.flags[4]==1))) or (((RepSpec.flags[1]==1) or (RepSpec.flags[2]==1)) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==1))) and testf) then begin
+      MessageBox(0,"Incorrect selection of Quartals!");
+      testf = false;
+    end;
+    if testf then begin
+      tmpDate = "";
+      if (RepSpec.flags[4]==1) then begin
+        tmpDate = "1/10/";
+      end;
+      if (RepSpec.flags[3]==1) then begin
+        tmpDate = "1/7/";
+      end;
+      if (RepSpec.flags[2]==1) then begin
+        tmpDate = "1/4/";
+      end;
+      if (RepSpec.flags[1]==1) then begin
+        tmpDate = "1/1/";
+      end;
+      tmpDate = tmpDate & RepSpec.f2;
+      RepSpec.sStartDate = StringToDate(tmpDate);
+      
+      tmpDate = "";
+      if (RepSpec.flags[1]==1) then begin
+        tmpDate = "31/3/";
+      end;
+      if (RepSpec.flags[2]==1) then begin
+        tmpDate = "30/6/";
+      end;
+      if (RepSpec.flags[3]==1) then begin
+        tmpDate = "30/9/";
+      end;
+      if (RepSpec.flags[4]==1) then begin
+        tmpDate = "31/12/";
+      end;
+      tmpDate = tmpDate & RepSpec.f2;
+      RepSpec.sEndDate = StringToDate(tmpDate);
+    end;
+  end;
+  if testf then begin
+    
+		tstr = "Total Report - All Companies -" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
+    filename = SaveFileDialog(tstr,"","xlsx");
+		if ((filename!=tstr) and nonblank(filename)) then begin
+			AllPrjAllCompRn(RepSpec,fnserv,md5strServ,PrjFoundf);
+      if (PrjFoundf) then begin
+			  if(fileexists(filename))then begin
+					delete_file(filename);
+				end;
+			  BackupXLSX(fnserv);
+        testf = true;
+        err = false;
+        while (testf) begin
+          while (!EOF) begin
+            EOF = GetPartFileToArea(fnserv,tmparea);
+            writeareatofile(tmparea,filename,1);
+          end;
+          md5strCli = GetFileMD5(filename);
+          if (md5strCli!=md5strServ) then begin
+            err = true;
+            RecoverXLSX(fnserv,"AllPrjAllComp");
+            transCNT = transCNT - 1;
+            if (transCNT==0) then begin
+              testf = false;
+            end;
+          end else begin
+            testf = false;
+          end;
+        end;
+        DeleteXLSXJunk(fnserv);
+        CloseWindow(wn);
+        if (err) then begin 
+          Messagebox(0,"Communication problems! Try again later.");
+        end else begin
+          Messagebox(0,"Done!");
+        end;
+			end else begin
+        if nonblank(RepSpec.f1) then begin
+					MessageBox(0,"Project " & chr(34) & RepSpec.f1 & chr(34) & " is not included in the specified period!");
+				end else begin
+					MessageBox(0,"Projects for specified period not found!");
+				end;
+			end;
+		end;
+	end;
+	return;
+end;
