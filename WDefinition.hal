@@ -5050,7 +5050,7 @@ begin
 end;
 
 window MyBIRClass:1
-  wtag("language","UKR"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer") 
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer") 
 begin
   
   WindowBegin("Web Statistics DEMO",MyBIRClass,CGother,-);  
@@ -5058,6 +5058,45 @@ begin
   UseView(RcVc);
   EditField(100,6,80,"Quantity",Normal,f1,false,0);
   HalPushButton(50,30,150,50,"MyBIRun","Run");
+  
+  EndWindow;
+end;
+
+window APDClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,h1,h2,t,v,vs;
+  WindowBegin("APVc",APDClass,CGview,-);
+  SetWRect(20,80,512,639);
+  UseView(APVc);
+  vs = 20; h=50; h1=100; h2=220;
+  EditField(h=80,v=10, 70, "InvoiceNr",Normal,InvoiceNr,false,0);
+  EditField(h,v+=20, 82, "Date",Normal,DueDate,false,0);
+  EditField(h,v+=20, 82, "RVal",Normal,RVal,false,0);
+  EditField(h,v+=20, 82, "VECode",Normal,VECode,false,0);
+  EditField(h,v+=20, 82, "RebDate",Normal,RebDate,false,0);
+  EditField(h,v+=20, 82, "CurncyCode",Normal,CurncyCode,false,0);
+  EditField(h,v+=20, 82, "VEName",Normal,VEName,false,0);
+  EditField(h,v+=20, 82, "BookRVal",Normal,BookRVal,false,0);
+  EditField(h,v+=20, 82, "OPNr",Normal,OPNr,false,0);
+  EditField(h,v+=20, 82, "RebDate2",Normal,RebDate2,false,0);
+  
+  EndWindow;
+end;
+
+window APLClass:10
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","iPad") 
+begin
+  WindowBegin("APVc",APLClass,CGmlist,-); 
+  SetWRect(20,80,800,298);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(APDClass);
+  UseView(APVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"InvoiceNr",InvoiceNr,false,InvoiceNr); 
+  RlColKey(111,111,"Date",DueDate,false,DueDate); 
+  RlColKey(220,200,"VEName",VEName,false,VEName); 
+  SearchField("Search"); 
   
   EndWindow;
 end;

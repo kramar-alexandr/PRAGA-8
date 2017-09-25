@@ -7,6 +7,7 @@ begin
 	Register("Contracts","Contracts",ContractsVc,modPL);		//Edit----------------------Dima  09.02.2016
   //registers for Excel reports
   Register("BOVc","BOVc",BOVc,modTS);
+  Register("APVc","APVc",APVc,modDBMain);
 
 	Report("TEST",TESTRClass,TESTRn,0,modTS);
 	Report("TEST2",TEST2RClass,TEST2Rn,0,modTS);
