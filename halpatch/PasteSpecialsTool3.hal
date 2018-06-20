@@ -851,7 +851,7 @@ begin
       case "April":
 				GetMonthNum = 4;
       case "May":
-				GetMonthNum = 4;
+				GetMonthNum = 5;
       case "June":
 				GetMonthNum = 6;
       case "July":
