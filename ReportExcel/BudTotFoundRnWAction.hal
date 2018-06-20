@@ -6,6 +6,30 @@ remote procedure RecoverXLSX(string,string);
 external function integer GetMonthNum(string);
 
 global
+procedure BudTotFound2018RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2018";
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
+function Boolean BudTotFound2018RClassOnOpenWindow(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2018";
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
 procedure BudTotFound2017RClassReportDefaults(integer wn)
 begin
 	record RcVc RepSpec;
@@ -28,6 +52,7 @@ begin
 
 	return;
 end;
+
 global
 procedure BudTotFoundRClassReportDefaults(integer wn)
 begin

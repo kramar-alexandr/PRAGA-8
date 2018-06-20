@@ -30,9 +30,8 @@ BEGIN
 	while(loopmain(ITr,1,true)) begin
     testf = true;
     if ((RepSpec.f2=="2016" and right(ITr.Code,3)!="_16") or
-        (RepSpec.f2=="2017" and right(ITr.Code,3)!="_17")) then begin testf = false; end;
-    if ((RepSpec.f2!="2016" and right(ITr.Code,3)=="_16") or
-        (RepSpec.f2!="2017" and right(ITr.Code,3)=="_17")) then begin testf = false; end;
+        (RepSpec.f2=="2017" and right(ITr.Code,3)!="_17") or
+        (RepSpec.f2=="2018" and right(ITr.Code,3)!="_18")) then begin testf = false; end;
     if (testf) then begin
       ArtArrayWithGroups[kw] = ITr.Code;
       kw = kw + 1;
@@ -44,9 +43,8 @@ BEGIN
         if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
         if (blank(INr.Objects)) then begin testf = false; end;
         if ((RepSpec.f2=="2016" and right(INr.Objects,3)!="_16") or
-            (RepSpec.f2=="2017" and right(INr.Objects,3)!="_17")) then begin testf = false; end;
-        if ((RepSpec.f2!="2016" and right(INr.Objects,3)=="_16") or
-            (RepSpec.f2!="2017" and right(INr.Objects,3)=="_17")) then begin testf = false; end;
+            (RepSpec.f2=="2017" and right(INr.Objects,3)!="_17") or
+            (RepSpec.f2=="2018" and right(INr.Objects,3)!="_18")) then begin testf = false; end;
         if (testf) then begin
           tstr = INr.Objects;
           foundf = false;
@@ -73,6 +71,8 @@ BEGIN
       case "2016.998":
         goto L1;
       case "2017.998":
+        goto L1;
+      case "2018.998":
         goto L1;
     end;
 		if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin

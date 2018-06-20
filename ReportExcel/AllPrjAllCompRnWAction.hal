@@ -8,7 +8,7 @@ remote function integer GetQuartal(date);
 external function integer GetMonthNum(string);
 
 global
-procedure AllPrjAllCompRClassReportDefaults(integer wn)
+procedure AllPrjAllComp2017RClassReportDefaults(integer wn)
 begin
 	record RcVc RepSpec;
 	
@@ -20,12 +20,36 @@ begin
 end;
 
 global
-function Boolean AllPrjAllCompRClassOnOpenWindow(Integer wn)
+function Boolean AllPrjAllComp2017RClassOnOpenWindow(Integer wn)
 begin
 	record RcVc RepSpec;
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2017";
+  PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+procedure AllPrjAllComp2018RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2018";
+  PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
+function Boolean AllPrjAllComp2018RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2018";
   PutWindowRecord(wn,RepSpec);
 
 	return;

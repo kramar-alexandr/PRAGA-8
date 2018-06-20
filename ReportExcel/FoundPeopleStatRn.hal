@@ -34,9 +34,8 @@ BEGIN
 	kw = 0;
   while(loopmain(ITr,1,true)) begin
     if ((RepSpec.f2=="2016" and right(ITr.Code,3)=="_16") or
-        (RepSpec.f2!="2016" and right(ITr.Code,3)!="_16") or
         (RepSpec.f2=="2017" and right(ITr.Code,3)=="_17") or
-        (RepSpec.f2!="2017" and right(ITr.Code,3)!="_17")) then begin
+        (RepSpec.f2=="2018" and right(ITr.Code,3)=="_18")) then begin
       ArtArrayWithGroups[kw] = ITr.Code;
       kw = kw + 1;
       resetloop(INr);
@@ -47,7 +46,8 @@ BEGIN
         if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
         if (blank(INr.Objects)) then begin testf = false; end;
         if ((RepSpec.f2=="2016" and right(INr.Objects,3)!="_16") or
-            (RepSpec.f2=="2017" and right(INr.Objects,3)!="_17")) then begin testf = false; end;
+            (RepSpec.f2=="2017" and right(INr.Objects,3)!="_17") or
+            (RepSpec.f2=="2018" and right(INr.Objects,3)!="_18")) then begin testf = false; end;
         if (testf) then begin
           tstr = INr.Objects;
           foundf = false;
@@ -75,6 +75,10 @@ BEGIN
             goto L1;
           end;
         case "2017.998":
+        if (RepSpec.flags[5]==0) then begin
+          goto L1;
+        end;
+        case "2018.998":
         if (RepSpec.flags[5]==0) then begin
           goto L1;
         end;
@@ -708,6 +712,7 @@ BEGIN
                 style = 81;
                 tstr = StrReplace(group,"_16","000");
                 tstr = StrReplace(tstr,"_17","000");
+                tstr = StrReplace(tstr,"_18","000");
                 StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                 colnum = colnum + 1;
                 StringCell(sheetnum,fileToSave,colnum,rownum,style,ITr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
@@ -766,7 +771,9 @@ BEGIN
                     (Right(ArtArrayWithGroups[i],4)=="0_16") or
                     (Right(ArtArrayWithGroups[i],5)=="99_16") or
                     (Right(ArtArrayWithGroups[i],4)=="0_17") or
-                    (Right(ArtArrayWithGroups[i],5)=="99_17")) then begin
+                    (Right(ArtArrayWithGroups[i],5)=="99_17") or
+                    (Right(ArtArrayWithGroups[i],4)=="0_18") or
+                    (Right(ArtArrayWithGroups[i],5)=="99_18")) then begin
                   StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                   colnum = colnum + 1;
                 end else begin
@@ -830,7 +837,9 @@ BEGIN
                             (Right(ArtArrayWithGroups[i],4)=="0_16") or
                             (Right(ArtArrayWithGroups[i],5)=="99_16") or
                             (Right(ArtArrayWithGroups[i],4)=="0_17") or
-                            (Right(ArtArrayWithGroups[i],5)=="99_17")) then begin
+                            (Right(ArtArrayWithGroups[i],5)=="99_17") or
+                            (Right(ArtArrayWithGroups[i],4)=="0_18") or
+                            (Right(ArtArrayWithGroups[i],5)=="99_18")) then begin
                           StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                           colnum = colnum + 1;
                         end else begin
@@ -1251,6 +1260,7 @@ BEGIN
                 style = 81;
                 tstr = StrReplace(group,"_16","000");
                 tstr = StrReplace(tstr,"_17","000");
+                tstr = StrReplace(tstr,"_18","000");
                 StringCell(sheetnum,fileToSave,colnum,rownum,style,tstr,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                 colnum = colnum + 1;
                 style = 2;
@@ -1306,7 +1316,9 @@ BEGIN
                     (Right(ArtArrayWithGroups[i],4)=="0_16") or
                     (Right(ArtArrayWithGroups[i],5)=="99_16") or
                     (Right(ArtArrayWithGroups[i],4)=="0_17") or
-                    (Right(ArtArrayWithGroups[i],5)=="99_17")) then begin
+                    (Right(ArtArrayWithGroups[i],5)=="99_17") or
+                    (Right(ArtArrayWithGroups[i],4)=="0_18") or
+                    (Right(ArtArrayWithGroups[i],5)=="99_18")) then begin
                   StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                   colnum = colnum + 1;
                 end else begin
@@ -1370,7 +1382,9 @@ BEGIN
                             (Right(ArtArrayWithGroups[i],4)=="0_16") or
                             (Right(ArtArrayWithGroups[i],5)=="99_16") or
                             (Right(ArtArrayWithGroups[i],4)=="0_17") or
-                            (Right(ArtArrayWithGroups[i],5)=="99_17")) then begin
+                            (Right(ArtArrayWithGroups[i],5)=="99_17") or
+                            (Right(ArtArrayWithGroups[i],4)=="0_18") or
+                            (Right(ArtArrayWithGroups[i],5)=="99_18")) then begin
                           StringCell(sheetnum,fileToSave,colnum,rownum,style,ArtArrayWithGroups[i],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                           colnum = colnum + 1;
                         end else begin

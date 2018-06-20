@@ -32,10 +32,12 @@ BEGIN
   
 	k = 0;
 	while (loopmain(PRr,1,true)) begin
-		switch (PRr.Code) begin
-      case "2017.998":
-      if (RepSpec.flags[6]==0) then begin
-        goto L1;
+    if (RepSpec.flags[6]==0) then begin
+      switch (PRr.Code) begin
+        case "2017.998":
+          goto L1;
+        case "2018.998":
+          goto L1;
       end;
     end;
 		if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) and ((nonblank(RepSpec.f1) and (RepSpec.f1 == PRr.Code)) or blank(RepSpec.f1)) then begin
@@ -96,15 +98,15 @@ BEGIN
   val tempVal;
   
 	curcomp = currentcompany;
-  SetCompany(1,false);
+  SetCompany(2,false);
   for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
 		PRr.Code = ProjArray[PAi];
 		if (ReadFirstMain(PRr,1,true)) then begin
       prjobjs[PAi] = PRr.Objects;
-			if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
+      if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
 				TBBUr.PRCode = PRr.Code;
 				if (readfirstmain(TBBUr,1,true)) then begin
-					mtrw = matrowcnt(TBBUr);
+        	mtrw = matrowcnt(TBBUr);
 					k = 0;
 					for (i=0;i<mtrw;i=i+1) begin
 						matrowget(TBBUr,i,TBBUrw);

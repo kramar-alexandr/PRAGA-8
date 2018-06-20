@@ -35,9 +35,8 @@ BEGIN
 	while(loopmain(ITr,1,true)) begin
     testf = true;
     if ((RepSpec.f2=="2016" and right(ITr.Code,3)!="_16") or
-        (RepSpec.f2=="2017" and right(ITr.Code,3)!="_17")) then begin testf = false; end;
-    if ((RepSpec.f2!="2016" and right(ITr.Code,3)=="_16") or
-        (RepSpec.f2!="2017" and right(ITr.Code,3)=="_17")) then begin testf = false; end;
+        (RepSpec.f2=="2017" and right(ITr.Code,3)!="_17") or
+        (RepSpec.f2=="2018" and right(ITr.Code,3)!="_18")) then begin testf = false; end;
     if (testf) then begin
       ArtArrayWithGroups[kw] = ITr.Code;
       kw = kw + 1;
@@ -49,9 +48,8 @@ BEGIN
         if (INr.Group!=ITr.Code) then begin testf = false; TrHs = false; end;
         if (blank(INr.Objects)) then begin testf = false; end;
         if ((RepSpec.f2=="2016" and right(INr.Objects,3)!="_16") or
-            (RepSpec.f2=="2017" and right(INr.Objects,3)!="_17")) then begin testf = false; end;
-        if ((RepSpec.f2!="2016" and right(INr.Objects,3)=="_16") or
-            (RepSpec.f2!="2017" and right(INr.Objects,3)=="_17")) then begin testf = false; end;
+            (RepSpec.f2=="2017" and right(INr.Objects,3)!="_17") or
+            (RepSpec.f2=="2018" and right(INr.Objects,3)!="_18")) then begin testf = false; end;
         if (testf) then begin
           tstr = INr.Objects;
           foundf = false;
@@ -72,15 +70,15 @@ BEGIN
 	end;
 	k = 0;
 	while(loopmain(PRr,1,true)) begin
-		switch (PRr.Code) begin
-      case "2016.998":
-        if (RepSpec.flags[6]==0) then begin
+    if (RepSpec.flags[6]==0) then begin
+      switch (PRr.Code) begin
+        case "2016.998":
           goto L1;
-        end;
         case "2017.998":
-        if (RepSpec.flags[6]==0) then begin
           goto L1;
-        end;
+        case "2018.998":
+          goto L1;
+      end;
     end;
 		if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) and ((nonblank(RepSpec.f1) and (RepSpec.f1 == PRr.Code)) or blank(RepSpec.f1)) then begin
 			ProjArray[k] = PRr.Code;
@@ -228,6 +226,18 @@ BEGIN
                 QuartVect[k & ";" & group &         ";" & tstr]                      = QuartVect[k & ";" & group &         ";" & tstr]                      + tempVal;
                 QuartVect[k & ";" &                "T;" & tstr]                      = QuartVect[k & ";" &                "T;" & tstr]                      + tempVal;
               end;
+              if (RepSpec.f2=="2018") then begin
+                switch (ProjArray[PAi]) begin
+                  case "2018.998":
+                    tstr = "sT1";
+                  otherwise
+                    tstr = "sT3";
+                end;
+                QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";" & tstr] = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ";" & tstr] + tempVal;
+                QuartVect[k & ";" & TBBUrw.ArtCode & ";" & tstr]                      = QuartVect[k & ";" & TBBUrw.ArtCode & ";" & tstr]                      + tempVal;
+                QuartVect[k & ";" & group &         ";" & tstr]                      = QuartVect[k & ";" & group &         ";" & tstr]                      + tempVal;
+                QuartVect[k & ";" &                "T;" & tstr]                      = QuartVect[k & ";" &                "T;" & tstr]                      + tempVal;
+              end;
 						end;
 					end; 
 				end;
@@ -309,6 +319,18 @@ BEGIN
                     QuartVect[k & "F;" & group &                    ";" & tstr]                = QuartVect[k & "F;" & group &                    ";" & tstr]                - TRrw.CredVal + TRrw.DebVal;
                     QuartVect[k &                                "F;T;" & tstr]                = QuartVect[k &                                "F;T;" & tstr]                - TRrw.CredVal + TRrw.DebVal;
                   end;
+                  if (RepSpec.f2=="2018") then begin
+                    switch (ProjArray[PAi]) begin
+                      case "2018.998":
+                        tstr = "sT1";
+                      otherwise
+                        tstr = "sT3";
+                    end;
+                    QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";" & tstr] = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ":" & extras & ";" & tstr] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & tstr]                = QuartVect[k & "F;" & ArtArrayWithoutGroups[j] & ";" & tstr]                - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k & "F;" & group &                    ";" & tstr]                = QuartVect[k & "F;" & group &                    ";" & tstr]                - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[k &                                "F;T;" & tstr]                = QuartVect[k &                                "F;T;" & tstr]                - TRrw.CredVal + TRrw.DebVal;
+                  end;
                 end;
 							end;
 						end;
@@ -366,6 +388,27 @@ BEGIN
         testf = true;
         switch (ProjArray2[i]) begin
           case "2017.998":
+            testf = false;
+        end;
+        if (testf) then begin
+          ProjArray[PAi] = ProjArray2[i];
+          PAi = PAi + 1;
+        end;
+      end;
+      ProjArray[PAi] = "sT3";
+    end;
+    if (RepSpec.f2=="2018") then begin
+      PAi = 0;
+      if (RepSpec.flags[6]==1) then begin
+        ProjArray[PAi] = "2018.998";
+        PAi = PAi + 1;
+        ProjArray[PAi] = "sT1";
+        PAi = PAi + 1;
+      end;
+      for (i=0;i<ProjArray2.length;i=i+1) begin
+        testf = true;
+        switch (ProjArray2[i]) begin
+          case "2018.998":
             testf = false;
         end;
         if (testf) then begin
