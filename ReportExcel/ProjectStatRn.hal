@@ -26,7 +26,7 @@ BEGIN
 	record ITVc ITr;
 	record INVc INr;
 	record PRVc PRr,PR2r;
-	integer i,j,k,kw,kwo;
+	integer i,j,k,kw,kwo,oldcomp;
 	boolean TrHs,testf,foundf;
 	string 100 tstr;
 	
@@ -68,6 +68,13 @@ BEGIN
       end;
     end;
 	end;
+  oldcomp = currentcompany;
+  switch (RepSpec.f2) begin
+    case "2017":
+      SetCompany(2,false);
+    case "2018":
+      SetCompany(1,false);
+  end;
 	k = 0;
 	while(loopmain(PRr,1,true)) begin
     if (RepSpec.flags[6]==0) then begin
@@ -101,6 +108,7 @@ BEGIN
 			end;
 		end;
 L1:end;
+  resetcompany(oldcomp);
 	if (k==0) then begin
 		PrjFoundf = false;
 	end;
@@ -127,7 +135,7 @@ BEGIN
 	record ObjVc Objr;
 	row TBBUVc TBBUrw;
 	row TRVc TRrw;
-	integer i,j,k,l,mtrw,PAi,EAi;
+	integer i,j,k,l,mtrw,PAi,EAi,oldcomp;
 	boolean TrHs,testf,kTestf;
 	string 20 group,extras;
   array string 20 prjobjs;
@@ -136,6 +144,13 @@ BEGIN
   string 5 tstr;
   val tempVal;
 	
+  oldcomp = currentcompany;
+  switch (RepSpec.f2) begin
+    case "2017":
+      SetCompany(2,false);
+    case "2018":
+      SetCompany(1,false);
+  end;
   EAi = 0;
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin 
 		PRr.Code = ProjArray[PAi];
@@ -244,6 +259,7 @@ BEGIN
 			end;
 		end;
 	end;
+  resetcompany(oldcomp);
   
 	TRr.TransDate = RepSpec.sStartDate;
 	TrHs = true;

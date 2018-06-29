@@ -21,7 +21,7 @@ BEGIN
 	record INVc INr;
 	record PRVc PRr;
 	record ObjVc Objr;
-	integer i,j,k;
+	integer i,j,k,oldcomp;
 	boolean TrHs,testf,foundf;
 	string 100 tstr;
   string 2 year;
@@ -103,6 +103,13 @@ BEGIN
     end;
   end;
 	
+  oldcomp = currentcompany;
+  switch (RepSpec.f2) begin
+    case "2017":
+      SetCompany(2,false);
+    case "2018":
+      SetCompany(1,false);
+  end;
 	k = 0;
 	while(loopmain(PRr,1,true)) begin
 		if (PRr.Code=="20" & year & ".998") then begin goto L1; end;
@@ -114,6 +121,7 @@ BEGIN
 			end;
 		end;
 L1:end;
+  resetcompany(oldcomp);
 	if (k==0) then begin
 		PrjFoundf = false;
 	end;
@@ -139,7 +147,7 @@ BEGIN
 	row TBBUVc TBBUrw;
 	row TRVc TRrw;
 	record ObjVc Objr;
-	integer i,k,mtrw,PAi,FAi,AAi,ASi,TVi,DPi,DPTVi,supcount;
+	integer i,k,mtrw,PAi,FAi,AAi,ASi,TVi,DPi,DPTVi,supcount,oldcomp;
 	boolean TrHs,testf,firstf,kTestf;
 	vector boolean SupplInArr;
 	vector val TempVect;
@@ -150,7 +158,14 @@ BEGIN
 	ASi = 0;
 	ArtSuppl[ASi] = "";
 	ASi = ASi + 1;
-	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+	oldcomp = currentcompany;
+  switch (RepSpec.f2) begin
+    case "2017":
+      SetCompany(2,false);
+    case "2018":
+      SetCompany(1,false);
+  end;
+  for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
 		PRr.Code = ProjArray[PAi];
 		if (ReadFirstMain(PRr,1,true)) then begin
 			ProjManager[ProjArray[PAi]] = PRr.PRMan;
@@ -269,6 +284,7 @@ BEGIN
 			end;
 		end;
 	end;
+  resetcompany(oldcomp);
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
 		ClearVector(SupplInArr);
 		supcount = 0;

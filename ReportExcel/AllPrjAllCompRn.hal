@@ -88,7 +88,7 @@ BEGIN
   row CompaniesBlock CBrw;
 	row TBBUVc TBBUrw;
 	row TRVc TRrw;
-	integer i,j,k,mtrw,PAi,curcomp,compi,CBbmtrw,CAi;
+	integer i,j,k,mtrw,PAi,compi,CBbmtrw,CAi;
 	boolean TrHs,testf,kTestf;
 	string 20 group,extras;
   array string 20 prjobjs;
@@ -97,9 +97,7 @@ BEGIN
   string 5 tstr;
   val tempVal;
   
-	curcomp = currentcompany;
-  SetCompany(2,false);
-  for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
 		PRr.Code = ProjArray[PAi];
 		if (ReadFirstMain(PRr,1,true)) then begin
       prjobjs[PAi] = PRr.Objects;
@@ -197,8 +195,7 @@ BEGIN
       end;
     end;
   end;
-  resetcompany(curcomp);
-	RETURN;
+  RETURN;
 END;
 
 global
@@ -209,7 +206,7 @@ BEGIN
 	vector val QuartVect;
 	vector boolean isMotherProjVect;
 	vector string 255 ProjNamesVect,CompNamesVect;
-	integer i,CAi,PAi,quartCount,Qi;
+	integer i,CAi,PAi,quartCount,Qi,oldcomp;
 	string 10 tstr;
   
 	array integer quartToPrint;
@@ -225,9 +222,17 @@ BEGIN
 	array string 225 mas;
   area areatofile;
   
+  oldcomp = currentcompany;
+  switch (RepSpec.f2) begin
+    case "2017":
+      SetCompany(2,false);
+    case "2018":
+      SetCompany(1,false);
+  end;
   ArraysCollect(RepSpec,ProjArray,ProjNamesVect,PrjFoundf,isMotherProjVect);
 	if (PrjFoundf) then begin
 		DataCollect(ProjArray,CompArray,CompNamesVect,RepSpec,QuartVect);
+    resetcompany(oldcomp);
     reportName = "AllPrjAllCompRn";
 		if(windowsmode==1)then begin
       fileToSave = DateToString(CurrentDate,"YYYYMMDD") & "_" & TimeToString(CurrentTime,"HHMMSS",false) & "_" & GetCurTick() & ".xlsx";
@@ -668,5 +673,6 @@ BEGIN
     fnserv = fileToSave;
     md5str = GetFileMD5(fnserv);
 	end;
+  resetcompany(oldcomp);
   RETURN;
 END;

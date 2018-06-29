@@ -97,7 +97,7 @@ BEGIN
 	record INVc INr;
 	record PRVc PRr;
   record ObjVc Objr;
-	integer i,j,k,kw,kwo;
+	integer i,j,k,kw,kwo,oldcomp;
 	boolean TrHs,TrHs2,testf,foundf;
 	string 100 tstr;
   string 10 inputObjType,group;
@@ -156,6 +156,13 @@ BEGIN
     ReadFirstMain(PRr,1,true);
     PRNames[ProjArray[0]] = PRr.Name;
   end else begin
+    oldcomp = currentcompany;
+    switch (RepSpec.f2) begin
+      case "2017":
+        SetCompany(2,false);
+      case "2018":
+        SetCompany(1,false);
+    end;
     k = 0;
     while(loopmain(PRr,1,true)) begin
       if blank(PRr.MotherCode) then begin
@@ -170,6 +177,7 @@ BEGIN
         end;
 L1:   end;
     end;
+    resetcompany(oldcomp);
     
     if (k==0) then begin
       PrjFoundf = false;
@@ -198,7 +206,7 @@ BEGIN
 	record MainVc Mainr;
 	row TBBUVc TBBUrw;
 	row TRVc TRrw;
-	integer i,k,j,mtrw,PAi,ASi,EAi;
+	integer i,k,j,mtrw,PAi,ASi,EAi,oldcomp;
 	boolean TrHs,testf,kTestf;
 	string 20 group,extras,suppl,prj,found;
   vector boolean SupplInArr,ExtInArr;
@@ -207,6 +215,13 @@ BEGIN
   ArtSuppl[ASi] = "";
   ASi = ASi + 1;
   EAi = 0;
+  oldcomp = currentcompany;
+  switch (RepSpec.f2) begin
+    case "2017":
+      SetCompany(2,false);
+    case "2018":
+      SetCompany(1,false);
+  end;
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin 
 		PRr.Code = ProjArray[PAi];
 		if (ReadFirstMain(PRr,1,true)) then begin
@@ -337,6 +352,7 @@ BEGIN
       end;
     end;
 	end;
+  resetcompany(oldcomp);
   
   TRr.TransDate = RepSpec.sStartDate;
 	TrHs = true;
