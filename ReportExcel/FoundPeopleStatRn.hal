@@ -19,6 +19,11 @@ external procedure GetObjs(string,string,var string);
 external procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
 external function string 50 TimeToString(time,string,boolean);
 external function string 255 MonthName(Date);
+external function val AbsoluteVal(val);
+external procedure GetFullCurncyRate(var string,Date,var val,var val,var val,var val,var val);
+external function val MulRateToBase1(var string,val,val,val,val,val,val,roundmode);
+external function Boolean GetPMRow(string,var row PMBlock);
+external function roundmode SetRoundModeD(Integer);
 
 procedure ArraysCollect(record RcVc RepSpec, var array string ArtArrayWithoutGroups, var array string ProjArray, var array string ArtArrayWithGroups, var boolean PrjFoundf, var vector boolean isMotherProjVect)
 BEGIN
@@ -116,7 +121,7 @@ L1:	end;
 	RETURN;
 END;
 
-procedure DataCollect(array string ArtArrayWithoutGroups, array string ExtArr, var array string ArtSuppl, array string ProjArray, record RcVc RepSpec,
+procedure DataCollect(array string ArtArrayWithoutGroups, var array string ExtArr, var array string ArtSuppl, array string ProjArray, record RcVc RepSpec,
 					var vector val QuartVect)
 BEGIN
 	record PRVc PRr,PR2r;
@@ -128,13 +133,31 @@ BEGIN
 	row TBBUVc TBBUrw;
 	row TRVc TRrw;
 	integer i,k,j,mtrw,PAi,ASi,EAi,oldcomp;
-	boolean TrHs,testf,kTestf;
+	boolean TrHs,testf,kTestf,TrHs2;
 	string 20 group,extras,suppl;
   vector boolean SupplInArr,ExtInArr;
-  val tempVal;
+  val tmpval;
+  record VIVc VIr;
+  record OPVc OPr;
+  record PDVc PDr;
+  record BaseCurBlock bcur;
+  record OPrsVc OPrsr;
+  row VIVc VIrw;
+  row OPVc OPrw,VIOPrw;
+  row PMBlock PMrw;
+  val sum,fr,to1,to2,br1,br2,opsum,trsum,paidsum;
+  string 10 vicur,tstr;
+  vector boolean ProjInArr,ArtInArr;
 	
-	ASi = 0;
+  ASi = 0;
   EAi = 0;
+  for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+    ProjInArr[ProjArray[PAi]] = true;
+  end;
+  for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
+    ArtInArr[ArtArrayWithoutGroups[j]] = true;
+  end;
+  
   oldcomp = currentcompany;
   switch (RepSpec.f2) begin
     case "2017":
@@ -194,49 +217,49 @@ BEGIN
               ReadFirstMain(ITr,1,true);
               group = ITr.Code;
               if nonblank(RepSpec.f4) then begin
-                tempVal = TBBUrw.MonthSum;
+                tmpval = TBBUrw.MonthSum;
               end else begin
-                tempVal = TBBUrw.Sum;
+                tmpval = TBBUrw.Sum;
               end;
-              QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]] = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]] + tempVal;
-              QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]] = QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]] + tempVal;
+              QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]] = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]] + tmpval;
+              QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]] = QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]] + tmpval;
               
-              QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";T"]                 = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";T"] + tempVal;
-              QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";T"]                 = QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";T"] + tempVal;
+              QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";T"]                 = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";T"] + tmpval;
+              QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";T"]                 = QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";T"] + tmpval;
               
-              QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]]                       = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]] + tempVal;
-              QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]]                       = QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]] + tempVal;
+              QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]]                       = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]] + tmpval;
+              QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]]                       = QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & ProjArray[PAi]] + tmpval;
               
-              QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";T"]                                       = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";T"] + tempVal;
-              QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";T"]                                       = QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";T"] + tempVal;
+              QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";T"]                                       = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";T"] + tmpval;
+              QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";T"]                                       = QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";T"] + tmpval;
               
-              QuartVect[k & ";" & TBBUrw.ArtCode &                       ";" & ProjArray[PAi]]                       = QuartVect[k & ";" & TBBUrw.ArtCode &                       ";" & ProjArray[PAi]] + tempVal;
-              QuartVect[    ";" & TBBUrw.ArtCode &                       ";" & ProjArray[PAi]]                       = QuartVect[    ";" & TBBUrw.ArtCode &                       ";" & ProjArray[PAi]] + tempVal;
+              QuartVect[k & ";" & TBBUrw.ArtCode &                       ";" & ProjArray[PAi]]                       = QuartVect[k & ";" & TBBUrw.ArtCode &                       ";" & ProjArray[PAi]] + tmpval;
+              QuartVect[    ";" & TBBUrw.ArtCode &                       ";" & ProjArray[PAi]]                       = QuartVect[    ";" & TBBUrw.ArtCode &                       ";" & ProjArray[PAi]] + tmpval;
               
-              QuartVect[k & ";" & TBBUrw.ArtCode &                       ";T"]                                       = QuartVect[k & ";" & TBBUrw.ArtCode &                       ";T"] + tempVal;
-              QuartVect[    ";" & TBBUrw.ArtCode &                       ";T"]                                       = QuartVect[    ";" & TBBUrw.ArtCode &                       ";T"] + tempVal;
+              QuartVect[k & ";" & TBBUrw.ArtCode &                       ";T"]                                       = QuartVect[k & ";" & TBBUrw.ArtCode &                       ";T"] + tmpval;
+              QuartVect[    ";" & TBBUrw.ArtCode &                       ";T"]                                       = QuartVect[    ";" & TBBUrw.ArtCode &                       ";T"] + tmpval;
               
-              QuartVect[k & ";" & group &                                ";" & ProjArray[PAi]]                       = QuartVect[k & ";" & group &                                ";" & ProjArray[PAi]] + tempVal;
-              QuartVect[    ";" & group &                                ";" & ProjArray[PAi]]                       = QuartVect[    ";" & group &                                ";" & ProjArray[PAi]] + tempVal;
+              QuartVect[k & ";" & group &                                ";" & ProjArray[PAi]]                       = QuartVect[k & ";" & group &                                ";" & ProjArray[PAi]] + tmpval;
+              QuartVect[    ";" & group &                                ";" & ProjArray[PAi]]                       = QuartVect[    ";" & group &                                ";" & ProjArray[PAi]] + tmpval;
               
-              QuartVect[k & ";T;" & ProjArray[PAi]]                                                                  = QuartVect[k & ";T;" & ProjArray[PAi]] + tempVal;
-              QuartVect[    ";T;" & ProjArray[PAi]]                                                                  = QuartVect[    ";T;" & ProjArray[PAi]] + tempVal;
+              QuartVect[k & ";T;" & ProjArray[PAi]]                                                                  = QuartVect[k & ";T;" & ProjArray[PAi]] + tmpval;
+              QuartVect[    ";T;" & ProjArray[PAi]]                                                                  = QuartVect[    ";T;" & ProjArray[PAi]] + tmpval;
               
               if nonblank(PRr.MotherCode) and (PRr.MotherCode!="") then begin
-                QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & PRr.MotherCode] = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & PRr.MotherCode] + tempVal;
-                QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & PRr.MotherCode] = QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & PRr.MotherCode] + tempVal;
+                QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & PRr.MotherCode] = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & PRr.MotherCode] + tmpval;
+                QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & PRr.MotherCode] = QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.Extras & ":" & TBBUrw.VECode & ";" & PRr.MotherCode] + tmpval;
                 
-                QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & PRr.MotherCode]                       = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & PRr.MotherCode] + tempVal;
-                QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & PRr.MotherCode]                       = QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & PRr.MotherCode] + tempVal;
+                QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & PRr.MotherCode]                       = QuartVect[k & ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & PRr.MotherCode] + tmpval;
+                QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & PRr.MotherCode]                       = QuartVect[    ";" & TBBUrw.ArtCode & ":" & TBBUrw.VECode & ";" & PRr.MotherCode] + tmpval;
                 
-                QuartVect[k & ";" & TBBUrw.ArtCode &                       ";" & PRr.MotherCode]                       = QuartVect[k & ";" & TBBUrw.ArtCode &                       ";" & PRr.MotherCode] + tempVal;
-                QuartVect[    ";" & TBBUrw.ArtCode &                       ";" & PRr.MotherCode]                       = QuartVect[    ";" & TBBUrw.ArtCode &                       ";" & PRr.MotherCode] + tempVal;
+                QuartVect[k & ";" & TBBUrw.ArtCode &                       ";" & PRr.MotherCode]                       = QuartVect[k & ";" & TBBUrw.ArtCode &                       ";" & PRr.MotherCode] + tmpval;
+                QuartVect[    ";" & TBBUrw.ArtCode &                       ";" & PRr.MotherCode]                       = QuartVect[    ";" & TBBUrw.ArtCode &                       ";" & PRr.MotherCode] + tmpval;
                 
-                QuartVect[k & ";" & group &                                ";" & PRr.MotherCode]                       = QuartVect[k & ";" & group &                                ";" & PRr.MotherCode] + tempVal;
-                QuartVect[    ";" & group &                                ";" & PRr.MotherCode]                       = QuartVect[    ";" & group &                                ";" & PRr.MotherCode] + tempVal;
+                QuartVect[k & ";" & group &                                ";" & PRr.MotherCode]                       = QuartVect[k & ";" & group &                                ";" & PRr.MotherCode] + tmpval;
+                QuartVect[    ";" & group &                                ";" & PRr.MotherCode]                       = QuartVect[    ";" & group &                                ";" & PRr.MotherCode] + tmpval;
                 
-                QuartVect[k & ";T;" & PRr.MotherCode]                                                                  = QuartVect[k & ";T;" & PRr.MotherCode] + tempVal;
-                QuartVect[    ";T;" & PRr.MotherCode]                                                                  = QuartVect[    ";T;" & PRr.MotherCode] + tempVal;
+                QuartVect[k & ";T;" & PRr.MotherCode]                                                                  = QuartVect[k & ";T;" & PRr.MotherCode] + tmpval;
+                QuartVect[    ";T;" & PRr.MotherCode]                                                                  = QuartVect[    ";T;" & PRr.MotherCode] + tmpval;
               end;
 						end;
 					end; 
@@ -246,93 +269,288 @@ BEGIN
 	end;
   resetcompany(oldcomp);
   
-  TRr.TransDate = RepSpec.sStartDate;
-	TrHs = true;
-	while (loopkey("TransDate",TRr,1,TrHs)) begin
-		if (TRr.TransDate > RepSpec.sEndDate) then begin
-			TrHs = false;
-		end;
-		if (TrHs) then begin
-      k = 0;
-			k = GetQuartal(TRr.TransDate);
-      if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
-        k = 1;
+  if (RepSpec.flags[7]==0) then begin
+    TRr.TransDate = RepSpec.sStartDate;
+    TrHs = true;
+    while (loopkey("TransDate",TRr,1,TrHs)) begin
+      if (TRr.TransDate > RepSpec.sEndDate) then begin
+        TrHs = false;
       end;
-			mtrw = matrowcnt(TRr);
-			for (i=0;i<mtrw;i=i+1) begin
-				matrowget(TRr,i,TRrw);
-				if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5") and setinset(RepSpec.f1,TRrw.Objects)) then begin
-					for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
-            PRr.Code = ProjArray[PAi];
-            ReadFirstMain(PRr,1,true);
-            if(setinset(PRr.Objects,TRrw.Objects)) then begin
-							for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
-								if (setinset(ArtArrayWithoutGroups[j],TRrw.Objects)) then begin
-                  INr.Objects = ArtArrayWithoutGroups[j];
-                  ReadfirstKey("Objects",INr,1,true);
-                  group = INr.Group;
-									extras = "";
-                  GetObjs("EXTRA",TRrw.Objects,extras);
-                  if nonblank(extras) and !ExtInArr[extras] then begin
-                    ExtInArr[extras] = true;
-                    ExtArr[EAi] = extras;
-                    EAi = EAi + 1;
+      if (TrHs) then begin
+        k = 0;
+        k = GetQuartal(TRr.TransDate);
+        if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
+          k = 1;
+        end;
+        mtrw = matrowcnt(TRr);
+        for (i=0;i<mtrw;i=i+1) begin
+          matrowget(TRr,i,TRrw);
+          if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5") and setinset(RepSpec.f1,TRrw.Objects)) then begin
+            for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+              PRr.Code = ProjArray[PAi];
+              ReadFirstMain(PRr,1,true);
+              if(setinset(PRr.Objects,TRrw.Objects)) then begin
+                for (j=0;j<ArtArrayWithoutGroups.length;j=j+1) begin
+                  if (setinset(ArtArrayWithoutGroups[j],TRrw.Objects)) then begin
+                    INr.Objects = ArtArrayWithoutGroups[j];
+                    ReadfirstKey("Objects",INr,1,true);
+                    group = INr.Group;
+                    extras = "";
+                    GetObjs("EXTRA",TRrw.Objects,extras);
+                    if nonblank(extras) and !ExtInArr[extras] then begin
+                      ExtInArr[extras] = true;
+                      ExtArr[EAi] = extras;
+                      EAi = EAi + 1;
+                    end;
+                    suppl = "";
+                    GetObjs("SUPPL",TRrw.Objects,suppl);
+                    if nonblank(suppl) and !SupplInArr[suppl] then begin
+                      SupplInArr[suppl] = true;
+                      ArtSuppl[ASi] = suppl;
+                      ASi = ASi + 1;
+                    end;
+                    QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & ProjArray[PAi]]   = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & ProjArray[PAi]]   = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                    
+                    QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";T"]                   = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";T"] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";T"]                   = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";T"] - TRrw.CredVal + TRrw.DebVal;
+                    
+                    QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl &                ";" & ProjArray[PAi]]   = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl &                ";" & ProjArray[PAi]]   = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                    
+                    QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl &                ";T"]                   = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl & ";T"] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl &                ";T"]                   = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl & ";T"] - TRrw.CredVal + TRrw.DebVal;
+                    
+                    QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] &                              ";" & ProjArray[PAi]]   = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] &                              ";" & ProjArray[PAi]]   = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                    
+                    QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] &                              ";T"]                   = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ";T"] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] &                              ";T"]                   = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ";T"] - TRrw.CredVal + TRrw.DebVal;
+                    
+                    QuartVect[k & "Fact;" & group &                                                 ";" & ProjArray[PAi]]   = QuartVect[k & "Fact;" & group & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[    "Fact;" & group &                                                 ";" & ProjArray[PAi]]   = QuartVect[    "Fact;" & group & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                    
+                    QuartVect[k & "Fact;T;" & ProjArray[PAi]]                                                               = QuartVect[k & "Fact;T;" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                    QuartVect[    "Fact;T;" & ProjArray[PAi]]                                                               = QuartVect[    "Fact;T;" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
+                    
+                    if nonblank(PRr.MotherCode) and (PRr.MotherCode!="") then begin
+                      QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & PRr.MotherCode] = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                      QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & PRr.MotherCode] = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                      
+                      QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl &                ";" & PRr.MotherCode] = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                      QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl &                ";" & PRr.MotherCode] = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                      
+                      QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] &                              ";" & PRr.MotherCode] = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                      QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] &                              ";" & PRr.MotherCode] = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                      
+                      QuartVect[k & "Fact;" & group &                                                 ";" & PRr.MotherCode] = QuartVect[k & "Fact;" & group & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                      QuartVect[    "Fact;" & group &                                                 ";" & PRr.MotherCode] = QuartVect[    "Fact;" & group & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                      
+                      QuartVect[k & "Fact;T;" & PRr.MotherCode]                                                             = QuartVect[k & "Fact;T;" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                      QuartVect[    "Fact;T;" & PRr.MotherCode]                                                             = QuartVect[    "Fact;T;" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                    end;
                   end;
-                  suppl = "";
-                  GetObjs("SUPPL",TRrw.Objects,suppl);
-                  if nonblank(suppl) and !SupplInArr[suppl] then begin
-                    SupplInArr[suppl] = true;
-                    ArtSuppl[ASi] = suppl;
-                    ASi = ASi + 1;
+                end;
+              end;
+            end;
+          end;
+        end;
+      end;
+    end;
+  end else begin
+    blockload(bcur);
+    VIr.InvDate = RepSpec.sStartDate;
+    TrHs = true;
+    while (loopkey("InvDate",VIr,1,TrHs)) begin
+      testf = true;
+      if (VIr.InvDate>RepSpec.sEndDate) then begin TrHs = false; testf = false; end;
+      if (VIr.OKFlag==0) then begin testf = false; end;
+      if (VIr.Invalid==1) then begin testf = false; end;
+      if (testf and nonblank(RepSpec.f1)) then begin
+        mtrw = matrowcnt(VIr);
+        testf = false;
+        for (i=0;i<mtrw;i=i+1) begin
+          matrowget(VIr,i,VIrw);
+          if (VIrw.Found==RepSpec.f1) then begin
+            testf = true;
+            i = mtrw;
+          end;
+        end;
+      end;
+      if (testf) then begin
+        sum = 0;
+        paidsum = 0;
+        PDr.Code = VIr.PayDeal;
+        if (ReadFirstMain(PDr,1,true)) then begin
+          if (PDr.PDType==kInvoiceTypeCash) then begin
+            if (VIr.CurncyCode==bcur.BaseCur1) then begin
+              sum = VIr.PayVal;
+              paidsum = VIr.PayVal;
+            end else begin
+              TRr.Number = VIr.SerNr;
+              TRr.IntYc = VIYc;
+              if (ReadFirstMain(TRr,2,true)) then begin
+                mtrw = matrowcnt(TRr);
+                for (i=0;i<mtrw;i=i+1) begin
+                  matrowget(TRr,i,TRrw);
+                  if (TRrw.ovst==0 and (TRrw.AccNumber==PDr.pdCashAcc)) then begin
+                    sum = AbsoluteVal(TRrw.CredVal - TRrw.DebVal);
+                    paidsum = VIr.PayVal;
+                    i = mtrw;
                   end;
-                  QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & ProjArray[PAi]]   = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & ProjArray[PAi]]   = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-                  
-                  QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";T"]                   = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";T"] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";T"]                   = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";T"] - TRrw.CredVal + TRrw.DebVal;
-                  
-                  QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl &                ";" & ProjArray[PAi]]   = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl &                ";" & ProjArray[PAi]]   = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-                  
-                  QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl &                ";T"]                   = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl & ";T"] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl &                ";T"]                   = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl & ";T"] - TRrw.CredVal + TRrw.DebVal;
-                  
-                  QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] &                              ";" & ProjArray[PAi]]   = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] &                              ";" & ProjArray[PAi]]   = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-                  
-                  QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] &                              ";T"]                   = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ";T"] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] &                              ";T"]                   = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ";T"] - TRrw.CredVal + TRrw.DebVal;
-                  
-                  QuartVect[k & "Fact;" & group &                                                 ";" & ProjArray[PAi]]   = QuartVect[k & "Fact;" & group & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[    "Fact;" & group &                                                 ";" & ProjArray[PAi]]   = QuartVect[    "Fact;" & group & ";" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-                  
-                  QuartVect[k & "Fact;T;" & ProjArray[PAi]]                                                               = QuartVect[k & "Fact;T;" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect[    "Fact;T;" & ProjArray[PAi]]                                                               = QuartVect[    "Fact;T;" & ProjArray[PAi]] - TRrw.CredVal + TRrw.DebVal;
-                  
-                  if nonblank(PRr.MotherCode) and (PRr.MotherCode!="") then begin
-                    QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & PRr.MotherCode] = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & PRr.MotherCode] = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & extras & ":" & suppl & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
-                    
-                    QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl &                ";" & PRr.MotherCode] = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl &                ";" & PRr.MotherCode] = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ":" & suppl & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
-                    
-                    QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] &                              ";" & PRr.MotherCode] = QuartVect[k & "Fact;" & ArtArrayWithoutGroups[j] & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] &                              ";" & PRr.MotherCode] = QuartVect[    "Fact;" & ArtArrayWithoutGroups[j] & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
-                    
-                    QuartVect[k & "Fact;" & group &                                                 ";" & PRr.MotherCode] = QuartVect[k & "Fact;" & group & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[    "Fact;" & group &                                                 ";" & PRr.MotherCode] = QuartVect[    "Fact;" & group & ";" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
-                    
-                    QuartVect[k & "Fact;T;" & PRr.MotherCode]                                                             = QuartVect[k & "Fact;T;" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect[    "Fact;T;" & PRr.MotherCode]                                                             = QuartVect[    "Fact;T;" & PRr.MotherCode] - TRrw.CredVal + TRrw.DebVal;
+                end;
+              end;
+            end;
+          end;
+        end;
+        if (sum==0) then begin
+          OPrsr.VINr = VIr.SerNr;
+          TrHs2 = true;
+          while (LoopKey("VIKey",OPrsr,1,TrHs2)) begin
+            if (OPrsr.VINr<>VIr.SerNr) then begin TrHs2 = false; end;
+            if (TrHs2) then begin
+              if (OPrsr.TransType==kOPrsTransTypePayment) then begin
+                OPr.SerNr = OPrsr.TransNr;
+                if (ReadFirstMain(OPr,1,true)) then begin
+                  if ((OPr.DoneFlag!=0) and (OPr.TransDate==OPrsr.TransDate)) then begin
+                    mtrw = MatRowCnt(OPr);
+                    GetPMRow(OPr.PayMode,PMrw);
+                    for (i=0;i<mtrw;i=i+1) begin
+                      MatRowGet(OPr,i,VIOPrw);
+                      if ((VIOPrw.ovst==0) and (VIOPrw.VISerNr==VIr.SerNr) and (VIOPrw.stp==kPaymentRowTypeNormal)) then begin
+                        i = mtrw;
+                      end;
+                    end;
+                    opsum = 0;
+                    for (i=0;i<mtrw;i=i+1) begin
+                      MatRowGet(OPr,i,OPrw);
+                      if ((OPrw.ovst==0) and (OPrw.BankCurncy==VIOPrw.BankCurncy) and (OPrw.stp==kPaymentRowTypeNormal)) then begin
+                        opsum = opsum + OPrw.BankVal;
+                      end;
+                    end;
+                    TRr.Number = OPr.SerNr;
+                    TRr.IntYc = OPYc;
+                    if (ReadFirstMain(TRr,2,true)) then begin
+                      mtrw = matrowcnt(TRr);
+                      trsum = 0;
+                      for (j=0;j<mtrw;j=j+1) begin
+                        matrowget(TRr,j,TRrw);
+                        if (TRrw.ovst==0 and (TRrw.AccNumber==PMrw.AccNr) and (TRrw.Curncy==VIOPrw.BankCurncy)) then begin
+                          trsum = trsum + AbsoluteVal(TRrw.CredVal - TRrw.DebVal);
+                        end;
+                      end;
+                    end;
+                    sum = sum + VIOPrw.BankVal/opsum*trsum;
+                    paidsum = paidsum + VIOPrw.RecVal;
                   end;
-								end;
-							end;
-						end;
-					end;
-				end;
-			end;
-		end;
-	end;
+                end;
+              end;
+            end;
+          end;
+        end;
+        if (sum==0) then begin
+          fr = 0;
+          to1 = 0;
+          to2 = 0;
+          br1 = 0;
+          br2 = 0;
+          tstr = VIr.CurncyCode;
+          GetFullCurncyRate(tstr,VIr.TransDate,fr,to1,to2,br1,br2);
+          if (fr==0) or (fr==blankval) then begin fr = VIr.FrRate; end;
+          if (br1==0) or (br1==blankval) then begin br1 = VIr.BaseRate1; end;
+          if (br2==0) or (br2==blankval) then begin br2 = VIr.BaseRate2; end;
+          if (to1==0) or (to1==blankval) then begin to1 = VIr.ToRateB1; end;
+          if (to2==0) or (to2==blankval) then begin to2 = VIr.ToRateB2; end;
+          sum = MulRateToBase1(tstr,VIr.PayVal,fr,to1,to2,br1,br2,SetRoundModeD(2));
+          paidsum = VIr.PayVal;
+        end;
+        if (paidsum<VIr.PayVal) then begin
+          fr = 0;
+          to1 = 0;
+          to2 = 0;
+          br1 = 0;
+          br2 = 0;
+          tstr = VIr.CurncyCode;
+          GetFullCurncyRate(tstr,VIr.TransDate,fr,to1,to2,br1,br2);
+          if (fr==0) or (fr==blankval) then begin fr = VIr.FrRate; end;
+          if (br1==0) or (br1==blankval) then begin br1 = VIr.BaseRate1; end;
+          if (br2==0) or (br2==blankval) then begin br2 = VIr.BaseRate2; end;
+          if (to1==0) or (to1==blankval) then begin to1 = VIr.ToRateB1; end;
+          if (to2==0) or (to2==blankval) then begin to2 = VIr.ToRateB2; end;
+          sum = sum + MulRateToBase1(tstr,(VIr.PayVal - paidsum),fr,to1,to2,br1,br2,SetRoundModeD(2));
+        end;
+        k = 0;
+        k = GetQuartal(TRr.TransDate);
+        if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
+          k = 1;
+        end;
+        mtrw = matrowcnt(VIr);
+        for (i=0;i<mtrw;i=i+1) begin
+          matrowget(VIr,i,VIrw);
+          PRr.Objects = VIrw.Prj;
+          ReadFirstKey("Objects",PRr,1,true);
+          if ((VIrw.Found==RepSpec.f1) or blank(RepSpec.f1)) and (ArtInArr[VIrw.Exp]) and (ProjInArr[PRr.Code]) then begin
+            INr.Objects = VIrw.Exp;
+            ReadfirstKey("Objects",INr,1,true);
+            group = INr.Group;
+            if nonblank(VIrw.Extras) and !ExtInArr[VIrw.Extras] then begin
+              ExtInArr[VIrw.Extras] = true;
+              ExtArr[EAi] = VIrw.Extras;
+              EAi = EAi + 1;
+            end;
+            if nonblank(VIrw.Supp) and !SupplInArr[VIrw.Supp] then begin
+              SupplInArr[VIrw.Supp] = true;
+              ArtSuppl[ASi] = VIrw.Supp;
+              ASi = ASi + 1;
+            end;
+            tmpval = VIrw.Sum/VIr.PayVal*sum;
+            
+            QuartVect[k & "Fact;" & VIrw.Exp & ":" & VIrw.Extras & ":" & VIrw.Supp & ";" & PRr.Code] = QuartVect[k & "Fact;" & VIrw.Exp & ":" & VIrw.Extras & ":" & VIrw.Supp & ";" & PRr.Code] + tmpval;
+            QuartVect[    "Fact;" & VIrw.Exp & ":" & VIrw.Extras & ":" & VIrw.Supp & ";" & PRr.Code] = QuartVect[    "Fact;" & VIrw.Exp & ":" & VIrw.Extras & ":" & VIrw.Supp & ";" & PRr.Code] + tmpval;
+            
+            QuartVect[k & "Fact;" & VIrw.Exp & ":" & VIrw.Extras & ":" & VIrw.Supp & ";T"]           = QuartVect[k & "Fact;" & VIrw.Exp & ":" & VIrw.Extras & ":" & VIrw.Supp & ";T"] + tmpval;
+            QuartVect[    "Fact;" & VIrw.Exp & ":" & VIrw.Extras & ":" & VIrw.Supp & ";T"]           = QuartVect[    "Fact;" & VIrw.Exp & ":" & VIrw.Extras & ":" & VIrw.Supp & ";T"] + tmpval;
+            
+            QuartVect[k & "Fact;" & VIrw.Exp & ":"                     & VIrw.Supp & ";" & PRr.Code] = QuartVect[k & "Fact;" & VIrw.Exp & ":" & VIrw.Supp & ";" & PRr.Code] + tmpval;
+            QuartVect[    "Fact;" & VIrw.Exp & ":"                     & VIrw.Supp & ";" & PRr.Code] = QuartVect[    "Fact;" & VIrw.Exp & ":" & VIrw.Supp & ";" & PRr.Code] + tmpval;
+            
+            QuartVect[k & "Fact;" & VIrw.Exp & ":"                     & VIrw.Supp & ";T"]           = QuartVect[k & "Fact;" & VIrw.Exp & ":" & VIrw.Supp & ";T"] + tmpval;
+            QuartVect[    "Fact;" & VIrw.Exp & ":"                     & VIrw.Supp & ";T"]           = QuartVect[    "Fact;" & VIrw.Exp & ":" & VIrw.Supp & ";T"] + tmpval;
+            
+            QuartVect[k & "Fact;" & VIrw.Exp &                                       ";" & PRr.Code] = QuartVect[k & "Fact;" & VIrw.Exp & ";" & PRr.Code] + tmpval;
+            QuartVect[    "Fact;" & VIrw.Exp &                                       ";" & PRr.Code] = QuartVect[    "Fact;" & VIrw.Exp & ";" & PRr.Code] + tmpval;
+            
+            QuartVect[k & "Fact;" & VIrw.Exp &                                       ";T"]           = QuartVect[k & "Fact;" & VIrw.Exp & ";T"] + tmpval;
+            QuartVect[    "Fact;" & VIrw.Exp &                                       ";T"]           = QuartVect[    "Fact;" & VIrw.Exp & ";T"] + tmpval;
+            
+            QuartVect[k & "Fact;" & group &                                          ";" & PRr.Code] = QuartVect[k & "Fact;" & group & ";" & PRr.Code] + tmpval;
+            QuartVect[    "Fact;" & group &                                          ";" & PRr.Code] = QuartVect[    "Fact;" & group & ";" & PRr.Code] + tmpval;
+            
+            QuartVect[k & "Fact;T;" &                                                      PRr.Code] = QuartVect[k & "Fact;T;" & PRr.Code] + tmpval;
+            QuartVect[    "Fact;T;" &                                                      PRr.Code] = QuartVect[    "Fact;T;" & PRr.Code] + tmpval;
+            
+            if nonblank(PRr.MotherCode) and (PRr.MotherCode!="") then begin
+              QuartVect[k & "Fact;" & VIrw.Exp & ":" & VIrw.Extras & ":" & VIrw.Supp & ";" & PRr.MotherCode] = QuartVect[k & "Fact;" & VIrw.Exp & ":" & VIrw.Extras & ":" & VIrw.Supp & ";" & PRr.MotherCode] + tmpval;
+              QuartVect[    "Fact;" & VIrw.Exp & ":" & VIrw.Extras & ":" & VIrw.Supp & ";" & PRr.MotherCode] = QuartVect[    "Fact;" & VIrw.Exp & ":" & VIrw.Extras & ":" & VIrw.Supp & ";" & PRr.MotherCode] + tmpval;
+              
+              QuartVect[k & "Fact;" & VIrw.Exp & ":" & VIrw.Supp &                     ";" & PRr.MotherCode] = QuartVect[k & "Fact;" & VIrw.Exp & ":" & VIrw.Supp & ";" & PRr.MotherCode] + tmpval;
+              QuartVect[    "Fact;" & VIrw.Exp & ":" & VIrw.Supp &                     ";" & PRr.MotherCode] = QuartVect[    "Fact;" & VIrw.Exp & ":" & VIrw.Supp & ";" & PRr.MotherCode] + tmpval;
+              
+              QuartVect[k & "Fact;" & VIrw.Exp &                                       ";" & PRr.MotherCode] = QuartVect[k & "Fact;" & VIrw.Exp & ";" & PRr.MotherCode] + tmpval;
+              QuartVect[    "Fact;" & VIrw.Exp &                                       ";" & PRr.MotherCode] = QuartVect[    "Fact;" & VIrw.Exp & ";" & PRr.MotherCode] + tmpval;
+              
+              QuartVect[k & "Fact;" & group &                                          ";" & PRr.MotherCode] = QuartVect[k & "Fact;" & group & ";" & PRr.MotherCode] + tmpval;
+              QuartVect[    "Fact;" & group &                                          ";" & PRr.MotherCode] = QuartVect[    "Fact;" & group & ";" & PRr.MotherCode] + tmpval;
+              
+              QuartVect[k & "Fact;T;" &                                                      PRr.MotherCode] = QuartVect[k & "Fact;T;" & PRr.MotherCode] + tmpval;
+              QuartVect[    "Fact;T;" &                                                      PRr.MotherCode] = QuartVect[    "Fact;T;" & PRr.MotherCode] + tmpval;
+            end;
+            
+          end;
+        end;
+      end;
+    end;
+  end;
   ExtArr[EAi] = "";
   ArtSuppl[ASi] = "";
   

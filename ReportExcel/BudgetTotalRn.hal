@@ -15,6 +15,11 @@ external procedure ConvertToXLSX(string);
 external function string 10 GetStringCellNum(integer,integer);
 external procedure GetObjs(string,string,var string);
 external function string 50 TimeToString(time,string,boolean);
+external function val AbsoluteVal(val);
+external procedure GetFullCurncyRate(var string,Date,var val,var val,var val,var val,var val);
+external function val MulRateToBase1(var string,val,val,val,val,val,val,roundmode);
+external function Boolean GetPMRow(string,var row PMBlock);
+external function roundmode SetRoundModeD(Integer);
 
 procedure ArraysCollect(record RcVc RepSpec, var array string FoundArray, var array string ProjArray, var vector string ProjNamesVect, var vector string FoundNamesVect)
 BEGIN
@@ -85,10 +90,28 @@ BEGIN
 	record TRVc TRr;
 	row TRVc TRrw;
 	integer i,k,j,mtrw,PAi,FAi,oldcomp;
-	boolean TrHs,testf,kTestf;
+	boolean TrHs,testf,kTestf,TrHs2;
 	//array string 20 prjobjs;
-  string 20 prj
+  string 20 prj;
+  record VIVc VIr;
+  record OPVc OPr;
+  record PDVc PDr;
+  record BaseCurBlock bcur;
+  record OPrsVc OPrsr;
+  row VIVc VIrw;
+  row OPVc OPrw,VIOPrw;
+  row PMBlock PMrw;
+  val sum,fr,to1,to2,br1,br2,opsum,trsum,paidsum,tmpval;
+  string 10 vicur,tstr;
+  vector boolean ProjInArr,FoundInArr;
 	
+  for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+    ProjInArr[ProjArray[PAi]] = true;
+  end;
+  for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin
+    FoundInArr[FoundArray[FAi]] = true;
+  end;
+  
   oldcomp = currentcompany;
   switch (RepSpec.f2) begin
     case "2017":
@@ -198,56 +221,214 @@ BEGIN
 		end;
 	end;
   resetcompany(oldcomp);
-	
-	TRr.TransDate = RepSpec.sStartDate;
-	TrHs = true;
-  resetloop(TRr);
-	while (loopkey("TransDate",TRr,1,TrHs)) begin
-		if (TRr.TransDate > RepSpec.sEndDate) then begin
-			TrHs = false;
-		end;
-		if (TrHs) then begin
-			mtrw = matrowcnt(TRr);
-			for (i=0;i<mtrw;i=i+1) begin
-				matrowget(TRr,i,TRrw);
-				if ((TRrw.ovst == 0) and ((mid(TRrw.AccNumber,0,1)=="5")) and (setinset(RepSpec.ObjStr,TRrw.Objects) or blank(RepSpec.ObjStr))) then begin
-					for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin
-						if setinset(FoundArray[FAi],TRrw.Objects) then begin
-							GetObjs("PRJ",TRrw.Objects,prj);
-              PRr.Objects = prj;
-              if (ReadFirstKey("Objects",PRr,1,true)) then begin
-                testf = false;
-                if nonblank(PRr.MotherCode) then begin
-                  for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
-                    if ProjArray[PAi]==PRr.MotherCode then begin
-                      testf = true;
-                      prj = PRr.MotherCode;
-                      PAi = ProjArray.length;
+	if (RepSpec.flags[7]==0) then begin
+    TRr.TransDate = RepSpec.sStartDate;
+    TrHs = true;
+    resetloop(TRr);
+    while (loopkey("TransDate",TRr,1,TrHs)) begin
+      if (TRr.TransDate > RepSpec.sEndDate) then begin
+        TrHs = false;
+      end;
+      if (TrHs) then begin
+        mtrw = matrowcnt(TRr);
+        for (i=0;i<mtrw;i=i+1) begin
+          matrowget(TRr,i,TRrw);
+          if ((TRrw.ovst == 0) and ((mid(TRrw.AccNumber,0,1)=="5")) and (setinset(RepSpec.ObjStr,TRrw.Objects) or blank(RepSpec.ObjStr))) then begin
+            for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin
+              if setinset(FoundArray[FAi],TRrw.Objects) then begin
+                GetObjs("PRJ",TRrw.Objects,prj);
+                PRr.Objects = prj;
+                if (ReadFirstKey("Objects",PRr,1,true)) then begin
+                  testf = false;
+                  if nonblank(PRr.MotherCode) then begin
+                    for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+                      if ProjArray[PAi]==PRr.MotherCode then begin
+                        testf = true;
+                        prj = PRr.MotherCode;
+                        PAi = ProjArray.length;
+                      end;
                     end;
                   end;
-                end;
-                if !testf then begin
-                  for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
-                    if ProjArray[PAi]==PRr.Code then begin
-                      testf = true;
-                      prj = PRr.Code;
-                      PAi = ProjArray.length;
+                  if !testf then begin
+                    for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+                      if ProjArray[PAi]==PRr.Code then begin
+                        testf = true;
+                        prj = PRr.Code;
+                        PAi = ProjArray.length;
+                      end;
                     end;
                   end;
+                  if testf then begin
+                    FPVect["Fact:" & FoundArray[FAi] & ":" & prj] = FPVect["Fact:" & FoundArray[FAi] & ":" & prj] - TRrw.CredVal + TRrw.DebVal;
+                    FPVect["Fact:TOTAL:" & prj] = FPVect["Fact:TOTAL:" & prj] - TRrw.CredVal + TRrw.DebVal;
+                    FPVect["Fact:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Fact:" & FoundArray[FAi] & ":TOTAL"] - TRrw.CredVal + TRrw.DebVal;
+                    FPVect["Fact:TOTAL:TOTAL"] = FPVect["Fact:TOTAL:TOTAL"] - TRrw.CredVal + TRrw.DebVal;
+                  end;
                 end;
-                if testf then begin
-                  FPVect["Fact:" & FoundArray[FAi] & ":" & prj] = FPVect["Fact:" & FoundArray[FAi] & ":" & prj] - TRrw.CredVal + TRrw.DebVal;
-									FPVect["Fact:TOTAL:" & prj] = FPVect["Fact:TOTAL:" & prj] - TRrw.CredVal + TRrw.DebVal;
-									FPVect["Fact:" & FoundArray[FAi] & ":TOTAL"] = FPVect["Fact:" & FoundArray[FAi] & ":TOTAL"] - TRrw.CredVal + TRrw.DebVal;
-									FPVect["Fact:TOTAL:TOTAL"] = FPVect["Fact:TOTAL:TOTAL"] - TRrw.CredVal + TRrw.DebVal;
-								end;
-							end;
-						end;
-					end;
-				end;
-			end;
-		end;
-	end;
+              end;
+            end;
+          end;
+        end;
+      end;
+    end;
+  end else begin
+    blockload(bcur);
+    VIr.InvDate = RepSpec.sStartDate;
+    TrHs = true;
+    while (loopkey("InvDate",VIr,1,TrHs)) begin
+      testf = true;
+      if (VIr.InvDate>RepSpec.sEndDate) then begin TrHs = false; testf = false; end;
+      if (VIr.OKFlag==0) then begin testf = false; end;
+      if (VIr.Invalid==1) then begin testf = false; end;
+      if (testf and nonblank(RepSpec.ObjStr)) then begin
+        mtrw = matrowcnt(VIr);
+        testf = false;
+        for (i=0;i<mtrw;i=i+1) begin
+          matrowget(VIr,i,VIrw);
+          if (VIrw.Loc==RepSpec.ObjStr) then begin
+            testf = true;
+            i = mtrw;
+          end;
+        end;
+      end;
+      if (testf) then begin
+        sum = 0;
+        paidsum = 0;
+        PDr.Code = VIr.PayDeal;
+        if (ReadFirstMain(PDr,1,true)) then begin
+          if (PDr.PDType==kInvoiceTypeCash) then begin
+            if (VIr.CurncyCode==bcur.BaseCur1) then begin
+              sum = VIr.PayVal;
+              paidsum = VIr.PayVal;
+            end else begin
+              TRr.Number = VIr.SerNr;
+              TRr.IntYc = VIYc;
+              if (ReadFirstMain(TRr,2,true)) then begin
+                mtrw = matrowcnt(TRr);
+                for (i=0;i<mtrw;i=i+1) begin
+                  matrowget(TRr,i,TRrw);
+                  if (TRrw.ovst==0 and (TRrw.AccNumber==PDr.pdCashAcc)) then begin
+                    sum = AbsoluteVal(TRrw.CredVal - TRrw.DebVal);
+                    paidsum = VIr.PayVal;
+                    i = mtrw;
+                  end;
+                end;
+              end;
+            end;
+          end;
+        end;
+        if (sum==0) then begin
+          OPrsr.VINr = VIr.SerNr;
+          TrHs2 = true;
+          while (LoopKey("VIKey",OPrsr,1,TrHs2)) begin
+            if (OPrsr.VINr<>VIr.SerNr) then begin TrHs2 = false; end;
+            if (TrHs2) then begin
+              if (OPrsr.TransType==kOPrsTransTypePayment) then begin
+                OPr.SerNr = OPrsr.TransNr;
+                if (ReadFirstMain(OPr,1,true)) then begin
+                  if ((OPr.DoneFlag!=0) and (OPr.TransDate==OPrsr.TransDate)) then begin
+                    mtrw = MatRowCnt(OPr);
+                    GetPMRow(OPr.PayMode,PMrw);
+                    for (i=0;i<mtrw;i=i+1) begin
+                      MatRowGet(OPr,i,VIOPrw);
+                      if ((VIOPrw.ovst==0) and (VIOPrw.VISerNr==VIr.SerNr) and (VIOPrw.stp==kPaymentRowTypeNormal)) then begin
+                        i = mtrw;
+                      end;
+                    end;
+                    opsum = 0;
+                    for (i=0;i<mtrw;i=i+1) begin
+                      MatRowGet(OPr,i,OPrw);
+                      if ((OPrw.ovst==0) and (OPrw.BankCurncy==VIOPrw.BankCurncy) and (OPrw.stp==kPaymentRowTypeNormal)) then begin
+                        opsum = opsum + OPrw.BankVal;
+                      end;
+                    end;
+                    TRr.Number = OPr.SerNr;
+                    TRr.IntYc = OPYc;
+                    if (ReadFirstMain(TRr,2,true)) then begin
+                      mtrw = matrowcnt(TRr);
+                      trsum = 0;
+                      for (j=0;j<mtrw;j=j+1) begin
+                        matrowget(TRr,j,TRrw);
+                        if (TRrw.ovst==0 and (TRrw.AccNumber==PMrw.AccNr) and (TRrw.Curncy==VIOPrw.BankCurncy)) then begin
+                          trsum = trsum + AbsoluteVal(TRrw.CredVal - TRrw.DebVal);
+                        end;
+                      end;
+                    end;
+                    sum = sum + VIOPrw.BankVal/opsum*trsum;
+                    paidsum = paidsum + VIOPrw.RecVal;
+                  end;
+                end;
+              end;
+            end;
+          end;
+        end;
+        if (sum==0) then begin
+          fr = 0;
+          to1 = 0;
+          to2 = 0;
+          br1 = 0;
+          br2 = 0;
+          tstr = VIr.CurncyCode;
+          GetFullCurncyRate(tstr,VIr.TransDate,fr,to1,to2,br1,br2);
+          if (fr==0) or (fr==blankval) then begin fr = VIr.FrRate; end;
+          if (br1==0) or (br1==blankval) then begin br1 = VIr.BaseRate1; end;
+          if (br2==0) or (br2==blankval) then begin br2 = VIr.BaseRate2; end;
+          if (to1==0) or (to1==blankval) then begin to1 = VIr.ToRateB1; end;
+          if (to2==0) or (to2==blankval) then begin to2 = VIr.ToRateB2; end;
+          sum = MulRateToBase1(tstr,VIr.PayVal,fr,to1,to2,br1,br2,SetRoundModeD(2));
+          paidsum = VIr.PayVal;
+        end;
+        if (paidsum<VIr.PayVal) then begin
+          fr = 0;
+          to1 = 0;
+          to2 = 0;
+          br1 = 0;
+          br2 = 0;
+          tstr = VIr.CurncyCode;
+          GetFullCurncyRate(tstr,VIr.TransDate,fr,to1,to2,br1,br2);
+          if (fr==0) or (fr==blankval) then begin fr = VIr.FrRate; end;
+          if (br1==0) or (br1==blankval) then begin br1 = VIr.BaseRate1; end;
+          if (br2==0) or (br2==blankval) then begin br2 = VIr.BaseRate2; end;
+          if (to1==0) or (to1==blankval) then begin to1 = VIr.ToRateB1; end;
+          if (to2==0) or (to2==blankval) then begin to2 = VIr.ToRateB2; end;
+          sum = sum + MulRateToBase1(tstr,(VIr.PayVal - paidsum),fr,to1,to2,br1,br2,SetRoundModeD(2));
+        end;
+        mtrw = matrowcnt(VIr);
+        for (i=0;i<mtrw;i=i+1) begin
+          matrowget(VIr,i,VIrw);
+          PRr.Objects = VIrw.Prj;
+          ReadFirstKey("Objects",PRr,1,true);
+          testf = false;
+          if nonblank(PRr.MotherCode) then begin
+            for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+              if ProjArray[PAi]==PRr.MotherCode then begin
+                testf = true;
+                prj = PRr.MotherCode;
+                PAi = ProjArray.length;
+              end;
+            end;
+          end;
+          if !testf then begin
+            for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+              if ProjArray[PAi]==PRr.Code then begin
+                testf = true;
+                prj = PRr.Code;
+                PAi = ProjArray.length;
+              end;
+            end;
+          end;
+          if testf and ((VIrw.Loc==RepSpec.ObjStr) or blank(RepSpec.ObjStr)) and (FoundInArr[VIrw.Found]) and (ProjInArr[PRr.Code]) then begin
+            tmpval = VIrw.Sum/VIr.PayVal*sum;
+            
+            FPVect["Fact:" & VIrw.Found & ":" & prj] = FPVect["Fact:" & VIrw.Found & ":" & prj] + tmpval;
+            FPVect["Fact:TOTAL:" & prj] = FPVect["Fact:TOTAL:" & prj] + tmpval;
+            FPVect["Fact:" & VIrw.Found & ":TOTAL"] = FPVect["Fact:" & VIrw.Found & ":TOTAL"] + tmpval;
+            FPVect["Fact:TOTAL:TOTAL"] = FPVect["Fact:TOTAL:TOTAL"] + tmpval;
+          end;
+        end;
+      end;
+    end;
+  end;
 	
 	for (i=0;i<ProjArray.length;i=i+1) begin
 		FPVect[		"TOTALproc:" & ProjArray[i]] = FPVect[     "TOTAL:" & ProjArray[i]]/FPVect[     "TOTAL:TOTAL"]*100;

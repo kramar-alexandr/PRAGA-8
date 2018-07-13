@@ -58,6 +58,10 @@ begin
 	SString(31007,"Invalid period. Check dates");
   SString(31008,"You should create Expense Account. Item will be created automatically"); //Edit---------------Vitalii 12:37 13.10.2015
   SString(31009,"	The contract with this provider has expired. Contract No. ");
+  SString(31010,"This account is registered with different name!");
+  SString(31011,"This object is registered with different name!");
+  SString(31012,"Payment term with this code is registered with different name!");
+  SString(31013,"Payment term with this code is registered with different account!");
 	
   StrSetAdd(3);
   StrSetText(UpdateBudget,"Allow creation new budget version");

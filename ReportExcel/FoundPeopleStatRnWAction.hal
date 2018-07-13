@@ -192,6 +192,9 @@ begin
     end else begin
       tstr = "All foundations";
     end;
+    if (RepSpec.flags[7]==1) then begin
+      tstr = tstr & " - by Payments";
+    end;
 		if nonblank(RepSpec.ObjStr) then begin
 			tstr = tstr & "-" & RepSpec.ObjStr;
 		end;

@@ -104,6 +104,9 @@ begin
 		tmpDate = tmpDate & RepSpec.f3;
 		RepSpec.sEndDate = StringToDate(tmpDate);
 		tstr = "Budget Report";
+    if (RepSpec.flags[7]==1) then begin
+      tstr = tstr & " - by Payments";
+    end;
 		if nonblank(RepSpec.f2) then begin
 			tstr = tstr & " for Project #" & RepSpec.f2;
 		end;

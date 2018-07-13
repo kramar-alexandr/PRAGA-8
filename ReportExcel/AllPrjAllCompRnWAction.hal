@@ -146,7 +146,11 @@ begin
   end;
   if testf then begin
     
-		tstr = "Total Report - All Companies -" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
+		tstr = "Total Report - All Companies";
+    if (RepSpec.flags[7]==1) then begin
+      tstr = tstr & " - by Payments";
+    end;
+    tstr = tstr & "-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
     filename = SaveFileDialog(tstr,"","xlsx");
 		if ((filename!=tstr) and nonblank(filename)) then begin
 			AllPrjAllCompRn(RepSpec,fnserv,md5strServ,PrjFoundf);

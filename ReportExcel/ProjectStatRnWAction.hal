@@ -186,6 +186,9 @@ begin
 		end else begin
 			tstr = "Projects";
 		end;
+    if (RepSpec.flags[7]==1) then begin
+      tstr = tstr & " - by Payments";
+    end;
 		tstr = tstr & "-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
     if (RepSpec.flags[6]==1) then begin
 			tstr = tstr & "(all projects)";
