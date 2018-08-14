@@ -36,6 +36,7 @@ BEGIN
 	string 100 tstr;
   
 	k = 0;
+  resetloop(PRr);
 	while (loopmain(PRr,1,true)) begin
     if (RepSpec.flags[6]==0) then begin
       switch (PRr.Code) begin
@@ -217,6 +218,7 @@ BEGIN
       end;
     end else begin
       blockload(bcur);
+      resetloop(VIr);
       VIr.InvDate = RepSpec.sStartDate;
       TrHs = true;
       while (loopkey("InvDate",VIr,1,TrHs)) begin
@@ -251,6 +253,7 @@ BEGIN
             end;
           end;
           if (sum==0) then begin
+            resetloop(OPrsr);
             OPrsr.VINr = VIr.SerNr;
             TrHs2 = true;
             while (LoopKey("VIKey",OPrsr,1,TrHs2)) begin

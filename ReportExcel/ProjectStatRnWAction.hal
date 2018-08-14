@@ -92,6 +92,36 @@ begin
 end;
 
 global
+procedure TotalProjectStat2018RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2018";
+	RepSpec.f3 = "5";
+	RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
+function Boolean TotalProjectStat2018RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2018";
+	RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
 procedure RunProjectStatRn()
 begin
 	record ObjVc Objr;
@@ -181,10 +211,13 @@ begin
     end;
   end;
   if testf then begin
+    if (RepSpec.flags[29]==1) then begin
+      tstr = "All companies ";
+    end;
     if nonblank(RepSpec.f1) then begin
-			tstr = RepSpec.f1;
+			tstr = tstr & RepSpec.f1;
 		end else begin
-			tstr = "Projects";
+			tstr = tstr & "Projects";
 		end;
     if (RepSpec.flags[7]==1) then begin
       tstr = tstr & " - by Payments";

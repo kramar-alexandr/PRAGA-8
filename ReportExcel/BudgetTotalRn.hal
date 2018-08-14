@@ -30,6 +30,7 @@ BEGIN
 	string 100 tstr;
 	
 	k = 0;
+  resetloop(Objr);
 	Objr.OTCode = "FOUND"; 
 	TrHs=true;
 	while (LoopKey("OTCode",Objr,1,TrHs)) begin
@@ -55,6 +56,7 @@ BEGIN
       SetCompany(1,false);
   end;
   k = 0;
+  resetloop(PRr);
 	while(loopmain(PRr,1,true)) begin
     switch (PRr.Code) begin
       case "2016.998":
@@ -222,9 +224,9 @@ BEGIN
 	end;
   resetcompany(oldcomp);
 	if (RepSpec.flags[7]==0) then begin
+    resetloop(TRr);
     TRr.TransDate = RepSpec.sStartDate;
     TrHs = true;
-    resetloop(TRr);
     while (loopkey("TransDate",TRr,1,TrHs)) begin
       if (TRr.TransDate > RepSpec.sEndDate) then begin
         TrHs = false;
@@ -273,6 +275,7 @@ BEGIN
     end;
   end else begin
     blockload(bcur);
+    resetloop(VIr);
     VIr.InvDate = RepSpec.sStartDate;
     TrHs = true;
     while (loopkey("InvDate",VIr,1,TrHs)) begin
@@ -318,6 +321,7 @@ BEGIN
           end;
         end;
         if (sum==0) then begin
+          resetloop(OPrsr);
           OPrsr.VINr = VIr.SerNr;
           TrHs2 = true;
           while (LoopKey("VIKey",OPrsr,1,TrHs2)) begin

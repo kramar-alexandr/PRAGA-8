@@ -37,6 +37,7 @@ BEGIN
 	
   PrjFoundf = true;
 	kw = 0;
+  resetloop(ITr);
   while(loopmain(ITr,1,true)) begin
     if ((RepSpec.f2=="2016" and right(ITr.Code,3)=="_16") or
         (RepSpec.f2=="2017" and right(ITr.Code,3)=="_17") or
@@ -79,6 +80,7 @@ BEGIN
       SetCompany(1,false);
   end;
   k = 0;
+  resetloop(PRr);
   while(loopmain(PRr,1,true)) begin
 		if ((GetYear(PRr.StartDate) & ""==RepSpec.f2) or (GetYear(PRr.EndDate) & ""==RepSpec.f2)) then begin
       switch (PRr.Code) begin
@@ -270,6 +272,7 @@ BEGIN
   resetcompany(oldcomp);
   
   if (RepSpec.flags[7]==0) then begin
+    resetloop(TRr);
     TRr.TransDate = RepSpec.sStartDate;
     TrHs = true;
     while (loopkey("TransDate",TRr,1,TrHs)) begin
@@ -359,6 +362,7 @@ BEGIN
     end;
   end else begin
     blockload(bcur);
+    resetloop(VIr);
     VIr.InvDate = RepSpec.sStartDate;
     TrHs = true;
     while (loopkey("InvDate",VIr,1,TrHs)) begin
@@ -404,6 +408,7 @@ BEGIN
           end;
         end;
         if (sum==0) then begin
+          resetloop(OPrsr);
           OPrsr.VINr = VIr.SerNr;
           TrHs2 = true;
           while (LoopKey("VIKey",OPrsr,1,TrHs2)) begin
