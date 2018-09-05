@@ -1021,7 +1021,7 @@ BEGIN
               end;
             end;
             style = 63;
-            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Overrun",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Delta,$",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
             style = 64;
             StringCell(sheetnum,fileToSave,colnum,rownum,style,"%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
             style = 36;
@@ -1514,7 +1514,7 @@ BEGIN
             end;
           end;
           style = 63;
-          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Overrun",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Delta,$",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
           style = 64;
           StringCell(sheetnum,fileToSave,colnum,rownum,style,"%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
           style = 36;
@@ -1994,7 +1994,7 @@ BEGIN
               end;
             end;
             style = 63;
-            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Overrun",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Delta,$",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
             style = 64;
             StringCell(sheetnum,fileToSave,colnum,rownum,style,"%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
             style = 36;
