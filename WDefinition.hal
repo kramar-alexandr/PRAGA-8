@@ -4990,6 +4990,7 @@ real h,v,vs,h1;
 		EditField(h,v+=vs,120,"Project",Normal,f1,false,PRSClass);
 		EditField(h+100,v+=vs,20,"Number of projects in one line",Normal,f3,false,0);
     CheckBox(h,v+=vs,0,"with " & chr(34) & "20xx.998" & chr(34) & " project",flags[6]);
+    CheckBox(h,v+=vs,0,"with " & chr(34) & "013 and 014" & chr(34) & " projects",flags[8]);
 		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunProjectStatRn","Run");
 	EndWindow;
 end;
