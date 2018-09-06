@@ -1422,8 +1422,23 @@ BEGIN
                 end;
               end;
               NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
+              // Edit Start ---------------------------------------------- Edit Start
+	//Thursday, 6 September 2018 08:59:08
+	
+              style = 28;
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact-totbud);
+              style = 30;
+             	if (totbud == 0) then begin
+								qtyOfEmpStr = 1;
+								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+							end else begin
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,(totfact-totbud)/totbud*100);
+							end;
+              
+	// Edit End ---------------------------------------------- Edit End
+	
             end;
-            colnum = colnum + 3;
+            colnum = colnum + 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 6 September 2018 08:53:46
           end;
         EndRow(sheetnum,fileToSave,rownum);
         rownum = rownum + 2;
@@ -1792,6 +1807,22 @@ BEGIN
               style = 78;
             end;
             NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
+            
+            // Edit Start ---------------------------------------------- Edit Start
+	//Thursday, 6 September 2018 08:59:08
+	
+						style = 28;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact-totbud);
+						style = 30;
+						if (totbud == 0) then begin
+							qtyOfEmpStr = 1;
+							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+						end else begin
+							NumericCell(sheetnum,fileToSave,colnum,rownum,style,(totfact-totbud)/totbud*100);
+						end;
+              
+	// Edit End ---------------------------------------------- Edit End
+            
           end;
         EndRow(sheetnum,fileToSave,rownum);
       end;
@@ -2272,6 +2303,22 @@ BEGIN
                 style = 74;
               end;
               NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
+              
+              // Edit Start ---------------------------------------------- Edit Start
+	//Thursday, 6 September 2018 08:59:08
+	
+              style = 28;
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact-totbud);
+              style = 30;
+              if (totbud == 0) then begin
+								qtyOfEmpStr = 1;
+								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+							end else begin
+								NumericCell(sheetnum,fileToSave,colnum,rownum,style,(totfact-totbud)/totbud*100);
+							end;
+              
+	// Edit End ---------------------------------------------- Edit End
+              
             end;
           EndRow(sheetnum,fileToSave,rownum);
 
