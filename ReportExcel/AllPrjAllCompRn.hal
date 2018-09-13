@@ -382,6 +382,7 @@ BEGIN
 	string 16 reportName;
 	array string 225 mas;
   area areatofile;
+  array val totalbycp,totalall;
   
   oldcomp = currentcompany;
   switch (RepSpec.f2) begin
@@ -451,6 +452,14 @@ BEGIN
     colnum = colnum + 1;
     sheetColls[colnum] = 12.7109375;
     colnum = colnum + 1;
+    
+    for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
+			sheetColls[colnum] = 13.7109375;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 12.7109375;
+			colnum = colnum + 1;
+		end;
+    
     sheetColls[colnum] = 13.7109375;
     colnum = colnum + 1;
     sheetColls[colnum] = 12.7109375;
@@ -548,6 +557,9 @@ BEGIN
         style = 70;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"GRAND TOTAL",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
         qtyOfEmpStr = 4;
+        for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:57:09
+					qtyOfEmpStr = qtyOfEmpStr + 2;
+				end;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
         style = 71;
         qtyOfEmpStr = 1;
@@ -595,6 +607,7 @@ BEGIN
         qtyOfEmpStr = 1;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
         mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+        
         style = 91;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"BUDGET-" & RepSpec.f2,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
         style = 92;
@@ -602,14 +615,25 @@ BEGIN
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
         mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
         qtyMergeCell = qtyMergeCell + 1;
+        
+
+				for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:28
+					style = 63;
+					StringCell(sheetnum,fileToSave,colnum,rownum,style,CompArray[CAi],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+					style = 18;
+					qtyOfEmpStr = 1;
+					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+				end;
+				
         mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
-        style = 68;
+        style = 68;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:29
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"FACT-" & RepSpec.f2,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
         style = 69;
         qtyOfEmpStr = 1;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
         mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
         qtyMergeCell = qtyMergeCell + 1;
+        
         style = 36;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"Override",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
         style = 39;
@@ -656,6 +680,15 @@ BEGIN
         style = 48;
         qtyOfEmpStr = 1;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+        
+        for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
+            style = 64;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            style = 19;
+            qtyOfEmpStr = 1;
+            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+				end;
+        
         style = 31;
         qtyOfEmpStr = 1;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -692,6 +725,8 @@ BEGIN
               for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
                 style = 15;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]]);
+                totalbycp[CAi] = totalbycp[CAi] + QuartVect["F;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
+                totalall[CAi] = totalall[CAi] + QuartVect["F;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];
                 style = 6;
                 qtyOfEmpStr = 1;
                 EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -708,7 +743,15 @@ BEGIN
             style = 51;
             qtyOfEmpStr = 1;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-            style = 56;
+            for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
+                style = 15;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbycp[CAi]);
+                totalbycp[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
+                style = 6;
+                qtyOfEmpStr = 1;
+                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+						end;
+						style = 56;
             NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;" & ProjArray[PAi] & ";T"]);
             style = 35;
             qtyOfEmpStr = 1;
@@ -772,12 +815,18 @@ BEGIN
       BeginRow(sheetnum,fileToSave,rownum,0,4.5);
         style = 1;
         qtyOfEmpStr = 12 + quartCount*(CompArray.length + 1)*2;
+        for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
+					qtyOfEmpStr = qtyOfEmpStr + 2;
+				end;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
       EndRow(sheetnum,fileToSave,rownum);
       colnum = 2;
       BeginRow(sheetnum,fileToSave,rownum,0,4.5);
         style = 11;
         qtyOfEmpStr = 12 + quartCount*(CompArray.length + 1)*2;
+        for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
+					qtyOfEmpStr = qtyOfEmpStr + 2;
+				end;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
       EndRow(sheetnum,fileToSave,rownum);
       BeginRow(sheetnum,fileToSave,rownum,0,4.5);
@@ -819,11 +868,24 @@ BEGIN
         style = 79;
         qtyOfEmpStr = 1;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+        for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
+						style = 74;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalall[CAi]);
+						totalall[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 17:37:46
+						style = 75;
+						qtyOfEmpStr = 1;
+						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+				end;
         style = 80;
         NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;T;T"]);
         style = 81;
         qtyOfEmpStr = 1;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+        style = 38;
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;T;T"] - QuartVect["T;T"]);
+				style = 41;
+				NumericCell(sheetnum,fileToSave,colnum,rownum,style,(QuartVect["F;T;T"] - QuartVect["T;T"])/QuartVect["T;T"]);
+
       EndRow(sheetnum,fileToSave,rownum);
     EndSheetData(sheetnum,fileToSave);
     MergeCells(sheetnum,fileToSave,mergeCell,qtyMergeCell);
