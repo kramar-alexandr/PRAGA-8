@@ -5048,6 +5048,8 @@ real h,v,vs,h1;
 		CheckBox(h+105,v,0,"IV",flags[4]);
     EditField(h,v+=vs,120,"or Month",Normal,f4,false,myMonthSClass);
 		CheckBox(h,v+=vs,0,"with " & chr(34) & "2018.998" & chr(34) & " project",flags[6]);
+		CheckBox(h,v+=vs,0,"with " & chr(34) & "013 and 014" & chr(34) & " projects",flags[7]);
+		
 		HalPushButton(h=50,v+=vs,h+110,v+=vs,"RunAllPrjAllCompRn","Run");
 	EndWindow;
 end;
