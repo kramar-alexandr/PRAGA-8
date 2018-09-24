@@ -442,18 +442,24 @@ BEGIN
 		colnum = colnum + 1;
     for (i=0;i<quartCount;i=i+1) begin
       sheetColls[colnum] = 13.7109375;
+      sheetCollsOutLvl[colnum] = 1;
       colnum = colnum + 1;
       sheetColls[colnum] = 12.7109375;
+      sheetCollsOutLvl[colnum] = 1;
       colnum = colnum + 1;
       for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
         sheetColls[colnum] = 13.7109375;
+        sheetCollsOutLvl[colnum] = 1;
         colnum = colnum + 1;
         sheetColls[colnum] = 12.7109375;
+        sheetCollsOutLvl[colnum] = 1;
         colnum = colnum + 1;
       end;
     end;
     sheetColls[colnum] = 0.5703125;
+    sheetCollsOutLvl[colnum] = 1;
 		colnum = colnum + 1;
+		sheetCollsOutLvl[colnum] = 1;
     sheetColls[colnum] = 0.42578125;
     colnum = colnum + 1;
 		sheetColls[colnum] = 13.7109375;
@@ -467,7 +473,6 @@ BEGIN
 			sheetColls[colnum] = 12.7109375;
 			colnum = colnum + 1;
 		end;
-    
     sheetColls[colnum] = 13.7109375;
     colnum = colnum + 1;
     sheetColls[colnum] = 12.7109375;
