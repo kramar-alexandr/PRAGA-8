@@ -1911,45 +1911,40 @@ BEGIN
 													if combExist[ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj]] then begin
 														ArtExtNonBlank = false;
 														for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
-															Logtext(0,Qi);
-															if QuartVect[quartToPrint[Qi] & "S;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T"]!=0 or QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T"]!=0 then begin
+															if QuartVect[quartToPrint[Qi] & "S;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T"]!=0 or QuartVect[quartToPrint[Qi] & "FS;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T"]!=0 then begin
 																ArtExtNonBlank = true;
-																Logtext(0,"ArtExtNonBlank " & ArtExtNonBlank);
 															end;
 														end;
 														if ArtExtNonBlank then begin
 															ExtPrinted = true;
 															colnum = 2;
-															BeginRow(sheetnum,fileToSave,rownum,RepSpec.flags[5]*2,blankval);
-																style = 45;
-																StringCell(sheetnum,fileToSave,colnum,rownum,style,ExtArr[j],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-																Objr.Code = ExtArr[j];
-																if ExtArr[j]=="" then begin
-																	Objr.Code = ArtArrayWithGroups[i];
-																end;
+															BeginRow(sheetnum,fileToSave,rownum,3,blankval);
+																style = 3;
+																StringCell(sheetnum,fileToSave,colnum,rownum,style,SuppArr[jj],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+																Objr.Code = SuppArr[jj];
 																readfirstmain(Objr,1,true);
-																style = 46;
+																style = 3;
 																StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-																style = 43;
+																style = 82;
 																qtyOfEmpStr = 1;
 																EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 																totbud = 0;
 																totfact = 0;
 																for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
 																	style = 47;
-																	bud = QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";T"];
+																	bud = QuartVect[quartToPrint[Qi] & "S;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T"];
 																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
 																	totbud = totbud + bud;
 																	style = 48;
 																	if (RepSpec.flags[29]==1) then begin
 																		for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-																			fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";T" & ";" & CompArray[CAi]];
+																			fact = QuartVect[quartToPrint[Qi] & "FS;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T" & ";" & CompArray[CAi]];
 																			NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
 																			totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
 																		end;
 																		style = 80;
 																	end;
-																	fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";T"];
+																	fact = QuartVect[quartToPrint[Qi] & "FS;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T"];
 																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
 																	totfact = totfact + fact;
 																end;
@@ -2479,6 +2474,83 @@ BEGIN
                           qtyOfEmpStr = 1;
                           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
                         EndRow(sheetnum,fileToSave,rownum);
+                        
+                        
+                        for(jj=0;jj<SuppArr.length;jj=jj+1)begin
+													if (nonblank(SuppArr[jj])) then begin
+														if combExist[ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj]] then begin
+															ArtExtNonBlank = false;
+															for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
+																if QuartVect[quartToPrint[Qi] & "S;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray2[PAi]]!=0 or QuartVect[quartToPrint[Qi] & "FS;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray2[PAi]]!=0 then begin
+																	ArtExtNonBlank = true;
+																end;
+															end;
+															if ArtExtNonBlank then begin
+																ExtPrinted = true;
+																colnum = 2;
+																BeginRow(sheetnum,fileToSave,rownum,3,blankval);
+																	style = 3;
+																	StringCell(sheetnum,fileToSave,colnum,rownum,style,SuppArr[jj],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+																	Objr.Code = SuppArr[jj];
+																	readfirstmain(Objr,1,true);
+																	style = 3;
+																	StringCell(sheetnum,fileToSave,colnum,rownum,style,Objr.Comment,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+																	style = 82;
+																	qtyOfEmpStr = 1;
+																	EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+																	totbud = 0;
+																	totfact = 0;
+																	for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
+																		style = 42;
+																		bud = QuartVect[quartToPrint[Qi] & "S;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray2[PAi]];
+																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+																		totbud = totbud + bud;
+																		style = 20;
+																		if (RepSpec.flags[29]==1) then begin
+																			for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
+																				fact = QuartVect[quartToPrint[Qi] & "FS;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
+																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
+																				totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
+																			end;
+																			style = 72;
+																		end;
+																		fact = QuartVect[quartToPrint[Qi] & "FS;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray2[PAi]];
+																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
+																		totfact = totfact + fact;
+																	end;
+																	if quartCount>1 then begin
+																		style = 42;
+																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
+																		style = 20;
+																		if (RepSpec.flags[29]==1) then begin
+																			for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
+																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
+																				totfactv[CompArray[CAi]] = 0;
+																			end;
+																			style = 72;
+																		end;
+																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
+																	end;
+																	style = 22;
+																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
+																	style = 21;
+																	if (totbud == 0) then begin
+																		qtyOfEmpStr = 1;
+																		EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+																	end else begin
+																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
+																	end;
+																	style = 36;
+																	qtyOfEmpStr = 1;
+																	EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+																EndRow(sheetnum,fileToSave,rownum);
+															end;
+														end;
+													end;
+                        end;
+                        
+                        
+                        
                       end;
                     end;
                   end;

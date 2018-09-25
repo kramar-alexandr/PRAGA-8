@@ -271,3 +271,47 @@ begin
 	end;
 	return;
 end;
+
+
+global webpublic procedure WebProjectStatRn()
+begin
+record ObjVc Objr;
+record OTVc OTr;
+string 255 filename,tstr,fnserv,md5strServ,md5strCli;
+string 10 tmpDate;
+area tmparea;
+record RcVc RepSpec;
+integer wn,transCNT;
+boolean PrjFoundf,testf,EOF,err;
+
+RepSpec.sStartDate = stringtodate("01/01/2018");
+RepSpec.sEndDate = stringtodate("30/06/2018");
+RepSpec.f2 = "2018";
+RepSpec.f3 = "5";
+RepSpec.flags[5] = 1;
+RepSpec.flags[1] = 1;
+
+if (RepSpec.flags[29]==1) then begin
+	tstr = "All companies ";
+end;
+if nonblank(RepSpec.f1) then begin
+	tstr = tstr & RepSpec.f1;
+end else begin
+	tstr = tstr & "Projects";
+end;
+if (RepSpec.flags[7]==1) then begin
+	tstr = tstr & " - by Payments";
+end;
+tstr = tstr & "-" & DateToString(RepSpec.sEndDate,"DD MM YYYY") & "-filled in on " & DateToString(CurrentDate,"DD MM YYYY");
+if (RepSpec.flags[6]==1) then begin
+	tstr = tstr & "(all projects)";
+end;
+
+filename = "1.xlsx";
+
+logtext(0,"WebProjectStatRn");
+PrjFoundf = true;
+ProjectStatRn(RepSpec,fnserv,md5strServ,PrjFoundf);
+
+return;
+end;
