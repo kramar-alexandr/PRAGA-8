@@ -271,3 +271,95 @@ begin
 	end;
 	return;
 end;
+
+
+global webpublic procedure WebProjectStatRn()
+begin
+record ObjVc Objr;
+record OTVc OTr;
+string 255 filename,tstr,fnserv,md5strServ,md5strCli;
+string 10 tmpDate;
+area tmparea;
+record RcVc RepSpec;
+integer wn,transCNT;
+boolean PrjFoundf,testf,EOF,err;
+
+RepSpec.sStartDate = stringtodate("01/01/2018");
+RepSpec.sEndDate = stringtodate("30/06/2018");
+RepSpec.f2 = "2018";
+RepSpec.f3 = "5";
+RepSpec.flags[5] = 1;
+RepSpec.flags[1] = 1;
+RepSpec.flags[29] = 1;
+RepSpec.flags[1] = 1;
+RepSpec.flags[2] = 1;
+if nonblank(RepSpec.f4) then begin
+    RepSpec.f4 = GetMonthNum(RepSpec.f4);
+    if (RepSpec.f4=="0") then begin
+      MessageBox(0,"Incorrect month!");
+      testf = false;
+    end else begin
+      RepSpec.sStartDate = StringToDate("1/" & RepSpec.f4 & "/" & RepSpec.f2);
+      RepSpec.sEndDate = StringToDate(DaysInMonth(StringToInt(RepSpec.f2),StringToInt(RepSpec.f4)) & "/" & RepSpec.f4 & "/" & RepSpec.f2);
+      RepSpec.flags[1] = 0;
+      RepSpec.flags[2] = 0;
+      RepSpec.flags[3] = 0;
+      RepSpec.flags[4] = 0;
+      switch GetQuartal(RepSpec.sStartDate) begin
+        case 1: RepSpec.flags[1] = 1;
+        case 2: RepSpec.flags[2] = 1;
+        case 3: RepSpec.flags[3] = 1;
+        case 4: RepSpec.flags[4] = 1;
+      end;
+    end;
+  end else begin
+    if ((RepSpec.flags[1]==0) and (RepSpec.flags[2]==0) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==0) and testf) then begin
+      MessageBox(0,"Select at least one Quartal!");
+      testf = false;
+    end;
+    if ((((RepSpec.flags[1]==1) and (RepSpec.flags[2]==0) and ((RepSpec.flags[3]==1) or (RepSpec.flags[4]==1))) or (((RepSpec.flags[1]==1) or (RepSpec.flags[2]==1)) and (RepSpec.flags[3]==0) and (RepSpec.flags[4]==1))) and testf) then begin
+      MessageBox(0,"Incorrect selection of Quartals!");
+      testf = false;
+    end;
+    if testf then begin
+      tmpDate = "";
+      if (RepSpec.flags[4]==1) then begin
+        tmpDate = "1/10/";
+      end;
+      if (RepSpec.flags[3]==1) then begin
+        tmpDate = "1/7/";
+      end;
+      if (RepSpec.flags[2]==1) then begin
+        tmpDate = "1/4/";
+      end;
+      if (RepSpec.flags[1]==1) then begin
+        tmpDate = "1/1/";
+      end;
+      tmpDate = tmpDate & RepSpec.f2;
+      RepSpec.sStartDate = StringToDate(tmpDate);
+      
+      tmpDate = "";
+      if (RepSpec.flags[1]==1) then begin
+        tmpDate = "31/3/";
+      end;
+      if (RepSpec.flags[2]==1) then begin
+        tmpDate = "30/6/";
+      end;
+      if (RepSpec.flags[3]==1) then begin
+        tmpDate = "30/9/";
+      end;
+      if (RepSpec.flags[4]==1) then begin
+        tmpDate = "31/12/";
+      end;
+      tmpDate = tmpDate & RepSpec.f2;
+      RepSpec.sEndDate = StringToDate(tmpDate);
+    end;
+  end;
+  
+
+logtext(0,"WebProjectStatRn");
+PrjFoundf = true;
+ProjectStatRn(RepSpec,fnserv,md5strServ,PrjFoundf);
+
+return;
+end;
