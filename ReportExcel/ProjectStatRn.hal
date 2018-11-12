@@ -727,7 +727,9 @@ BEGIN
 	array string 225 mas;
   area areatofile;
 	array string 100 SuppArr;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 25 September 2018 09:52:22
-
+	
+	logtext(0,"ProjectStatRn");
+	
   ArraysCollect(RepSpec,ArtArrayWithoutGroups,ProjArray,ProjNamesVect,ArtArrayWithGroups,PrjFoundf,isMotherProjVect);
 	if (PrjFoundf) then begin
 		DataCollect(ArtArrayWithoutGroups,ExtArr,ProjArray,ProjArray2,RepSpec,QuartVect,CompArray,CompNamesVect,SuppArr);

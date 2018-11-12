@@ -392,6 +392,8 @@ BEGIN
   area areatofile;
   array val totalbycp,totalall;
   
+  logtext(0,"AllPrjAllCompRn");
+  
   oldcomp = currentcompany;
   switch (RepSpec.f2) begin
     case "2017":
