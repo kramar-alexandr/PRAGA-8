@@ -1583,7 +1583,8 @@ BEGIN
                 end;
               end;
               NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-              // Edit Start ---------------------------------------------- Edit Start
+            end;
+            // Edit Start ---------------------------------------------- Edit Start
 	//Thursday, 6 September 2018 08:59:08
 	
               style = 28;
@@ -1598,7 +1599,6 @@ BEGIN
               
 	// Edit End ---------------------------------------------- Edit End
 	
-            end;
             colnum = colnum + 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 6 September 2018 08:53:46
           end;
         EndRow(sheetnum,fileToSave,rownum);
@@ -2041,8 +2041,8 @@ BEGIN
               style = 78;
             end;
             NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-            
-            // Edit Start ---------------------------------------------- Edit Start
+          end;
+          // Edit Start ---------------------------------------------- Edit Start
 	//Thursday, 6 September 2018 08:59:08
 	
 						style = 28;
@@ -2057,7 +2057,6 @@ BEGIN
               
 	// Edit End ---------------------------------------------- Edit End
             
-          end;
         EndRow(sheetnum,fileToSave,rownum);
       end;
     EndSheetData(sheetnum,fileToSave);
@@ -2614,7 +2613,8 @@ BEGIN
                 style = 74;
               end;
               NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-              
+            end;
+                          
               // Edit Start ---------------------------------------------- Edit Start
 	//Thursday, 6 September 2018 08:59:08
 	
@@ -2630,7 +2630,6 @@ BEGIN
               
 	// Edit End ---------------------------------------------- Edit End
               
-            end;
           EndRow(sheetnum,fileToSave,rownum);
 
         EndSheetData(sheetnum,fileToSave);
