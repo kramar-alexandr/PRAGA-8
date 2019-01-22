@@ -41,7 +41,8 @@ BEGIN
     testf = true;
     if ((RepSpec.f2=="2016" and right(ITr.Code,3)!="_16") or
         (RepSpec.f2=="2017" and right(ITr.Code,3)!="_17") or
-        (RepSpec.f2=="2018" and right(ITr.Code,3)!="_18")) then begin testf = false; end;
+        (RepSpec.f2=="2018" and right(ITr.Code,3)!="_18") or
+        (RepSpec.f2=="2019" and right(ITr.Code,3)!="_19")) then begin testf = false; end;
     if (testf) then begin
       ArtArrayWithGroups[kw] = ITr.Code;
       kw = kw + 1;
@@ -54,7 +55,8 @@ BEGIN
         if (blank(INr.Objects)) then begin testf = false; end;
         if ((RepSpec.f2=="2016" and right(INr.Objects,3)!="_16") or
             (RepSpec.f2=="2017" and right(INr.Objects,3)!="_17") or
-            (RepSpec.f2=="2018" and right(INr.Objects,3)!="_18")) then begin testf = false; end;
+            (RepSpec.f2=="2018" and right(INr.Objects,3)!="_18") or
+            (RepSpec.f2=="2019" and right(INr.Objects,3)!="_19")) then begin testf = false; end;
         if (testf) then begin
           tstr = INr.Objects;
           foundf = false;
@@ -79,6 +81,8 @@ BEGIN
       SetCompany(2,false);
     case "2018":
       SetCompany(1,false);
+    case "2019":
+      SetCompany(1,false);
   end;
 	k = 0;
   resetloop(PRr);
@@ -91,6 +95,8 @@ BEGIN
           goto L1;
         case "2018.998":
           goto L1;
+        case "2019.998":
+          goto L1;
       end;
     end;
     if (RepSpec.flags[8]==0) then begin
@@ -101,6 +107,8 @@ BEGIN
           goto L1;
         case "2018.013":
           goto L1;
+        case "2019.013":
+          goto L1;
       end;
     end;
     if (RepSpec.flags[8]==0) then begin
@@ -110,6 +118,8 @@ BEGIN
         case "2017.014":
           goto L1;
         case "2018.014":
+          goto L1;
+        case "2019.014":
           goto L1;
       end;
     end;
@@ -210,6 +220,18 @@ begin
     vect[kf & group &           ";" & tstr] = vect[kf & group &           ";" & tstr] + v;
     vect[kf                  & "T;" & tstr] = vect[kf                  & "T;" & tstr] + v;
   end;
+  if (RepSpec.f2=="2019") then begin
+    switch (prj) begin
+      case "2019.998":
+        tstr = "sT1";
+      otherwise
+        tstr = "sT3";
+    end;
+    vect[kf & art & ":" & ext & ";" & tstr] = vect[kf & art & ":" & ext & ";" & tstr] + v;
+    vect[kf & art &             ";" & tstr] = vect[kf & art &             ";" & tstr] + v;
+    vect[kf & group &           ";" & tstr] = vect[kf & group &           ";" & tstr] + v;
+    vect[kf                  & "T;" & tstr] = vect[kf                  & "T;" & tstr] + v;
+  end;
   
   if nonblank(comp) and (RepSpec.flags[29]==1) then begin
     vect[kf & art & ":" & ext & ";" & prj & ";" & comp] = vect[kf & art & ":" & ext & ";" & prj & ";" & comp] + v;
@@ -257,6 +279,18 @@ begin
     if (RepSpec.f2=="2018") then begin
       switch (prj) begin
         case "2018.998":
+          tstr = "sT1";
+        otherwise
+          tstr = "sT3";
+      end;
+      vect[kf & art & ":" & ext & ";" & tstr & ";" & comp] = vect[kf & art & ":" & ext & ";" & tstr & ";" & comp] + v;
+      vect[kf & art &             ";" & tstr & ";" & comp] = vect[kf & art &             ";" & tstr & ";" & comp] + v;
+      vect[kf & group &           ";" & tstr & ";" & comp] = vect[kf & group &           ";" & tstr & ";" & comp] + v;
+      vect[kf                  & "T;" & tstr & ";" & comp] = vect[kf                  & "T;" & tstr & ";" & comp] + v;
+    end;
+    if (RepSpec.f2=="2019") then begin
+      switch (prj) begin
+        case "2019.998":
           tstr = "sT1";
         otherwise
           tstr = "sT3";
@@ -316,6 +350,8 @@ BEGIN
     case "2017":
       SetCompany(2,false);
     case "2018":
+      SetCompany(1,false);
+    case "2019":
       SetCompany(1,false);
   end;
   EAi = 0;
@@ -682,6 +718,27 @@ BEGIN
         testf = true;
         switch (ProjArray2[i]) begin
           case "2018.998":
+            testf = false;
+        end;
+        if (testf) then begin
+          ProjArray[PAi] = ProjArray2[i];
+          PAi = PAi + 1;
+        end;
+      end;
+      ProjArray[PAi] = "sT3";
+    end;
+    if (RepSpec.f2=="2019") then begin
+      PAi = 0;
+      if (RepSpec.flags[6]==1) then begin
+        ProjArray[PAi] = "2019.998";
+        PAi = PAi + 1;
+        ProjArray[PAi] = "sT1";
+        PAi = PAi + 1;
+      end;
+      for (i=0;i<ProjArray2.length;i=i+1) begin
+        testf = true;
+        switch (ProjArray2[i]) begin
+          case "2019.998":
             testf = false;
         end;
         if (testf) then begin

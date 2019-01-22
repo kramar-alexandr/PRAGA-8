@@ -275,6 +275,7 @@ BEGIN
   record VEPRRetentionVc VEPRRr;
   record TaxTemplateVc TTr;
   record AT2UnitVc AT2Unitr;
+  date invdate;// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 21 January 2019 15:45:03
 
   res = 0;
   curcomp = CurrentCompany;    
@@ -1022,6 +1023,22 @@ what the hell?
               end;
               if(nonblank(VIrw.Extras))then begin
               	objstr = objstr & "," & VIrw.Extras;//Edit---------------Vitalii 17:12 04.08.2015
+              end;
+              
+              if(nonblank(VIrw.Exp))then begin
+								invdate = VIp.InvDate;// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 21 January 2019 15:44:41
+								if(right(VIrw.Exp,2)!=right(invdate.year,2))then begin// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 21 January 2019 15:44:44
+									RecordCheckError(31014,"",i,"Exp");      
+									res = -1; 
+									goto L99VIVcRecordCheck;
+								end;
+							end;
+							if(nonblank(VIrw.Prj))then begin
+								if(left(VIrw.Prj,4)!=left(invdate.year,4))then begin// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 21 January 2019 15:44:45
+									RecordCheckError(31014,"",i,"Prj");      
+									res = -1; 
+									goto L99VIVcRecordCheck;
+								end;
               end;
               
               NoDupObjs(objstr,objstr);

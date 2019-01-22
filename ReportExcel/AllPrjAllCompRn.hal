@@ -44,6 +44,8 @@ BEGIN
           goto L1;
         case "2018.998":
           goto L1;
+        case "2019.998":
+          goto L1;
       end;
     end;
     if (RepSpec.flags[8]==0) then begin
@@ -55,6 +57,10 @@ BEGIN
         case "2018.013":
           goto L1;
         case "2018.014":
+          goto L1;
+        case "2019.013":
+          goto L1;
+        case "2019.014":
           goto L1;
       end;
     end;
@@ -126,6 +132,8 @@ BEGIN
     case "2017":
       SetCompany(2,false);
     case "2018":
+      SetCompany(1,false);
+    case "2019":
       SetCompany(1,false);
   end;
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
@@ -403,6 +411,8 @@ BEGIN
     case "2017":
       SetCompany(2,false);
     case "2018":
+      SetCompany(1,false);
+    case "2019":
       SetCompany(1,false);
   end;
   ArraysCollect(RepSpec,ProjArray,ProjNamesVect,PrjFoundf,isMotherProjVect);
@@ -805,6 +815,7 @@ BEGIN
                 EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
                 style = 16;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]]);
+                totalbycp[CAi] = totalbycp[CAi] + QuartVect["F;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
               end;
             end;
             style = 24;
@@ -818,6 +829,16 @@ BEGIN
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
             style = 50;
             NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[ProjArray[PAi] & ";T"]);
+            
+            for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 22 January 2019 13:59:54
+                style = 7;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbycp[CAi]);
+                totalbycp[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 22 January 2019 13:59:57
+                style = 16;
+                qtyOfEmpStr = 1;
+                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+						end;
+            
             style = 33;
             qtyOfEmpStr = 1;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);

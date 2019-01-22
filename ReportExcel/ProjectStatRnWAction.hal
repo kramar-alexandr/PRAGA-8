@@ -78,12 +78,40 @@ begin
 end;
 
 global
+procedure ProjectStat2019RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2019";
+  RepSpec.f3 = "5";
+	RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
 function Boolean ProjectStat2018RClassOnOpenWindow(Integer wn)
 begin
 	record RcVc RepSpec;
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2018";
+  RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+function Boolean ProjectStat2019RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2019";
   RepSpec.f3 = "5";
   RepSpec.flags[5] = 1;
 	PutWindowRecord(wn,RepSpec);
@@ -107,12 +135,43 @@ begin
 end;
 
 global
+procedure TotalProjectStat2019RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2019";
+	RepSpec.f3 = "5";
+	RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+
+global
 function Boolean TotalProjectStat2018RClassOnOpenWindow(Integer wn)
 begin
 	record RcVc RepSpec;
 	
 	GetWindowRecord(wn,RepSpec);
   RepSpec.f2 = "2018";
+	RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+function Boolean TotalProjectStat2019RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2019";
 	RepSpec.f3 = "5";
   RepSpec.flags[5] = 1;
   RepSpec.flags[29] = 1;
@@ -284,9 +343,9 @@ record RcVc RepSpec;
 integer wn,transCNT;
 boolean PrjFoundf,testf,EOF,err;
 
-RepSpec.sStartDate = stringtodate("01/01/2018");
-RepSpec.sEndDate = stringtodate("30/06/2018");
-RepSpec.f2 = "2018";
+RepSpec.sStartDate = stringtodate("01/01/2019");
+RepSpec.sEndDate = stringtodate("30/06/2019");
+RepSpec.f2 = "2019";
 RepSpec.f3 = "5";
 RepSpec.flags[5] = 1;
 RepSpec.flags[1] = 1;
