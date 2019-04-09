@@ -4025,7 +4025,7 @@ begin
   WindowBegin("Contract",ContractsDClass,CGview,-);
   SetWRect(20,80,700,200);
 	UseView(ContractsVc);
-	//Sizeable(-1,-1,0,0);
+	Sizeable(-1,-1,0,0);
 
 	EditField(h,v=6,100,"Code",Normal,SerNr,false,0);
 	EditField(h2,v,150,"Contract Number",Normal,Number,false,0);
@@ -4043,9 +4043,83 @@ begin
 	CheckBox(-100,v+=vs,0,"Closed",Closed);
 
   EditField(h,v+=50,40,"Currency",Normal,CurncyCode,false,CurncyCodeSClass);
+  EditField(h+190,v,80,"Test period sum",Normal,TestTotalSum,false,0);
+  EditField(h+390,v,80,"Test period Date",Normal,TestDate,false,0);
+	EditField(h2+40,v,80,"Sum",Normal,TotalSum,false,0);
+	
+	
+	RecordList2(10,v+=40,-30,-30,"ContrChanVc");
+	RlColKey(4,4,"Date",TransDate,false,ActTransDate);
+  RlCol(70,70,"Description",Description,false);
+  RlColKey(350,350,"Sum",TotalSum,false,ActTotalSum);
+  
+  SpecialMenu("Add changes to contract",'',0,"AddConChanDsm");
+  SpecialMenu("Open changes to contract",'',0,"OpenChangedContrDsm");
+	EndWindow;
+end;
+
+
+window ContrChanLClass:1		//Edit----------------------Dima  09.02.2016
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  Integer pos;
+
+  WindowBegin("Contracts",ContrChanLClass,CGmlist,-);
+  SetWRect(20,80,700,350);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(ContrChanDClass);
+  UseView(ContrChanVc);
+  RecordList(4,17,-21,-39);
+	
+	RlColKey(4,4,"Number",SerNr,false,SerNr);
+  
+  RlColKey(70,70,"Date",TransDate,false,TransDate);
+  RlCol(120,120,"Description",Description,false);
+  RlCol(220,220,"Supplier",VECode,false);
+	RlCol(-340,-340,"StartDate",StartDate,false);
+	RlCol(-270,-270,"EndDate",EndDate,false);
+	RlColKey(-200,-200,"OK",OKFlag,false,OKFlag);
+	RlColKey(-170,-170,"Approved",SignDate,false,SignDate);
+	//RlColKey(500,500,"Description",Description,false,Description);
+	RlColKey(-100,100,"Sum",TotalSum,false,TotalSum);
+
+  SearchField("Search");
+  EndWindow;
+end;
+
+window ContrChanDClass:1		//Edit----------------------Dima  09.02.2016
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,h2,h3,h4,v,vs;
+
+  h = 100;
+  h2 = -170;
+  vs = 25;
+  WindowBegin("Changes to Contract",ContrChanDClass,CGview,-);
+  SetWRect(20,80,700,200);
+	UseView(ContrChanVc);
+	//Sizeable(-1,-1,0,0);
+
+	EditField(h,v=6,100,"Supplier",ViewOnly,VECode,false,ObjSuppSClass);
+	EditField(h2,v,150,"Contract Number",ViewOnly,SerNr,false,0);
+	EditField(h,v+=vs,100,"Date",Normal,TransDate,false,PasteCurDate);
+	EditField(h+140,v,260,"Name",ViewOnly,VEName,false,0);
+
+	EditField(h,v+=30,400,"Description",Normal,Description,false,0);
+  EditField(h,v+=30,400,"Description RUS",Normal,DescriptionRus,false,0);
+  //EditFieldTL(h,v+=30,100,"Start Date",M4Date,Normal,0 ,StartDate,false,PasteCurDate);
+	EditField(h,v+=30,100,"Start Date",Normal,StartDate,false,PasteCurDate);
+	//EditField(h+220,v,100,"Approval Date",Normal,SignDate,false,PasteCurDate);
+	EditField(h,v+=vs,100,"End Date",Normal,EndDate,false,PasteCurDate);
+	//EditField(h+220,v,100,"Close Date",Normal,CloseDate,false,PasteCurDate);
+	//CheckBox(-100,v=90,0,"OK",OKFlag);
+	//CheckBox(-100,v+=vs,0,"Closed",Closed);
+
+  EditField(h,v+=50,40,"Currency",Normal,CurncyCode,false,CurncyCodeSClass);
+  /*EditField(h+190,v,80,"Test period sum",Normal,TestTotalSum,false,0);
+  EditField(h+390,v,80,"Test period Date",Normal,TestDate,false,0);*/
 	EditField(h2+40,v,80,"Sum",Normal,TotalSum,false,0);
 
-  
 	EndWindow;
 end;
  
@@ -5387,4 +5461,17 @@ begin
   SearchField("Search"); 
   
   EndWindow;
+end;
+
+window ZARPLATARClass:1
+	wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+real h,v,vs,h1;
+	WindowBegin("Remuneration report",ZARPLATARClass,CGRcW,RcType);
+		SetWRect(20,80,450,250);
+		v = 20; vs = 20; h = 120;
+		//PeriodField(h,v=6,"Period");
+		EditField(100,6,80,"Year",Normal,f1,false,0);
+		CheckBox(100,26,0,"All companies",flags[1]);
+	EndWindow;
 end;

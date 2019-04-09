@@ -633,12 +633,6 @@ BEGIN
 								end;
                 tmpval = VIrw.Sum/VIr.PayVal*sum;
                 FillVect(k & "F;",VIrw.Exp,VIrw.Extras,PRr.Code,group,PRr.MotherCode,CBrw.ShortName,tmpval,RepSpec,QuartVect);
-                
-                if nonblank(VIrw.Supp) and !ExtInArr[VIrw.Supp] then begin
-                  SuppInArr[VIrw.Supp] = true;
-                  SuppArr[SAi] = VIrw.Supp;
-                  SAi = SAi + 1;
-                end;
                 FillVect(k & "FS;",VIrw.Exp,VIrw.Extras & ":::" & VIrw.Supp,PRr.Code,group,PRr.MotherCode,CBrw.ShortName,tmpval,RepSpec,QuartVect);
               end;
             end;

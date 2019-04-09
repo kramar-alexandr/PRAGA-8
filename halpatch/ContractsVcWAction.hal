@@ -33,3 +33,96 @@ BEGIN
   ContractsDClassAfterEditField = res;
   RETURN;
 END;
+
+
+global
+function Boolean ContractsDClassUpdateWindowSubset(Integer wn,var string subsetname)
+begin
+	record ContractsVc Contractsr;
+		
+  GetWindowRecord(wn,Contractsr);
+  subsetname = Contractsr.SerNr;
+  ContractsDClassUpdateWindowSubset = true;
+  return;
+end;
+
+
+global
+function Boolean ContractsDClassListDblClick(Integer wn)
+begin
+  Integer mwn;
+	record ContractsVc Contractsr;
+  record ContrChanVc ContrChanr,oldContrChanr;
+  
+  if (WindowState(wn)==0) then begin
+    if (ReadMarkedRecord(wn,ContrChanr)) then begin
+      mwn = OpenWindow("ContrChanDClass",1,0,"","",ContrChanr);
+    end;
+  end;
+  ContractsDClassListDblClick = true;
+  return;
+end;
+
+global procedure OpenChangedContrDsm()
+begin
+	record ContrChanVc ContrChanr,oldContrChanr;
+	record ContractsVc Contractsr;
+	integer wn,mwn;
+	date bd;
+	
+	wn = curwindow;
+	
+	if (WindowState(wn)==0) then begin
+    if (ReadMarkedRecord(wn,ContrChanr)) then begin
+      mwn = OpenWindow("ContrChanDClass",1,0,"","",ContrChanr);
+    end;
+  end;
+
+return;
+end;
+
+global updating procedure AddConChanDsm()
+begin
+	record ContrChanVc ContrChanr,oldContrChanr;
+	record ContractsVc Contractsr;
+	integer wn;
+	date bd;
+	
+	wn = curwindow;
+	getwindowrecord(wn,Contractsr);
+
+	if(windowstate(wn)==Rs_normal)then begin
+		recordnew(ContrChanr);
+		ContrChanr.SerNr = Contractsr.SerNr;
+		ContrChanr.VECode = Contractsr.VECode;
+		ContrChanr.TransDate = CurrentDate;
+		ContrChanr.TotalSum = Contractsr.TotalSum;
+		ContrChanr.CurncyCode = Contractsr.CurncyCode;
+		ContrChanr.VEName = Contractsr.VEName;
+		ContrChanr.StartDate = Contractsr.StartDate;
+		ContrChanr.EndDate = Contractsr.EndDate;
+		ContrChanr.SignDate = Contractsr.SignDate;
+		ContrChanr.CloseDate = Contractsr.CloseDate;
+		ContrChanr.OKFlag = Contractsr.OKFlag;
+		ContrChanr.Closed = Contractsr.Closed;
+		ContrChanr.Description = Contractsr.Description;
+		ContrChanr.DescriptionRus = Contractsr.DescriptionRus;
+		ContrChanr.TestTotalSum = Contractsr.TestTotalSum;
+		ContrChanr.TestDate = Contractsr.TestDate;
+		
+		oldContrChanr.SerNr = Contractsr.SerNr;
+		oldContrChanr.TransDate = currentdate;
+		if(readfirstmain(oldContrChanr,2,true)==false)then begin
+			recordstore(ContrChanr,true);
+			UpdateBrowses("ContrChanVc");
+		end else begin
+			ContrChanr.TransDate = bd;
+		end;
+		OpenWindow("ContrChanDClass",1,0,"","",ContrChanr);
+			
+	end else begin
+		beep;
+	end;
+	
+return;
+end;

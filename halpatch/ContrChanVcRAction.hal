@@ -1,0 +1,69 @@
+
+global
+function LongInt ContrChanVcRecordDefaults(var record ContrChanVc ContrChanr,record ContrChanVc ContrChan2r,LongInt stat,LongInt long4)
+BEGIN
+  LongInt res;
+  record UserVc Userr;
+
+
+  ContrChanVcRecordDefaults = res; 
+  RETURN;
+END;
+
+
+global
+updating function LongInt ContrChanVcRecordCheck(var record ContrChanVc ContrChanr,record ContrChanVc ContrChan2r,LongInt stat,LongInt long4)
+BEGIN
+	LongInt res;
+	record ContractsVc Contractsr;
+	boolean testf,TrHs,foundf;
+	
+	res = 0;
+	
+	
+	if (blank(ContrChanr.VECode)) then begin
+		RecordCheckError(1854,"",-1,"VECode");      
+		res = -1;
+		goto LContrChanVcRecordCheck;
+	end;
+		
+	if (blank(ContrChanr.TransDate)) then begin
+		RecordCheckError(1854,"",-1,"TransDate");      
+		res = -1;
+		goto LContrChanVcRecordCheck;
+	end;
+	
+	Contractsr.Number = ContrChanr.Number;
+	Contractsr.VECode = ContrChanr.VECode;
+	TrHs = true;
+	foundf = false;
+	while(loopkey("VECode",Contractsr,1,TrHs))begin
+		testf = true;
+		if(Contractsr.VECode!=ContrChanr.VECode)then begin TrHs = false; testf = false; end;
+		if(Contractsr.Number!=ContrChanr.Number)then begin testf = false; end;
+		
+		if(testf)then begin
+			foundf = true;
+		end;
+	end;
+	
+	if(foundf==false)then begin
+		RecordCheckError(1854,"",-1,"VECode");      
+		res = -1;
+		goto LContrChanVcRecordCheck;
+	end;
+	
+	if (nonblank(ContrChanr.StartDate) and nonblank(ContrChanr.EndDate)) then begin
+		if (ContrChanr.EndDate < ContrChanr.StartDate) then begin
+			RecordCheckError(31007,"",-1,"StartDate");      
+			res = -1;
+			goto LContrChanVcRecordCheck;
+		end;
+	end;
+
+  
+
+LContrChanVcRecordCheck:;	
+	ContrChanVcRecordCheck = res; 
+	RETURN;
+END;

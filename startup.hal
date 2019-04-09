@@ -5,6 +5,7 @@ begin
 	
 	Register("Budgets History","Budgets History",BudgetsHistVc,modTS);		//Edit----------------------Dima  13.07.2015
 	Register("Contracts","Contracts",ContractsVc,modPL);		//Edit----------------------Dima  09.02.2016
+	Register("Changes to Contracts","Changes to Contracts",ContrChanVc,modDBMaint);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 8 April 2019 16:01:09
   //registers for Excel reports
   Register("BOVc","BOVc",BOVc,modTS);
   Register("APVc","APVc",APVc,modDBMain);
@@ -41,6 +42,7 @@ begin
   Report("Total Report - All Companies 2018",AllPrjAllComp2018RClass,AllPrjAllCompRn,0,modTS);
   Report("Total Report - All Companies 2019",AllPrjAllComp2019RClass,AllPrjAllCompRn,0,modTS);
   Report("Web Statistics DEMO",MyBIRClass,MyBIRn,0,modTS);//Edit-------------------Vitalii 11:30 14:48 19.09.2016
+  Report("Remuneration report",ZARPLATARClass,ZARPLATARn,0,modTS);
   
 	Setting("Uploading a file to MS Excel",ExcelUploadTClass,modTS);
   Setting("Number Series - Contacts",CUSerTClass,modSL);
