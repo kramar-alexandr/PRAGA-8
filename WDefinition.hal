@@ -4024,7 +4024,9 @@ begin
   vs = 25;
   WindowBegin("Contract",ContractsDClass,CGview,-);
   SetWRect(20,80,700,200);
+  DynamicWindow;
 	UseView(ContractsVc);
+	
 	Sizeable(-1,-1,0,0);
 
 	EditField(h,v=6,100,"Code",Normal,SerNr,false,0);
@@ -4049,8 +4051,9 @@ begin
 	
 	
 	RecordList2(10,v+=40,-30,-30,"ContrChanVc");
-	RlColKey(4,4,"Date",TransDate,false,ActTransDate);
-  RlCol(70,70,"Description",Description,false);
+	RlColKey(4,4,"No.",SerNr,false,ActSerNr);
+	RlColKey(70,70,"Date",TransDate,false,ActTransDate);
+  RlCol(200,200,"Description",Description,false);
   RlColKey(350,350,"Sum",TotalSum,false,ActTotalSum);
   
   SpecialMenu("Add changes to contract",'',0,"AddConChanDsm");

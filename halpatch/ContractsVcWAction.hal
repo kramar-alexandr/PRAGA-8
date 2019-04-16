@@ -46,7 +46,6 @@ begin
   return;
 end;
 
-
 global
 function Boolean ContractsDClassListDblClick(Integer wn)
 begin
@@ -126,3 +125,29 @@ begin
 	
 return;
 end;
+
+
+global procedure DblZARPLATARn(string dblstr,string l,Integer currepwn)
+begin
+	record RcVc RepSpec;
+	
+	getwindowrecord(currepwn,RepSpec);
+	RepSpec.f2 = dblstr;
+	runreport(RepSpec,0);
+
+return;
+end;
+
+global procedure DblSuppInvRn(string dblstr,string l,Integer currepwn)
+begin
+	record RcVc RepSpec;
+	
+	getwindowrecord(currepwn,RepSpec);
+	RepSpec.f3 = l;
+	RepSpec.repname = "SuppInvRn";
+	runreport(RepSpec,0);
+
+return;
+end;
+
+

@@ -424,7 +424,7 @@ return;
 end;
 
 
-global
+/*global
 function Boolean ZARPLATARClassOnOpenWindow(Integer wn)
 begin
 	record RcVc RepSpec;
@@ -451,4 +451,4 @@ begin
 	PutWindowRecord(wn,RepSpec);
 	
 	return;
-end;
+end;*/

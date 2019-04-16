@@ -41,7 +41,35 @@ begin
 	vector val vSupSum,vToCurSumProj,vTotalByPesCur;
 	record CompaniesBlock CBb;
 	row CompaniesBlock CBrw;
+	record ContractsVc Contr;
+	record ContrChanVc ContrChanr;
+	vector val vZP;
+	vector string 50 vZPcur;
+	date chdayesr,stchdayesr;
 	
+	Contr.SerNr = -1;
+	while(loopmain(Contr,1,true))begin
+		chdayesr = Contr.EndDate;
+		stchdayesr = Contr.StartDate;
+		if(chdayesr.year>=stringtoint(RepSpec.f1) and stchdayesr.year<=stringtoint(RepSpec.f1))then begin
+			vZP[Contr.VECode] = Contr.TotalSum;
+			vZPcur[Contr.VECode] = Contr.CurncyCode;
+		end;
+		ContrChanr.SerNr = Contr.SerNr;
+		TrHs = true;
+		while(loopmain(ContrChanr,1,TrHs))begin
+			if(ContrChanr.SerNr!=Contr.SerNr)then begin TrHs = false; end;
+			
+			chdayesr = ContrChanr.EndDate;
+			stchdayesr = ContrChanr.StartDate;
+			if(TrHs and chdayesr.year>=stringtoint(RepSpec.f1) and stchdayesr.year<=stringtoint(RepSpec.f1))then begin
+				vZP[Contr.VECode] = ContrChanr.TotalSum;
+				vZPcur[Contr.VECode] = ContrChanr.CurncyCode;
+			end;
+		end;
+		resetloop(ContrChanr);
+	end;
+	resetloop(Contr);
 	
 	startreportjob("Remuneration report");
 
@@ -55,6 +83,7 @@ begin
 		if(RepSpec.flags[1]==1 or c==curcmp-1)then begin
 			setcompany(c+1,false);
 			
+			
 			CCr.CurncyCode = "";
 			while(loopmain(CCr,1,true))begin
 				if(curncysexis[CCr.CurncyCode]==false)then begin
@@ -63,9 +92,7 @@ begin
 				end;
 			end;
 			resetloop(CCr);
-			logtext(0,"CCr count " & curncys.length);
-		
-		
+			logtext(0,"CCr count " & curncys.length);		
 				VIr.SerNr = -1;
 				TrHs = true;
 				while(loopkey("SerNr",VIr,1,TrHs))begin
@@ -94,6 +121,9 @@ begin
 							end;
 					
 							if(left(VIrw.Prj,4)!=RepSpec.f1)then begin
+								printf = false;
+							end;
+							if(nonblank(RepSpec.f2) and RepSpec.f2!=VIrw.Supp)then begin
 								printf = false;
 							end;
 							//printf = true;
@@ -157,6 +187,9 @@ begin
 							if(left(CLOutrw.Prj,4)!=RepSpec.f1)then begin
 								printf = false;
 							end;
+							if(nonblank(RepSpec.f2) and RepSpec.f2!=CLOutrw.Company)then begin
+								printf = false;
+							end;
 							//printf = true;
 							if(printf)then begin
 								if(prExist[CLOutrw.Prj]==false)then begin
@@ -192,6 +225,14 @@ begin
 		For(i=0;i<aprojects.length;i=i+1) begin
 			totpers = 0;
 			
+			startformat(15);
+				outstring(50,0,"",false);
+				outstring(100,0,"",false);
+				outstring(340,0,"Monthly",true);
+				outstring(390,0,"",true);
+				outstring(440,0,"Paid",true);
+			endformat;
+			
 	  	startformat(15);
 	  	outstring(0,0,aprojects[i],false);
   		outstring(100,0,prExistName[aprojects[i]],false);
@@ -201,20 +242,25 @@ begin
 	  	ClearVector(vToCurSumProj);
 	  	
 	  	For(j=0;j<asupp.length;j=j+1) begin
-	  		
+				
 	  		For(k=0;k<curncys.length;k=k+1) begin
 	  			if(vSupSum[aprojects[i] & asupp[j] & curncys[k]]!=0)then begin
 	  				if(vToPersProj[asupp[j]]==false)then begin
 							vToPersProj[asupp[j]] = true;
 							totpers = totpers + 1;
 	  				end;
-	  				
+
 	  				vToCurSumProj[curncys[k]] = vToCurSumProj[curncys[k]] + vSupSum[aprojects[i] & asupp[j] & curncys[k]];
-	  				
 						startformat(15);
-						outstring(50,0,asupp[j],false);
-						outstring(150,0,prSuppExistName[asupp[j]],false);
-						outstring(440,0,vSupSum[aprojects[i] & asupp[j] & curncys[k]],true);
+						outstring(50,"DblZARPLATARn",asupp[j],false);//Добавить отчет по человеку по всем проэктам
+						outstring(100,0,prSuppExistName[asupp[j]],false);
+						outstring(340,0,vZP[asupp[j]],true);
+						outstring(390,0,vZPcur[asupp[j]],true);
+						if(nonblank(RepSpec.f2))then begin
+							outstringid(440,"DblSuppInvRn",vSupSum[aprojects[i] & asupp[j] & curncys[k]],true,aprojects[i] & ":" & curncys[k]);
+						end else begin
+							outstring(440,0,vSupSum[aprojects[i] & asupp[j] & curncys[k]],true);
+						end;
 						outstring(450,0,curncys[k],false);
 						endformat;
 					end;
@@ -272,6 +318,285 @@ begin
 					outstring(300,0,vToCurSumProj[curncys[k]],false);
 				endformat;
 			end;
+		end;
+	endjob;
+	
+	resetcompany(curcmp);
+
+return;
+end;
+
+
+global procedure SuppInvRn(record RcVc RepSpec)
+begin
+	record MainVc Mainr;
+	record TRVc TRr;
+	row TRVc TRrw;
+	record VIVc VIr;
+	row VIVc VIrw;
+	boolean testf,TrHs,printf,vifound;
+	integer mtrw,i,j,k,totpers,compnr,curcmp,c,vi;
+	record CLOutVc CLOutr;
+	row CLOutVc CLOutrw;
+	vector boolean prExist,vToPersProj,curncysexis,viExist;
+	vector string 255 prExistName,prSuppExistName;
+	vector boolean prSuppExist,vVIExistCC;
+	record ObjVc Objr;
+	array string 100 aprojects,asupp,curncys;
+	record CurncyCodeVc CCr;
+	vector val vSupSum,vToCurSumProj,vTotalByPesCur,vCompValSum;
+	record CompaniesBlock CBb;
+	row CompaniesBlock CBrw;
+	record ContractsVc Contr;
+	record ContrChanVc ContrChanr;
+	vector val vZP,vSupSumVI;
+	vector string 50 vZPcur,vSupCurncyVI;
+	date chdayesr,stchdayesr;
+	array longint aVIr;
+	vector date vVIrDate;
+	
+	Contr.SerNr = -1;
+	while(loopmain(Contr,1,true))begin
+		chdayesr = Contr.EndDate;
+		stchdayesr = Contr.StartDate;
+		if(chdayesr.year>=stringtoint(RepSpec.f1) and stchdayesr.year<=stringtoint(RepSpec.f1))then begin
+			vZP[Contr.VECode] = Contr.TotalSum;
+			vZPcur[Contr.VECode] = Contr.CurncyCode;
+		end;
+		ContrChanr.SerNr = Contr.SerNr;
+		TrHs = true;
+		while(loopmain(ContrChanr,1,TrHs))begin
+			if(ContrChanr.SerNr!=Contr.SerNr)then begin TrHs = false; end;
+			
+			chdayesr = ContrChanr.EndDate;
+			stchdayesr = ContrChanr.StartDate;
+			if(TrHs and chdayesr.year>=stringtoint(RepSpec.f1) and stchdayesr.year<=stringtoint(RepSpec.f1))then begin
+				vZP[Contr.VECode] = ContrChanr.TotalSum;
+				vZPcur[Contr.VECode] = ContrChanr.CurncyCode;
+			end;
+		end;
+		resetloop(ContrChanr);
+	end;
+	resetloop(Contr);
+	
+	startreportjob("Supplier Invoices report");
+
+	endheader;
+			
+	Objr.Code = RepSpec.f2;
+	readfirstmain(Objr,1,true);
+	startformat(15);
+		outstring(20,0,Objr.Code,false);
+		outstring(150,0,Objr.Comment,true);
+	endformat;
+	curcmp = currentcompany;
+	blockload(CBb);
+	compnr = matrowcnt(CBb);
+	For(c=0;c<compnr;c=c+1) begin
+
+		if(RepSpec.flags[1]==1 or c==curcmp-1)then begin
+			setcompany(c+1,false);
+			
+			CCr.CurncyCode = "";
+			while(loopmain(CCr,1,true))begin
+				if(curncysexis[CCr.CurncyCode]==false)then begin
+					curncysexis[CCr.CurncyCode] = true;
+					curncys[curncys.length] = CCr.CurncyCode;
+				end;
+			end;
+			resetloop(CCr);
+			logtext(0,"CCr count " & curncys.length);		
+				VIr.SerNr = -1;
+				TrHs = true;
+				while(loopkey("SerNr",VIr,1,TrHs))begin
+					testf= true;
+					//if(VIr.InvDate>RepSpec.sEndDate)then begin TrHs = false; testf = false; end;
+					if(VIr.OKFlag==0)then begin testf = false; end;
+					
+					if(nonblank(RepSpec.f3) and lastinrange(RepSpec.f3,5)!=VIr.CurncyCode)then begin
+						printf = false;
+					end;
+					
+					vifound = false;
+					if(testf)then begin
+						mtrw = matrowcnt(VIr);
+						For(i=0;i<mtrw;i=i+1) begin
+							matrowget(VIr,i,VIrw);
+							if(VIr.InvType==kInvoiceTypeCredit)then begin
+								VIrw.Sum = -VIrw.Sum;
+							end;
+							printf = false;
+				 			
+							if(left(VIrw.Exp,1)=="1")then begin
+								if(left(VIrw.Supp,1)=="P" or (VIrw.Supp>"000" and VIrw.Supp<"500"))then begin
+									printf = true;
+								end;
+							end;
+							if(left(VIrw.Exp,1)=="3")then begin
+								if(left(VIrw.Supp,1)=="P" or (VIrw.Supp>"000" and VIrw.Supp<"500"))then begin
+									printf = true;
+								end;
+							end;
+							if(nonblank(RepSpec.f3) and firstinrange(RepSpec.f3,10)!=VIrw.Prj)then begin
+								printf = false;
+							end;
+
+							if(left(VIrw.Prj,4)!=RepSpec.f1)then begin
+								printf = false;
+							end;
+							if(nonblank(RepSpec.f2) and RepSpec.f2!=VIrw.Supp)then begin
+								printf = false;
+							end;
+							//printf = true;
+							if(printf)then begin
+								logtext(0,"RepSpec.f3 " & RepSpec.f3);
+								vifound = true;
+								if(prExist[VIrw.Prj]==false)then begin
+									prExist[VIrw.Prj] = true;
+									Objr.Code = VIrw.Prj;
+									readfirstmain(Objr,1,true);
+									prExistName[VIrw.Prj] = Objr.Comment;
+									aprojects[aprojects.length] = VIrw.Prj;
+								end;
+								if(prSuppExist[VIrw.Supp]==false)then begin
+									prSuppExist[VIrw.Supp] = true;
+									Objr.Code = VIrw.Supp;
+									readfirstmain(Objr,1,true);
+									prSuppExistName[VIrw.Supp] = Objr.Comment;
+									asupp[asupp.length] = VIrw.Supp;
+								end;
+								vSupSum[VIrw.Prj] = vSupSum[VIrw.Prj] + VIrw.Sum;
+								vTotalByPesCur[VIrw.Supp & VIr.CurncyCode] = vTotalByPesCur[VIrw.Supp & VIr.CurncyCode] + VIrw.Sum;
+								
+								logtext(0,VIr.SerNr);
+								vCompValSum[currentcompany] = vCompValSum[currentcompany] + VIrw.Sum;
+								vSupSumVI[currentcompany & ":" & VIrw.Prj & VIr.SerNr] = vSupSumVI[currentcompany & ":" & VIrw.Prj & VIr.SerNr] + VIrw.Sum;
+								vSupCurncyVI[currentcompany & ":" & VIrw.Prj & VIr.SerNr] = VIr.CurncyCode;
+								vVIrDate[currentcompany & ":" & VIrw.Prj & VIr.SerNr] = VIr.InvDate;
+								vVIExistCC[currentcompany & ":" & VIrw.Prj & VIr.SerNr] = true;
+								if(viExist[VIr.SerNr]==false)then begin
+									viExist[VIr.SerNr] = true;
+									aVIr[aVIr.length] = VIr.SerNr;
+								end;
+								
+							end;
+						end;
+					end;
+				end;
+				resetloop(VIr);
+
+				CLOutr.SerNr = -1;
+				TrHs = true;
+				while(loopkey("SerNr",CLOutr,1,TrHs))begin
+					testf= true;
+					if(CLOutr.OKFlag==0)then begin testf = false; end;
+			
+					if(testf)then begin
+						mtrw = matrowcnt(CLOutr);
+						For(i=0;i<mtrw;i=i+1) begin
+							matrowget(CLOutr,i,CLOutrw);
+							printf = false;
+				 
+							if(left(CLOutrw.CorspCode,1)=="1")then begin
+								if(left(CLOutrw.Company,1)=="P" or (CLOutrw.Company>"000" and CLOutrw.Company<"500"))then begin
+									printf = true;
+								end;
+							end;
+							if(left(CLOutrw.CorspCode,1)=="3")then begin
+								if(left(CLOutrw.Company,1)=="P" or (CLOutrw.Company>"000" and CLOutrw.Company<"500"))then begin
+									printf = true;
+								end;
+							end;
+					
+							if(left(CLOutrw.Prj,4)!=RepSpec.f1)then begin
+								printf = false;
+							end;
+							if(nonblank(RepSpec.f2) and RepSpec.f2!=CLOutrw.Company)then begin
+								printf = false;
+							end;
+							if(printf)then begin
+								if(prExist[CLOutrw.Prj]==false)then begin
+									prExist[CLOutrw.Prj] = true;
+									Objr.Code = CLOutrw.Prj;
+									readfirstmain(Objr,1,true);
+									prExistName[CLOutrw.Prj] = Objr.Comment;
+									aprojects[aprojects.length] = CLOutrw.Prj;
+								end;
+								if(prSuppExist[CLOutrw.Company]==false)then begin
+									prSuppExist[CLOutrw.Company] = true;
+									Objr.Code = CLOutrw.Company;
+									readfirstmain(Objr,1,true);
+									prSuppExistName[CLOutrw.Company] = Objr.Comment;
+									asupp[asupp.length] = CLOutrw.Company;
+								end;
+								
+								vSupSum[CLOutrw.Prj] = vSupSum[CLOutrw.Prj] + CLOutrw.Sum;
+								vTotalByPesCur[CLOutrw.Company & CLOutr.CurncyCode] = vTotalByPesCur[CLOutrw.Company & CLOutr.CurncyCode] + CLOutrw.Sum;
+							end;
+						end;
+					end;
+				end;
+				resetloop(CLOutr);
+			end;
+		end;
+		
+		MySortStringArray(aprojects,aprojects.length);
+		MySortStringArray(asupp,asupp.length);
+		For(i=0;i<aprojects.length;i=i+1) begin
+			totpers = 0;
+			
+			startformat(15);
+				outstring(50,0,"",false);
+				outstring(100,0,"",false);
+				outstring(340,0,"",true);
+				outstring(390,0,"Curncy",true);
+				outstring(440,0,"Paid",true);
+			endformat;
+			
+	  	startformat(15);
+	  	outstring(0,0,aprojects[i],false);
+  		outstring(100,0,prExistName[aprojects[i]],false);
+	  	endformat;
+	  	
+	  	ClearVector(vToPersProj);
+	  	ClearVector(vToCurSumProj);
+	  	
+	  	For(j=0;j<asupp.length;j=j+1) begin
+				logtext(0,"aprojects[i] " & aprojects[i]);
+				if(vSupSum[aprojects[i]]!=0)then begin
+					
+					For(c=0;c<compnr;c=c+1) begin
+						logtext(0,"compnr " & c & "  " & vCompValSum[c+1]);
+						if(RepSpec.flags[1]==1 or c==curcmp-1)then begin
+							if(vCompValSum[c+1]!=0)then begin
+								matrowget(CBb,c,CBrw);
+								startformat(15);
+									outstring(50,0,CBrw.CompName,false);
+								endformat;
+			
+								For(vi=0;vi<aVIr.length;vi=vi+1) begin
+									if(vVIExistCC[c+1 & ":" & aprojects[i] & aVIr[vi]])then begin
+										startformat(15);
+											outstring(0,"DblVIVc",aVIr[vi],false);
+											outstring(90,0,vVIrDate[c+1 & ":" & aprojects[i] & aVIr[vi]],false);
+											outstring(390,0,vSupCurncyVI[c+1 & ":" & aprojects[i] & aVIr[vi]],true);
+											outstring(440,0,vSupSumVI[c+1 & ":" & aprojects[i] & aVIr[vi]],true);
+											vToCurSumProj[c+1] = vToCurSumProj[c+1] + vSupSumVI[c+1 & ":" & aprojects[i] & aVIr[vi]];
+										endformat;
+									end;
+								end; 
+								startformat(15);
+									outstring(0,0,"Total by " & CBrw.CompName & ":",false);
+									outstring(300,0,vToCurSumProj[c+1],false);
+									outstring(360,0,lastinrange(RepSpec.f3,5),false);
+								endformat;
+								black_divider(0,1);
+							end;
+						end;
+					end;
+				end;
+			end; 
+	  	
 		end;
 	endjob;
 	
