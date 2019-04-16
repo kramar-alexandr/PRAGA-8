@@ -79,7 +79,6 @@ begin
 	blockload(CBb);
 	compnr = matrowcnt(CBb);
 	For(c=0;c<compnr;c=c+1) begin
-	  logtext(0,"Company " & c+1);
 		if(RepSpec.flags[1]==1 or c==curcmp-1)then begin
 			setcompany(c+1,false);
 			
@@ -92,7 +91,6 @@ begin
 				end;
 			end;
 			resetloop(CCr);
-			logtext(0,"CCr count " & curncys.length);		
 				VIr.SerNr = -1;
 				TrHs = true;
 				while(loopkey("SerNr",VIr,1,TrHs))begin
@@ -157,9 +155,7 @@ begin
 					end;
 				end;
 				resetloop(VIr);
-				logtext(0,"VIr aprojects count " & aprojects.length);
-				logtext(0,"VIr asupp count " & asupp.length);
-
+				
 				CLOutr.SerNr = -1;
 				TrHs = true;
 				while(loopkey("SerNr",CLOutr,1,TrHs))begin
@@ -405,7 +401,7 @@ begin
 				end;
 			end;
 			resetloop(CCr);
-			logtext(0,"CCr count " & curncys.length);		
+
 				VIr.SerNr = -1;
 				TrHs = true;
 				while(loopkey("SerNr",VIr,1,TrHs))begin
@@ -449,7 +445,7 @@ begin
 							end;
 							//printf = true;
 							if(printf)then begin
-								logtext(0,"RepSpec.f3 " & RepSpec.f3);
+
 								vifound = true;
 								if(prExist[VIrw.Prj]==false)then begin
 									prExist[VIrw.Prj] = true;
@@ -467,8 +463,6 @@ begin
 								end;
 								vSupSum[VIrw.Prj] = vSupSum[VIrw.Prj] + VIrw.Sum;
 								vTotalByPesCur[VIrw.Supp & VIr.CurncyCode] = vTotalByPesCur[VIrw.Supp & VIr.CurncyCode] + VIrw.Sum;
-								
-								logtext(0,VIr.SerNr);
 								vCompValSum[currentcompany] = vCompValSum[currentcompany] + VIrw.Sum;
 								vSupSumVI[currentcompany & ":" & VIrw.Prj & VIr.SerNr] = vSupSumVI[currentcompany & ":" & VIrw.Prj & VIr.SerNr] + VIrw.Sum;
 								vSupCurncyVI[currentcompany & ":" & VIrw.Prj & VIr.SerNr] = VIr.CurncyCode;
@@ -562,11 +556,9 @@ begin
 	  	ClearVector(vToCurSumProj);
 	  	
 	  	For(j=0;j<asupp.length;j=j+1) begin
-				logtext(0,"aprojects[i] " & aprojects[i]);
 				if(vSupSum[aprojects[i]]!=0)then begin
 					
 					For(c=0;c<compnr;c=c+1) begin
-						logtext(0,"compnr " & c & "  " & vCompValSum[c+1]);
 						if(RepSpec.flags[1]==1 or c==curcmp-1)then begin
 							if(vCompValSum[c+1]!=0)then begin
 								matrowget(CBb,c,CBrw);
