@@ -151,3 +151,31 @@ return;
 end;
 
 
+global
+procedure DblVIVcGlobal(string dblstr,string l,Integer currepwn)
+begin
+  Integer wn;
+  record VIVc VIr;
+	integer curcmp;
+	
+	curcmp = currentcompany;
+	
+	if(stringtoint(l)>0)then begin
+		setcompany(stringtoint(l),false);
+		VIr.SerNr = LastInRange(dblstr,10);
+		if (VIr.SerNr>0) then begin
+			if (ReadFirstMain(VIr,1,true)) then begin  
+				wn = OpenWindow("VIDClass",1,0,"","",VIr);
+			end; 
+		end;
+		resetcompany(curcmp);
+  end else begin
+		VIr.SerNr = LastInRange(dblstr,10);
+		if (VIr.SerNr>0) then begin
+			if (ReadFirstMain(VIr,1,true)) then begin  
+				wn = OpenWindow("VIDClass",1,0,"","",VIr);
+			end; 
+		end;
+  end;
+  return;
+end;

@@ -569,7 +569,7 @@ begin
 								For(vi=0;vi<aVIr.length;vi=vi+1) begin
 									if(vVIExistCC[c+1 & ":" & aprojects[i] & aVIr[vi]])then begin
 										startformat(15);
-											outstring(0,"DblVIVc",aVIr[vi],false);
+											outstringid(0,"DblVIVcGlobal",aVIr[vi],false,c+1);
 											outstring(90,0,vVIrDate[c+1 & ":" & aprojects[i] & aVIr[vi]],false);
 											outstring(390,0,vSupCurncyVI[c+1 & ":" & aprojects[i] & aVIr[vi]],true);
 											outstring(440,0,vSupSumVI[c+1 & ":" & aprojects[i] & aVIr[vi]],true);
