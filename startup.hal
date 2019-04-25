@@ -5,7 +5,7 @@ begin
 	
 	Register("Budgets History","Budgets History",BudgetsHistVc,modTS);		//Edit----------------------Dima  13.07.2015
 	Register("Contracts","Contracts",ContractsVc,modPL);		//Edit----------------------Dima  09.02.2016
-	Register("Changes to Contracts","Changes to Contracts",ContrChanVc,modDBMaint);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 8 April 2019 16:01:09
+	Register("Changes to Contracts","Changes to Contracts",ContrChanVc,modDBMain);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 8 April 2019 16:01:09
   //registers for Excel reports
   Register("BOVc","BOVc",BOVc,modTS);
   Register("APVc","APVc",APVc,modDBMain);
@@ -56,6 +56,9 @@ begin
 	Maintenance("Create Purchase Invoices from Project Budgets for month",CreateVIfromTBBUVClass,CreateVIfromTBBUMn,modPL); //Edit-------------------Vitalii 13:08 25.09.2015
   
   Maintenance("Fill BOVc",FillBOVClass,FillBOMn,modTS);
+  
+  Maintenance("Fill Capital Letter to Supplier Names",FillCLVClass,UpperCaseCUNames,modPL);
+  
 	Report("Change date in Purch.Inv.",FixVIVcDateRClass,FixVIVcDateRn,0,modDBMain);
   
 	SString(31000,"Object with this name but with other type already exists");
@@ -73,6 +76,7 @@ begin
   SString(31012,"Payment term with this code is registered with different name!");
   SString(31013,"Payment term with this code is registered with different account!");
   SString(31014,"Check Item or Project Year");
+  SString(31015,"Supplier hasn't contract");
 	
   StrSetAdd(3);
   StrSetText(UpdateBudget,"Allow creation new budget version");

@@ -1,3 +1,6 @@
+external function Boolean IsDigit(string);
+external procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
+
 global
 procedure MySortStringArray(var array string astr,integer cnt)
 begin
@@ -46,12 +49,20 @@ begin
 	vector val vZP;
 	vector string 50 vZPcur;
 	date chdayesr,stchdayesr;
+	record SysFormatBlock SysFormatRec;
+	
+	BlockLoad(SysFormatRec);	
 	
 	Contr.SerNr = -1;
 	while(loopmain(Contr,1,true))begin
 		chdayesr = Contr.EndDate;
 		stchdayesr = Contr.StartDate;
-		if(chdayesr.year>=stringtoint(RepSpec.f1) and stchdayesr.year<=stringtoint(RepSpec.f1))then begin
+		if(nonblank(RepSpec.f1))then begin
+			if(chdayesr.year>=stringtoint(RepSpec.f1) and stchdayesr.year<=stringtoint(RepSpec.f1))then begin
+				vZP[Contr.VECode] = Contr.TotalSum;
+				vZPcur[Contr.VECode] = Contr.CurncyCode;
+			end;
+		end else begin
 			vZP[Contr.VECode] = Contr.TotalSum;
 			vZPcur[Contr.VECode] = Contr.CurncyCode;
 		end;
@@ -62,9 +73,16 @@ begin
 			
 			chdayesr = ContrChanr.EndDate;
 			stchdayesr = ContrChanr.StartDate;
-			if(TrHs and chdayesr.year>=stringtoint(RepSpec.f1) and stchdayesr.year<=stringtoint(RepSpec.f1))then begin
-				vZP[Contr.VECode] = ContrChanr.TotalSum;
-				vZPcur[Contr.VECode] = ContrChanr.CurncyCode;
+			if(TrHs)then begin
+				if(nonblank(RepSpec.f1))then begin
+					if(chdayesr.year>=stringtoint(RepSpec.f1) and stchdayesr.year<=stringtoint(RepSpec.f1))then begin
+						vZP[Contr.VECode] = ContrChanr.TotalSum;
+						vZPcur[Contr.VECode] = ContrChanr.CurncyCode;
+					end;
+				end else begin
+					vZP[Contr.VECode] = ContrChanr.TotalSum;
+					vZPcur[Contr.VECode] = ContrChanr.CurncyCode;
+				end;
 			end;
 		end;
 		resetloop(ContrChanr);
@@ -117,8 +135,8 @@ begin
 									printf = true;
 								end;
 							end;
-					
-							if(left(VIrw.Prj,4)!=RepSpec.f1)then begin
+						
+							if(nonblank(RepSpec.f1) and left(VIrw.Prj,4)!=RepSpec.f1)then begin
 								printf = false;
 							end;
 							if(nonblank(RepSpec.f2) and RepSpec.f2!=VIrw.Supp)then begin
@@ -180,7 +198,7 @@ begin
 								end;
 							end;
 					
-							if(left(CLOutrw.Prj,4)!=RepSpec.f1)then begin
+							if(nonblank(RepSpec.f1) and left(CLOutrw.Prj,4)!=RepSpec.f1)then begin
 								printf = false;
 							end;
 							if(nonblank(RepSpec.f2) and RepSpec.f2!=CLOutrw.Company)then begin
@@ -250,12 +268,12 @@ begin
 						startformat(15);
 						outstring(50,"DblZARPLATARn",asupp[j],false);//Добавить отчет по человеку по всем проэктам
 						outstring(100,0,prSuppExistName[asupp[j]],false);
-						outstring(340,0,vZP[asupp[j]],true);
+						outval(340,0,vZP[asupp[j]],m4val,true);
 						outstring(390,0,vZPcur[asupp[j]],true);
 						if(nonblank(RepSpec.f2))then begin
-							outstringid(440,"DblSuppInvRn",vSupSum[aprojects[i] & asupp[j] & curncys[k]],true,aprojects[i] & ":" & curncys[k]);
+							outstringid(440,"DblSuppInvRn",valtostring(vSupSum[aprojects[i] & asupp[j] & curncys[k]],M4Val,SysFormatRec.thousSep,SysFormatRec.decimalPt,0),true,aprojects[i] & ":" & curncys[k]);
 						end else begin
-							outstring(440,0,vSupSum[aprojects[i] & asupp[j] & curncys[k]],true);
+							outval(440,0,vSupSum[aprojects[i] & asupp[j] & curncys[k]],m4val,true);
 						end;
 						outstring(450,0,curncys[k],false);
 						endformat;
@@ -273,7 +291,7 @@ begin
 	  		if(vToCurSumProj[curncys[k]]!=0)then begin
 					startformat(15);
 						outstring(0,0,curncys[k],false);
-						outstring(300,0,vToCurSumProj[curncys[k]],false);
+						outval(300,0,vToCurSumProj[curncys[k]],m4val,false);
 					endformat;
 				end;
 	  	end;
@@ -293,7 +311,7 @@ begin
 						outstring(0,0,asupp[j],false);
 						Objr.Code = asupp[j];
 						outstring(50,0,prSuppExistName[asupp[j]],false);
-						outstring(440,0,vTotalByPesCur[asupp[j] & curncys[k]],true);
+						outval(440,0,vTotalByPesCur[asupp[j] & curncys[k]],m4val,true);
 						outstring(450,0,curncys[k],false);
 					endformat;
 					vToCurSumProj[curncys[k]] = vToCurSumProj[curncys[k]] + vTotalByPesCur[asupp[j] & curncys[k]];
@@ -311,7 +329,7 @@ begin
 			if(vToCurSumProj[curncys[k]]!=0)then begin
 				startformat(15);
 					outstring(0,0,curncys[k],false);
-					outstring(300,0,vToCurSumProj[curncys[k]],false);
+					outval(300,0,vToCurSumProj[curncys[k]],m4val,false);
 				endformat;
 			end;
 		end;
@@ -355,7 +373,12 @@ begin
 	while(loopmain(Contr,1,true))begin
 		chdayesr = Contr.EndDate;
 		stchdayesr = Contr.StartDate;
-		if(chdayesr.year>=stringtoint(RepSpec.f1) and stchdayesr.year<=stringtoint(RepSpec.f1))then begin
+		if(nonblank(RepSpec.f1))then begin
+			if(chdayesr.year>=stringtoint(RepSpec.f1) and stchdayesr.year<=stringtoint(RepSpec.f1))then begin
+				vZP[Contr.VECode] = Contr.TotalSum;
+				vZPcur[Contr.VECode] = Contr.CurncyCode;
+			end;
+		end else begin
 			vZP[Contr.VECode] = Contr.TotalSum;
 			vZPcur[Contr.VECode] = Contr.CurncyCode;
 		end;
@@ -366,9 +389,16 @@ begin
 			
 			chdayesr = ContrChanr.EndDate;
 			stchdayesr = ContrChanr.StartDate;
-			if(TrHs and chdayesr.year>=stringtoint(RepSpec.f1) and stchdayesr.year<=stringtoint(RepSpec.f1))then begin
-				vZP[Contr.VECode] = ContrChanr.TotalSum;
-				vZPcur[Contr.VECode] = ContrChanr.CurncyCode;
+			if(TrHs)then begin
+				if(nonblank(RepSpec.f1))then begin
+					if(chdayesr.year>=stringtoint(RepSpec.f1) and stchdayesr.year<=stringtoint(RepSpec.f1))then begin
+						vZP[Contr.VECode] = ContrChanr.TotalSum;
+						vZPcur[Contr.VECode] = ContrChanr.CurncyCode;
+					end;
+				end else begin
+					vZP[Contr.VECode] = ContrChanr.TotalSum;
+					vZPcur[Contr.VECode] = ContrChanr.CurncyCode;
+				end;
 			end;
 		end;
 		resetloop(ContrChanr);
@@ -437,7 +467,7 @@ begin
 								printf = false;
 							end;
 
-							if(left(VIrw.Prj,4)!=RepSpec.f1)then begin
+							if(nonblank(RepSpec.f1) and left(VIrw.Prj,4)!=RepSpec.f1)then begin
 								printf = false;
 							end;
 							if(nonblank(RepSpec.f2) and RepSpec.f2!=VIrw.Supp)then begin
@@ -502,7 +532,7 @@ begin
 								end;
 							end;
 					
-							if(left(CLOutrw.Prj,4)!=RepSpec.f1)then begin
+							if(nonblank(RepSpec.f1) and left(CLOutrw.Prj,4)!=RepSpec.f1)then begin
 								printf = false;
 							end;
 							if(nonblank(RepSpec.f2) and RepSpec.f2!=CLOutrw.Company)then begin
@@ -572,14 +602,14 @@ begin
 											outstringid(0,"DblVIVcGlobal",aVIr[vi],false,c+1);
 											outstring(90,0,vVIrDate[c+1 & ":" & aprojects[i] & aVIr[vi]],false);
 											outstring(390,0,vSupCurncyVI[c+1 & ":" & aprojects[i] & aVIr[vi]],true);
-											outstring(440,0,vSupSumVI[c+1 & ":" & aprojects[i] & aVIr[vi]],true);
+											outval(440,0,vSupSumVI[c+1 & ":" & aprojects[i] & aVIr[vi]],m4val,true);
 											vToCurSumProj[c+1] = vToCurSumProj[c+1] + vSupSumVI[c+1 & ":" & aprojects[i] & aVIr[vi]];
 										endformat;
 									end;
 								end; 
 								startformat(15);
 									outstring(0,0,"Total by " & CBrw.CompName & ":",false);
-									outstring(300,0,vToCurSumProj[c+1],false);
+									outval(300,0,vToCurSumProj[c+1],m4val,false);
 									outstring(360,0,lastinrange(RepSpec.f3,5),false);
 								endformat;
 								black_divider(0,1);
@@ -593,6 +623,75 @@ begin
 	endjob;
 	
 	resetcompany(curcmp);
+
+return;
+end;
+
+
+global updating procedure UpperCaseCUNames(record RcVc RepSpec)
+begin
+	record CUVc CUr;
+	boolean foundf;
+	integer pos;
+	string 200 tstr,newname;
+	
+	while(loopmain(CUr,1,true))begin
+		foundf = false;
+		if(left(CUr.Code,1)=="P" and IsDigit(mid(CUr.Code,1,1)))then begin
+			foundf = true;
+		end;
+		if(stringtoint(CUr.Code)>0 and stringtoint(CUr.Code)<501 and IsDigit(mid(CUr.Code,1,1)))then begin
+			foundf = true;
+		end;
+		
+		if(foundf)then begin
+			newname = "";
+			pos = 0;
+			ExtractObjWithSeparator(" ",CUr.Name,true,pos,tstr);
+			while(nonblank(tstr))begin
+				if(nonblank(tstr))then begin
+					tstr = LowerCase(tstr);
+					tstr = UpperCase(left(tstr,1)) & right(tstr,len(tstr)-1);
+					if(nonblank(newname))then begin
+						newname = newname & " " & tstr;
+					end else begin
+						newname = tstr;
+					end;
+				end;
+				ExtractObjWithSeparator(" ",CUr.Name,true,pos,tstr);
+			end;
+			
+			//logtext(0,CUr.Code & " " & CUr.Name & "   -->  " & newname);
+			if(CUr.Name!=newname)then begin
+				logtext(0,CUr.Code & " " & CUr.Name & "|-->|" & newname);
+				CUr.Name = newname;
+				recordStore(CUr,true);
+			end;
+			
+			newname = "";
+			pos = 0;
+			ExtractObjWithSeparator(" ",CUr.NameinDocument,true,pos,tstr);
+			while(nonblank(tstr))begin
+				if(nonblank(tstr))then begin
+					tstr = LowerCase(tstr);
+					tstr = UpperCase(left(tstr,1)) & right(tstr,len(tstr)-1);
+					if(nonblank(newname))then begin
+						newname = newname & " " & tstr;
+					end else begin
+						newname = tstr;
+					end;
+				end;
+				ExtractObjWithSeparator(" ",CUr.NameinDocument,true,pos,tstr);
+			end;
+			
+			//logtext(0,CUr.Code & " " & CUr.Name & "   -->  " & newname);
+			if(CUr.NameinDocument!=newname)then begin
+				logtext(0,CUr.Code & " " & CUr.NameinDocument & "|-->|" & newname);
+				CUr.NameinDocument = newname;
+				recordStore(CUr,true);
+			end;
+		end;
+	end;	
 
 return;
 end;

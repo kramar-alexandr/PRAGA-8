@@ -5379,6 +5379,16 @@ begin
   EndWindow;
 end;
 
+window FillCLVClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs;
+  WindowBegin("Fill Capital Letters",FillCLVClass,CGMnt,RcType);
+  SetWRect(20,80,400,240);
+  vs = 20;h = 130; v = 26;
+  EndWindow;
+end;
+
 window CUSerTClass:2
   wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
@@ -5476,5 +5486,6 @@ real h,v,vs,h1;
 		//PeriodField(h,v=6,"Period");
 		EditField(100,6,80,"Year",Normal,f1,false,0);
 		CheckBox(100,26,0,"All companies",flags[1]);
+		EditField(100,50,80,"Supplier",Normal,f2,false,VESClass);
 	EndWindow;
 end;
