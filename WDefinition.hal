@@ -4050,7 +4050,7 @@ begin
 	EditField(h2+40,v,80,"Sum",Normal,TotalSum,false,0);
 	
 	
-	RecordList2(10,v+=40,-30,-30,"ContrChanVc");
+	RecordList2(10,v+=40,-30,-39,"ContrChanVc");
 	RlColKey(4,4,"No.",SerNr,false,ActSerNr);
 	RlColKey(70,70,"Date",TransDate,false,ActTransDate);
   RlCol(200,200,"Description",Description,false);
