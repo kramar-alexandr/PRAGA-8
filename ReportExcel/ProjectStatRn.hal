@@ -1336,6 +1336,9 @@ BEGIN
               EndRow(sheetnum,fileToSave,rownum);
               ExtPrinted = false;
               for (j=0;j<ExtArr.length;j=j+1) begin
+              	if(combExist[ArtArrayWithGroups[i] & ":"])then begin
+									ExtPrinted = true;
+								end;
                 if (blank(ExtArr[j]) and ExtPrinted) or nonblank(ExtArr[j]) then begin
                   if combExist[ArtArrayWithGroups[i] & ":" & ExtArr[j]] then begin
                     ArtExtNonBlank = false;
@@ -1440,7 +1443,6 @@ BEGIN
                           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
                         end;
                       EndRow(sheetnum,fileToSave,rownum);
-                      
                       
                       for (jj=0;jj<SuppArr.length;jj=jj+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 25 September 2018 09:59:25                	
 												if (nonblank(SuppArr[jj])) then begin
@@ -1893,6 +1895,9 @@ BEGIN
               EndRow(sheetnum,fileToSave,rownum);
               ExtPrinted = false;
               for (j=0;j<ExtArr.length;j=j+1) begin
+              	if(combExist[ArtArrayWithGroups[i] & ":"])then begin
+									ExtPrinted = true;
+								end;
                 if (blank(ExtArr[j]) and ExtPrinted) or nonblank(ExtArr[j]) then begin
                   if combExist[ArtArrayWithGroups[i] & ":" & ExtArr[j]] then begin
                     ArtExtNonBlank = false;
@@ -2463,6 +2468,9 @@ BEGIN
                 EndRow(sheetnum,fileToSave,rownum);
                 ExtPrinted = false;
                 for (j=0;j<ExtArr.length;j=j+1) begin
+                	if(combExist[ArtArrayWithGroups[i] & ":"])then begin
+										ExtPrinted = true;
+									end;
                   if (blank(ExtArr[j]) and ExtPrinted) or nonblank(ExtArr[j]) then begin
                     if combExist[ArtArrayWithGroups[i] & ":" & ExtArr[j]] then begin
                       ArtExtNonBlank = false;
