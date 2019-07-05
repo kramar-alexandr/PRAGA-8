@@ -268,7 +268,7 @@ BEGIN
   record AcceptGroupVc AcceptGroupr;
   record BankVc Bankr;
   record APVc APr;
-  Boolean morethanonevat,somelinesmisvat,controlaccf;
+  Boolean morethanonevat,somelinesmisvat,controlaccf,TrHs1;
   string 10 vatc;
   Integer firstlinewithblankvat,creditedinvtype;
   Integer prevvt,curvt;
@@ -917,7 +917,7 @@ what the hell?
 						if(transf)then begin
 							if ((nonblank(VIrw.Item) and (left(VIrw.Item,1)=="1" or left(VIrw.Item,1)=="3"))) then begin
 								contser = -1;
-								logtext(0,VIrw.Supp);
+
 								if (nonblank(VIrw.Supp) and (left(VIrw.Supp,1)=="P") or (stringtoint(VIrw.Supp)<501 and stringtoint(VIrw.Supp)>0)) then begin
 									Contr.VECode = VIrw.Supp;
 									foundfcontract = false;
@@ -928,22 +928,23 @@ what the hell?
 											SuTrHs = false;
 											Sutestf = false;
 										end;
-									
+
 										if(Sutestf)then begin
 											contser = Contr.SerNr;
 											if(Contr.Closed==0)then begin
-												logtext(0,dateinrange(VIp.InvDate,Contr.StartDate,Contr.EndDate));
 												if(dateinrange(VIp.InvDate,Contr.StartDate,Contr.EndDate))then begin
 													foundfcontract = true;
 												end;
 												resetloop(ContChanr);
 												ContChanr.SerNr = Contr.SerNr;
-												if(readlastmain(ContChanr,1,true))then begin
-													logtext(0,"ContChanr " & ContChanr.SerNr);
-													if(dateinrange(VIp.InvDate,ContChanr.StartDate,ContChanr.EndDate))then begin
-														foundfcontract = true;
-													end else begin
-														foundfcontract = false;
+												TrHs1 = true;
+												while(loopmain(ContChanr,1,TrHs1))begin
+													if(ContChanr.SerNr!=Contr.SerNr)then begin TrHs1 = false; end;
+
+													if(TrHs1)then begin
+														if(dateinrange(VIp.InvDate,ContChanr.StartDate,ContChanr.EndDate))then begin
+															foundfcontract = true;
+														end;
 													end;
 												end;
 											end;
