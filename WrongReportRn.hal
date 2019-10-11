@@ -1,0 +1,30 @@
+
+global procedure FindWrongInvoicesRn()
+begin
+	record VIVc VIr;
+	record BaseCurBlock bcr;
+	
+	
+	blockload(bcr);
+	startreportnoheaderjob("Wrong Purchase Invoices report");
+	
+	while(loopmain(VIr,1,true))begin
+		if((VIr.FrRate==0 and VIr.ToRateB1!=0) or (VIr.FrRate!=0 and VIr.ToRateB1==0))then begin
+			startformat(15);
+				outstring(0,"DblVIVc",VIr.SerNr,false);
+				outstring(100,0,VIr.InvDate,false);
+			endformat;
+		end else begin
+			if(VIr.CurncyCode==bcr.BaseCur1 and (VIr.FrRate!=0 or VIr.ToRateB1!=0))then begin
+				startformat(15);
+					outstring(0,"DblVIVc",VIr.SerNr,false);
+					outstring(100,0,VIr.InvDate,false);
+				endformat;
+			end;
+		end;
+	end;
+	
+	endjob;
+
+return;
+end;

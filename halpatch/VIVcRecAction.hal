@@ -538,6 +538,12 @@ what the hell?
       goto L99VIVcRecordCheck;
     end;
   end;
+  
+  if((VIp.FrRate!=0 and VIp.ToRateB1==0) or (VIp.FrRate==0 and VIp.ToRateB1!=0))then begin// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 11 October 2019 11:22:31
+  	RecordCheckError(1264,"",-1,"FrRate");      
+		res = -1;
+		goto L99VIVcRecordCheck;
+  end;
 /*most people dont want it
   if (nonblank(VIp.BankCode)) then begin
     Bankr.Code = VIp.BankCode;
