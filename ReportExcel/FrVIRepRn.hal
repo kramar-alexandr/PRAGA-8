@@ -1,0 +1,55 @@
+external function Boolean IsDigit(string);
+external procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
+
+
+global procedure FrVIRepRn(record RcVc RepSpec)
+begin
+	record VIVc VIr;
+	row VIVc VIrw;
+	boolean TrHs,testf;
+	integer i,rwcnt;
+	record ObjVc Objr;
+	
+	startreportnoheaderjob("France Invoices Report 2018");
+	
+	TrHs = true;
+	VIr.InvDate = stringtodate("1/1/2018");
+	while(loopkey("InvDate",VIr,1,TrHs))begin
+		testf = true;
+		if(VIr.InvDate>stringtodate("31/12/2018"))then begin TrHs = false; testf = false; end;
+		if(VIr.Invalid>0)then begin testf = false; end;
+		if(VIr.OKFlag==0)then begin testf = false; end;
+		
+		if(testf)then begin
+			if(VIr.PayDeal>="G1" and VIr.PayDeal>="G9")then begin
+				rwcnt = matrowcnt(VIr);
+				for(i=0;i<rwcnt;i=i+1)begin
+					matrowget(VIr,i,VIrw);
+					if(VIrw.stp==1 and nonblank(VIrw.Supp))then begin
+						startformat(15);
+							outstring(0,0,VIr.SerNr,false);
+							outstring(50,0,VIr.InvDate,false);
+							Objr.Code = VIrw.Supp;
+							readfirstmain(Objr,1,true);
+							outstring(100,0,Objr.Comment,false);
+							outstring(150,0,VIrw.Prj,false);
+							outstring(200,0,VIrw.Exp,false);
+							outstring(250,0,VIrw.Comment,false);
+							outstring(300,0,VIrw.Found,false);
+							outstring(350,0,VIrw.Loc,false);
+							outstring(400,0,VIrw.Sum,false);
+							outstring(450,0,VIr.CurncyCode,false);
+						endformat;
+					end;
+				end;
+			end;
+		end;
+	
+	end;
+	
+	
+	endjob;
+	
+return;
+end;
+
