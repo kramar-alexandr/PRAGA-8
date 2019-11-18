@@ -52,18 +52,48 @@ BEGIN
       switch (PRr.Code) begin
         case "2017.013":
           goto L1;
-        case "2017.014":
-          goto L1;
         case "2018.013":
           goto L1;
-        case "2018.014":
-          goto L1;
         case "2019.013":
+          goto L1;
+      end;
+    end;
+    if (RepSpec.flags[9]==0) then begin
+      switch (PRr.Code) begin
+        case "2017.014":
+          goto L1;
+        case "2018.014":
           goto L1;
         case "2019.014":
           goto L1;
       end;
     end;
+    if (RepSpec.flags[10]==0) then begin
+      switch (PRr.Code) begin
+        case "2017.015":
+          goto L1;
+        case "2018.015":
+          goto L1;
+        case "2019.015":
+          goto L1;
+      end;
+    end;
+    if (RepSpec.flags[11]==0) then begin
+      switch (PRr.Code) begin
+        case "2017.016":
+          goto L1;
+        case "2018.016":
+          goto L1;
+        case "2019.016":
+          goto L1;
+      end;
+    end;
+    
+    
+    
+    
+    
+    
 		if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
 			ProjArray[k] = PRr.Code;
 			ProjNamesVect[PRr.Code] = PRr.Name;
