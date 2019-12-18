@@ -23,6 +23,8 @@ begin
 				startformat(15);
 					outstring(0,"DblVIVc",VIr.SerNr,false);
 					outstring(30,0,VIr.InvDate,false);
+					outstring(30,0,"",false);
+					outstring(30,0,"",false);
 					outstring(75,0,VIrw.Supp,false);
 					Objr.Code = VIrw.Supp;
 					readfirstmain(Objr,1,true);
@@ -66,6 +68,8 @@ begin
 											startformat(15);
 												outstring(0,"DblVIVc",VIr.SerNr,false);
 												outstring(30,0,VIr.InvDate,false);
+												outstring(30,0,OPrsr.TransDate,false);
+												outstring(30,0,OPr.SerNr,false);
 												outstring(75,0,VIrw.Supp,false);
 												Objr.Code = VIrw.Supp;
 												readfirstmain(Objr,1,true);
@@ -83,7 +87,7 @@ begin
 								end;
 							end;
 					
-							rwcnt = matrowcnt(OPr);
+							/*rwcnt = matrowcnt(OPr);
 							for(i=0;i<rwcnt;i=i+1)begin
 								matrowget(OPr,i,OPrw);
 								if(OPrw.VISerNr==VIr.SerNr)then begin
@@ -108,7 +112,7 @@ begin
 										outstring(300,0,OPrw.RecVal,false);
 									endformat;
 								end;
-							end;
+							end;*/
 						end;
 					end;
 				end;
@@ -145,7 +149,9 @@ begin
 		//outstring(0,0,"Sum in current period",false);
 		//outstring(0,0,"Currency",false);
 		outstring(0,0,"Inv No",false);
-		outstring(30,0,"Date",false);
+		outstring(30,0,"Inv. Date",false);
+		outstring(30,0,"Payment Date",false);
+		outstring(30,0,"Payment Number",false);
 		outstring(75,0,"Supplier",false);
 		outstring(100,0,"Supp Name",false);
 		outstring(150,0,"Project",false);
@@ -193,12 +199,12 @@ begin
 					VIr.SerNr = OPrw.VISerNr;
 					if(readfirstmain(VIr,1,true))then begin
 					
-						if(printed and VIr.OKFlag==1)then begin
+						/*if(printed and VIr.OKFlag==1)then begin
 							printed = false;
 							startformat(15);
 								outstring(0,0,"Payments for older invoices",false);
 							endformat;
-						end;
+						end;*/
 						
 						PrintInvoice(VIr,invinperiod,RepSpec);
 					end;
