@@ -2,6 +2,124 @@ external function Boolean IsDigit(string);
 external procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
 
 
+procedure PrintInvoice(record VIVc VIr,var vector boolean invinperiod,record RcVc RepSpec)
+begin
+	row VIVc VIrw;
+	boolean TrHs,testf;
+	integer i,rwcnt;
+	record ObjVc Objr;
+	record OPrsVc OPrsr; 
+	record OPVc OPr;
+	row OPVc OPrw;
+	boolean printed,TrHs1,testf1;
+	
+	invinperiod[VIr.SerNr] = true;
+	if(VIr.PayDeal>=RepSpec.f1 and VIr.PayDeal<=RepSpec.f2 and dateinrange(VIr.InvDate,RepSpec.d1,RepSpec.d2))then begin
+		invinperiod[VIr.SerNr] = true;
+		rwcnt = matrowcnt(VIr);
+		for(i=0;i<rwcnt;i=i+1)begin
+			matrowget(VIr,i,VIrw);
+			if(VIrw.stp==1 and nonblank(VIrw.Supp))then begin
+				startformat(15);
+					outstring(0,"DblVIVc",VIr.SerNr,false);
+					outstring(30,0,VIr.InvDate,false);
+					outstring(75,0,VIrw.Supp,false);
+					Objr.Code = VIrw.Supp;
+					readfirstmain(Objr,1,true);
+					outstring(100,0,Objr.Comment,false);
+					outstring(150,0,VIrw.Prj,false);
+					outstring(200,0,VIrw.Exp,false);
+					outstring(250,0,VIrw.Comment,false);
+					outstring(300,0,VIrw.Found,false);
+					outstring(350,0,VIrw.Loc,false);
+					outstring(400,0,VIrw.Sum,false);
+					outstring(450,0,VIr.CurncyCode,false);
+				endformat;
+			end;
+		end;
+	end else begin
+		resetloop(OPrsr);
+		printed = false;
+		OPrsr.VINr = VIr.SerNr;
+		OPrsr.TransType = 1;
+		TrHs1 = true;
+		while(loopkey("VIKey",OPrsr,2,TrHs1))begin
+			testf1 = true;
+			if(OPrsr.VINr!=VIr.SerNr)then begin TrHs1 = false; testf1 = false; end;
+			if(OPrsr.TransType!=1)then begin TrHs1 = false; testf1 = false; end;
+			if(OPrsr.TransDate<RepSpec.d1)then begin testf1 = false; end;
+			if(OPrsr.TransDate>RepSpec.d2)then begin testf1 = false; end;
+
+			if(testf1)then begin
+				if(OPrsr.TransNr>0)then begin
+					OPr.SerNr = OPrsr.TransNr;
+					if(readfirstmain(OPr,1,true))then begin
+						if(OPr.PayMode>=RepSpec.f1 and OPr.PayMode<=RepSpec.f2 and OPr.DoneFlag==1 and OPr.Invalid==0)then begin
+							invinperiod[VIr.SerNr] = true;
+							if(printed==false)then begin
+								printed = true;
+								rwcnt = matrowcnt(VIr);
+								for(i=0;i<rwcnt;i=i+1)begin
+									matrowget(VIr,i,VIrw);
+									if(VIrw.stp==1 and nonblank(VIrw.Supp))then begin
+										if(dateinrange(VIr.InvDate,RepSpec.d1,RepSpec.d2))then begin
+											startformat(15);
+												outstring(0,"DblVIVc",VIr.SerNr,false);
+												outstring(30,0,VIr.InvDate,false);
+												outstring(75,0,VIrw.Supp,false);
+												Objr.Code = VIrw.Supp;
+												readfirstmain(Objr,1,true);
+												outstring(100,0,Objr.Comment,false);
+												outstring(150,0,VIrw.Prj,false);
+												outstring(200,0,VIrw.Exp,false);
+												outstring(250,0,VIrw.Comment,false);
+												outstring(300,0,VIrw.Found,false);
+												outstring(350,0,VIrw.Loc,false);
+												outstring(400,0,VIrw.Sum,false);
+												outstring(450,0,VIr.CurncyCode,false);
+											endformat;
+										end;
+									end;
+								end;
+							end;
+					
+							rwcnt = matrowcnt(OPr);
+							for(i=0;i<rwcnt;i=i+1)begin
+								matrowget(OPr,i,OPrw);
+								if(OPrw.VISerNr==VIr.SerNr)then begin
+									startformat(15);
+										//outstring(0,0,OPrw.BankVal,false);
+										//outstring(0,0,OPrw.RecCurncy,false);
+										outstring(0,0,"",false);
+										outstring(0,0,"Payment for",false);
+										outstring(0,0,"invoice nr.",false);
+										outstring(30,0,VIr.SerNr,false);
+										outstring(75,0,"Payment nr.",false);
+										outstring(100,0,OPr.SerNr,false);
+										outstring(110,0,"Payment Date",false);
+										outstring(120,0,OPr.TransDate,false);
+										outstring(150,0,"Bank Curncy",false);
+										outstring(200,0,OPrw.BankCurncy,false);
+										outstring(250,0,"Bank Sum",false);
+										outstring(300,0,OPrw.BankVal,false);
+										outstring(150,0,"Invoice Curncy",false);
+										outstring(200,0,OPrw.RecCurncy,false);
+										outstring(250,0,"Invoice Sum",false);
+										outstring(300,0,OPrw.RecVal,false);
+									endformat;
+								end;
+							end;
+						end;
+					end;
+				end;
+			end;
+		end;
+	end;
+
+return;
+end;
+
+
 global procedure FrVIRepRn(record RcVc RepSpec)
 begin
 	record VIVc VIr;
@@ -11,10 +129,21 @@ begin
 	record ObjVc Objr;
 	record OPrsVc OPrsr; 
 	record OPVc OPr;
+	row OPVc OPrw;
+	boolean printed,TrHs1,testf1;
+	vector boolean invinperiod;
 	
 	startreportnoheaderjob("Invoices for Excel 2018");
 	
+	RepSpec.d1 = stringtodate("1/6/2018");
+	RepSpec.d2 = stringtodate("31/12/2018");
+	
+	RepSpec.f1 = "G1";
+	RepSpec.f2 = "G9";
+	
 	startformat(15);
+		//outstring(0,0,"Sum in current period",false);
+		//outstring(0,0,"Currency",false);
 		outstring(0,0,"Inv No",false);
 		outstring(30,0,"Date",false);
 		outstring(75,0,"Supplier",false);
@@ -26,76 +155,57 @@ begin
 		outstring(350,0,"Location",false);
 		outstring(400,0,"Summ",false);
 		outstring(450,0,"Currency",false);
+		outstring(450,0,"",false);
 	endformat;
 	
 	TrHs = true;
-	VIr.InvDate = stringtodate("1/6/2018");
+	VIr.InvDate = RepSpec.d1;
 	while(loopkey("InvDate",VIr,1,TrHs))begin
 		testf = true;
-		if(VIr.InvDate>stringtodate("31/12/2018"))then begin TrHs = false; testf = false; end;
+		if(VIr.InvDate>RepSpec.d2)then begin TrHs = false; testf = false; end;
 		if(VIr.Invalid>0)then begin testf = false; end;
 		if(VIr.OKFlag==0)then begin testf = false; end;
 		
 		if(testf)then begin
-			if(VIr.PayDeal>="G1" and VIr.PayDeal<="G9")then begin
-				rwcnt = matrowcnt(VIr);
-				for(i=0;i<rwcnt;i=i+1)begin
-					matrowget(VIr,i,VIrw);
-					if(VIrw.stp==1 and nonblank(VIrw.Supp))then begin
-						startformat(15);
-							outstring(0,"DblVIVc",VIr.SerNr,false);
-							outstring(30,0,VIr.InvDate,false);
-							outstring(75,0,VIrw.Supp,false);
-							Objr.Code = VIrw.Supp;
-							readfirstmain(Objr,1,true);
-							outstring(100,0,Objr.Comment,false);
-							outstring(150,0,VIrw.Prj,false);
-							outstring(200,0,VIrw.Exp,false);
-							outstring(250,0,VIrw.Comment,false);
-							outstring(300,0,VIrw.Found,false);
-							outstring(350,0,VIrw.Loc,false);
-							outstring(400,0,VIrw.Sum,false);
-							outstring(450,0,VIr.CurncyCode,false);
-						endformat;
-					end;
-				end;
-			end else begin
-				OPrsr.VINr = VIr.SerNr;
-				OPrsr.TransType = 1;
-				readfirstkey("VIKey",OPrsr,2,true);
-				if(OPrsr.TransNr>0)then begin
-					OPr.SerNr = OPrsr.TransNr;
-					if(readfirstmain(OPr,1,true))then begin
-						if(OPr.PayMode>="G1" and OPr.PayMode<="G9")then begin
-							rwcnt = matrowcnt(VIr);
-							for(i=0;i<rwcnt;i=i+1)begin
-								matrowget(VIr,i,VIrw);
-								if(VIrw.stp==1 and nonblank(VIrw.Supp))then begin
-									startformat(15);
-										outstring(0,"DblVIVc",VIr.SerNr,false);
-										outstring(30,0,VIr.InvDate,false);
-										outstring(75,0,VIrw.Supp,false);
-										Objr.Code = VIrw.Supp;
-										readfirstmain(Objr,1,true);
-										outstring(100,0,Objr.Comment,false);
-										outstring(150,0,VIrw.Prj,false);
-										outstring(200,0,VIrw.Exp,false);
-										outstring(250,0,VIrw.Comment,false);
-										outstring(300,0,VIrw.Found,false);
-										outstring(350,0,VIrw.Loc,false);
-										outstring(400,0,VIrw.Sum,false);
-										outstring(450,0,VIr.CurncyCode,false);
-									endformat;
-								end;
-							end;
+			PrintInvoice(VIr,invinperiod,RepSpec);
+		end;
+	end;
+	
+	printed = true;
+	
+	resetloop(OPr);
+	TrHs = true;
+	OPr.TransDate = RepSpec.d1;
+	while(loopkey("TransDate",OPr,1,TrHs))begin
+		testf = true;
+		if(OPr.TransDate<RepSpec.d1)then begin testf = false; end;
+		if(OPr.TransDate>RepSpec.d2)then begin TrHs = false; testf = false; end;
+		if(OPr.PayMode<RepSpec.f1 or OPr.PayMode>RepSpec.f2)then begin testf = false; end;
+		if(OPr.DoneFlag==0)then begin testf = false; end;
+		if(OPr.Invalid==1)then begin testf = false; end;
+		
+		matrowget(OPr,i,OPrw);
+		if(testf)then begin
+			rwcnt = matrowcnt(OPr);
+			for(i=0;i<rwcnt;i=i+1)begin
+				matrowget(OPr,i,OPrw);				
+				if(invinperiod[OPrw.VISerNr]==false)then begin
+					VIr.SerNr = OPrw.VISerNr;
+					if(readfirstmain(VIr,1,true))then begin
+					
+						if(printed and VIr.OKFlag==1)then begin
+							printed = false;
+							startformat(15);
+								outstring(0,0,"Payments for older invoices",false);
+							endformat;
 						end;
+						
+						PrintInvoice(VIr,invinperiod,RepSpec);
 					end;
 				end;
 			end;
 		end;
-	
 	end;
-	
 	
 	endjob;
 	
