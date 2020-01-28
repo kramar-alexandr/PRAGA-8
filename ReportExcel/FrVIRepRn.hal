@@ -140,7 +140,7 @@ begin
 	startreportnoheaderjob("Invoices for Excel 2019");
 	
 	RepSpec.d1 = stringtodate("1/1/2019");
-	RepSpec.d2 = stringtodate("30/9/2019");
+	RepSpec.d2 = stringtodate("31/12/2019");
 	
 	RepSpec.f1 = "G1";
 	RepSpec.f2 = "G9";
