@@ -1,0 +1,487 @@
+external function Boolean FindTheUser(var record UserVc);
+external updating procedure FindAcptRulesAndCreateAcceptanceAlert2(Integer,Integer,string,string,string,val,val,string,string,string,string);
+external updating procedure CancelApprovalRequestActivities(Integer,string,string,string);
+external function Boolean AcceptanceRulesExists(Integer,string);
+external function val MulRateToBase1(var string,val,val,val,val,val,val,roundmode);
+external function Integer CheckRates(string,val,val,val,val,val,var string);
+external procedure SwapM4Val(var val,var val);
+external procedure ConvertToDualBase(var string,date,var val,var val,var val,var val,var val,var val,Boolean);
+external procedure B1ToB2Val(val,val,val,var val);
+external procedure GetFullCurncyRate (var string,Date,var val,var val,var val,var val,var val);
+external procedure GetSalesGroup(string,var string);
+external function string 60 AddObjectToObjectList(string,string);
+external procedure NormalizeObjstr(var string);
+external function string 60 RemoveObjectFromObjectList(string,string);
+external procedure GetPRItemCost(string,string,string,string,Integer,var val);
+external procedure RoundRowSum(string,string,string,var val);
+external function Boolean FindTheUser(var record UserVc);
+external updating procedure FindAcptRulesAndCreateAcceptanceAlert2(Integer,Integer,string,string,string,val,val,string,string,string,string);
+external updating procedure CancelApprovalRequestActivities(Integer,string,string,string);
+external function Boolean AcceptanceRulesExists(Integer,string);
+external function val MulRateToBase1(var string,val,val,val,val,val,val,roundmode);
+external function Integer CheckRates(string,val,val,val,val,val,var string);
+external procedure SwapM4Val(var val,var val);
+external procedure ConvertToDualBase(var string,date,var val,var val,var val,var val,var val,var val,Boolean);
+external procedure TBBUSumup(var record TBBUVc);
+external procedure B1ToB2Val(val,val,val,var val);
+external procedure GetFullCurncyRate (var string,Date,var val,var val,var val,var val,var val);
+external procedure GetSalesGroup(string,var string);
+external function string 60 AddObjectToObjectList(string,string);
+external procedure NormalizeObjstr(var string);
+external function string 60 RemoveObjectFromObjectList(string,string);
+external function val DivRateToBase1(string,val,val,val,val,val,val,roundmode);
+
+
+
+global
+procedure CalcPrice(val cp,val pf,val reb,var val price,Integer UseDiscount)
+begin
+  val p;
+  
+  switch (UseDiscount) begin
+    case 3:
+      if (reb!=0) then begin
+        p = cp;
+        if (pf!=0) then begin
+          p = p / pf;
+        end;
+        if ((reb>=-100) and (reb<=100)) then begin
+          p = p + (p * reb / 100.0);
+        end;
+        price = p;
+      end;
+  end;
+  return;
+end;
+
+global
+function Boolean DiscountedPrice(var val newp,val rvp,roundmode roundoff,Integer UseDiscount)
+BEGIN
+  val tpr;
+  Boolean res;
+  record RoundBlock RoundRec;
+
+  res = false;
+  BlockLoad(RoundRec);
+  if (RoundRec.Discount==1) then begin
+//Trace("1.newp=",ValToString(newp,M45Val,"",".",0));        
+    switch (UseDiscount) begin
+      case 0:
+        tpr = newp * rvp;
+        tpr = tpr / 100;
+        tpr = newp - tpr;
+        tpr = Round(tpr,roundoff);
+        newp = tpr;
+      case 1:
+        tpr = newp * rvp;
+        tpr = tpr / 100;
+        tpr = Round(tpr,roundoff);
+        newp = tpr;
+      case 2:
+        tpr = newp * rvp;
+        tpr = tpr / 100;
+        tpr = newp + tpr;
+        tpr = Round(tpr,roundoff);
+        newp = tpr;
+    end;
+  
+    res = true;
+  end;
+  DiscountedPrice = res;
+  return;
+END;
+
+global
+procedure CalcExtra(val bp,string extra,var val res)
+BEGIN
+  string 255 tstr;
+  val v;
+
+  res = blankval;
+  tstr = extra;
+  if (nonblank(tstr)) then begin
+    if (Mid(tstr,len(tstr)-1,1)=="%") then begin
+      tstr = Left(tstr,len(tstr)-1);
+      v = StringToVal(tstr,M4Val);
+      res = bp*v;
+      res = res/100;
+    end else begin
+      res = StringToVal(tstr,M4Val);
+    end;
+  end;
+  RETURN;
+END;
+
+global
+procedure CalcSum(val q,val p,val f,val rvp,var val s,Integer UseDiscount)
+BEGIN
+  val newp,s2;
+  Boolean discountedpricef;
+
+  discountedpricef = false;
+  newp = p;
+  discountedpricef = DiscountedPrice(newp,rvp,DefaultCurRoundOff,UseDiscount);//3 why , must be setting
+  s2 = q * newp;
+  if (q==blankval) and (newp==blankval) then begin
+    s2 = blankval;
+  end;
+  if (f<>0) then begin
+    s2 = s2 / f;
+  end;
+
+  if (discountedpricef==false) then begin
+    if (s2<>0) then begin
+      if (rvp<>0) then begin
+        switch (UseDiscount) begin
+          case 0:
+//            if ((rvp>=-100) and (rvp<=100)) then begin
+            if (rvp<=100) then begin
+              s2 = s2 - (s2 * rvp / 100.0);
+            end;
+          case 1:
+//            if ((rvp>=-100) and (rvp<=100)) then begin
+            if (rvp<=100) then begin
+              s2 = s2 * rvp / 100.0;
+            end;
+          case 2:
+//            if ((rvp>=-100) and (rvp<=100)) then begin
+            if (rvp<=100) then begin
+              s2 = s2 + (s2 * rvp / 100.0);
+            end;
+        end;
+      end;
+    end;
+  end;        
+
+  s = s2;
+  RETURN;
+END;
+
+global
+procedure TBBUInSumup(var record TBBUInVc TBBUInp)
+BEGIN
+  row TBBUInVc TBBUInrw;
+  record INVc INr;
+  Integer i,rwcnt;
+  val tt,ot,mt,st;
+  Integer itemtyp;
+  val subtotv,costv;
+  
+  rwcnt = MatRowCnt(TBBUInp);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(TBBUInp,i,TBBUInrw);
+    if (TBBUInrw.stp!=9) then begin
+      if ((nonblank(TBBUInrw.ArtCode)) and (TBBUInrw.stp!=9)) then begin
+        itemtyp = TBBUInrw.ItemType;
+        if (itemtyp==0) then begin
+          INr.Code = TBBUInrw.ArtCode;
+          if (ReadFirstMain(INr,1,true)) then begin
+            if (INr.ItemMaterial!=0) then begin itemtyp = 5; end;
+          end;
+        end;
+        if (itemtyp==0) then begin
+          ot = ot + TBBUInrw.Sum;
+        end;
+        if (itemtyp==1) then begin
+          st = st + TBBUInrw.Sum;
+        end;
+        if (itemtyp==2) then begin//structured
+          st = st + TBBUInrw.Sum;
+        end;
+        if (itemtyp==3) then begin
+          tt = tt + TBBUInrw.Sum;
+        end;
+        if (itemtyp==5) then begin
+          mt = mt + TBBUInrw.Sum;
+        end;
+      end;
+      subtotv = subtotv + TBBUInrw.Sum;
+      costv = costv + TBBUInrw.Qty*TBBUInrw.Cost;
+    end else begin
+      if (TBBUInrw.Sum!=subtotv) or (TBBUInrw.Cost!=costv) then begin
+        TBBUInrw.Sum = subtotv;
+        TBBUInrw.Cost = costv;
+        MatRowPut(TBBUInp,i,TBBUInrw);
+      end;
+      subtotv = blankval;
+      costv = blankval;
+    end;
+  end;
+  TBBUInp.SumTime = tt;
+  TBBUInp.SumOther = ot;
+  TBBUInp.SumStocked = st;
+  TBBUInp.SumMaterial = mt;
+  tt = tt + ot;
+  tt = tt + st;
+  tt = tt + mt;
+  TBBUInp.TotSum = tt;
+  RETURN;
+END;
+
+global
+procedure TBBUInDchrsum(var record TBBUInVc TBBUInr,Integer rownr,Boolean pritemf,Integer UseDiscount)
+BEGIN
+  val t,v,totrowcost,pritcost,s;
+  row TBBUInVc TBBUInrw;
+
+  MatRowGet(TBBUInr,rownr,TBBUInrw);
+  t = TBBUInrw.Cost;
+  if (pritemf) then begin
+    if nonblank(TBBUInrw.EMCode) or (blank(t)) then begin
+      GetPRItemCost(TBBUInr.PRCode,TBBUInrw.EMCode,TBBUInrw.ArtCode,TBBUInrw.TimeClass,TBBUInrw.ItemType,t);
+    end;
+    TBBUInrw.Cost = t;
+  end;
+  totrowcost = TBBUInrw.Cost*TBBUInrw.Qty;
+  if (TBBUInrw.Price!=0) then begin
+    CalcSum(TBBUInrw.Qty,TBBUInrw.Price,0,TBBUInrw.Discount,t,UseDiscount);
+    CalcExtra(t,TBBUInrw.Markup,v);
+    TBBUInrw.Sum = t + v;
+    RoundRowSum(TBBUInr.CurncyCode,"","TBBUInVc",TBBUInrw.Sum);
+/*    
+  if (QTrw.PriceFactor<>0) then begin
+    t = t / QTrw.PriceFactor;
+  end;
+*/  
+  end else begin
+    if (nonblank(TBBUInrw.Markup)) then begin
+      CalcExtra(TBBUInrw.Cost,TBBUInrw.Markup,v);
+      TBBUInrw.Price = v + TBBUInrw.Cost;
+      TBBUInrw.Price  = DivRateToBase1(TBBUInr.CurncyCode,TBBUInrw.Price,TBBUInr.FrRate,TBBUInr.ToRateB1,TBBUInr.ToRateB2,TBBUInr.BaseRate1,TBBUInr.BaseRate2,DefaultCurRoundOff);
+      CalcSum(TBBUInrw.Qty,TBBUInrw.Price,0,TBBUInrw.Discount,t,UseDiscount);
+      RoundRowSum(TBBUInr.CurncyCode,"","TBBUInVc",t);
+      TBBUInrw.Sum = t;
+    end else begin
+      TBBUInrw.Sum = 0;
+    end;
+  end;
+  s  = MulRateToBase1(TBBUInr.CurncyCode,TBBUInrw.Sum,TBBUInr.FrRate,TBBUInr.ToRateB1,TBBUInr.ToRateB2,TBBUInr.BaseRate1,TBBUInr.BaseRate2,DefaultCurRoundOff);
+  TBBUInrw.GP = s - totrowcost;
+  t = TBBUInrw.GP*100;
+  TBBUInrw.GM = t/TBBUInrw.Sum;
+  MatRowPut(TBBUInr,rownr,TBBUInrw);
+  RETURN;
+END;
+
+global
+function LongInt TBBUInVcRecordDefaults(var record TBBUInVc TBBUInr,record TBBUInVc TBBUIn2r,LongInt stat,LongInt long4)
+BEGIN
+  LongInt res;
+  record ProjectBlock PRRec;
+  val fr,to1,to2,br1,br2;
+  string 255 tstr;
+      
+  BlockLoad(PRRec);
+  TBBUInr.SalesMan = CurrentUser;
+  GetSalesGroup(TBBUInr.SalesMan,tstr);
+  TBBUInr.SalesGroup = tstr;
+  TBBUInr.BudMaterial = PRRec.BudMaterial;
+  TBBUInr.BudStocked = PRRec.BudStocked;
+  TBBUInr.BudTime = PRRec.BudTime;
+  TBBUInr.BudOther = PRRec.BudOther;
+  tstr = TBBUInr.CurncyCode;
+  GetFullCurncyRate(tstr,TBBUInr.TransDate,fr,to1,to2,br1,br2);
+  TBBUInr.CurncyCode = tstr;
+  TBBUInr.FrRate = fr;
+  TBBUInr.ToRateB1 = to1; 
+  TBBUInr.ToRateB2 = to2;
+  TBBUInr.BaseRate1 = br1;
+  TBBUInr.BaseRate2 = br2;    
+  TBBUInVcRecordDefaults = res; 
+  RETURN;
+END;
+
+global
+function LongInt TBBUInVcRecordDuplicate(var record TBBUInVc TBBUInr,record TBBUInVc TBBUIn2r,LongInt stat,LongInt long4)
+BEGIN
+  LongInt res;
+  record ProjectBlock PRRec;
+  Integer rwcnt,i;
+  row TBBUInVc TBBUInrw;
+  string 255 tstr;
+      
+  TBBUInr.SalesMan = CurrentUser;
+  GetSalesGroup(TBBUInr.SalesMan,tstr);
+  TBBUInr.SalesGroup = tstr;
+  rwcnt = MatRowCnt(TBBUInr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(TBBUInr,i,TBBUInrw);
+    TBBUInrw.Invoiced = -1;
+    MatRowPut(TBBUInr,i,TBBUInrw);
+  end;
+  TBBUInVcRecordDuplicate = res; 
+  RETURN;
+END;
+
+global
+function LongInt TBBUInVcRecordCheck(var record TBBUInVc TBBUInr,record TBBUInVc TBBUIn2r,LongInt stat,LongInt long4)
+BEGIN
+  LongInt res,errcode;
+  record INVc INr;
+  record PRVc PRr;
+  record UserVc Userr;
+  record CUVc CUr;
+  record ObjVc Objr;
+  record SalesGroupVc SalesGroupr;
+  row TBBUInVc TBBUInrw,TBBUIn2rw;
+  Integer insertmode,updatemode;
+  Integer i,rwcnt,orwcnt;
+  string 255 tstr;
+
+  res = 0;
+  insertmode = 1;//Rs_insert
+  updatemode = 2;//Rs_update
+  PRr.Code = TBBUInr.PRCode;
+  if (ReadFirstMain(PRr,1,true)==false) then begin
+    RecordCheckError(1232,"",-1,"PRCode");      
+    res = -1;
+    goto LTBBUInVcRecordCheck;
+  end;  
+  if (PRr.Terminated!=0) then begin
+    RecordCheckError(1236,"",-1,"PRCode");      
+    res = -1;
+    goto LTBBUInVcRecordCheck;
+  end;
+  if (TBBUInr.CustCode!=PRr.CustCode) then begin
+    RecordCheckError(20172,"",-1,"CustCode");      
+    res = -1;
+    goto LTBBUInVcRecordCheck;
+  end;
+  if (TBBUInr.CurncyCode!=PRr.CurncyCode) then begin
+    RecordCheckError(20573,"",-1,"PRCode");      
+    res = -1;
+    goto LTBBUInVcRecordCheck;
+  end;
+  if (nonblank(TBBUInr.PRLeader)) then begin
+    Userr.Code = TBBUInr.PRLeader;
+    if (FindTheUser(Userr)==false) then begin
+      RecordCheckError(20170,"",-1,"PRLeader");      
+      res = -1;
+      goto LTBBUInVcRecordCheck;
+    end;
+  end;
+  if (nonblank(TBBUInr.SalesMan)) then begin
+    Userr.Code = TBBUInr.SalesMan;
+    if (FindTheUser(Userr)==false) then begin
+      RecordCheckError(20170,"",-1,"SalesMan");      
+      res = -1;
+      goto LTBBUInVcRecordCheck;
+    end;
+  end;
+  if (nonblank(TBBUInr.SalesGroup)) then begin
+    SalesGroupr.SGroupCode = TBBUInr.SalesGroup;
+    if (ReadFirstMain(SalesGroupr,1,true)==false) then begin
+      RecordCheckError(20171,"",-1,"SalesGroup");      
+      res = -1;
+      goto LTBBUInVcRecordCheck;
+    end;
+  end;
+  if (nonblank(TBBUInr.CustCode)) then begin
+    CUr.Code = TBBUInr.CustCode;
+    if (ReadFirstMain(CUr,1,true)==false) then begin
+      RecordCheckError(1290,"",-1,"CustCode");      
+      res = -1;
+      goto LTBBUInVcRecordCheck;
+    end;
+  end;
+  if (nonblank(TBBUInr.CurncyCode)) then begin
+    errcode = CheckRates(TBBUInr.CurncyCode,TBBUInr.FrRate,TBBUInr.ToRateB1,TBBUInr.ToRateB2,TBBUInr.BaseRate1,TBBUInr.BaseRate2,tstr);
+    if (errcode!=0) then begin
+      RecordCheckError(errcode,"",-1,tstr);      
+      res = -1; 
+      goto LTBBUInVcRecordCheck;
+    end;      
+  end;
+  rwcnt = MatRowCnt(TBBUInr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(TBBUInr,i,TBBUInrw);
+     switch (TBBUInrw.stp) begin
+       case 1:
+          TBBUInrw.Objects = "";
+       	 if(blank(TBBUInrw.ExtraObj))then begin// Edit ************************** Thursday, 23 April 2015 14:05:28
+       	 		RecordCheckError(1854,"",i,"ExtraObj");     
+            res = -1;
+            goto LTBBUInVcRecordCheck;
+       	 end;
+          
+       	 	TBBUInrw.Objects = AddObjectToObjectList(TBBUInrw.Objects,TBBUInrw.ExtraObj);// Edit ************************** Friday, 24 April 2015 12:04:00
+					
+       	 /*if(blank(TBBUInrw.VECode))then begin// Edit ************************** Thursday, 23 April 2015 14:05:28
+       	 		RecordCheckError(1854,"",i,"VECode");     
+            res = -1;
+            goto LTBBUInVcRecordCheck;
+       	 end;*/
+       	 
+          if(nonblank(TBBUInrw.VECode))then begin
+            CUr.Code = TBBUInrw.VECode;
+            if(ReadFirstMain(CUr,1,true)==false)then begin// Edit ************************** Thursday, 23 April 2015 14:07:26
+              RecordCheckError(1290,"",i,"VECode");      
+              res = -1;
+              goto LTBBUInVcRecordCheck;
+            end;
+            CUr.Code = TBBUInrw.VECode;
+            if(ReadFirstMain(CUr,1,true))then begin// Edit ************************** Thursday, 23 April 2015 14:07:26
+              if(blank(CUr.VEObjects))then begin
+                RecordCheckError(1386," in Vendor card",i,"VECode");      
+                res = -1;
+                goto LTBBUInVcRecordCheck;
+              end else begin
+                TBBUInrw.Objects = AddObjectToObjectList(TBBUInrw.Objects,CUr.VEObjects);//Edit-------------------Vitalii 16:56 18.03.2016
+              end;
+            end;
+          end;
+       	 
+       	 
+        if (nonblank(TBBUInrw.ArtCode)) then begin
+          INr.Code = TBBUInrw.ArtCode;
+          if (ReadFirstMain(INr,1,true)==false) then begin
+            RecordCheckError(1233,"",i,"ArtCode");      
+            res = -1;
+            goto LTBBUInVcRecordCheck;
+          end;
+          TBBUInrw.Objects = AddObjectToObjectList(TBBUInrw.Objects,TBBUInrw.ArtCode);
+        end else begin
+          if (TBBUInrw.Qty!=0) then begin
+            if (blank(TBBUInrw.TimeClass)) then begin
+              RecordCheckError(1233,"",i,"ArtCode");      
+              res = -1;
+              goto LTBBUInVcRecordCheck;
+            end;
+          end;
+          if nonblank(TBBUInrw.Extras) then begin
+            RecordCheckError(1233,"",i,"ArtCode");      
+            res = -1;
+            goto LTBBUInVcRecordCheck;
+          end;
+        end;
+        if (nonblank(TBBUInrw.PRStageSign)) then begin
+          Userr.Code = TBBUInrw.PRStageSign;
+          if (ReadFirstMain(Userr,1,true)==false) then begin
+            RecordCheckError(20170," " & TBBUInrw.PRStageSign, i, "PRStageSign");   
+            res = -1;
+            goto LTBBUInVcRecordCheck;
+          end;
+        end;
+        if nonblank(TBBUInrw.Extras) then begin
+          Objr.Code = TBBUInrw.Extras;
+          if (ReadFirstMain(Objr,1,true)==false) then begin
+            RecordCheckError(1043,"",i,"Extras");      
+            res = -1;
+            goto LTBBUInVcRecordCheck;
+          end else begin
+            if Objr.OTCode!="EXTRA" then begin
+              RecordCheckError(1083,"EXTRA",i,"Extras");      
+              res = -1;
+              goto LTBBUInVcRecordCheck;
+            end;
+          end;
+          TBBUInrw.Objects = AddObjectToObjectList(TBBUInrw.Objects,TBBUInrw.Extras);
+        end;
+        NormalizeObjstr(TBBUInrw.Objects);// Edit ************************** Friday, 24 April 2015 12:07:28
+        matrowput(TBBUInr,i,TBBUInrw);
+     end;
+  end;
+LTBBUInVcRecordCheck:;
+  TBBUInVcRecordCheck = res;
+  RETURN;
+END;

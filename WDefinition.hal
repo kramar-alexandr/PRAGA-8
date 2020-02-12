@@ -2374,6 +2374,26 @@ begin
   EndWindow;
 end;
 
+window ObjDonorSClass:2
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer,iPad,iPhone")
+begin
+  real v;
+  Integer mwn;
+  Boolean contf;
+  
+  WindowBegin("Paste Object",ObjDonorSClass,CGslist,ObjView);
+  DynamicWindow;
+  SpawnClass(ObjDClass);
+  UseView(ObjVc);
+  Sizeable(-1,-1,0,0);
+  SetWRect(220,80,600,298);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,1,    "Object",Code,false,ActSbstOTCode);
+  RlColKey(201,201,"Name",Comment,false,ActSbstComment);
+  SearchField("Search");
+  EndWindow;
+end;
+
 window CLInDClass:1
   wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
@@ -2381,7 +2401,7 @@ begin
   Integer tilenr;
   
   WindowBegin("Cash In",CLInDClass,CGview,-);
-  SetWRect(20,80,700,550);
+  SetWRect(20,80,900,550);
   UseView(CLInVc);
   ActiveFieldOnNew("TransDate");
 //  Sizeable(-1,-1,0,0);
@@ -2480,6 +2500,7 @@ begin
   MatCol(t,h+=70,"Project",Normal,Prj,false,ObjPrjSClass);
   MatCol(t,h+=70,"#Supplier#",0,Supp,false,VESClass);
   MatCol(t,h+=70,"Foundation",0,Found,false,ObjFoundSClass);
+  MatCol(t,h+=70,"Donor",0,Donor,false,ObjDonorSClass);// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 11 February 2020 17:21:38
   MatCol(t,h+=70,"Location",0,Loc,false,ObjLocSClass);
   MatCol(1,h+=70,"#Supplier# Name",0,SupName,true,0);
   MatCol(t,h+=100,"Comment",0,Comment,false,0);// Edit ************************** Tuesday, 26 May 2015 13:46:50
@@ -3061,7 +3082,7 @@ begin
   Integer pos;
 
   WindowBegin("#Purchase Invoice#",VIDClass,CGview,-);
-  SetWRect(20,80,950,460);
+  SetWRect(20,80,1050,460);
   if (IsEnterprise==false) and (HasModNL==false) then begin
   end else begin
     Sizeable(-1,-1,0,0);
@@ -3476,7 +3497,8 @@ begin
         MatCol(t,230,"Expences",0,Exp,false,ObjExpSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
         MatCol(t,290,"Supplier",0,Supp,false,ObjSuppSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
         MatCol(t,350,"Foundation",0,Found,false,ObjFoundSClass);//Edit---------------Vitalii 14:15 04.08.2015
-        MatCol(t,410,"Location",0,Loc,false,ObjLocSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
+        MatCol(t,410,"Donor",0,Donor,false,ObjDonorSClass);// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 11 February 2020 17:21:01
+        MatCol(t,470,"Location",0,Loc,false,ObjLocSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
       end;
       MatCol(t,470,"Suppl. Name",0,SupName,false,0);
       MatCol(t,600,"Description",0,Comment,false,0);
@@ -5523,4 +5545,111 @@ real h,v,vs,h1;
 		SetWRect(20,80,450,250);
 		v = 20; vs = 20; h = 120;
 	EndWindow;
+end;
+
+
+window TBBUInDClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,h1,h2,h3,t,v,vm,vs;
+  Integer tnr;
+
+  WindowBegin("Income Budget",TBBUInDClass,CGview,-);
+  SetWRect(20,80,900,410);
+  Sizeable(900,-1,0,0);
+  UseView(TBBUInVc);
+  vs=20; h=100; h2=260; h1=50;
+  Tile(0,90,false,"",PRCode);
+  EditField(h,v=6,80, "Project",St_i,PRCode,false,PRSClass);
+  EditField(h2,v,240, "Description",Normal,PRName,false,0);
+  EditField(h,v+=vs,80, "Customer",St_i,CustCode,false,CUSClass);
+  EditField(h2,v,240, "Name",Normal,CustName,false,0);
+  EditField(h,v+=vs,80, "Trans. Date",Normal,TransDate,false,PasteCurDate);
+  EnterSkip(Math);
+  tnr = 1;
+  TileButton(tnr,"Items"); tnr = tnr + 1;
+  tnr = 1;
+  Tile(tnr,120,true,tnr,Math); tnr = tnr + 1;
+  v=6; h = 20;
+  MatrixBegin(h,vm=(v+=16),-50,-56,-,999);
+  MatTypedRow(stp);
+  Flip(0);
+  MatText(t=9,30,"Subtotal",true);
+  MatCol(t,100,"",0,Spec,false,0);
+  MatCol(t,-140,"Sum",0,Sum,true,0);
+  MatCol(t,-70,"Cost",0,Cost,true,0);
+  MatText(t=17,30,"Header",true);
+  MatCol(t,100,"",0,Spec,false,0);
+  MatText(t=18,30,"Quartal",true);// Edit ************************** Friday, 22 May 2015 10:12:52
+  MatCol(t,100,"",0,Spec,false,0);// Edit ************************** Friday, 22 May 2015 10:13:17
+  MatCol(1,30,"Item",0,ArtCode,false,CLCorspSClass);// Edit ************************** Thursday, 18 June 2015 17:57:24
+  MatCol(1,100,"Extras",0,Extras,false,ExtSClass);
+  MatCol(1,150,"Suppl",0,VECode,false,VESClass);
+  MatCol(1,200,"Name",0,VEName,false,0);
+  MatCol(1,h=-370,"Donator",0,ExtraObj,true,ObjDonorSClass);
+  MatCol(t=kInvoiceRowTypeStructuredItemComponent,30,"Item",0,ArtCode,false,INSClass);
+  MatCol(t,100,"Person",0,EMCode,false,UserSClass);
+  MatCol(t,200,"Description",0,Comment,false,0);
+  MatCol(t=1,h+=60,"Description",0,Comment,false,0);
+  Flip(1);
+  MatCol(t,-160,"Month Sum",0,MonthSum,true,0);
+  MatCol(t,-80,"Quart Sum",0,Price,true,0);
+  MatCol(t=kInvoiceRowTypeStructuredItemComponent,-285,"Price",0,Price,true,0);
+  MatCol(t,-215,"%",0,Discount,true,0);
+  MatCol(t,-175,"Sum",0,Sum,true,0);
+  MatCol(t,-100,"Phase",0,PRStage,false,PRStageSClass);
+  MatCol(t,-50,"Sign",0,PRStageSign,false,UserSClass);
+  
+  
+  DeleteRowTest;
+  RowMenuBegin("");
+  RowMenuItem(0,"Item Status",'I','I',0,"ItemStatusTBBUDsm");
+  RowMenuItem(0,"Add Header Line",' ',' ',0,"HeaderLineTBBUDsm");
+  RowMenuItem(0,"Add Subtotal Line",' ',' ',0,"SubtotalTBBUDsm");
+  RowMenuItem(0,"--------",' ',' ',0,"HeaderLine0TBBUDsm");
+  RowMenuItem(0,"Add Quartal I Line",' ',' ',0,"HeaderLine1TBBUDsm");
+  RowMenuItem(0,"Add Quartal II Line",' ',' ',0,"HeaderLine2TBBUDsm");
+  RowMenuItem(0,"Add Quartal III Line",' ',' ',0,"HeaderLine3TBBUDsm");
+  RowMenuItem(0,"Add Quartal IV Line",' ',' ',0,"HeaderLine4TBBUDsm");
+  EndRowMenu;
+  EndMatrix;
+  vs = 22;
+  v = 18; VTab(-35,v,-16,v+vs,ToolFlip,1,"A");
+
+  EditField(580,-25,80, "Total Sum",Normal,TotSum,true,0);
+  
+  SpecialMenu("Add Quartal I Line",'1',3,"HeaderLine1TBBUInDsm");
+	SpecialMenu("Add Quartal II Line",'2',4,"HeaderLine2TBBUInDsm");  
+	SpecialMenu("Add Quartal III Line",'3',5,"HeaderLine3TBBUInDsm");
+	SpecialMenu("Add Quartal IV Line",'4',6,"HeaderLine4TBBUInDsm");	
+	
+  SpecialMenu("Copy Quartal",'Q',7,"CopyQuartInDsm");//Edit-------------------Vitalii 17:14 10.02.2016
+
+
+
+  EndWindow;
+end;
+
+
+window TBBUInLClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Income Budgets",TBBUInLClass,CGmlist,-);
+  SpawnClass(TBBUInDClass);
+  SetWRect(64,80,840,298);
+  Sizeable(-1,-1,0,0);
+  UseView(TBBUInVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,    "Project",PRCode,false,MainKey);
+  RlColKey(81,81,"Date",TransDate,false,TransDate);
+  RlColKey(155,155,"User",SalesMan,false,SalesMan);
+  RlColKey(220,220,"Name",PRName,false,PRName);
+  RlColKey(-210,-210,"Cust.",CustCode,false,CustCode);
+  RlColKey(-160,-160,"Cust. Name",CustName,false,CustName);
+  RlCol(-85,-35,"Total",TotSum,true);
+  SearchField("Search");
+  if (HasLimitedAccess) then begin
+    BrowseSubsetButton(-40,-15);
+  end;
+  EndWindow;
 end;

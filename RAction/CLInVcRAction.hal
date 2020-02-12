@@ -27,6 +27,9 @@ string 200 objstr;
 		if(nonblank(CLInrw.Found))then begin
 			objstr = objstr & "," & CLInrw.Found;
 		end;
+		if(nonblank(CLInrw.Donor))then begin
+			objstr = objstr & "," & CLInrw.Donor;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 11 February 2020 17:18:32
+		end;
 		if(nonblank(CLInrw.Loc))then begin
 			objstr = objstr & "," & CLInrw.Loc;
 		end;

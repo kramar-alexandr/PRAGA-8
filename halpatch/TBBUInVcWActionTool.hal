@@ -1,0 +1,673 @@
+external function Boolean HasApprovals();
+external procedure RowCalculateTaxMatrix_POVc(var record POVc,Integer,row POVc);
+external procedure RowCalculateTaxMatrix_ORVc(var record ORVc,Integer,row ORVc);
+external procedure ORDchsum(var record ORVc,Integer);
+external function Boolean ORDchrsum(var record ORVc,Integer);
+external function string 255 FillupTaxMatrix(Integer,string,string,string,string,string,var record TaxMatrixVc);
+external function Boolean POVc_PasteArtCode(var record POVc,Integer,Boolean);
+external procedure GetDatePriceBasedOn(string,Date,Date,string,var Date);
+external function Boolean GetItemPriceDiscount3(string,val,var record INVc,string,val,val,val,val,val,string,string,string,string,
+                                                var val,var string,var val,var string,var val,var string,Integer,var Boolean,Date,Time,
+                                                string,Boolean,var Boolean,string,var string,var val,string,string,var string);
+external function string 20 GetTax2Acc(string);
+external procedure GetTaxesDiscounts(string,Date,string,string,var val,var val);
+external function Boolean GetTimeClassPrice(string,string,var val,var val);
+external function val MulRateToBase1(var string,val,val,val,val,val,val,roundmode);
+external function Integer TypeOfCurncy(var string,var Integer);
+external function Boolean HasSalesmanChanged(string,string);
+external function string 60 AddObjectToObjectList(string,string);
+external procedure ExtractObj(string,var Integer,var string);
+external function val DivRateToBase1(string,val,val,val,val,val,val,roundmode);
+external function val DivWithRateToBase1(string,Date,val,roundmode);
+external procedure TBBUInDchrsum(var record TBBUInVc,Integer,Boolean,Integer);
+external procedure TBBUInSumup(var record TBBUInVc);
+external procedure GetFullCurncyRate (var string,Date,var val,var val,var val,var val,var val);
+external function Boolean OtherExchangeRate(val,val,val,val,val,val,val,val,val,val);
+external procedure SaveExchangeRate(val,val,val,val,val,var val,var val,var val,var val,var val);
+external function string 255 FindINObjects(string,string);
+external function Boolean GetItemNameStr(Integer,var string,string,string,string);
+external procedure GetProjectPrice(string,string,string,string,string,val,var val,var val,var string,var val,var string);
+external function Boolean GetFirstItem(var string,var record INVc);
+external procedure GetItemSalesAcc(string,Integer,var string);
+external function Boolean PasteCustInOR(var record ORVc);
+external procedure CalcSum(val,val,val,val,var val,Integer);
+external procedure GetItemVATCode(string,Integer,var string,Boolean);
+external procedure RoundRowSum(string,string,string,var val);
+external procedure POSumup(var record POVc);
+external procedure ORSumup(var record ORVc);
+external function Boolean ORDchrsum(var record ORVc,Integer);
+external procedure ORDchsum(var record ORVc,Integer);
+
+function Boolean CheckPOPRITHandle(record INVc INp,Integer ItemType,record PRITHandleBlock PRITRecp)
+BEGIN
+  Boolean res;
+  
+  if (ItemType==0) then begin
+    if (INp.ItemMaterial==0) then begin
+      if (PRITRecp.AllowPO!=0) then begin res = true; end;
+    end;
+  end;  
+  if (ItemType==1) then begin
+    if ((PRITRecp.StockItem==1) or (PRITRecp.StockItem==3)) then begin res = true; end;
+  end;
+  if (ItemType==2) then begin
+    if (PRITRecp.AllowPO!=0) then begin res = true; end;
+  end;  
+  CheckPOPRITHandle = res;
+  RETURN;
+END;
+
+procedure PutOnPORow2(record POVc POp,row POVc POrwp,var Integer porownr,row TBBUInVc TBBUInrwp,record TBBUInVc TBBUInp,record INVc INp,string vevatcode,Integer exportflag,var vector val remqtys)
+BEGIN
+  string 255 tstr;
+  val qty;
+  Integer oldstyle;
+  record TaxMatrixVc TMr;
+  
+  if (TBBUInrwp.Qty<=remqtys[TBBUInrwp.ArtCode]) then begin
+    qty = TBBUInrwp.Qty;
+  end else begin
+    qty = remqtys[TBBUInrwp.ArtCode];
+  end;
+  if (qty<=0) then begin
+    goto LPutOnPORow2;
+  end;
+  
+  ClearRow(POp,POrwp,1);
+  POrwp.ArtCode = TBBUInrwp.ArtCode;
+  MatRowPut(POp,porownr,POrwp);
+  POVc_PasteArtCode(POp,porownr,false);
+  MatRowGet(POp,porownr,POrwp);
+
+  POrwp.ArtCode = TBBUInrwp.ArtCode;
+  POrwp.Spec = TBBUInrwp.Comment;
+  POrwp.Objects = TBBUInrwp.Objects;
+  POrwp.PRCode = TBBUInp.PRCode;
+  POrwp.Quant = qty;
+  POrwp.VEQuant = qty;
+  if (TBBUInrwp.Cost==0) then begin
+    if (TypeOfCurncy(TBBUInp.CurncyCode,oldstyle)!=1) and (nonblank(TBBUInp.CurncyCode)) then begin
+      POrwp.Price = MulRateToBase1(TBBUInp.CurncyCode,TBBUInrwp.Price,TBBUInp.FrRate,TBBUInp.ToRateB1,TBBUInp.ToRateB2,TBBUInp.BaseRate1,TBBUInp.BaseRate2,DefaultCurRoundOff);
+    end else begin
+      POrwp.Price = TBBUInrwp.Price;
+    end;
+  end else begin
+    POrwp.Price = TBBUInrwp.Cost;
+  end;
+  POrwp.vRebate = blankval;
+  POrwp.Sum = TBBUInrwp.Sum;
+  POrwp.PriceFactor = INp.PriceFactor;
+  POrwp.VATCode = vevatcode;
+  if (blank(POrwp.VATCode)) then begin
+    GetItemVATCode(POrwp.ArtCode,exportflag,tstr,false);
+    POrwp.VATCode = tstr;
+  end;    
+  MatRowPut(POp,porownr,POrwp);
+  MatRowGet(POp,porownr,POrwp);
+  CalcSum(POrwp.Quant,POrwp.Price,POrwp.PriceFactor,POrwp.vRebate,POrwp.Sum,0);
+  RoundRowSum(POp.CurncyCode,POp.PayDeal,"POVc",POrwp.Sum);
+  RowCalculateTaxMatrix_POVc(POp,porownr,POrwp);
+  MatRowPut(POp,porownr,POrwp);
+  porownr = porownr + 1;
+  remqtys[TBBUInrwp.ArtCode] = remqtys[TBBUInrwp.ArtCode] - qty;
+LPutOnPORow2:;
+  RETURN;
+END;
+
+procedure PutOnPORow(record POVc POp,row POVc POrwp,var Integer porownr,row TBBUInVc TBBUInrwp,record TBBUInVc TBBUInp,record INVc INp,string vevatcode,Integer exportflag)
+begin
+  vector val remqtys;
+  
+  remqtys[TBBUInrwp.ArtCode] = TBBUInrwp.Qty;
+  PutOnPORow2(POp,POrwp,porownr,TBBUInrwp,TBBUInp,INp,vevatcode,exportflag,remqtys);
+end;
+
+procedure PasteTBBUInInPOGetRemainingQuantities(record TBBUInVc TBBUInr,var vector val remqtys)
+begin
+  row TBBUInVc TBBUInrw;
+  record POVc POr;
+  row POVc POrw;
+  record RLinkVc RLr;
+  Integer i,rwcnt,ponr;
+  
+  rwcnt = MatRowCnt(TBBUInr);
+  for (i = 0; i<rwcnt; i = i + 1) begin
+    MatRowGet(TBBUInr,i,TBBUInrw);
+    if (nonblank(TBBUInrw.ArtCode)) then begin
+      remqtys[TBBUInrw.ArtCode] = remqtys[TBBUInrw.ArtCode] + TBBUInrw.Qty;
+    end;
+  end;
+  
+  ponr = 1;
+  while (ReadRecordLink(TBBUInr,ponr,POr,RLr)) begin
+    rwcnt = MatRowCnt(POr);
+    for (i = 0; i<rwcnt; i = i + 1) begin
+      MatRowGet(POr,i,POrw);
+      if (nonblank(POrw.ArtCode)) then begin
+        remqtys[POrw.ArtCode] = remqtys[POrw.ArtCode] - POrw.Quant;
+      end;
+    end;
+    ponr = ponr + 1;
+  end;
+end;
+
+global
+procedure PasteTBBUInInPO(record TBBUInVc TBBUInp,var record POVc POp)
+BEGIN
+  Integer rwcnt,i;
+  record CUVc VEr;
+  row TBBUInVc TBBUInrw;
+  row POVc POrw;
+  Integer porownr;
+  record PRITHandleBlock PRITRec;
+  record INVc INr;
+  val t;
+  record PRVc PRr;
+  vector val remqtys;
+  
+  BlockLoad(PRITRec);  
+  POp.PRCode = TBBUInp.PRCode;
+  POp.Comment = TBBUInp.Comment;
+  PRr.Code = TBBUInp.PRCode;
+  if (ReadFirstMain(PRr,1,true)) then begin
+    POp.Objects = PRr.Objects;
+  end;
+  PasteTBBUInInPOGetRemainingQuantities(TBBUInp,remqtys);
+  rwcnt = MatRowCnt(TBBUInp);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(TBBUInp,i,TBBUInrw);    
+    if (blank(VEr.Code)) then begin
+      VEr.Code = POp.VECode;
+      if (ReadFirstMain(VEr,1,true)) then begin end;
+    end;
+    INr.Code = TBBUInrw.ArtCode;
+    if (ReadFirstMain(INr,1,true)) then begin
+      if (CheckPOPRITHandle(INr,TBBUInrw.ItemType,PRITRec)) then begin
+        PutOnPORow2(POp,POrw,porownr,TBBUInrw,TBBUInp,INr,VEr.VEVATCode,POp.ExportFlag,remqtys);
+      end;
+    end;
+  end;     
+  POSumup(POp);    
+  RETURN;
+END;
+
+function Boolean CheckORPRITHandle(string artcode,Integer ItemType,record PRITHandleBlock PRITRecp)
+BEGIN
+  Boolean res;
+  record INVc INr;
+  
+  if (ItemType==0) then begin
+    INr.Code = artcode;
+    if (ReadFirstMain(INr,1,true)) then begin
+      if (INr.ItemMaterial==0) then begin
+        if (PRITRecp.AllowSO!=0) then begin res = true; end;
+      end;
+    end;
+  end;  
+  if (ItemType==1) then begin
+    if ((PRITRecp.StockItem==0) or (PRITRecp.StockItem==3)) then begin res = true; end;
+  end;
+  if (ItemType==2) then begin
+    if (PRITRecp.AllowSO!=0) then begin res = true; end;
+  end;  
+  CheckORPRITHandle = res;
+  RETURN;
+END;
+
+procedure PutOnORORow2(record ORVc ORp,row ORVc ORrwp,row TBBUInVc TBBUInrwp,string prcode,string CustVATCode,Integer exportflag,var Integer orrownr,var vector val remqtys)
+begin
+  record INVc INr;
+  val t,s,price,vreb,baseprice,temp,tax2prc,tax2reb,qty;
+  string 255 curitemname,salesacc,vatcode,tstr,tax2code,location,taxtemplatecode;
+  Boolean calcprice;
+  Date orddate;
+  Boolean dummyf;
+  Time blankt;
+  record TaxMatrixVc TMr;
+  
+  if (TBBUInrwp.Qty<=remqtys[TBBUInrwp.ArtCode]) then begin
+    qty = TBBUInrwp.Qty;
+  end else begin
+    qty = remqtys[TBBUInrwp.ArtCode];
+  end;
+  if (qty<=0) then begin
+    goto LPutOnORORow2;
+  end;
+
+  GetDatePriceBasedOn(ORp.CustCode,ORp.OrdDate,ORp.DespatchDate,ORp.PlanShip,orddate);
+  if (GetItemPriceDiscount3(TBBUInrwp.ArtCode,qty,INr,ORp.CurncyCode,
+                            ORp.FrRate,ORp.ToRateB1,ORp.ToRateB2,ORp.BaseRate1,ORp.BaseRate2,
+                            ORp.LangCode,ORp.CustCat,ORp.PriceList,ORp.RebCode,
+                            price,curitemname,vreb,vatcode,baseprice,salesacc,
+                            ORp.ExportFlag,calcprice,orddate,blankt,ORp.CustCode,true,dummyf,ORp.PayDeal,tax2code,tax2prc,ORp.Region,location,taxtemplatecode)) then begin
+    ClearRow(ORp,ORrwp,1);
+    ORrwp.TaxTemplateCode = FillupTaxMatrix(0,ORp.BranchID,ORp.CustCode,ORp.CustCat,ORp.DelAddrCode,taxtemplatecode,TMr);
+    ORrwp.ArtCode = TBBUInrwp.ArtCode;
+    ORrwp.Spec = TBBUInrwp.Comment;
+    ORrwp.Objects = TBBUInrwp.Objects;
+    ORrwp.Quant = qty;
+    ORrwp.Price = TBBUInrwp.Price;
+    ORrwp.vRebate = TBBUInrwp.Discount;
+    ORrwp.Sum = TBBUInrwp.Sum;
+    ORrwp.VATCode = CustVATCode;
+    ORrwp.BasePrice = TBBUInrwp.Cost;
+    ORrwp.rowGP = TBBUInrwp.GP;
+    ORrwp.PriceFactor = INr.PriceFactor;
+    GetItemSalesAcc(ORrwp.ArtCode,exportflag,tstr);
+    ORrwp.SalesAcc = tstr;
+    if (blank(ORrwp.VATCode)) then begin
+      GetItemVATCode(ORrwp.ArtCode,exportflag,tstr,true);
+      ORrwp.VATCode = tstr;
+    end;  
+
+    GetTaxesDiscounts(ORp.CustCode,ORp.OrdDate,ORrwp.VATCode,tax2code,t,tax2reb);
+    if (ORp.NoTax2==0) then begin
+      ORrwp.TAX2Code = tax2code;
+      ORrwp.TAX2Prc = tax2prc;
+      ORrwp.TAX2Reb = tax2reb;
+      ORrwp.TAX2Acc = GetTax2Acc(ORrwp.TAX2Code);
+    end;
+    if (ORp.NoTax1==0) then begin
+      ORrwp.TAX1Reb = t;
+    end;
+    PackRowFieldMatrix(ORrwp,"TaxMatrix",TMr);
+    MatRowPut(ORp,orrownr,ORrwp);
+    RowCalculateTaxMatrix_ORVc(ORp,orrownr,ORrwp);
+    MatRowPut(ORp,orrownr,ORrwp);
+    if (ORDchrsum(ORp,orrownr)) then begin
+      ORDchsum(ORp,orrownr);
+    end;
+    orrownr = orrownr + 1;
+    remqtys[TBBUInrwp.ArtCode] = remqtys[TBBUInrwp.ArtCode] - qty;
+  end;
+LPutOnORORow2:;
+  return;
+end;
+
+procedure PutOnORORow(record ORVc ORp,row ORVc ORrwp,row TBBUInVc TBBUInrwp,string prcode,string CustVATCode,Integer exportflag,var Integer orrownr)
+begin
+  vector val remqtys;
+  
+  remqtys[TBBUInrwp.ArtCode] = TBBUInrwp.Qty;
+  PutOnORORow2(ORp,ORrwp,TBBUInrwp,prcode,CustVATCode,exportflag,orrownr,remqtys);
+end;
+
+procedure PasteTBBUInInORGetRemainingQuantities(record TBBUInVc TBBUInr,var vector val remqtys)
+begin
+  row TBBUInVc TBBUInrw;
+  record ORVc ORr;
+  row ORVc ORrw;
+  record RLinkVc RLr;
+  Integer i,rwcnt,ornr;
+  
+  rwcnt = MatRowCnt(TBBUInr);
+  for (i = 0; i<rwcnt; i = i + 1) begin
+    MatRowGet(TBBUInr,i,TBBUInrw);
+    if (nonblank(TBBUInrw.ArtCode)) then begin
+      remqtys[TBBUInrw.ArtCode] = remqtys[TBBUInrw.ArtCode] + TBBUInrw.Qty;
+    end;
+  end;
+  
+  ornr = 1;
+  while (ReadRecordLink(TBBUInr,ornr,ORr,RLr)) begin
+    rwcnt = MatRowCnt(ORr);
+    for (i = 0; i<rwcnt; i = i + 1) begin
+      MatRowGet(ORr,i,ORrw);
+      if (nonblank(ORrw.ArtCode)) then begin
+        remqtys[ORrw.ArtCode] = remqtys[ORrw.ArtCode] - ORrw.Quant;
+      end;
+    end;
+    ornr = ornr + 1;
+  end;
+end;
+
+global
+procedure PasteTBBUInInOR(record TBBUInVc TBBUInp,var record ORVc ORp)
+BEGIN
+  Integer rwcnt,i;
+  row TBBUInVc TBBUInrw;
+  row ORVc ORrw;
+  Integer orrownr;
+  record PRITHandleBlock PRITRec;
+  record PRVc PRr;
+  vector val remqtys;
+  
+  BlockLoad(PRITRec);  
+  ORp.CustCode = TBBUInp.CustCode;
+  if (PasteCustInOR(ORp)) then begin end;
+  PRr.Code = TBBUInp.PRCode;
+  ReadFirstMain(PRr,1,true);
+  ORp.Objects = AddObjectToObjectList(ORp.Objects,PRr.Objects);                
+  ORp.PRCode = TBBUInp.PRCode;
+  ORp.Comment = TBBUInp.Comment;    
+  ORp.CurncyCode = TBBUInp.CurncyCode;    
+  ORp.FrRate = TBBUInp.FrRate;    
+  ORp.ToRateB1 = TBBUInp.ToRateB1;    
+  ORp.ToRateB2 = TBBUInp.ToRateB2;    
+  ORp.BaseRate1 = TBBUInp.BaseRate1;    
+  ORp.BaseRate2 = TBBUInp.BaseRate2;
+  PasteTBBUInInORGetRemainingQuantities(TBBUInp,remqtys);
+  rwcnt = MatRowCnt(TBBUInp);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(TBBUInp,i,TBBUInrw);
+    if (CheckORPRITHandle(TBBUInrw.ArtCode,TBBUInrw.ItemType,PRITRec)) then begin
+      PutOnORORow2(ORp,ORrw,TBBUInrw,TBBUInp.PRCode,ORp.CustVATCode,ORp.ExportFlag,orrownr,remqtys);
+    end;
+  end;
+  ORSumup(ORp);
+  RETURN;
+END;
+
+procedure TBBUInMultiLineText(record TBBUInVc TBBUInr,record INVc INr,string  langcode,Integer arow)
+begin
+  row TBBUInVc TBBUInrw;
+  string 255 tstr;
+  Integer tcnt;
+ 
+  tcnt = 2;
+  while (GetItemNameStr(tcnt,tstr,langcode,INr.Name,INr.Code)) begin      
+    ClearRow(TBBUInr,TBBUInrw,1);
+    TBBUInrw.Comment = tstr;
+    MatRowInsert(TBBUInr,arow+tcnt-1,TBBUInrw);
+    tcnt = tcnt + 1;
+  end;
+  return;
+end;
+
+global
+procedure TBBUInRowAddPrice(record TBBUInVc TBBUInr,row TBBUInVc TBBUInrw)
+begin
+  string 255 tstr,markup,markupincur;
+  val price,reb,v,priceincur;
+
+  GetProjectPrice(TBBUInr.PRCode,TBBUInrw.ArtCode,TBBUInrw.EMCode,TBBUInrw.TimeClass,"",TBBUInrw.Qty,price,reb,markup,priceincur,markupincur);    
+  TBBUInrw.Discount = reb;
+  if (priceincur!=0) then begin //assumption price is zero
+    TBBUInrw.Price = priceincur;
+    TBBUInrw.Markup = markupincur;
+  end else begin
+    if (nonblank(TBBUInr.CurncyCode)) then begin  
+      if (TBBUInr.FrRate==0 and TBBUInr.ToRateB1==0 and TBBUInr.ToRateB2==0 and TBBUInr.BaseRate1==0 and TBBUInr.BaseRate2==0) then begin
+        TBBUInrw.Price = DivWithRateToBase1(TBBUInr.CurncyCode,CurrentDate,price,DefaultCurRoundOff);
+        if (Mid(markup,len(markup)-1,1)!="%") then begin    
+          markup = DivWithRateToBase1(TBBUInr.CurncyCode,CurrentDate,StringToVal(markup,M4Val),DefaultCurRoundOff);
+        end;
+      end else begin
+        TBBUInrw.Price = DivRateToBase1(TBBUInr.CurncyCode,price,TBBUInr.FrRate,TBBUInr.ToRateB1,TBBUInr.ToRateB2,TBBUInr.BaseRate1,TBBUInr.BaseRate2,DefaultCurRoundOff);
+        if (Mid(markup,len(markup)-1,1)!="%") then begin    
+          markup = DivRateToBase1(TBBUInr.CurncyCode,StringToVal(markup,M4Val),TBBUInr.FrRate,TBBUInr.ToRateB1,TBBUInr.ToRateB2,TBBUInr.BaseRate1,TBBUInr.BaseRate2,DefaultCurRoundOff);
+        end;
+      end;
+    end else begin
+      TBBUInrw.Price = price;
+    end;
+    TBBUInrw.Markup = markup;
+  end;
+  if (TBBUInrw.Discount==0) then begin TBBUInrw.Discount = blankval; end;
+  return;
+end;
+
+global
+function Boolean TBBUInVc_PasteArtCode(var record TBBUInVc TBBUInr,Integer rownr,var string inmsg)
+begin
+  Boolean res;
+  record CUVc CUr;
+  row TBBUInVc TBBUInrw;
+  string 255 tstr,markup,markupincur;
+  val price,reb,v,priceincur;
+  record INVc INr;
+  Time blankt;
+  val cost,t,s,vreb,baseprice,temp,tax2prc,tax2reb;
+  string 255 curitemname,salesacc,vatcode,tax2code,location,taxtemplatecode;
+  Boolean calcprice;
+  Boolean pritemf;
+  Boolean dummyf,varf2;
+  record TaxMatrixVc TMr;
+  
+  inmsg = "";
+  MatRowGet(TBBUInr,rownr,TBBUInrw);
+  if (nonblank(TBBUInrw.ArtCode)) then begin
+    if (GetFirstItem(TBBUInrw.ArtCode,INr)) then begin
+      TBBUInrw.ArtCode = INr.Code;
+      if (nonblank(INr.WarnText1)) then begin
+        inmsg = INr.WarnText1;
+      end;
+      if (INr.ItemType==1) then begin        
+        TBBUInrw.RowType = TBBUInr.BudStocked;
+      end;    
+      if (INr.ItemType==3) then begin        
+        TBBUInrw.RowType = TBBUInr.BudTime;
+      end;    
+      if ((INr.ItemType!=1) and (INr.ItemType!=3)) then begin
+        if (INr.ItemMaterial!=0) then begin
+          TBBUInrw.RowType = TBBUInr.BudMaterial;
+        end else begin
+          TBBUInrw.RowType = TBBUInr.BudOther;
+        end;      
+      end;
+      TBBUInrw.ItemType = INr.ItemType;
+      if (TBBUInrw.ItemType==0) then begin 
+        if (INr.ItemMaterial!=0) then begin            
+          TBBUInrw.ItemType = 5;
+        end;
+      end;      
+      if ((INr.ItemType==2) and (nonblank(INr.Recepy))) then begin
+        TBBUInrw.Recepy = INr.Recepy;
+      end else begin
+        TBBUInrw.Recepy = "";
+      end;    
+      if (GetItemNameStr(1,tstr,TBBUInr.LangCode,INr.Name,INr.Code)) then begin end;
+      TBBUInrw.Comment = tstr;
+      TBBUInrw.Objects = FindINObjects(INr.Objects,INr.Group);
+      MatRowPut(TBBUInr,rownr,TBBUInrw);
+      if ((INr.ExplodeRec==0) or (blank(TBBUInrw.Recepy))) then begin
+        TBBUInMultiLineText(TBBUInr,INr,TBBUInr.LangCode,rownr);
+      end;          
+      res = true;
+    end else begin
+      res = false;
+    end;
+    TBBUInRowAddPrice(TBBUInr,TBBUInrw);
+/*    
+    CUr.Code = TBBUInr.CustCode;
+    if (ReadFirstMain(CUr,1,true)) then begin 
+      if (GetItemPriceDiscount3(INr.Code,1,INr,CUr.CurncyCode,0,0,0,0,0,CUr.LangCode,CUr.CustCat,CUr.PLCode,CUr.RebCode,price,curitemname,reb,vatcode,cost,salesacc,CUr.ExportFlag,calcprice,CurrentDate,blankt,CUr.Code,true,dummyf,CUr.PayDeal,tax2code,tax2prc,"","",taxtemplatecode)) then begin
+        TBBUInrw.Cost = cost;
+      end; 
+    end;  
+*/    
+    MatRowPut(TBBUInr,rownr,TBBUInrw);
+  end;
+  TBBUInVc_PasteArtCode = res;
+  return;
+end;
+
+global
+procedure TBBUInVc_PasteEMCode(var record TBBUInVc TBBUInr,Integer rownr)
+begin
+  row TBBUInVc TBBUInrw;
+  val price,reb,priceincur;
+  string 10 markup,markupincur;
+      
+  MatRowGet(TBBUInr,rownr,TBBUInrw);
+  TBBUInRowAddPrice(TBBUInr,TBBUInrw);
+  MatRowPut(TBBUInr,rownr,TBBUInrw);
+  return;
+end;
+
+global
+function Boolean TBBUInVc_PasteQty(var record TBBUInVc TBBUInr,Integer rownr)
+begin
+  Boolean res;
+  record INVc INr;
+  row TBBUInVc TBBUInrw;
+  val price,reb,v;
+  string 10 markup;
+  
+  MatRowGet(TBBUInr,rownr,TBBUInrw);
+  if (nonblank(TBBUInrw.ArtCode)) then begin
+    INr.Code = TBBUInrw.ArtCode;
+    if (ReadFirstMain(INr,1,true)) then begin
+      if (INr.ExplodeRec==0) then begin
+        if ((INr.ItemType==2) and (nonblank(INr.Recepy))) then begin
+          TBBUInrw.Recepy = INr.Recepy;
+        end else begin
+          TBBUInrw.Recepy = "";
+        end;
+      end;
+    end;
+    TBBUInRowAddPrice(TBBUInr,TBBUInrw);
+    MatRowPut(TBBUInr,rownr,TBBUInrw);
+    res = true;
+  end;
+  TBBUInVc_PasteQty = res;
+  return;
+end;
+    
+global
+procedure TBBUInGetRate(var record TBBUInVc TBBUInp)
+begin
+  val from,to1,to2,base1,base2;
+  string 5 crncy;
+  Date td;
+ 
+  crncy = TBBUInp.CurncyCode;
+  td = TBBUInp.TransDate;
+  if (blankdate(td)) then begin td = CurrentDate; end;
+  GetFullCurncyRate(crncy,td,from,to1,to2,base1,base2);
+  TBBUInp.CurncyCode = crncy;
+  TBBUInp.FrRate = from;
+  TBBUInp.ToRateB1 = to1;
+  TBBUInp.ToRateB2 = to2;
+  TBBUInp.BaseRate1 = base1;
+  TBBUInp.BaseRate2 = base2;  
+  return;
+end;
+
+global
+procedure TBBUInDUpdatePrices(var record TBBUInVc TBBUInr,Boolean readf)
+begin
+  Integer i,rwcnt;
+  row TBBUInVc TBBUInrw;
+  record INVc INr;
+  val price,reb;
+  string 10 markup;
+  record GeneralOptionBlock GOb;
+
+  BlockLoad(GOb);
+  if (readf) then begin
+    if (ReadFirstMain(TBBUInr,0,true)) then begin end;  
+  end;
+  rwcnt = MatRowCnt(TBBUInr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(TBBUInr,i,TBBUInrw);
+    if (nonblank(TBBUInrw.ArtCode)) then begin
+      INr.Code = TBBUInrw.ArtCode;
+      if (ReadFirstMain(INr,1,true)) then begin
+        TBBUInRowAddPrice(TBBUInr,TBBUInrw);
+        MatRowPut(TBBUInr,i,TBBUInrw);
+        TBBUInDchrsum(TBBUInr,i,true,GOb.UseDiscount);
+      end;
+    end;
+  end;
+  TBBUInSumup(TBBUInr);
+  return;
+end;
+            
+global
+procedure TBBUInVc_PasteCurncyCode(var record TBBUInVc TBBUInp,string oldcurncy,Boolean newratef)
+begin
+  val fr,to1,to2,br1,br2;
+  row TBBUInVc TBBUInrw;
+  string 10 crncy;
+  record ItemSettingBlock ISr;
+  Boolean testf;
+  
+  testf = true;
+  if (testf) then begin
+    if (TBBUInp.CurncyCode!=oldcurncy) or (newratef) then begin
+      BlockLoad(ISr);
+      SaveExchangeRate(TBBUInp.FrRate,TBBUInp.ToRateB1,TBBUInp.ToRateB2,TBBUInp.BaseRate1,TBBUInp.BaseRate2,fr,to1,to2,br1,br2);
+      TBBUInGetRate(TBBUInp);
+      if ((OtherExchangeRate(TBBUInp.FrRate,TBBUInp.ToRateB1,TBBUInp.ToRateB2,TBBUInp.BaseRate1,TBBUInp.BaseRate2,fr,to1,to2,br1,br2)) and (ISr.UpdCurPrWithDate!=0)) then begin 
+        TBBUInDUpdatePrices(TBBUInp,false);
+      end;
+    end;
+  end;
+  return;
+end;
+
+global
+procedure TBBUInVc_PasteSalesMan(var record TBBUInVc TBBUInp,string oldsalesmen)
+begin 
+  record UserVc Userr;
+  string 255 salesman;
+  Integer pos;
+
+  if (HasSalesmanChanged(TBBUInp.SalesMan,oldsalesmen)) then begin
+    TBBUInp.SalesGroup = "";    
+    pos = 0;
+    ExtractObj(TBBUInp.SalesMan,pos,salesman);
+    while (nonblank(salesman)) begin
+      Userr.Code = salesman;
+      if (ReadFirstMain(Userr,1,true)) then begin
+        TBBUInp.SalesGroup = AddObjectToObjectList(TBBUInp.SalesGroup,Userr.SalesGroup);                
+      end;
+      ExtractObj(TBBUInp.SalesMan,pos,salesman);
+    end;
+  end;
+  return;
+end;
+
+global
+procedure TBBUInVc_PastePRCode(var record TBBUInVc TBBUInr)
+begin 
+  record CUVc CUr;
+  record PRVc PRr;
+
+  PRr.Code = TBBUInr.PRCode;
+  if (ReadFirstMain(PRr,1,true)) then begin
+    TBBUInr.PRName = PRr.Name;
+    CUr.Code = PRr.CustCode;
+    if (ReadFirstMain(CUr,1,true)) then begin
+      TBBUInr.CustCode = PRr.CustCode;
+      TBBUInr.CustName = PRr.CustName;
+      TBBUInr.LangCode = PRr.LangCode;
+      TBBUInr.PRLeader = PRr.Leader;
+      TBBUInr.SalesMan = PRr.PrSalesMan;
+      TBBUInr.SalesGroup = PRr.SalesGroup;
+      TBBUInr.Members = PRr.Members;
+      TBBUInr.CurncyCode = PRr.CurncyCode;
+      TBBUInVc_PasteCurncyCode(TBBUInr,"",true);    
+    end;
+  end;
+  return;
+end;
+
+global
+function Boolean TBBUInVc_PasteTimeClass(var record TBBUInVc TBBUInr,Integer rownr)
+begin
+  Boolean res;
+  row TBBUInVc TBBUInrw;
+  val price,cost;
+  string 10 markup;
+  record GeneralOptionBlock GOb;
+  
+  BlockLoad(GOb);
+  MatRowGet(TBBUInr,rownr,TBBUInrw);
+  if (nonblank(TBBUInrw.TimeClass)) then begin
+    price = TBBUInrw.Price;
+    cost = TBBUInrw.Cost;
+    if (GetTimeClassPrice(TBBUInrw.TimeClass,TBBUInrw.ArtCode,price,cost)) then begin
+      TBBUInrw.Price = price;
+      TBBUInrw.Cost = cost;
+      MatRowPut(TBBUInr,rownr,TBBUInrw);
+      TBBUInRowAddPrice(TBBUInr,TBBUInrw);
+      MatRowPut(TBBUInr,rownr,TBBUInrw);
+      TBBUInDchrsum(TBBUInr,rownr,false,GOb.UseDiscount);
+    end;
+  end;
+  TBBUInSumup(TBBUInr);
+  TBBUInVc_PasteTimeClass = res;
+  return;
+end;

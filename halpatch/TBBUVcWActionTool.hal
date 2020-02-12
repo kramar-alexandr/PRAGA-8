@@ -38,7 +38,6 @@ external procedure POSumup(var record POVc);
 external function Boolean SetInSet2(string,string); //Edit***************************Sasha2,10:55 14.10.2014
 external function Boolean POVc_PasteVECode(var record POVc,Boolean); //Edit***************************Sasha2,13:33 14.10.2014
 external function val FindVAT(string,val,Integer,Integer); //Edit***************************Sasha2,10:10 21.10.2014
-external procedure CalcTBBUVcCurrencyPriceAndSum(record TBBUVc,var row TBBUVc,val,val,val,Boolean); //Edit***************************Sasha2,17:16 27.02.2015
 
 
 procedure PutOnPORow(var record POVc POp,row POVc POrwp,var Integer porownr,row TBBUVc TBBUrwp,record TBBUVc TBBUp,record INVc INp,string vevatcode,Integer exportflag)

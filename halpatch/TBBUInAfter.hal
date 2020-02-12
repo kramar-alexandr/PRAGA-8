@@ -1,0 +1,563 @@
+external function Boolean ReadFirstItem(string,var record INVc,Boolean,Boolean);
+remote procedure TBBUInDchrsum(var record TBBUInVc,Integer,Boolean,Integer);
+remote procedure TBBUInVc_PastePRCode(var record TBBUInVc);
+remote procedure TBBUInVc_PasteSalesMan(var record TBBUInVc,string);
+external function val DivRateToBase1(string,val,val,val,val,val,val,roundmode);
+external function val MulRateToBase1(var string,val,val,val,val,val,val,roundmode);
+external function Boolean CheckProjectManager(record PRVc);
+remote procedure TBBUInVc_PasteCurncyCode(var record TBBUInVc,string,Boolean);
+remote function Boolean TBBUInVc_PasteQty(var record TBBUInVc,Integer);
+remote procedure TBBUInVc_PasteEMCode(var record TBBUInVc,Integer);
+remote function Boolean TBBUInVc_PasteArtCode(var record TBBUInVc,Integer,var string);
+external function roundmode SetRoundModeD(Integer);
+external function roundmode DefaultRoundMode();
+external procedure SendArtStat(string,string,string,val,val,val,Date,Integer);
+external procedure CalcProc(val,val,var val);
+external procedure CalcSum(val,val,val,val,var val,Integer);
+external procedure CalcExtra(val,string,var val);
+remote procedure TBBUInSumup(var record TBBUInVc);
+external function Boolean GetItemNameStr(Integer,var string,string,string,string);
+remote updating procedure GenProInvoices(var record RcVc,Boolean);
+external function Boolean UserCanChangePendingRecord(Integer);
+remote updating procedure CopyBudgetToHistory(record TBBUInVc);
+ 
+
+
+function Boolean TBBUInDClassCurncyCodeEFAfter(Integer wn,Boolean changedf)
+begin  
+  record TBBUInVc TBBUInr;
+
+  if (changedf) then begin
+    GetWindowRecord(wn,TBBUInr);
+    if (nonblank(TBBUInr.CurncyCode)) then begin
+      TBBUInVc_PasteCurncyCode(TBBUInr,"",true);
+      PutWindowRecord(wn,TBBUInr);
+    end;
+  end;
+  TBBUInDClassCurncyCodeEFAfter = true;
+  return;
+end;
+ 
+ 
+function Boolean TBBUInDClassPRCodeEFAfter(Integer wn,Integer fn,Integer rownr,Integer changedf)
+begin  
+  record TBBUInVc TBBUInr;
+
+  if (changedf!=0) then begin
+    GetWindowRecord(wn,TBBUInr);
+    TBBUInVc_PastePRCode(TBBUInr);
+    PutWindowRecord(wn,TBBUInr);
+  end;
+  TBBUInDClassPRCodeEFAfter = true;
+  RETURN;
+END;
+ 
+ 
+function Boolean TBBUInDClassCostEFAfter(Integer wn,Integer fn,Integer rownr,Integer changedf)
+begin  
+  record TBBUInVc TBBUInr;
+  row TBBUInVc TBBUInrw;
+  record GeneralOptionBlock GenOptRec;
+
+  if (changedf!=0) then begin
+    BlockLoad(GenOptRec);
+    GetWindowRecord(wn,TBBUInr);
+    TBBUInDchrsum(TBBUInr,rownr,false,GenOptRec.UseDiscount);
+    TBBUInSumup(TBBUInr);
+    PutWindowRecord(wn,TBBUInr);
+  end;
+  TBBUInDClassCostEFAfter = true;
+  return;
+end;
+
+ 
+function Boolean TBBUInDClassArtCodeEFAfter(Integer wn,Integer fn,Integer rownr,Integer changedf)
+begin  
+  record TBBUInVc TBBUInr;
+  row TBBUInVc TBBUInrw;
+  record GeneralOptionBlock GOb;
+  string 255 inmsg;
+  record ObjVc Objr;
+
+  if (changedf!=0) then begin
+    GetWindowRecord(wn,TBBUInr);
+    if (TBBUInVc_PasteArtCode(TBBUInr,rownr,inmsg)) then begin
+      MatRowGet(TBBUInr,rownr,TBBUInrw);
+      if (nonblank(TBBUInrw.ArtCode)) then begin //Edit-------------------Vitalii 16:26 10.02.2016
+        if nonblank(TBBUInrw.Extras) then begin
+          Objr.Code = TBBUInrw.Extras;
+          if (ReadFirstMain(Objr,1,true)) then begin
+            TBBUInrw.Comment = Objr.Comment;
+          end;
+        end;
+        TBBUInrw.Qty = 1;
+        if (nonblank(TBBUInrw.Price)) then begin
+          TBBUInrw.MonthSum = TBBUInrw.Price/3;
+          TBBUInrw.Sum = TBBUInrw.Price*TBBUInrw.Qty;
+        end else begin
+          if (nonblank(TBBUInrw.MonthSum)) then begin
+            TBBUInrw.Price = TBBUInrw.MonthSum*3;
+            TBBUInrw.Sum = TBBUInrw.Price*TBBUInrw.Qty;
+          end else begin
+            if (nonblank(TBBUInrw.Sum)) then begin
+              TBBUInrw.Price = TBBUInrw.Sum/TBBUInrw.Qty;
+              TBBUInrw.MonthSum = TBBUInrw.Price/3;
+            end;
+          end;
+        end;
+        
+        MatRowPut(TBBUInr,rownr,TBBUInrw);
+        if (TBBUInVc_PasteQty(TBBUInr,rownr)) then begin
+          BlockLoad(GOb);
+          TBBUInDchrsum(TBBUInr,rownr,true,GOb.UseDiscount);
+          TBBUInSumup(TBBUInr);
+          PutWindowRecord(wn,TBBUInr);
+        end;
+      end;
+      if (nonblank(inmsg)) then begin
+        MessageBox(0,inmsg);
+      end;
+    end else begin
+      MessageBox(0,USetStr(20860));
+    end;
+  end;
+  TBBUInDClassArtCodeEFAfter = true;
+  return;
+end;
+ 
+function Boolean TBBUInDClassQtyEFAfter(Integer wn,Integer fn,Integer rownr,Integer changedf)
+begin  
+  record TBBUInVc TBBUInr;  
+  row TBBUInVc TBBUInrw;
+  record GeneralOptionBlock GenOptRec;
+
+  if (changedf!=0) then begin
+    BlockLoad(GenOptRec);
+    GetWindowRecord(wn,TBBUInr);
+    if (TBBUInVc_PasteQty(TBBUInr,rownr)) then begin      
+      TBBUInDchrsum(TBBUInr,rownr,true,GenOptRec.UseDiscount);
+      TBBUInSumup(TBBUInr);
+      PutWindowRecord(wn,TBBUInr);          
+    end else begin
+      MatRowGet(TBBUInr,rownr,TBBUInrw);
+      if (nonblank(TBBUInrw.TimeClass)) then begin
+        TBBUInDchrsum(TBBUInr,rownr,true,GenOptRec.UseDiscount);
+        TBBUInSumup(TBBUInr);
+        PutWindowRecord(wn,TBBUInr);
+      end;
+    end;
+  end;  
+  TBBUInDClassQtyEFAfter = true;
+  return;
+end;
+ 
+function Boolean TBBUInDClassPriceEFAfter(Integer wn,Integer fn,Integer rownr,Integer changedf)
+begin  
+  record INVc INr;
+  record TBBUInVc TBBUInr;  
+  row TBBUInVc TBBUInrw;
+  string 255 tstr;
+  val price,reb,v;
+  record GeneralOptionBlock GenOptRec;
+
+  if (changedf!=0) then begin
+    BlockLoad(GenOptRec);
+    GetWindowRecord(wn,TBBUInr);
+    MatRowGet(TBBUInr,rownr,TBBUInrw);
+
+    if ((nonblank(TBBUInrw.ArtCode)) or (nonblank(TBBUInrw.TimeClass))) then begin
+      TBBUInrw.MonthSum = TBBUInrw.Price/3;
+      TBBUInrw.Sum = TBBUInrw.MonthSum*TBBUInrw.Qty;
+      MatRowPut(TBBUInr,rownr,TBBUInrw);
+      TBBUInDchrsum(TBBUInr,rownr,true,GenOptRec.UseDiscount);
+      TBBUInSumup(TBBUInr);
+      PutWindowRecord(wn,TBBUInr);          
+    end;
+  end;  
+  TBBUInDClassPriceEFAfter = true;
+  return;
+end;
+
+function Boolean TBBUInDClassMonthSumEFAfter(Integer wn,Integer fn,Integer rownr,Integer changedf)
+begin  
+  record INVc INr;
+  record TBBUInVc TBBUInr;  
+  row TBBUInVc TBBUInrw;
+  string 255 tstr;
+  val price,reb,v;
+  record GeneralOptionBlock GenOptRec;
+
+  if (changedf!=0) then begin
+    BlockLoad(GenOptRec);
+    GetWindowRecord(wn,TBBUInr);
+    MatRowGet(TBBUInr,rownr,TBBUInrw);
+
+    if ((nonblank(TBBUInrw.ArtCode)) or (nonblank(TBBUInrw.TimeClass))) then begin
+      TBBUInrw.Price = TBBUInrw.MonthSum*3;
+      TBBUInrw.Sum = TBBUInrw.Price*TBBUInrw.Qty;
+      MatRowPut(TBBUInr,rownr,TBBUInrw);
+      TBBUInDchrsum(TBBUInr,rownr,true,GenOptRec.UseDiscount);
+      TBBUInSumup(TBBUInr);
+      PutWindowRecord(wn,TBBUInr);          
+    end;
+  end;  
+  TBBUInDClassMonthSumEFAfter = true;
+  return;
+end;
+
+function Boolean TBBUInDClassSumEFAfter(Integer wn,Integer rownr,Boolean changedf)
+begin  
+  record INVc INr;
+  record TBBUInVc TBBUInr;  
+  row TBBUInVc TBBUInrw;
+  string 255 tstr;
+  val price,reb,v,s;
+  record GeneralOptionBlock GOb;
+
+  if (changedf) then begin
+    GetWindowRecord(wn,TBBUInr);
+    MatRowGet(TBBUInr,rownr,TBBUInrw);
+  
+    if ((TBBUInrw.Qty!=0) and (TBBUInrw.Price!=0)) then begin  
+      BlockLoad(GOb);
+      TBBUInrw.Discount = blankval;
+      CalcSum(TBBUInrw.Qty,TBBUInrw.Price,1,TBBUInrw.Discount,v,GOb.UseDiscount);
+      v = Round(v,SetRoundModeD(2));
+      s = TBBUInrw.Sum;
+      s = v - s;
+      s = s*100;
+      s = s/v;
+      TBBUInrw.Discount = Round(s,SetRoundModeD(1));
+      if (TBBUInrw.Discount==0) then begin TBBUInrw.Discount = blankval; end;
+      MatRowPut(TBBUInr,rownr,TBBUInrw);
+      TBBUInDchrsum(TBBUInr,rownr,true,GOb.UseDiscount);
+      TBBUInSumup(TBBUInr);
+      PutWindowRecord(wn,TBBUInr);          
+    end;
+
+  end;  
+  TBBUInDClassSumEFAfter = true;
+  return;
+end;
+
+function Boolean TBBUInDClassVECodeEFAfter(Integer wn,Integer rownr,Boolean changedf)
+begin  
+  record CUVc CUr;
+  record TBBUInVc TBBUInr;  
+  row TBBUInVc TBBUInrw;
+  if (changedf) then begin
+    GetWindowRecord(wn,TBBUInr);
+    MatRowGet(TBBUInr,rownr,TBBUInrw);
+  
+    if nonblank(TBBUInrw.VECode) then begin  
+      CUr.Code = TBBUInrw.VECode;
+      ReadFirstMain(CUr,1,true);
+      TBBUInrw.VEName = CUr.Name;
+      MatRowPut(TBBUInr,rownr,TBBUInrw);
+      PutWindowRecord(wn,TBBUInr);          
+    end else begin
+      TBBUInrw.VEName = "";
+      MatRowPut(TBBUInr,rownr,TBBUInrw);
+      PutWindowRecord(wn,TBBUInr);          
+    end;
+
+  end;  
+  TBBUInDClassVECodeEFAfter = true;
+  return;
+end;
+
+function Boolean TBBUInDClassExtrasEFAfter(Integer wn,Integer rownr,Boolean changedf)
+begin  
+  record ObjVc Objr;
+  record TBBUInVc TBBUInr;  
+  row TBBUInVc TBBUInrw;
+  
+  if (changedf) then begin
+    GetWindowRecord(wn,TBBUInr);
+    MatRowGet(TBBUInr,rownr,TBBUInrw);
+  
+    if nonblank(TBBUInrw.Extras) then begin  
+      Objr.Code = TBBUInrw.Extras;
+      ReadFirstMain(Objr,1,true);
+      TBBUInrw.Comment = Objr.Comment;
+      MatRowPut(TBBUInr,rownr,TBBUInrw);
+      PutWindowRecord(wn,TBBUInr);          
+    end else begin
+      if nonblank(TBBUInrw.ArtCode) then begin
+        Objr.Code = TBBUInrw.ArtCode;
+        ReadFirstMain(Objr,1,true);
+        TBBUInrw.Comment = Objr.Comment;
+        MatRowPut(TBBUInr,rownr,TBBUInrw);
+        PutWindowRecord(wn,TBBUInr); 
+      end;
+    end;
+  end;
+  
+  TBBUInDClassExtrasEFAfter = true;
+  return;
+end;
+
+global
+function Boolean TBBUInDClassAfterEditField(Integer wn,string fieldname,Integer fn, Integer rownr,Integer changed)
+BEGIN
+  Boolean res;
+
+  switch (fieldname) begin
+    case "Sum": res = TBBUInDClassSumEFAfter(wn,rownr,changed!=0);
+    case "Price": res = TBBUInDClassPriceEFAfter(wn,fn,rownr,changed);
+    case "Qty": res = TBBUInDClassQtyEFAfter(wn,fn,rownr,changed);
+    case "ArtCode": res = TBBUInDClassArtCodeEFAfter(wn,fn,rownr,changed);
+    case "Cost": res = TBBUInDClassCostEFAfter(wn,fn,rownr,changed);
+    case "PRCode": res = TBBUInDClassPRCodeEFAfter(wn,fn,rownr,changed);
+    case "CurncyCode": res = TBBUInDClassCurncyCodeEFAfter(wn,changed!=0);
+    case "TransDate": res = TBBUInDClassCurncyCodeEFAfter(wn,changed!=0);
+    case "VECode": res = TBBUInDClassVECodeEFAfter(wn,rownr,changed!=0);
+    case "MonthSum": res = TBBUInDClassMonthSumEFAfter(wn,fn,rownr,changed);
+    case "Extras": res = TBBUInDClassExtrasEFAfter(wn,rownr,changed);
+  end;
+  TBBUInDClassAfterEditField = res;
+  RETURN;
+END;
+
+
+global
+function Boolean TBBUInDClassSwitchRow(Integer wn,Integer rownr)
+begin        
+  record TBBUInVc TBBUInr;  
+  row TBBUInVc TBBUInrw; 
+  Integer rwcnt;
+  Boolean res;
+  val t,tproc,unitprdisc,s,rowsum,sum;
+  string 255 recepy;
+
+  res = true;
+  GetWindowRecord(wn,TBBUInr);
+  rwcnt = MatRowCnt(TBBUInr);  
+  if ((rownr<rwcnt) and (rownr>=0)) then begin
+    MatRowGet(TBBUInr,rownr,TBBUInrw);
+    t = TBBUInrw.GP;
+    rowsum = TBBUInrw.Sum;
+    CalcProc(rowsum,t,tproc);    
+    unitprdisc = TBBUInrw.Sum/TBBUInrw.Qty;
+    unitprdisc = Round(unitprdisc,DefaultRoundMode);    
+    recepy = TBBUInrw.Recepy;
+
+    SendArtStat(TBBUInrw.ArtCode,"",recepy,t,tproc,unitprdisc,TBBUInr.TransDate,0);
+  end;
+  TBBUInDClassSwitchRow = res;  
+  return;
+end;
+
+procedure AddTBBUInLineType(Integer t,Boolean firstf)
+begin
+  record TBBUInVc TBBUInr;
+  row TBBUInVc TBBUInrw;
+  Integer wn,rownr;
+  
+  wn = CurWindow;
+  GetWindowRecord(wn,TBBUInr);
+//  if (TBBUInr.OKFlag==0) then begin
+    rownr = WindowActiveRow(wn);
+    DeselectWindow(wn,false);
+    if (rownr<0) then begin 
+      if (firstf) then begin
+        rownr = 0;
+      end else begin
+        rownr = MatRowCnt(TBBUInr);
+      end;
+    end;
+    ClearRow(TBBUInr,TBBUInrw,t);
+    TBBUInrw.Spec = "";
+    MatRowInsert(TBBUInr,rownr,TBBUInrw);
+    PutWindowRecord(wn,TBBUInr);
+    WindowFieldGoto(wn,TBBUInr,rownr,"Spec",false);
+//  end;
+  return;
+end;
+
+global
+function Boolean TBBUInDClassOnOverStrike(Integer wn,Integer rownr)
+BEGIN
+  record TBBUInVc TBBUInr;
+
+  if (rownr>=0) then begin
+    GetWindowRecord(wn,TBBUInr);    
+    TBBUInSumup(TBBUInr);
+    PutWindowRecord(wn,TBBUInr);    
+  end;
+  TBBUInDClassOnOverStrike = true;
+  RETURN;
+END;
+
+
+global 
+function Boolean TBBUInDClassDeleteRowTest(Integer wn,Integer rownr)
+begin
+  record TBBUInVc TBBUInr;
+  row TBBUInVc TBBUInrw;
+  Boolean res,puf;
+  record INVc INr;
+  Integer i,rwcnt;
+
+  res = true;
+  switch (WindowState(wn)) begin
+    case Rs_update:
+      GetPrevWindowRecord(wn,TBBUInr);    
+    case Rs_insert:
+      GetWindowRecord(wn,TBBUInr);    
+    case Rs_normal:
+      GetWindowRecord(wn,TBBUInr);    
+  end;
+
+  if (res) then begin
+    MatRowGet(TBBUInr,rownr,TBBUInrw);
+    switch (TBBUInrw.stp) begin
+      case kInvoiceRowTypeStructuredItemComponent:
+        res = false;
+    end;
+  end;
+  if (res) then begin
+    MatRowGet(TBBUInr,rownr,TBBUInrw);
+    if (TBBUInrw.Qty!=0) then begin
+      if (ReadFirstItem(TBBUInrw.ArtCode,INr,false,false)) then begin
+        if (INr.ItemType==kItemTypeStructured) then begin
+          if (INr.ExplodeRec!=0) then begin
+            rwcnt = MatRowCnt(TBBUInr);
+            i = rownr + 1;
+            while (i<rwcnt) begin
+              MatRowGet(TBBUInr,i,TBBUInrw); 
+              if (TBBUInrw.stp==kInvoiceRowTypeStructuredItemComponent) then begin
+                MatRowDelete(TBBUInr,i);
+                puf = true;
+              end else begin
+                i = rwcnt;
+              end;
+            end;
+          end;
+        end;
+      end;
+    end;
+    if (TBBUInrw.Invoiced>0) then begin res = false; end;
+    if (puf) then begin
+      PutWindowRecord(wn,TBBUInr);    
+    end;
+  end;
+LTBBUInDClassDeleteRowTest:;  
+  TBBUInDClassDeleteRowTest = res;
+  return;
+end;
+
+global 
+function Boolean TBBUInDClassInsertRowTest(Integer wn,Integer rownr)
+begin
+  Boolean res;
+  record TBBUInVc TBBUInr;
+  row TBBUInVc TBBUInrw;
+  
+  res = true;
+  switch (WindowState(wn)) begin
+    case Rs_update:
+      GetPrevWindowRecord(wn,TBBUInr);    
+    case Rs_insert:
+      GetWindowRecord(wn,TBBUInr);    
+    case Rs_normal:
+      GetWindowRecord(wn,TBBUInr);    
+  end;
+
+  if (res) then begin
+    MatRowGet(TBBUInr,rownr,TBBUInrw);
+    switch (TBBUInrw.stp) begin
+      case kInvoiceRowTypeStructuredItemComponent:
+        res = false;
+    end;
+  end;
+  TBBUInDClassInsertRowTest = res;
+  return;
+end;
+
+procedure TBBUInDClassSpecPasteNameArtCode(Integer wn,var string psname)
+begin
+  record TBBUInVc TBBUInr;
+  Integer rownr;
+
+  GetWindowRecord(wn,TBBUInr);
+  rownr = WindowActiveRow(wn);
+  DeselectWindow(wn,false);//to get VARINSClass working
+  WindowFieldGoto(wn,TBBUInr,rownr,"ArtCode",false);
+  return;
+end;
+
+global
+function string 40 TBBUInDClassSpecPasteName(Integer wn,string defpsname)
+begin
+  string 40 psname;
+
+  psname = defpsname;
+  switch (WindowActiveField(wn)) begin
+    case "ArtCode": TBBUInDClassSpecPasteNameArtCode(wn,psname);
+  end;
+  TBBUInDClassSpecPasteName = psname;
+  return;
+end;
+
+global
+function Boolean TBBUInDClassActiveEditField(Integer wn,string fieldname,Integer fn,Integer wnst,Integer rownr,Integer changed)
+BEGIN
+  Boolean res;
+  record TBBUInVc TBBUInr;
+  row TBBUInVc TBBUInrw;
+  Integer nwn;
+  
+  res = true;
+  nwn = FindWindow("SelectApproverWClass");
+  if (nwn>0) then begin
+    if (MotherWindow(nwn)==wn) then begin
+      res = false;
+      goto LTBBUInDClassActiveEditField;
+    end;
+  end;
+  GetWindowRecord(wn,TBBUInr);
+
+  switch (fieldname) begin
+  	case "Spec":// Edit ************************** Friday, 3 July 2015 09:52:41 
+    	getwindowrecord(wn,TBBUInr);
+      MatRowGet(TBBUInr,rownr,TBBUInrw);
+      switch (TBBUInrw.stp) begin
+        case 18:
+          res = false;
+      end;// Edit ************************** Friday, 3 July 2015 09:52:40
+    case "Cost": 
+      if (rownr>=0) then begin
+        MatRowGet(TBBUInr,rownr,TBBUInrw);
+        if (nonblank(TBBUInrw.EMCode)) then begin
+          res = false;
+        end;
+      end;
+    case "MotherArtCode": res = false;
+    case "RecipeQuant": res = false;
+    case "Recepy": res = false;
+    case "ArtCode": 
+      MatRowGet(TBBUInr,rownr,TBBUInrw);
+      switch (TBBUInrw.stp) begin
+        case kInvoiceRowTypeStructuredItemComponent:
+          res = false;
+      end;
+    case "Quant": 
+      MatRowGet(TBBUInr,rownr,TBBUInrw);
+      switch (TBBUInrw.stp) begin
+        case kInvoiceRowTypeStructuredItemComponent:
+          res = false;
+      end;
+    case "Comment": 
+      if (HasLocalization("PRT")) then begin
+        MatRowGet(TBBUInr,rownr,TBBUInrw);
+        if (nonblank(TBBUInrw.ArtCode)) then begin
+          res = false;
+        end;
+      end;
+  end;
+LTBBUInDClassActiveEditField:;
+  TBBUInDClassActiveEditField = res;
+  RETURN;
+END;
+

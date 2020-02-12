@@ -1,0 +1,11 @@
+
+global
+Function Boolean ObjDonorSClassOnOpenWindow(Integer wn)
+begin
+  
+	SetWindowSubset(wn,"DONOR");
+  
+  
+  ObjDonorSClassOnOpenWindow = false;
+  return;
+end;

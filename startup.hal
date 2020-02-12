@@ -4,6 +4,7 @@ begin
 	SetLangMode(LangEnglish,"ENG",0);
 	
 	Register("Budgets History","Budgets History",BudgetsHistVc,modTS);		//Edit----------------------Dima  13.07.2015
+	Register("Income Budgets","Income Budgets",TBBUInVc,modTS);// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 11 February 2020 14:39:47
 	Register("Contracts","Contracts",ContractsVc,modPL);		//Edit----------------------Dima  09.02.2016
 	Register("Changes to Contracts","Changes to Contracts",ContrChanVc,modDBMain);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 8 April 2019 16:01:09
   //registers for Excel reports

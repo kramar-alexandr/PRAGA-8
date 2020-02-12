@@ -249,6 +249,7 @@ begin
 		ArrayField(Found,M4UStr,60,ObjVc);
 		ArrayField(SupName,M4Str,100,0);
     ArrayField(Extras,M4UStr,60,ObjVc);//Edit-------------------Vitalii 17:34 18.03.2016
+    ArrayField(Donor,M4UStr,60,ObjVc);// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 11 February 2020 17:14:55
 		SubsetKeyBegin2(SalesMan);	//Edit----------------------Dima  07.08.2015
   	StoreInBaseKey;
   	AppendFieldToKeyName(SalesGroup);
@@ -274,6 +275,7 @@ begin
 		ArrayField(Loc,M4UStr,60,ObjVc);
 		ArrayField(Found,M4UStr,60,ObjVc);
 		ArrayField(SupName,M4Str,100,0);
+		ArrayField(Donor,M4UStr,60,ObjVc);// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 11 February 2020 17:15:28
 	EndRecordAdd;
 
  RecordBegin(ContractsVc,-,"ContractsVc");	//Edit----------------------Dima  09.02.2016
@@ -439,6 +441,131 @@ begin
   ArrayField(LastNo,M4Int,0,0)
   EndArray;
  EndBlock;
+ 
+ RecordBegin(TBBUInVc,-,"");//budjets for incomes
+  RecordField(PRCode,M4Code,20,PRVc);
+  RecordField(PRName,M4Str,60,0);
+  RecordField(Math,M4Matrix,0,0);
+  RecordField(BudTime,M4Int,0,0);
+  RecordField(BudOther,M4Int,0,0);
+  RecordField(SumTime,M4Val,0,0);
+  RecordField(SumOther,M4Val,0,0);
+  RecordField(Text0,M4Str,100,0);
+  RecordField(Text1,M4Str,100,0);
+  RecordField(Text2,M4Str,100,0);
+  RecordField(Text3,M4Str,100,0);
+  RecordField(Text4,M4Str,100,0);
+  RecordField(Text5,M4Str,100,0);
+  RecordField(Text6,M4Str,100,0);
+  RecordField(Text7,M4Str,100,0);
+  RecordField(Text8,M4Str,100,0);
+  RecordField(Text9,M4Str,100,0);
+  RecordField(Comment,M4Str,60,0);
+  RecordField(CustCode,M4Code,20,CUVc);
+  RecordField(CustName,M4Str,60,0);
+  RecordField(BudStocked,M4Int,0,0);
+  RecordField(SumStocked,M4Val,0,0);
+  RecordField(BudMaterial,M4Int,0,0);
+  RecordField(SumMaterial,M4Val,0,0);
+  RecordField(PRLeader,M4Code,10,UserVc); /* PR Leader */
+  RecordField(LangCode,M4Code,5,0);
+  RecordField(Markup,M4PrcStr,10,0);
+  RecordField(SalesGroup,M4UStr,30,SalesGroupVc);
+  FieldIsGroup(SalesGroup);
+  RecordField(TransDate,M4Date,0,0);
+  RecordField(TotSum,M4Val,0,0);
+  RecordField(SalesMan,M4UStr,60,UserVc);
+  FieldIsUser(SalesMan);
+  RecordField(CurncyCode,M4Code,5,CurncyCodeVc);
+  RecordField(FrRate,M4Rate,0,0); 
+  RecordField(ToRateB1,M4Rate,0,0);
+  RecordField(ToRateB2,M4Rate,0,0); 
+  RecordField(BaseRate1,M4Rate,0,0); 
+  RecordField(BaseRate2,M4Rate,0,0); 
+  RecordField(Members,M4UStr,200,0);
+  RecordField(AcceptanceStatus,M4Int,0,0);
+  RecordField(AcceptanceBy,M4List,200,UserVc);
+  RecordField(AcceptanceFYI,M4List,200,UserVc);
+  RecordField(Version,M4Int,0,0);			
+		
+  ArrayBegin(Math,-,1);
+  ArrayField(ArtCode,M4Code,20,INVc);
+  ArrayField(Spec,M4Str,100,0);
+  ArrayField(Qty,M4UVal,0,0);
+  ArrayField(Price,M423Val,0,0);
+  ArrayField(Discount,M4Qty,0,0);
+  ArrayField(Sum,M4Val,0,0);
+  ArrayField(EMCode,M4Code,10,UserVc);
+  ArrayField(RowType,M4Set,12,0);
+  ArrayField(BudType,M4Set,13,0);
+  ArrayField(ItemType,M4Int,0,0);
+  ArrayField(InvAfter,M4Date,0,0);
+  ArrayField(Invoiced,M4Long,0,0);
+  ArrayField(Comment,M4Str,60,0);
+  ArrayField(Cost,M423Val,0,0);
+  ArrayField(GP,M423Val,0,0);
+  ArrayField(TimeClass,M4Code,5,0);
+  ArrayField(Objects,M4UStr,60,ObjVc);
+  ArrayField(InvDate,M4Date,0,0);
+  ArrayField(FromTBQT,M4Int,0,0);
+  ArrayField(stp,M4Int,0,0);
+  ArrayField(Markup,M4PrcStr,10,0);
+  ArrayField(GM,M41Val,0,0);
+  ArrayField(Recepy,M4Code,20,RecVc);
+  ArrayField(JobGroup,M4Code,5,EGVc);
+  ArrayField(PRStage,M4Code,10,PRStageVc);
+  ArrayField(PRStageSign,M4Code,10,UserVc);
+  ArrayField(MotherArtCode,M4Code,20,INVc);
+  ArrayField(RecipeQuant,M4Qty,0,0);
+  ArrayField(VECode,M4Code,20,CUVc);
+	ArrayField(ExtraObj,M4Code,20,ObjVc);
+	ArrayField(VEName,M4Str,200,0);
+	ArrayField(MonthSum,M4Val,0,0);
+	ArrayField(Extras,M4Code,20,ObjVc);
+  
+  EndArray;
+  MainKeyBegin(MainKey,1);
+  StoreInBaseKey;
+  AppendFieldToKeyName(SalesGroup);
+  AppendFieldToKeyName(SalesMan);
+  AppendListFieldToKeyName(Members);
+  KeySegment(PRCode);
+  SubsetKeyBegin2(PRName);
+  StoreInBaseKey;
+  AppendFieldToKeyName(SalesGroup);
+  AppendFieldToKeyName(SalesMan);
+  AppendListFieldToKeyName(Members);
+  KeySegment(PRName);
+  KeySegment(PRCode);
+  SubsetKeyBegin2(CustCode);
+  StoreInBaseKey;
+  AppendFieldToKeyName(SalesGroup);
+  AppendFieldToKeyName(SalesMan);
+  AppendListFieldToKeyName(Members);
+  KeySegment(CustCode);
+  KeySegment(PRCode);
+  SubsetKeyBegin2(CustName);
+  StoreInBaseKey;
+  AppendFieldToKeyName(SalesGroup);
+  AppendFieldToKeyName(SalesMan);
+  AppendListFieldToKeyName(Members);
+  KeySegment(CustName);
+  KeySegment(PRCode);
+  SubsetKeyBegin2(TransDate);
+  StoreInBaseKey;
+  AppendFieldToKeyName(SalesGroup);
+  AppendFieldToKeyName(SalesMan);
+  AppendListFieldToKeyName(Members);
+  KeySegment(TransDate);
+  KeySegment(PRCode);
+  SubsetKeyBegin2(SalesMan);
+  StoreInBaseKey;
+  AppendFieldToKeyName(SalesGroup);
+  AppendFieldToKeyName(SalesMan);
+  AppendListFieldToKeyName(Members);
+  KeySegment(SalesMan);
+  KeySegment(PRCode);
+  EndRecord;
  
 return;  
 end;

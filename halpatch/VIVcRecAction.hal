@@ -1086,6 +1086,9 @@ what the hell?
               if(nonblank(VIrw.Found))then begin
               	objstr = objstr & "," & VIrw.Found;//Edit---------------Vitalii 17:12 04.08.2015
               end;
+              if(nonblank(VIrw.Donor))then begin
+              	objstr = objstr & "," & VIrw.Donor;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 11 February 2020 17:18:08
+              end;
               if(nonblank(VIrw.Extras))then begin
               	objstr = objstr & "," & VIrw.Extras;//Edit---------------Vitalii 17:12 04.08.2015
               end;
