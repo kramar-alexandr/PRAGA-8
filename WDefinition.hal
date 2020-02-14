@@ -2446,7 +2446,8 @@ begin
   EditField(h,v+=vs,-20,"",Normal,Addr4,false,0);
   EditField(h,v+=vs,-20,"Specification",Normal,Comment,false,0);
   if (HasObjects) then begin
-    EditField(h,v+=vs,-20,"Objects",Normal,Objects,false,ObjSClass);
+    EditField(h,v+=vs,200,"Objects",Normal,Objects,false,ObjSClass);
+    EditField(h+250,v,100,"Donor",Normal,Donor,false,ObjDonorSClass);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 February 2020 14:43:22
   end;
 //  CheckBox(20,-20,0,"OK",OKFlag);
   EditField(h,v+=vs,100,"Total",Normal,Total,true,0);
@@ -3500,7 +3501,7 @@ begin
         MatCol(t,410,"Donor",0,Donor,false,ObjDonorSClass);// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 11 February 2020 17:21:01
         MatCol(t,470,"Location",0,Loc,false,ObjLocSClass);// Edit ************************** Wednesday, 15 July 2015 10:28:19
       end;
-      MatCol(t,470,"Suppl. Name",0,SupName,false,0);
+      MatCol(t,530,"Suppl. Name",0,SupName,false,0);
       MatCol(t,600,"Description",0,Comment,false,0);
       MatCol(t,-80,"Amount",0,Sum,true,0);// Edit ************************** Wednesday, 15 July 2015 10:15:50
       /*if (CYb.UseTaxTemplatesforTaxCalc!=0) then begin

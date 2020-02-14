@@ -276,6 +276,7 @@ begin
 		ArrayField(Found,M4UStr,60,ObjVc);
 		ArrayField(SupName,M4Str,100,0);
 		ArrayField(Donor,M4UStr,60,ObjVc);// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 11 February 2020 17:15:28
+		RecordField(Donor,M4UStr,60,ObjVc);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 February 2020 14:42:30
 	EndRecordAdd;
 
  RecordBegin(ContractsVc,-,"ContractsVc");	//Edit----------------------Dima  09.02.2016

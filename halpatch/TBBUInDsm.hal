@@ -1,3 +1,5 @@
+remote procedure TBBUInSumup(var record TBBUInVc);
+
 procedure AddTBBUInLineType18(Integer t,Boolean firstf)
 begin
   record TBBUInVc TBBUInr;
@@ -119,6 +121,7 @@ begin
           rowstoput = rowstoput - 1;
         end;
       end;
+      TBBUInSumup(TBBUInr);
       PutWindowRecord(wn,TBBUInr);
     end;
   end;
