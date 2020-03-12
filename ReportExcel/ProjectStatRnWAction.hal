@@ -92,6 +92,21 @@ begin
 end;
 
 global
+procedure ProjectStat2020RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2020";
+  RepSpec.f3 = "5";
+	RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+
+global
 function Boolean ProjectStat2018RClassOnOpenWindow(Integer wn)
 begin
 	record RcVc RepSpec;
@@ -112,6 +127,20 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2019";
+  RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+function Boolean ProjectStat2020RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2020";
   RepSpec.f3 = "5";
   RepSpec.flags[5] = 1;
 	PutWindowRecord(wn,RepSpec);
@@ -149,6 +178,22 @@ begin
 	return;
 end;
 
+global
+procedure TotalProjectStat2020RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2020";
+	RepSpec.f3 = "5";
+	RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+
 
 global
 function Boolean TotalProjectStat2018RClassOnOpenWindow(Integer wn)
@@ -172,6 +217,21 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
   RepSpec.f2 = "2019";
+	RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+function Boolean TotalProjectStat2020RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2020";
 	RepSpec.f3 = "5";
   RepSpec.flags[5] = 1;
   RepSpec.flags[29] = 1;

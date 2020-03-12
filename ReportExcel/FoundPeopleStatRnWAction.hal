@@ -86,6 +86,19 @@ begin
 end;
 
 global
+procedure FoundPeopleStat2020RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2020";
+	//RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
 function Boolean FoundPeopleStat2018RClassOnOpenWindow(Integer wn)
 begin
 	record RcVc RepSpec;
@@ -105,6 +118,19 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2019";
+	//RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+function Boolean FoundPeopleStat2020RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2020";
 	//RepSpec.flags[5] = 1;
 	PutWindowRecord(wn,RepSpec);
 
