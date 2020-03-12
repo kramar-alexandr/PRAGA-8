@@ -14,7 +14,8 @@ begin
 	boolean printed,TrHs1,testf1;
 	
 	invinperiod[VIr.SerNr] = true;
-	if(VIr.PayDeal>=RepSpec.f1 and VIr.PayDeal<=RepSpec.f2 and dateinrange(VIr.InvDate,RepSpec.d1,RepSpec.d2))then begin
+	//if(VIr.PayDeal>=RepSpec.f1 and VIr.PayDeal<=RepSpec.f2 and dateinrange(VIr.InvDate,RepSpec.d1,RepSpec.d2))then begin
+	if(setinset(VIr.PayDeal,RepSpec.f1) and dateinrange(VIr.InvDate,RepSpec.d1,RepSpec.d2))then begin
 		invinperiod[VIr.SerNr] = true;
 		rwcnt = matrowcnt(VIr);
 		for(i=0;i<rwcnt;i=i+1)begin
@@ -56,7 +57,8 @@ begin
 				if(OPrsr.TransNr>0)then begin
 					OPr.SerNr = OPrsr.TransNr;
 					if(readfirstmain(OPr,1,true))then begin
-						if(OPr.PayMode>=RepSpec.f1 and OPr.PayMode<=RepSpec.f2 and OPr.DoneFlag==1 and OPr.Invalid==0)then begin
+						//if(OPr.PayMode>=RepSpec.f1 and OPr.PayMode<=RepSpec.f2 and OPr.DoneFlag==1 and OPr.Invalid==0)then begin
+						if(setinset(OPr.PayMode,RepSpec.f1) and OPr.DoneFlag==1 and OPr.Invalid==0)then begin
 							invinperiod[VIr.SerNr] = true;
 							if(printed==false)then begin
 								printed = true;
@@ -142,8 +144,8 @@ begin
 	RepSpec.d1 = stringtodate("1/1/2019");
 	RepSpec.d2 = stringtodate("31/12/2019");
 	
-	RepSpec.f1 = "G1";
-	RepSpec.f2 = "G9";
+	RepSpec.f1 = "G1,G2,G3,G4,G5,G6,G7,G8,G9,L1,L2,L3,L4,L5,L6,L7,L8,L9,K1,K2,K3,K4,K5,K6,K7,K8,K9";
+	//RepSpec.f2 = "G9";
 	
 	startformat(15);
 		//outstring(0,0,"Sum in current period",false);
@@ -186,7 +188,8 @@ begin
 		testf = true;
 		if(OPr.TransDate<RepSpec.d1)then begin testf = false; end;
 		if(OPr.TransDate>RepSpec.d2)then begin TrHs = false; testf = false; end;
-		if(OPr.PayMode<RepSpec.f1 or OPr.PayMode>RepSpec.f2)then begin testf = false; end;
+		//if(OPr.PayMode<RepSpec.f1 or OPr.PayMode>RepSpec.f2)then begin testf = false; end;
+		if(!setinset(OPr.PayMode,RepSpec.f1))then begin testf = false; end;
 		if(OPr.DoneFlag==0)then begin testf = false; end;
 		if(OPr.Invalid==1)then begin testf = false; end;
 		
