@@ -144,7 +144,7 @@ BEGIN
 	row TRVc TRrw;
 	integer i,j,k,mtrw,PAi,compi,CBbmtrw,CAi,oldcomp;
 	boolean TrHs,testf,kTestf;
-	string 20 group,extras;
+	string 20 group,extras,donorobj;
   array string 20 prjobjs;
   vector boolean ExtInArr;
   array string 10 tempProjArray;
@@ -272,9 +272,44 @@ BEGIN
                     QuartVect["F;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["F;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
                     QuartVect["F;" & PRr.MotherCode & ";T"]                           = QuartVect["F;" & PRr.MotherCode & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
                   end;
+                  donorobj = "";
+                  GetObjs("DONOR",TRrw.Objects,donorobj);
+                  if(nonblank(donorobj))then begin
+                  	logtext(0,currentcompany & " " & TRr.TransDate & " " & TRr.Comment & " " & TRrw.CredVal + TRrw.DebVal);
+										QuartVect["FS;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
+										QuartVect["FS;" & ProjArray[PAi] & ";T"]                           = QuartVect["FS;" & ProjArray[PAi] & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+										QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                      = QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                      - TRrw.CredVal + TRrw.DebVal;
+										QuartVect["F;T;TS"]                                                = QuartVect["F;T;TS"]                                                - TRrw.CredVal + TRrw.DebVal;
+										if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
+											QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["FS;" & PRr.MotherCode & ";T"]                           = QuartVect["FS;" & PRr.MotherCode & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+										end;
+                  end;
                 end;
               end;
             end;
+            
+            if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="6") and TRr.IntYc==CLInYc) then begin
+              for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+                PRr.Code = ProjArray[PAi];
+                ReadFirstMain(PRr,1,true);
+                if(setinset(prjobjs[PAi],TRrw.Objects)) then begin
+                  donorobj = "";
+                  GetObjs("DONOR",TRrw.Objects,donorobj);
+                  if(nonblank(donorobj))then begin
+										QuartVect["FS;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
+										QuartVect["FS;" & ProjArray[PAi] & ";T"]                           = QuartVect["FS;" & ProjArray[PAi] & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+										QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                      = QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                      - TRrw.CredVal + TRrw.DebVal;
+										QuartVect["F;T;TS"]                                                = QuartVect["F;T;TS"]                                                - TRrw.CredVal + TRrw.DebVal;
+										if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
+											QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["FS;" & PRr.MotherCode & ";T"]                           = QuartVect["FS;" & PRr.MotherCode & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+										end;
+                  end;
+                end;
+              end;
+            end;
+            
           end;
         end;
       end;
@@ -412,6 +447,18 @@ BEGIN
                 QuartVect["F;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["F;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] + tmpval;
                 QuartVect["F;" & PRr.MotherCode & ";T"]                           = QuartVect["F;" & PRr.MotherCode & ";T"] + tmpval;
               end;
+              
+              if(nonblank(VIrw.Donor))then begin
+              	QuartVect["FS;" & PRr.Code & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & PRr.Code & ";" & k & ";" & CBrw.ShortName] + tmpval;
+								QuartVect["FS;" & PRr.Code & ";T"]                           = QuartVect["FS;" & PRr.Code & ";T"] + tmpval;
+								QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                = QuartVect["F;TS;" & k & ";" & CBrw.ShortName] + tmpval;
+								QuartVect["F;T;TS"]                                          = QuartVect["F;T;TS"] + tmpval;
+								if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
+									QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] + tmpval;
+									QuartVect["FS;" & PRr.MotherCode & ";T"]                           = QuartVect["FS;" & PRr.MotherCode & ";T"] + tmpval;
+								end;
+              end;
+              
             end;
           end;
         end;
@@ -445,6 +492,8 @@ BEGIN
 	array string 225 mas;
   area areatofile;
   array val totalbycp,totalall;
+  array val totalbycpr,totalallr;
+  array val totalbycps,totalalls;
   
   logtext(0,"AllPrjAllCompRn");
   
@@ -514,6 +563,13 @@ BEGIN
         sheetColls[colnum] = 12.7109375;
         sheetCollsOutLvl[colnum] = 1;
         colnum = colnum + 1;
+        
+        sheetColls[colnum] = 12.7109375;
+        sheetCollsOutLvl[colnum] = 1;
+        colnum = colnum + 1;
+        sheetColls[colnum] = 12.7109375;
+        sheetCollsOutLvl[colnum] = 1;
+        colnum = colnum + 1;
       end;
     end;
     sheetColls[colnum] = 0.5703125;
@@ -529,6 +585,10 @@ BEGIN
     
     for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
 			sheetColls[colnum] = 13.7109375;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 12.7109375;
+			colnum = colnum + 1;
+			sheetColls[colnum] = 12.7109375;
 			colnum = colnum + 1;
 			sheetColls[colnum] = 12.7109375;
 			colnum = colnum + 1;
@@ -556,7 +616,7 @@ BEGIN
         style = 52;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"All Project - " & RepSpec.f2,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
         style = 20;
-        qtyOfEmpStr = 6 + 2*CompArray.length;
+        qtyOfEmpStr = 6 + 4*CompArray.length;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
       EndRow(sheetnum,fileToSave,rownum);
       rownum = rownum + 1;
@@ -612,7 +672,7 @@ BEGIN
           mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
           style = 70;
           StringCell(sheetnum,fileToSave,colnum,rownum,style,"FACT-" & QuartalIntToStr(quartToPrint[Qi]),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-          qtyOfEmpStr = (CompArray.length-1)*2;
+          qtyOfEmpStr = (CompArray.length-1)*4+2;
           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
           style = 77;
           qtyOfEmpStr = 1;
@@ -631,7 +691,7 @@ BEGIN
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"GRAND TOTAL",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
         qtyOfEmpStr = 4;
         for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:57:09
-					qtyOfEmpStr = qtyOfEmpStr + 2;
+					qtyOfEmpStr = qtyOfEmpStr + 4;
 				end;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
         style = 71;
@@ -669,7 +729,7 @@ BEGIN
             style = 63;
             StringCell(sheetnum,fileToSave,colnum,rownum,style,CompArray[CAi],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
             style = 18;
-            qtyOfEmpStr = 1;
+            qtyOfEmpStr = 3;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
           end;
         end;
@@ -694,7 +754,7 @@ BEGIN
 					style = 63;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,CompArray[CAi],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 					style = 18;
-					qtyOfEmpStr = 1;
+					qtyOfEmpStr = 3;
 					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
 				end;
 				
@@ -739,6 +799,10 @@ BEGIN
             style = 19;
             qtyOfEmpStr = 1;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 19;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donation rsvd",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            style = 19;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donation spent",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
           end;
         end;
         style = 23;
@@ -760,6 +824,10 @@ BEGIN
             style = 19;
             qtyOfEmpStr = 1;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            style = 19;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donation rsvd",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            style = 19;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donation spent",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
 				end;
         
         style = 31;
@@ -803,6 +871,14 @@ BEGIN
                 style = 6;
                 qtyOfEmpStr = 1;
                 EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                style = 15;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["FR;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]]);
+                totalbycpr[CAi] = totalbycpr[CAi] + QuartVect["FR;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
+                totalallr[CAi] = totalallr[CAi] + QuartVect["FR;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];
+								style = 15;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["FS;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]]);
+                totalbycps[CAi] = totalbycps[CAi] + QuartVect["FS;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
+                totalalls[CAi] = totalalls[CAi] + QuartVect["FS;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];                
               end;
             end;
             style = 53;
@@ -823,6 +899,12 @@ BEGIN
                 style = 6;
                 qtyOfEmpStr = 1;
                 EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                style = 15;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbycpr[CAi]);
+                totalbycpr[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
+                style = 15;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbycps[CAi]);
+                totalbycps[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
 						end;
 						style = 56;
             NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;" & ProjArray[PAi] & ";T"]);
@@ -860,6 +942,12 @@ BEGIN
                 style = 16;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]]);
                 totalbycp[CAi] = totalbycp[CAi] + QuartVect["F;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
+              	style = 16;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["FR;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]]);
+                totalbycpr[CAi] = totalbycpr[CAi] + QuartVect["FR;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13
+                style = 16;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["FS;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]]);
+                totalbycps[CAi] = totalbycps[CAi] + QuartVect["FS;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13
               end;
             end;
             style = 24;
@@ -878,9 +966,17 @@ BEGIN
                 style = 7;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbycp[CAi]);
                 totalbycp[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 22 January 2019 13:59:57
+                
                 style = 16;
                 qtyOfEmpStr = 1;
                 EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+                
+                style = 7;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbycpr[CAi]);
+                totalbycpr[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 22 January 2019 13:59:57
+                style = 7;
+                NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbycps[CAi]);
+                totalbycps[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 22 January 2019 13:59:57
 						end;
             
             style = 33;
@@ -898,18 +994,18 @@ BEGIN
       colnum = 2;
       BeginRow(sheetnum,fileToSave,rownum,0,4.5);
         style = 1;
-        qtyOfEmpStr = 12 + quartCount*(CompArray.length + 1)*2;
+        qtyOfEmpStr = 12 + quartCount*(CompArray.length + 1)*4;
         for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
-					qtyOfEmpStr = qtyOfEmpStr + 2;
+					qtyOfEmpStr = qtyOfEmpStr + 4;
 				end;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
       EndRow(sheetnum,fileToSave,rownum);
       colnum = 2;
       BeginRow(sheetnum,fileToSave,rownum,0,4.5);
         style = 11;
-        qtyOfEmpStr = 12 + quartCount*(CompArray.length + 1)*2;
+        qtyOfEmpStr = 12 + quartCount*(CompArray.length + 1)*4;
         for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
-					qtyOfEmpStr = qtyOfEmpStr + 2;
+					qtyOfEmpStr = qtyOfEmpStr + 4;
 				end;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
       EndRow(sheetnum,fileToSave,rownum);
@@ -939,6 +1035,10 @@ BEGIN
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
             mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
             qtyMergeCell = qtyMergeCell + 1;
+            style = 74;
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;TR;" & quartToPrint[Qi] & ";" & CompArray[CAi]]);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 27 May 2020 16:17:04
+            style = 74;
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;TS;" & quartToPrint[Qi] & ";" & CompArray[CAi]]);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 27 May 2020 16:17:03
           end;
         end;
         style = 30;
@@ -955,10 +1055,16 @@ BEGIN
         for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
 						style = 74;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalall[CAi]);
-						totalall[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 17:37:46
+						totalall[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 17:37:46						
 						style = 75;
 						qtyOfEmpStr = 1;
 						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+						style = 74;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalallr[CAi]);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 27 May 2020 16:17:18
+						totalallr[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 17:37:46						
+						style = 74;
+						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalalls[CAi]);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 27 May 2020 16:17:18
+						totalalls[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 17:37:46						
 				end;
         style = 80;
         NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;T;T"]);
