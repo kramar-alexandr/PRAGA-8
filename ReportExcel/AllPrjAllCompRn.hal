@@ -275,7 +275,6 @@ BEGIN
                   donorobj = "";
                   GetObjs("DONOR",TRrw.Objects,donorobj);
                   if(nonblank(donorobj))then begin
-                  	logtext(0,currentcompany & " " & TRr.TransDate & " " & TRr.Comment & " " & TRrw.CredVal + TRrw.DebVal);
 										QuartVect["FS;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
 										QuartVect["FS;" & ProjArray[PAi] & ";T"]                           = QuartVect["FS;" & ProjArray[PAi] & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
 										QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                      = QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                      - TRrw.CredVal + TRrw.DebVal;
@@ -289,7 +288,7 @@ BEGIN
               end;
             end;
             
-            if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="6") and TRr.IntYc==CLInYc) then begin
+            if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="2") and TRr.IntYc==CLInYc) then begin
               for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
                 PRr.Code = ProjArray[PAi];
                 ReadFirstMain(PRr,1,true);
