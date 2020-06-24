@@ -40,10 +40,14 @@ begin
   Report("Project Statistics 2017",ProjectStat2017RClass,ProjectStatRn,0,modTS);
   Report("Project Statistics 2018",ProjectStat2018RClass,ProjectStatRn,0,modTS);
   Report("Project Statistics 2019",ProjectStat2019RClass,ProjectStatRn,0,modTS);
-  Report("Project Statistics 2020",ProjectStat2020RClass,ProjectStatRn,0,modTS);
+  
+  Report("Donations Statistics 2020",DonationsStat2020RClass,ProjectStatRn,0,modTS);
   Report("Total Project Statistics 2018",TotalProjectStat2018RClass,ProjectStatRn,0,modTS);
   Report("Total Project Statistics 2019",TotalProjectStat2019RClass,ProjectStatRn,0,modTS);
   Report("Total Project Statistics 2020",TotalProjectStat2020RClass,ProjectStatRn,0,modTS);
+  
+  Report("Total Donations Statistics 2020",TotalDonationsStat2020RClass,ProjectStatRn,0,modTS);
+
 	Report("Projects Facts",ProjectFactRClass,ProjectFactRn,0,modTS);
   Report("Total Report - All Companies 2017",AllPrjAllComp2017RClass,AllPrjAllCompRn,0,modTS);
   Report("Total Report - All Companies 2018",AllPrjAllComp2018RClass,AllPrjAllCompRn,0,modTS);

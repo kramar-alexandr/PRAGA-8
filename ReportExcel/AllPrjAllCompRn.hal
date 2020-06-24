@@ -239,230 +239,275 @@ BEGIN
   for (compi=0;compi<CBbmtrw;compi=compi+1) begin
     SetCompany(compi+1,false);
     matrowget(CBb,compi,CBrw);
-    CompArray[CAi] = CBrw.ShortName;
-    CompNamesVect[CompArray[CAi]] = CBrw.CompName;
-    CAi = CAi + 1;
-    if (RepSpec.flags[7]==0) then begin
-      resetloop(TRr);
-      TRr.TransDate = RepSpec.sStartDate;
-      TrHs = true;
-      while (loopkey("TransDate",TRr,1,TrHs)) begin
-        if (TRr.TransDate > RepSpec.sEndDate) then begin
-          TrHs = false;
-        end;
-        if (TrHs) then begin
-          k = 0;
-          k = GetQuartal(TRr.TransDate);
-          if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
-            k = 1;
-          end;
-          mtrw = matrowcnt(TRr);
-          for (i=0;i<mtrw;i=i+1) begin
-            matrowget(TRr,i,TRrw);
-            if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5")) then begin
-              for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
-                PRr.Code = ProjArray[PAi];
-                ReadFirstMain(PRr,1,true);
-                if(setinset(prjobjs[PAi],TRrw.Objects)) then begin
-                  QuartVect["F;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] = QuartVect["F;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect["F;" & ProjArray[PAi] & ";T"]                           = QuartVect["F;" & ProjArray[PAi] & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect["F;T;" & k & ";" & CBrw.ShortName]                      = QuartVect["F;T;" & k & ";" & CBrw.ShortName]                      - TRrw.CredVal + TRrw.DebVal;
-                  QuartVect["F;T;T"]                                                = QuartVect["F;T;T"]                                                - TRrw.CredVal + TRrw.DebVal;
-                  if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
-                    QuartVect["F;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["F;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
-                    QuartVect["F;" & PRr.MotherCode & ";T"]                           = QuartVect["F;" & PRr.MotherCode & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
-                  end;
-                  donorobj = "";
-                  GetObjs("DONOR",TRrw.Objects,donorobj);
-                  if(nonblank(donorobj))then begin
-										QuartVect["FS;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
-										QuartVect["FS;" & ProjArray[PAi] & ";T"]                           = QuartVect["FS;" & ProjArray[PAi] & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
-										QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                      = QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                      - TRrw.CredVal + TRrw.DebVal;
-										QuartVect["F;T;TS"]                                                = QuartVect["F;T;TS"]                                                - TRrw.CredVal + TRrw.DebVal;
+    if(CBrw.ActiveStatus==0)then begin
+			CompArray[CAi] = CBrw.ShortName;
+			CompNamesVect[CompArray[CAi]] = CBrw.CompName;
+			CAi = CAi + 1;
+			if (RepSpec.flags[7]==0) then begin
+				resetloop(TRr);
+				TRr.TransDate = RepSpec.sStartDate;
+				TrHs = true;
+				while (loopkey("TransDate",TRr,1,TrHs)) begin
+					if (TRr.TransDate > RepSpec.sEndDate) then begin
+						TrHs = false;
+					end;
+					if (TrHs) then begin
+						k = 0;
+						k = GetQuartal(TRr.TransDate);
+						if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
+							k = 1;
+						end;
+						mtrw = matrowcnt(TRr);
+						for (i=0;i<mtrw;i=i+1) begin
+							matrowget(TRr,i,TRrw);
+							if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="5")) then begin
+								for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+									PRr.Code = ProjArray[PAi];
+									ReadFirstMain(PRr,1,true);
+									if(setinset(prjobjs[PAi],TRrw.Objects)) then begin
+										QuartVect["F;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] = QuartVect["F;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
+										QuartVect["F;" & ProjArray[PAi] & ";T"]                           = QuartVect["F;" & ProjArray[PAi] & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+										QuartVect["F;T;" & k & ";" & CBrw.ShortName]                      = QuartVect["F;T;" & k & ";" & CBrw.ShortName]                      - TRrw.CredVal + TRrw.DebVal;
+										QuartVect["F;T;T"]                                                = QuartVect["F;T;T"]                                                - TRrw.CredVal + TRrw.DebVal;
 										if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
-											QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
-											QuartVect["FS;" & PRr.MotherCode & ";T"]                           = QuartVect["FS;" & PRr.MotherCode & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["F;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["F;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["F;" & PRr.MotherCode & ";T"]                           = QuartVect["F;" & PRr.MotherCode & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
 										end;
-                  end;
-                end;
-              end;
-            end;
-            
-            if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="2") and TRr.IntYc==CLInYc) then begin
-              for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
-                PRr.Code = ProjArray[PAi];
-                ReadFirstMain(PRr,1,true);
-                if(setinset(prjobjs[PAi],TRrw.Objects)) then begin
-                  donorobj = "";
-                  GetObjs("DONOR",TRrw.Objects,donorobj);
-                  if(nonblank(donorobj))then begin
-										QuartVect["FS;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
-										QuartVect["FS;" & ProjArray[PAi] & ";T"]                           = QuartVect["FS;" & ProjArray[PAi] & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
-										QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                      = QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                      - TRrw.CredVal + TRrw.DebVal;
-										QuartVect["F;T;TS"]                                                = QuartVect["F;T;TS"]                                                - TRrw.CredVal + TRrw.DebVal;
-										if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
-											QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
-											QuartVect["FS;" & PRr.MotherCode & ";T"]                           = QuartVect["FS;" & PRr.MotherCode & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+										donorobj = "";
+										GetObjs("DONOR",TRrw.Objects,donorobj);
+										if(nonblank(donorobj))then begin
+											QuartVect["FS;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["FS;" & ProjArray[PAi] & ";T"]                           = QuartVect["FS;" & ProjArray[PAi] & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                      = QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                      - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["F;T;TS"]                                                = QuartVect["F;T;TS"]                                                - TRrw.CredVal + TRrw.DebVal;
+											if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
+												QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
+												QuartVect["FS;" & PRr.MotherCode & ";T"]                           = QuartVect["FS;" & PRr.MotherCode & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+											end;
 										end;
-                  end;
-                end;
-              end;
-            end;
-            
-          end;
-        end;
-      end;
-    end else begin
-      blockload(bcur);
-      resetloop(VIr);
-      VIr.InvDate = RepSpec.sStartDate;
-      TrHs = true;
-      while (loopkey("InvDate",VIr,1,TrHs)) begin
-        testf = true;
-        if (VIr.InvDate>RepSpec.sEndDate) then begin TrHs = false; testf = false; end;
-        if (VIr.OKFlag==0) then begin testf = false; end;
-        if (VIr.Invalid==1) then begin testf = false; end;
-        if (testf) then begin
-          sum = 0;
-          paidsum = 0;
-          PDr.Code = VIr.PayDeal;
-          if (ReadFirstMain(PDr,1,true)) then begin
-            if (PDr.PDType==kInvoiceTypeCash) then begin
-              if (VIr.CurncyCode==bcur.BaseCur1) then begin
-                sum = VIr.PayVal;
-                paidsum = VIr.PayVal;
-              end else begin
-                TRr.Number = VIr.SerNr;
-                TRr.IntYc = VIYc;
-                if (ReadFirstMain(TRr,2,true)) then begin
-                  mtrw = matrowcnt(TRr);
-                  for (i=0;i<mtrw;i=i+1) begin
-                    matrowget(TRr,i,TRrw);
-                    if (TRrw.ovst==0 and (TRrw.AccNumber==PDr.pdCashAcc)) then begin
-                      sum = AbsoluteVal(TRrw.CredVal - TRrw.DebVal);
-                      paidsum = VIr.PayVal;
-                      i = mtrw;
-                    end;
-                  end;
-                end;
-              end;
-            end;
-          end;
-          if (sum==0) then begin
-            resetloop(OPrsr);
-            OPrsr.VINr = VIr.SerNr;
-            TrHs2 = true;
-            while (LoopKey("VIKey",OPrsr,1,TrHs2)) begin
-              if (OPrsr.VINr<>VIr.SerNr) then begin TrHs2 = false; end;
-              if (TrHs2) then begin
-                if (OPrsr.TransType==kOPrsTransTypePayment) then begin
-                  OPr.SerNr = OPrsr.TransNr;
-                  if (ReadFirstMain(OPr,1,true)) then begin
-                    if ((OPr.DoneFlag!=0) and (OPr.TransDate==OPrsr.TransDate)) then begin
-                      mtrw = MatRowCnt(OPr);
-                      GetPMRow(OPr.PayMode,PMrw);
-                      for (i=0;i<mtrw;i=i+1) begin
-                        MatRowGet(OPr,i,VIOPrw);
-                        if ((VIOPrw.ovst==0) and (VIOPrw.VISerNr==VIr.SerNr) and (VIOPrw.stp==kPaymentRowTypeNormal)) then begin
-                          i = mtrw;
-                        end;
-                      end;
-                      opsum = 0;
-                      for (i=0;i<mtrw;i=i+1) begin
-                        MatRowGet(OPr,i,OPrw);
-                        if ((OPrw.ovst==0) and (OPrw.BankCurncy==VIOPrw.BankCurncy) and (OPrw.stp==kPaymentRowTypeNormal)) then begin
-                          opsum = opsum + OPrw.BankVal;
-                        end;
-                      end;
-                      TRr.Number = OPr.SerNr;
-                      TRr.IntYc = OPYc;
-                      if (ReadFirstMain(TRr,2,true)) then begin
-                        mtrw = matrowcnt(TRr);
-                        trsum = 0;
-                        for (j=0;j<mtrw;j=j+1) begin
-                          matrowget(TRr,j,TRrw);
-                          if (TRrw.ovst==0 and (TRrw.AccNumber==PMrw.AccNr) and (TRrw.Curncy==VIOPrw.BankCurncy)) then begin
-                            trsum = trsum + AbsoluteVal(TRrw.CredVal - TRrw.DebVal);
-                          end;
-                        end;
-                      end;
-                      sum = sum + VIOPrw.BankVal/opsum*trsum;
-                      paidsum = paidsum + VIOPrw.RecVal;
-                    end;
-                  end;
-                end;
-              end;
-            end;
-          end;
-          if (sum==0) then begin
-            fr = 0;
-            to1 = 0;
-            to2 = 0;
-            br1 = 0;
-            br2 = 0;
-            tstr = VIr.CurncyCode;
-            GetFullCurncyRate(tstr,VIr.TransDate,fr,to1,to2,br1,br2);
-            if (fr==0) or (fr==blankval) then begin fr = VIr.FrRate; end;
-            if (br1==0) or (br1==blankval) then begin br1 = VIr.BaseRate1; end;
-            if (br2==0) or (br2==blankval) then begin br2 = VIr.BaseRate2; end;
-            if (to1==0) or (to1==blankval) then begin to1 = VIr.ToRateB1; end;
-            if (to2==0) or (to2==blankval) then begin to2 = VIr.ToRateB2; end;
-            sum = MulRateToBase1(tstr,VIr.PayVal,fr,to1,to2,br1,br2,SetRoundModeD(2));
-            paidsum = VIr.PayVal;
-          end;
-          if (paidsum<VIr.PayVal) then begin
-            fr = 0;
-            to1 = 0;
-            to2 = 0;
-            br1 = 0;
-            br2 = 0;
-            tstr = VIr.CurncyCode;
-            GetFullCurncyRate(tstr,VIr.TransDate,fr,to1,to2,br1,br2);
-            if (fr==0) or (fr==blankval) then begin fr = VIr.FrRate; end;
-            if (br1==0) or (br1==blankval) then begin br1 = VIr.BaseRate1; end;
-            if (br2==0) or (br2==blankval) then begin br2 = VIr.BaseRate2; end;
-            if (to1==0) or (to1==blankval) then begin to1 = VIr.ToRateB1; end;
-            if (to2==0) or (to2==blankval) then begin to2 = VIr.ToRateB2; end;
-            sum = sum + MulRateToBase1(tstr,(VIr.PayVal - paidsum),fr,to1,to2,br1,br2,SetRoundModeD(2));
-          end;
-          k = 0;
-          k = GetQuartal(TRr.TransDate);
-          if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
-            k = 1;
-          end;
-          mtrw = matrowcnt(VIr);
-          for (i=0;i<mtrw;i=i+1) begin
-            matrowget(VIr,i,VIrw);
-            PRr.Objects = VIrw.Prj;
-            ReadFirstKey("Objects",PRr,1,true);
-            if (ProjInArr[PRr.Code]) then begin
-              tmpval = VIrw.Sum/VIr.PayVal*sum;
-              
-              QuartVect["F;" & PRr.Code & ";" & k & ";" & CBrw.ShortName] = QuartVect["F;" & PRr.Code & ";" & k & ";" & CBrw.ShortName] + tmpval;
-              QuartVect["F;" & PRr.Code & ";T"]                           = QuartVect["F;" & PRr.Code & ";T"] + tmpval;
-              QuartVect["F;T;" & k & ";" & CBrw.ShortName]                = QuartVect["F;T;" & k & ";" & CBrw.ShortName] + tmpval;
-              QuartVect["F;T;T"]                                          = QuartVect["F;T;T"] + tmpval;
-              if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
-                QuartVect["F;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["F;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] + tmpval;
-                QuartVect["F;" & PRr.MotherCode & ";T"]                           = QuartVect["F;" & PRr.MotherCode & ";T"] + tmpval;
-              end;
-              
-              if(nonblank(VIrw.Donor))then begin
-              	QuartVect["FS;" & PRr.Code & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & PRr.Code & ";" & k & ";" & CBrw.ShortName] + tmpval;
-								QuartVect["FS;" & PRr.Code & ";T"]                           = QuartVect["FS;" & PRr.Code & ";T"] + tmpval;
-								QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                = QuartVect["F;TS;" & k & ";" & CBrw.ShortName] + tmpval;
-								QuartVect["F;T;TS"]                                          = QuartVect["F;T;TS"] + tmpval;
-								if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
-									QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] + tmpval;
-									QuartVect["FS;" & PRr.MotherCode & ";T"]                           = QuartVect["FS;" & PRr.MotherCode & ";T"] + tmpval;
+									end;
 								end;
-              end;
-              
-            end;
-          end;
-        end;
-      end;
-    end;
+							end;
+						
+							if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="2") and TRr.IntYc==CLInYc) then begin
+								for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+									PRr.Code = ProjArray[PAi];
+									ReadFirstMain(PRr,1,true);
+									if(setinset(prjobjs[PAi],TRrw.Objects)) then begin
+										donorobj = "";
+										GetObjs("DONOR",TRrw.Objects,donorobj);
+										if(nonblank(donorobj))then begin
+											QuartVect["FR;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] = QuartVect["FR;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["FR;" & ProjArray[PAi] & ";T"]                           = QuartVect["FR;" & ProjArray[PAi] & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["F;TR;" & k & ";" & CBrw.ShortName]                      = QuartVect["F;TR;" & k & ";" & CBrw.ShortName]                      - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["F;T;TR"]                                                = QuartVect["F;T;TR"]                                                - TRrw.CredVal + TRrw.DebVal;
+											if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
+												QuartVect["FR;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["FR;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
+												QuartVect["FR;" & PRr.MotherCode & ";T"]                           = QuartVect["FR;" & PRr.MotherCode & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+											end;
+										end;
+									end;
+								end;
+							end;
+						
+						end;
+					end;
+				end;
+			end else begin
+				blockload(bcur);
+				
+				
+				
+				resetloop(TRr);
+				TRr.TransDate = RepSpec.sStartDate;
+				TrHs = true;
+				while (loopkey("TransDate",TRr,1,TrHs)) begin
+					if (TRr.TransDate > RepSpec.sEndDate) then begin
+						TrHs = false;
+					end;
+					if (TrHs) then begin
+						k = 0;
+						k = GetQuartal(TRr.TransDate);
+						if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
+							k = 1;
+						end;
+						mtrw = matrowcnt(TRr);
+						for (i=0;i<mtrw;i=i+1) begin
+							matrowget(TRr,i,TRrw);
+							if (TRrw.ovst==0 and (mid(TRrw.AccNumber,0,1)=="2") and TRr.IntYc==CLInYc) then begin
+								for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
+									PRr.Code = ProjArray[PAi];
+									ReadFirstMain(PRr,1,true);
+									if(setinset(prjobjs[PAi],TRrw.Objects)) then begin
+										donorobj = "";
+										GetObjs("DONOR",TRrw.Objects,donorobj);
+										if(nonblank(donorobj))then begin
+											QuartVect["FR;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] = QuartVect["FR;" & ProjArray[PAi] & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["FR;" & ProjArray[PAi] & ";T"]                           = QuartVect["FR;" & ProjArray[PAi] & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["F;TR;" & k & ";" & CBrw.ShortName]                      = QuartVect["F;TR;" & k & ";" & CBrw.ShortName]                      - TRrw.CredVal + TRrw.DebVal;
+											QuartVect["F;T;TR"]                                                = QuartVect["F;T;TR"]                                                - TRrw.CredVal + TRrw.DebVal;
+											if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
+												QuartVect["FR;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["FR;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] - TRrw.CredVal + TRrw.DebVal;
+												QuartVect["FR;" & PRr.MotherCode & ";T"]                           = QuartVect["FR;" & PRr.MotherCode & ";T"]                           - TRrw.CredVal + TRrw.DebVal;
+											end;
+										end;
+									end;
+								end;
+							end;
+						end;
+					end;
+				end;
+				
+				resetloop(VIr);
+				VIr.InvDate = RepSpec.sStartDate;
+				TrHs = true;
+				while (loopkey("InvDate",VIr,1,TrHs)) begin
+					testf = true;
+					if (VIr.InvDate>RepSpec.sEndDate) then begin TrHs = false; testf = false; end;
+					if (VIr.OKFlag==0) then begin testf = false; end;
+					if (VIr.Invalid==1) then begin testf = false; end;
+					if (testf) then begin
+						sum = 0;
+						paidsum = 0;
+						PDr.Code = VIr.PayDeal;
+						if (ReadFirstMain(PDr,1,true)) then begin
+							if (PDr.PDType==kInvoiceTypeCash) then begin
+								if (VIr.CurncyCode==bcur.BaseCur1) then begin
+									sum = VIr.PayVal;
+									paidsum = VIr.PayVal;
+								end else begin
+									TRr.Number = VIr.SerNr;
+									TRr.IntYc = VIYc;
+									if (ReadFirstMain(TRr,2,true)) then begin
+										mtrw = matrowcnt(TRr);
+										for (i=0;i<mtrw;i=i+1) begin
+											matrowget(TRr,i,TRrw);
+											if (TRrw.ovst==0 and (TRrw.AccNumber==PDr.pdCashAcc)) then begin
+												sum = AbsoluteVal(TRrw.CredVal - TRrw.DebVal);
+												paidsum = VIr.PayVal;
+												i = mtrw;
+											end;
+										end;
+									end;
+								end;
+							end;
+						end;
+						if (sum==0) then begin
+							resetloop(OPrsr);
+							OPrsr.VINr = VIr.SerNr;
+							TrHs2 = true;
+							while (LoopKey("VIKey",OPrsr,1,TrHs2)) begin
+								if (OPrsr.VINr<>VIr.SerNr) then begin TrHs2 = false; end;
+								if (TrHs2) then begin
+									if (OPrsr.TransType==kOPrsTransTypePayment) then begin
+										OPr.SerNr = OPrsr.TransNr;
+										if (ReadFirstMain(OPr,1,true)) then begin
+											if ((OPr.DoneFlag!=0) and (OPr.TransDate==OPrsr.TransDate)) then begin
+												mtrw = MatRowCnt(OPr);
+												GetPMRow(OPr.PayMode,PMrw);
+												for (i=0;i<mtrw;i=i+1) begin
+													MatRowGet(OPr,i,VIOPrw);
+													if ((VIOPrw.ovst==0) and (VIOPrw.VISerNr==VIr.SerNr) and (VIOPrw.stp==kPaymentRowTypeNormal)) then begin
+														i = mtrw;
+													end;
+												end;
+												opsum = 0;
+												for (i=0;i<mtrw;i=i+1) begin
+													MatRowGet(OPr,i,OPrw);
+													if ((OPrw.ovst==0) and (OPrw.BankCurncy==VIOPrw.BankCurncy) and (OPrw.stp==kPaymentRowTypeNormal)) then begin
+														opsum = opsum + OPrw.BankVal;
+													end;
+												end;
+												TRr.Number = OPr.SerNr;
+												TRr.IntYc = OPYc;
+												if (ReadFirstMain(TRr,2,true)) then begin
+													mtrw = matrowcnt(TRr);
+													trsum = 0;
+													for (j=0;j<mtrw;j=j+1) begin
+														matrowget(TRr,j,TRrw);
+														if (TRrw.ovst==0 and (TRrw.AccNumber==PMrw.AccNr) and (TRrw.Curncy==VIOPrw.BankCurncy)) then begin
+															trsum = trsum + AbsoluteVal(TRrw.CredVal - TRrw.DebVal);
+														end;
+													end;
+												end;
+												sum = sum + VIOPrw.BankVal/opsum*trsum;
+												paidsum = paidsum + VIOPrw.RecVal;
+											end;
+										end;
+									end;
+								end;
+							end;
+						end;
+						if (sum==0) then begin
+							fr = 0;
+							to1 = 0;
+							to2 = 0;
+							br1 = 0;
+							br2 = 0;
+							tstr = VIr.CurncyCode;
+							GetFullCurncyRate(tstr,VIr.TransDate,fr,to1,to2,br1,br2);
+							if (fr==0) or (fr==blankval) then begin fr = VIr.FrRate; end;
+							if (br1==0) or (br1==blankval) then begin br1 = VIr.BaseRate1; end;
+							if (br2==0) or (br2==blankval) then begin br2 = VIr.BaseRate2; end;
+							if (to1==0) or (to1==blankval) then begin to1 = VIr.ToRateB1; end;
+							if (to2==0) or (to2==blankval) then begin to2 = VIr.ToRateB2; end;
+							sum = MulRateToBase1(tstr,VIr.PayVal,fr,to1,to2,br1,br2,SetRoundModeD(2));
+							paidsum = VIr.PayVal;
+						end;
+						if (paidsum<VIr.PayVal) then begin
+							fr = 0;
+							to1 = 0;
+							to2 = 0;
+							br1 = 0;
+							br2 = 0;
+							tstr = VIr.CurncyCode;
+							GetFullCurncyRate(tstr,VIr.TransDate,fr,to1,to2,br1,br2);
+							if (fr==0) or (fr==blankval) then begin fr = VIr.FrRate; end;
+							if (br1==0) or (br1==blankval) then begin br1 = VIr.BaseRate1; end;
+							if (br2==0) or (br2==blankval) then begin br2 = VIr.BaseRate2; end;
+							if (to1==0) or (to1==blankval) then begin to1 = VIr.ToRateB1; end;
+							if (to2==0) or (to2==blankval) then begin to2 = VIr.ToRateB2; end;
+							sum = sum + MulRateToBase1(tstr,(VIr.PayVal - paidsum),fr,to1,to2,br1,br2,SetRoundModeD(2));
+						end;
+						k = 0;
+						k = GetQuartal(TRr.TransDate);
+						if ((k!= 1) and (k!= 2) and (k!= 3) and (k!= 4)) then begin
+							k = 1;
+						end;
+						mtrw = matrowcnt(VIr);
+						for (i=0;i<mtrw;i=i+1) begin
+							matrowget(VIr,i,VIrw);
+							PRr.Objects = VIrw.Prj;
+							ReadFirstKey("Objects",PRr,1,true);
+							if (ProjInArr[PRr.Code]) then begin
+								tmpval = VIrw.Sum/VIr.PayVal*sum;
+							
+								QuartVect["F;" & PRr.Code & ";" & k & ";" & CBrw.ShortName] = QuartVect["F;" & PRr.Code & ";" & k & ";" & CBrw.ShortName] + tmpval;
+								QuartVect["F;" & PRr.Code & ";T"]                           = QuartVect["F;" & PRr.Code & ";T"] + tmpval;
+								QuartVect["F;T;" & k & ";" & CBrw.ShortName]                = QuartVect["F;T;" & k & ";" & CBrw.ShortName] + tmpval;
+								QuartVect["F;T;T"]                                          = QuartVect["F;T;T"] + tmpval;
+								if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
+									QuartVect["F;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["F;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] + tmpval;
+									QuartVect["F;" & PRr.MotherCode & ";T"]                           = QuartVect["F;" & PRr.MotherCode & ";T"] + tmpval;
+								end;
+							
+								if(nonblank(VIrw.Donor))then begin
+									QuartVect["FS;" & PRr.Code & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & PRr.Code & ";" & k & ";" & CBrw.ShortName] + tmpval;
+									QuartVect["FS;" & PRr.Code & ";T"]                           = QuartVect["FS;" & PRr.Code & ";T"] + tmpval;
+									QuartVect["F;TS;" & k & ";" & CBrw.ShortName]                = QuartVect["F;TS;" & k & ";" & CBrw.ShortName] + tmpval;
+									QuartVect["F;T;TS"]                                          = QuartVect["F;T;TS"] + tmpval;
+									if nonblank (PRr.MotherCode) and (PRr.MotherCode!="") then begin
+										QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] = QuartVect["FS;" & PRr.MotherCode & ";" & k & ";" & CBrw.ShortName] + tmpval;
+										QuartVect["FS;" & PRr.MotherCode & ";T"]                           = QuartVect["FS;" & PRr.MotherCode & ";T"] + tmpval;
+									end;
+								end;
+							
+							end;
+						end;
+					end;
+				end;
+			end;
+		end;
   end;
   RETURN;
 END;
@@ -475,7 +520,7 @@ BEGIN
 	vector val QuartVect;
 	vector boolean isMotherProjVect;
 	vector string 255 ProjNamesVect,CompNamesVect;
-	integer i,CAi,PAi,quartCount,Qi,oldcomp;
+	integer i,CAi,PAi,quartCount,Qi,oldcomp,col;
 	string 10 tstr;
   
 	array integer quartToPrint;
@@ -556,19 +601,18 @@ BEGIN
       sheetCollsOutLvl[colnum] = 1;
       colnum = colnum + 1;
       for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-        sheetColls[colnum] = 13.7109375;
-        sheetCollsOutLvl[colnum] = 1;
-        colnum = colnum + 1;
-        sheetColls[colnum] = 12.7109375;
+        sheetColls[colnum] = 15.7109375;
         sheetCollsOutLvl[colnum] = 1;
         colnum = colnum + 1;
         
-        sheetColls[colnum] = 12.7109375;
-        sheetCollsOutLvl[colnum] = 1;
+        sheetColls[colnum] = 15.7109375;
+        sheetCollsOutLvl[colnum] = 2;
         colnum = colnum + 1;
-        sheetColls[colnum] = 12.7109375;
-        sheetCollsOutLvl[colnum] = 1;
+        
+        sheetColls[colnum] = 15.7109375;
+        sheetCollsOutLvl[colnum] = 2;
         colnum = colnum + 1;
+
       end;
     end;
     sheetColls[colnum] = 0.5703125;
@@ -583,13 +627,13 @@ BEGIN
     colnum = colnum + 1;
     
     for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-			sheetColls[colnum] = 13.7109375;
+			sheetColls[colnum] = 15.7109375;
 			colnum = colnum + 1;
-			sheetColls[colnum] = 12.7109375;
+			sheetColls[colnum] = 15.7109375;
+			sheetCollsOutLvl[colnum] = 2;
 			colnum = colnum + 1;
-			sheetColls[colnum] = 12.7109375;
-			colnum = colnum + 1;
-			sheetColls[colnum] = 12.7109375;
+			sheetColls[colnum] = 15.7109375;
+			sheetCollsOutLvl[colnum] = 2;
 			colnum = colnum + 1;
 		end;
     sheetColls[colnum] = 13.7109375;
@@ -615,7 +659,7 @@ BEGIN
         style = 52;
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"All Project - " & RepSpec.f2,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
         style = 20;
-        qtyOfEmpStr = 6 + 4*CompArray.length;
+        qtyOfEmpStr = 6 + 3*CompArray.length;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
       EndRow(sheetnum,fileToSave,rownum);
       rownum = rownum + 1;
@@ -671,7 +715,7 @@ BEGIN
           mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
           style = 70;
           StringCell(sheetnum,fileToSave,colnum,rownum,style,"FACT-" & QuartalIntToStr(quartToPrint[Qi]),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-          qtyOfEmpStr = (CompArray.length-1)*4+2;
+          qtyOfEmpStr = (CompArray.length-1)*3+1;
           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
           style = 77;
           qtyOfEmpStr = 1;
@@ -690,7 +734,7 @@ BEGIN
         StringCell(sheetnum,fileToSave,colnum,rownum,style,"GRAND TOTAL",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
         qtyOfEmpStr = 4;
         for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:57:09
-					qtyOfEmpStr = qtyOfEmpStr + 4;
+					qtyOfEmpStr = qtyOfEmpStr + 3;
 				end;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
         style = 71;
@@ -724,12 +768,27 @@ BEGIN
           style = 44;
           qtyOfEmpStr = 1;
           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          col = 0;
           for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-            style = 63;
+            mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+            style = 86;
+            if(col==1)then begin
+            	style = 97;
+            end;
             StringCell(sheetnum,fileToSave,colnum,rownum,style,CompArray[CAi],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-            style = 18;
-            qtyOfEmpStr = 3;
+            style = 88;
+            if(col==1)then begin
+            	style = 98;
+            end;
+            qtyOfEmpStr = 2;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
+            qtyMergeCell = qtyMergeCell + 1;
+            if(col==1)then begin
+            	col = 0;
+            end else begin
+            	col = 1;
+            end;
           end;
         end;
         style = 23;
@@ -748,13 +807,27 @@ BEGIN
         mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
         qtyMergeCell = qtyMergeCell + 1;
         
-
+				col = 0;
 				for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:28
-					style = 63;
+					mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
+					style = 86;
+					if(col==1)then begin
+						style = 97;
+					end;
 					StringCell(sheetnum,fileToSave,colnum,rownum,style,CompArray[CAi],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-					style = 18;
-					qtyOfEmpStr = 3;
+					style = 88;
+					if(col==1)then begin
+						style = 98;
+					end;
+					qtyOfEmpStr = 2;
 					EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+					mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
+          qtyMergeCell = qtyMergeCell + 1;
+          if(col==1)then begin
+						col = 0;
+					end else begin
+						col = 1;
+					end;
 				end;
 				
         mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
@@ -792,16 +865,30 @@ BEGIN
           style = 46;
           qtyOfEmpStr = 1;
           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+          col = 0;
           for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-            style = 64;
+            style = 101;
+            if(col==1)then begin
+            	style = 95;
+            end;
             StringCell(sheetnum,fileToSave,colnum,rownum,style,CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-            style = 19;
-            qtyOfEmpStr = 1;
-            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-            style = 19;
+            
+            style = 101;
+            if(col==1)then begin
+            	style = 95;
+            end;
             StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donation rsvd",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-            style = 19;
+						
+            style = 101;
+            if(col==1)then begin
+            	style = 95;
+            end;
             StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donation spent",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						if(col==1)then begin
+            	col = 0;
+            end else begin
+            	col = 1;
+            end;
           end;
         end;
         style = 23;
@@ -817,16 +904,28 @@ BEGIN
         qtyOfEmpStr = 1;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
         
+        col = 0;
         for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
-            style = 64;
+            style = 101;
+            if(col==1)then begin
+            	style = 95;
+            end;
             StringCell(sheetnum,fileToSave,colnum,rownum,style,CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-            style = 19;
-            qtyOfEmpStr = 1;
-            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-            style = 19;
+            style = 101;
+            if(col==1)then begin
+            	style = 95;
+            end;
             StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donation rsvd",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-            style = 19;
+            style = 101;
+            if(col==1)then begin
+            	style = 95;
+            end;
             StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donation spent",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+						if(col==1)then begin
+            	col = 0;
+            end else begin
+            	col = 1;
+            end;
 				end;
         
         style = 31;
@@ -862,22 +961,34 @@ BEGIN
               style = 62;
               qtyOfEmpStr = 1;
               EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+              col = 0;
               for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
                 style = 15;
+                if(col==1)then begin
+									style = 95;
+								end;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]]);
                 totalbycp[CAi] = totalbycp[CAi] + QuartVect["F;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
                 totalall[CAi] = totalall[CAi] + QuartVect["F;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];
-                style = 6;
-                qtyOfEmpStr = 1;
-                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
                 style = 15;
+                if(col==1)then begin
+									style = 95;
+								end;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["FR;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]]);
                 totalbycpr[CAi] = totalbycpr[CAi] + QuartVect["FR;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
                 totalallr[CAi] = totalallr[CAi] + QuartVect["FR;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];
 								style = 15;
+								if(col==1)then begin
+									style = 95;
+								end;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["FS;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]]);
                 totalbycps[CAi] = totalbycps[CAi] + QuartVect["FS;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
-                totalalls[CAi] = totalalls[CAi] + QuartVect["FS;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];                
+                totalalls[CAi] = totalalls[CAi] + QuartVect["FS;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];     
+                if(col==1)then begin
+									col = 0;
+								end else begin
+									col = 1;
+								end;       
               end;
             end;
             style = 53;
@@ -891,19 +1002,31 @@ BEGIN
             style = 51;
             qtyOfEmpStr = 1;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+            col = 0;
             for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
                 style = 15;
+                if(col==1)then begin
+									style = 95;
+								end;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbycp[CAi]);
                 totalbycp[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
-                style = 6;
-                qtyOfEmpStr = 1;
-                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
                 style = 15;
+                if(col==1)then begin
+									style = 95;
+								end;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbycpr[CAi]);
                 totalbycpr[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
                 style = 15;
+                if(col==1)then begin
+									style = 95;
+								end;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbycps[CAi]);
                 totalbycps[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
+                if(col==1)then begin
+									col = 0;
+								end else begin
+									col = 1;
+								end;
 						end;
 						style = 56;
             NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;" & ProjArray[PAi] & ";T"]);
@@ -935,9 +1058,6 @@ BEGIN
               style = 94;
               NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[ProjArray[PAi] & ";" & quartToPrint[Qi]]);
               for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                style = 7;
-                qtyOfEmpStr = 1;
-                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
                 style = 16;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]]);
                 totalbycp[CAi] = totalbycp[CAi] + QuartVect["F;" & ProjArray[PAi] & ";" & quartToPrint[Qi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 15:12:47
@@ -966,9 +1086,6 @@ BEGIN
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbycp[CAi]);
                 totalbycp[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 22 January 2019 13:59:57
                 
-                style = 16;
-                qtyOfEmpStr = 1;
-                EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
                 
                 style = 7;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalbycpr[CAi]);
@@ -993,18 +1110,18 @@ BEGIN
       colnum = 2;
       BeginRow(sheetnum,fileToSave,rownum,0,4.5);
         style = 1;
-        qtyOfEmpStr = 12 + quartCount*(CompArray.length + 1)*4;
+        qtyOfEmpStr = 12 + quartCount*(CompArray.length)*3 + quartCount*2;
         for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
-					qtyOfEmpStr = qtyOfEmpStr + 4;
+					qtyOfEmpStr = qtyOfEmpStr + 3;
 				end;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
       EndRow(sheetnum,fileToSave,rownum);
       colnum = 2;
       BeginRow(sheetnum,fileToSave,rownum,0,4.5);
         style = 11;
-        qtyOfEmpStr = 12 + quartCount*(CompArray.length + 1)*4;
+        qtyOfEmpStr = 12 + quartCount*(CompArray.length)*3 + quartCount*2;
         for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
-					qtyOfEmpStr = qtyOfEmpStr + 4;
+					qtyOfEmpStr = qtyOfEmpStr + 3;
 				end;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
       EndRow(sheetnum,fileToSave,rownum);
@@ -1025,19 +1142,31 @@ BEGIN
           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
           mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
           qtyMergeCell = qtyMergeCell + 1;
+          col = 0;
           for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-            mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
             style = 74;
+            if(col==1)then begin
+							style = 99;
+						end;
             NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;T;" & quartToPrint[Qi] & ";" & CompArray[CAi]]);
-            style = 75;
-            qtyOfEmpStr = 1;
-            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-            mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
-            qtyMergeCell = qtyMergeCell + 1;
+            
             style = 74;
+            if(col==1)then begin
+							style = 99;
+						end;
             NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;TR;" & quartToPrint[Qi] & ";" & CompArray[CAi]]);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 27 May 2020 16:17:04
+            
             style = 74;
+            if(col==1)then begin
+							style = 99;
+						end;
             NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;TS;" & quartToPrint[Qi] & ";" & CompArray[CAi]]);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 27 May 2020 16:17:03
+          	
+            if(col==1)then begin
+							col = 0;
+						end else begin
+							col = 1;
+						end;
           end;
         end;
         style = 30;
@@ -1051,19 +1180,34 @@ BEGIN
         style = 79;
         qtyOfEmpStr = 1;
         EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+        col = 0;
         for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 11:55:23
 						style = 74;
+						if(col==1)then begin
+							style = 99;
+						end;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalall[CAi]);
 						totalall[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 17:37:46						
-						style = 75;
-						qtyOfEmpStr = 1;
-						EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
+
 						style = 74;
+						if(col==1)then begin
+							style = 99;
+						end;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalallr[CAi]);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 27 May 2020 16:17:18
 						totalallr[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 17:37:46						
+						
 						style = 74;
+						if(col==1)then begin
+							style = 99;
+						end;
 						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totalalls[CAi]);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 27 May 2020 16:17:18
 						totalalls[CAi] = 0;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 13 September 2018 17:37:46						
+						
+						if(col==1)then begin
+							col = 0;
+						end else begin
+							col = 1;
+						end;
 				end;
         style = 80;
         NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect["F;T;T"]);
