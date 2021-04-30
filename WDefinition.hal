@@ -5880,7 +5880,7 @@ window FrVIRepRClass:1
 	wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
 real h,v,vs,h1;
-	WindowBegin("France Invoices Report 2018",FrVIRepRClass,CGRcW,RcType);
+	WindowBegin("France Invoices Report 2021",FrVIRepRClass,CGRcW,RcType);
 		SetWRect(20,80,450,250);
 		v = 20; vs = 20; h = 120;
 		//PeriodField(h,v=6,"Period");

@@ -67,7 +67,7 @@ begin
   Report("Web Statistics DEMO",MyBIRClass,MyBIRn,0,modTS);//Edit-------------------Vitalii 11:30 14:48 19.09.2016
   Report("Remuneration report",ZARPLATARClass,ZARPLATARn,0,modTS);
   
-  Report("Invoices for Excel 2020",FrVIRepRClass,FrVIRepRn,0,modPL);
+  Report("Invoices for Excel 2021",FrVIRepRClass,FrVIRepRn,0,modPL);
   
   Report("Find wrong invoices",WrongInvRClass,FindWrongInvoicesRn,0,modPL);// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 11 October 2019 11:15:12
   
