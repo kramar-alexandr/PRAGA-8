@@ -443,6 +443,10 @@ begin
   EndArray;
  EndBlock;
  
+ BlockBegin(VIBuCheckBlock,-,"");
+  RecordField(CheckVI,M4Int,0,0);
+ EndBlock;
+ 
  RecordBegin(TBBUInVc,-,"");//budjets for incomes
   RecordField(PRCode,M4Code,20,PRVc);
   RecordField(PRName,M4Str,60,0);

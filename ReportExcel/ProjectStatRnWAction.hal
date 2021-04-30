@@ -1,4 +1,5 @@
 remote procedure ProjectStatRn(record RcVc,var string,var string,var boolean);
+remote procedure DonationsStatRn(record RcVc,var string,var string,var boolean);
 remote function boolean OTCodeMatch(string,string);
 remote function boolean GetPartFileToArea(string,var area);
 remote procedure DeleteXLSXJunk(string);
@@ -105,6 +106,20 @@ begin
 	return;
 end;
 
+global
+procedure ProjectStat2021RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2021";
+  RepSpec.f3 = "5";
+	RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
 
 global
 function Boolean ProjectStat2018RClassOnOpenWindow(Integer wn)
@@ -141,6 +156,20 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2020";
+  RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+function Boolean ProjectStat2021RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2021";
   RepSpec.f3 = "5";
   RepSpec.flags[5] = 1;
 	PutWindowRecord(wn,RepSpec);
@@ -194,12 +223,42 @@ begin
 end;
 
 global
+procedure TotalProjectStat2021RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2021";
+	RepSpec.f3 = "5";
+	RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
 procedure TotalDonationsStat2020RClassReportDefaults(integer wn)
 begin
 	record RcVc RepSpec;
 	
 	GetWindowRecord(wn,RepSpec);
   RepSpec.f2 = "2020";
+	RepSpec.f3 = "5";
+	RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
+procedure TotalDonationsStat2021RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2021";
 	RepSpec.f3 = "5";
 	RepSpec.flags[5] = 1;
   RepSpec.flags[29] = 1;
@@ -256,6 +315,21 @@ begin
 end;
 
 global
+function Boolean TotalProjectStat2021RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2021";
+	RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
 function Boolean TotalDonationsStat2020RClassOnOpenWindow(Integer wn)
 begin
 	record RcVc RepSpec;
@@ -269,6 +343,22 @@ begin
 
 	return;
 end;
+
+global
+function Boolean TotalDonationsStat2021RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2021";
+	RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
 
 global
 procedure RunProjectStatRn()
@@ -530,8 +620,7 @@ begin
 		if ((filename!=tstr) and nonblank(filename)) then begin
 			
 			RepSpec.flags[12] = 1;//Only Donations Flag
-		
-			ProjectStatRn(RepSpec,fnserv,md5strServ,PrjFoundf);
+			DonationsStatRn(RepSpec,fnserv,md5strServ,PrjFoundf);
       if (PrjFoundf) then begin
 			  if(fileexists(filename))then begin
 					delete_file(filename);

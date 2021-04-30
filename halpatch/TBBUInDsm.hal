@@ -1,4 +1,6 @@
 remote procedure TBBUInSumup(var record TBBUInVc);
+remote procedure TBBUInDchrsum(var record TBBUInVc,Integer,Boolean,Integer);
+
 
 procedure AddTBBUInLineType18(Integer t,Boolean firstf)
 begin
@@ -94,6 +96,9 @@ begin
   row  TBBUInVc TBBUInrw;
   Integer wn,rownr,i,rowstoput;
   boolean testf;
+  record GeneralOptionBlock GenOptRec;
+  
+  blockload(GenOptRec);
   
   wn = CurWindow;
   rownr = GetWindowCurRow(wn);
@@ -117,6 +122,7 @@ begin
         if rowstoput<=0 then begin testf = false; end;
         if testf then begin
           MatRowPut(TBBUInr,i,TBBUInrw);
+          TBBUInDchrsum(TBBUInr,i,false,GenOptRec.UseDiscount);
           i = i + 1;
           rowstoput = rowstoput - 1;
         end;

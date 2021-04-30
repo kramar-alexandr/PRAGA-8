@@ -93,6 +93,19 @@ begin
 end;
 
 global
+procedure PrjSum2021RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2021";
+	//RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
 function Boolean PrjSum2018RClassOnOpenWindow(Integer wn)
 begin
 	record RcVc RepSpec;
@@ -125,6 +138,19 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2020";
+	//RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+function Boolean PrjSum2021RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2021";
 	//RepSpec.flags[5] = 1;
 	PutWindowRecord(wn,RepSpec);
 

@@ -68,6 +68,18 @@ begin
 end;
 
 global
+procedure AllPrjAllComp2021RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2021";
+  PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
 function Boolean AllPrjAllComp2018RClassOnOpenWindow(Integer wn)
 begin
 	record RcVc RepSpec;
@@ -98,6 +110,18 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2020";
+  PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+function Boolean AllPrjAllComp2021RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2021";
   PutWindowRecord(wn,RepSpec);
 
 	return;

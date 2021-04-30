@@ -26,7 +26,7 @@ external function val MulRateToBase1(var string,val,val,val,val,val,val,roundmod
 external function Boolean GetPMRow(string,var row PMBlock);
 external function roundmode SetRoundModeD(Integer);
 
-global procedure ArraysCollect(record RcVc RepSpec, var array string ArtArrayWithoutGroups, var array string ProjArray, var vector string ProjNamesVect, var array string ArtArrayWithGroups, var boolean PrjFoundf, var vector boolean isMotherProjVect)
+procedure ArraysCollect(record RcVc RepSpec, var array string ArtArrayWithoutGroups, var array string ProjArray, var vector string ProjNamesVect, var array string ArtArrayWithGroups, var boolean PrjFoundf, var vector boolean isMotherProjVect)
 BEGIN
 	record ITVc ITr;
 	record INVc INr;
@@ -409,8 +409,7 @@ begin
   return;
 end;
 
-
-global procedure DataCollect(array string ArtArrayWithoutGroups, array string ExtArr,var array string ProjArray,var array string ProjArray2, record RcVc RepSpec,
+procedure DataCollect(array string ArtArrayWithoutGroups, array string ExtArr,var array string ProjArray,var array string ProjArray2, record RcVc RepSpec,
 					var vector val QuartVect,var array string CompArray,var vector string CompNamesVect,array string SuppArr)
 BEGIN
 	record CompaniesBlock CBb;
@@ -445,8 +444,6 @@ BEGIN
   vector boolean ProjInArr,ArtInArr;
   string 20 donorobj;
   
-  logtext(0,"DataCollect");
-  
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
     ProjInArr[ProjArray[PAi]] = true;
   end;
@@ -465,6 +462,7 @@ BEGIN
       SetCompany(1,false);
     case "2021":
       SetCompany(1,false);
+    
   end;
   EAi = 0;
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin 
@@ -591,7 +589,10 @@ BEGIN
 													GetObjs("DONOR",TRrw.Objects,donorobj);
 													if(nonblank(donorobj))then begin
 														FillVect(k & "Fsp;",ArtArrayWithoutGroups[j],extras,ProjArray[PAi],group,PRr.MotherCode,CBrw.ShortName,(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);
-														FillVect(k & "FSsp;",ArtArrayWithoutGroups[j],extras & ":::" & extras1,ProjArray[PAi],group,PRr.MotherCode,CBrw.ShortName,(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);                        
+														FillVect(k & "FSsp;",ArtArrayWithoutGroups[j],extras & ":::" & extras1,ProjArray[PAi],group,PRr.MotherCode,CBrw.ShortName,(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);
+														
+														FillVect(k & "FspTOT;",ArtArrayWithoutGroups[j],extras,ProjArray[PAi],group,PRr.MotherCode,"_",(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);
+														FillVect(k & "FSspTOT;",ArtArrayWithoutGroups[j],extras & ":::" & extras1,ProjArray[PAi],group,PRr.MotherCode,"_",(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);                        
 													end;
 												end;
 											end;
@@ -628,9 +629,21 @@ BEGIN
 													GetObjs("DONOR",TRrw.Objects,donorobj);
 													if(nonblank(donorobj))then begin
 														FillVect(k & "Fdn;",ArtArrayWithoutGroups[j],extras,ProjArray[PAi],group,PRr.MotherCode,CBrw.ShortName,(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);
-														FillVect(k & "FSdn;",ArtArrayWithoutGroups[j],extras & ":::" & extras1,ProjArray[PAi],group,PRr.MotherCode,CBrw.ShortName,(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);                        
+														FillVect(k & "FSdn;",ArtArrayWithoutGroups[j],extras & ":::" & extras1,ProjArray[PAi],group,PRr.MotherCode,CBrw.ShortName,(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);   
+														
+														FillVect(k & "FdnTOT;",ArtArrayWithoutGroups[j],extras,ProjArray[PAi],group,PRr.MotherCode,"_",(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);
+														FillVect(k & "FSdnTOT;",ArtArrayWithoutGroups[j],extras & ":::" & extras1,ProjArray[PAi],group,PRr.MotherCode,"_",(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);                     
 													end;
 												end;
+											end;
+											donorobj = "";
+											GetObjs("DONOR",TRrw.Objects,donorobj);
+											if(nonblank(donorobj))then begin
+												FillVect(k & "FdnT;","-",extras,ProjArray[PAi],group,PRr.MotherCode,CBrw.ShortName,(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);
+												FillVect(k & "FSdnT;","-",extras & ":::" & extras1,ProjArray[PAi],group,PRr.MotherCode,CBrw.ShortName,(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);   
+												
+												FillVect(k & "FdnTTOT;","-",extras,ProjArray[PAi],group,PRr.MotherCode,"_",(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);
+												FillVect(k & "FSdnTTOT;","-",extras & ":::" & extras1,ProjArray[PAi],group,PRr.MotherCode,"_",(TRrw.DebVal- TRrw.CredVal),RepSpec,QuartVect);                     
 											end;
 										end;
 									end;
@@ -646,13 +659,7 @@ BEGIN
 					while (loopkey("InvDate",VIr,1,TrHs)) begin
 						testf = true;
 						if (VIr.InvDate>RepSpec.sEndDate) then begin TrHs = false; testf = false; end;
-						if (VIr.OKFlag==0) then begin 
-							if(RepSpec.long1>0 and RepSpec.long1==VIr.SerNr)then begin
-
-							end else begin
-								testf = false; 
-							end;
-						end;
+						if (VIr.OKFlag==0) then begin testf = false; end;
 						if (VIr.Invalid==1) then begin testf = false; end;
 						if (testf and nonblank(RepSpec.f1)) then begin
 							mtrw = matrowcnt(VIr);
@@ -693,7 +700,6 @@ BEGIN
 									end;
 								end;
 							end;
-							
 							if (sum==0) then begin
 								resetloop(OPrsr);
 								OPrsr.VINr = VIr.SerNr;
@@ -740,7 +746,6 @@ BEGIN
 									end;
 								end;
 							end;
-							
 							if (sum==0) then begin
 								fr = 0;
 								to1 = 0;
@@ -797,18 +802,15 @@ BEGIN
 										SAi = SAi + 1;
 									end;
 									tmpval = VIrw.Sum/VIr.PayVal*sum;
-									
-									if(RepSpec.long1>0 and RepSpec.long1==VIr.SerNr and VIr.OKFlag==0)then begin
-										FillVect(k & "F;",VIrw.Exp,VIrw.Extras,PRr.Code,INr.Objects,PRr.Code,CBrw.ShortName,tmpval,RepSpec,QuartVect);
-										FillVect(k & "FS;",VIrw.Exp,VIrw.Extras & ":::" & VIrw.Supp,PRr.Code,INr.Objects,PRr.MotherCode,CBrw.ShortName,tmpval,RepSpec,QuartVect);
-									end else begin
-										FillVect(k & "F;",VIrw.Exp,VIrw.Extras,PRr.Code,group,PRr.MotherCode,CBrw.ShortName,tmpval,RepSpec,QuartVect);
-										FillVect(k & "FS;",VIrw.Exp,VIrw.Extras & ":::" & VIrw.Supp,PRr.Code,group,PRr.MotherCode,CBrw.ShortName,tmpval,RepSpec,QuartVect);
-									end;
+									FillVect(k & "F;",VIrw.Exp,VIrw.Extras,PRr.Code,group,PRr.MotherCode,CBrw.ShortName,tmpval,RepSpec,QuartVect);
+									FillVect(k & "FS;",VIrw.Exp,VIrw.Extras & ":::" & VIrw.Supp,PRr.Code,group,PRr.MotherCode,CBrw.ShortName,tmpval,RepSpec,QuartVect);
 
 									if(nonblank(VIrw.Donor))then begin
 										FillVect(k & "Fsp;",VIrw.Exp,VIrw.Extras,PRr.Code,group,PRr.MotherCode,CBrw.ShortName,tmpval,RepSpec,QuartVect);
 										FillVect(k & "FSsp;",VIrw.Exp,VIrw.Extras & ":::" & VIrw.Supp,PRr.Code,group,PRr.MotherCode,CBrw.ShortName,tmpval,RepSpec,QuartVect);
+										
+										FillVect(k & "FspTOT;",VIrw.Exp,VIrw.Extras,PRr.Code,group,PRr.MotherCode,"_",tmpval,RepSpec,QuartVect);
+										FillVect(k & "FSspTOT;",VIrw.Exp,VIrw.Extras & ":::" & VIrw.Supp,PRr.Code,group,PRr.MotherCode,"_",tmpval,RepSpec,QuartVect);
 									end;
 								end;
 							end;
@@ -965,26 +967,8 @@ BEGIN
 	RETURN;
 END;
 
-
-global procedure GlobalDataCollect(array string ArtArrayWithoutGroups, array string ExtArr,var array string ProjArray,var array string ProjArray2, record RcVc RepSpec,
-					var vector val QuartVect,var array string CompArray,var vector string CompNamesVect,array string SuppArr)
-BEGIN
-	vector string 255 ProjNamesVect;
-	array string 10 ArtArrayWithGroups;
-	boolean PrjFoundf;
-	vector boolean isMotherProjVect;
-	
-	  ArraysCollect(RepSpec,ArtArrayWithoutGroups,ProjArray,ProjNamesVect,ArtArrayWithGroups,PrjFoundf,isMotherProjVect);
-		if (PrjFoundf) then begin
-			DataCollect(ArtArrayWithoutGroups,ExtArr,ProjArray,ProjArray2,RepSpec,QuartVect,CompArray,CompNamesVect,SuppArr);
-		end;
-
-return;
-end;
-
-
 global
-procedure ProjectStatRn(record RcVc RepSpec, var string fnserv, var string md5str, var boolean PrjFoundf)
+procedure DonationsStatRn(record RcVc RepSpec, var string fnserv, var string md5str, var boolean PrjFoundf)
 BEGIN
 	record BaseCurBlock BCb;
 	record ITVc ITr;
@@ -1088,85 +1072,87 @@ BEGIN
 			for (i=0;i<quartCount;i=i+1) begin
 				sheetColls[colnum] = 9.7109371;
 				colnum = colnum + 1;
+				sheetColls[colnum] = 9.7109371;
+				colnum = colnum + 1;
         if (RepSpec.flags[29]==1) then begin
           for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
             
+            //sheetColls[colnum] = 9.7109371;
+            if quartCount>1 then begin
+              //sheetCollsOutLvl[colnum] = RepSpec.flags[5]*2;
+            end else begin
+            	//sheetCollsOutLvl[colnum] = 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 13 November 2018 11:30:03
+            end;
+            //colnum = colnum + 1;
+            
             sheetColls[colnum] = 9.7109371;
             if quartCount>1 then begin
-              sheetCollsOutLvl[colnum] = RepSpec.flags[5]*2;
+              //sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
             end else begin
-            	sheetCollsOutLvl[colnum] = 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 13 November 2018 11:30:03
+            	//sheetCollsOutLvl[colnum] = 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 29 May 2020 16:15:09
             end;
             colnum = colnum + 1;
             
             sheetColls[colnum] = 9.7109371;
             if quartCount>1 then begin
-              sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
+              //sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
             end else begin
-            	sheetCollsOutLvl[colnum] = 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 29 May 2020 16:15:09
-            end;
-            colnum = colnum + 1;
-            
-            sheetColls[colnum] = 9.7109371;
-            if quartCount>1 then begin
-              sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
-            end else begin
-            	sheetCollsOutLvl[colnum] = 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 29 May 2020 16:15:12
+            	//sheetCollsOutLvl[colnum] = 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 29 May 2020 16:15:12
             end;
             colnum = colnum + 1;
           end;
         end;
-        sheetColls[colnum] = 9.7109371;
+        //sheetColls[colnum] = 9.7109371;
         if quartCount>1 then begin
-          sheetCollsOutLvl[colnum] = RepSpec.flags[5];
+          //sheetCollsOutLvl[colnum] = RepSpec.flags[5];
         end;
-        colnum = colnum + 1;
+        //colnum = colnum + 1;
 			end;
       if quartCount>1 then begin
         sheetColls[colnum] = 10.5703125;
         colnum = colnum + 1;
+      	sheetColls[colnum] = 10.5703125;
+        colnum = colnum + 1;
         if (RepSpec.flags[29]==1) then begin
           for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
+            //sheetColls[colnum] = 10.5703125;
+            if quartCount>1 then begin
+              //sheetCollsOutLvl[colnum] = RepSpec.flags[5]*2;
+            end;
+            //colnum = colnum + 1;
             sheetColls[colnum] = 10.5703125;
             if quartCount>1 then begin
-              sheetCollsOutLvl[colnum] = RepSpec.flags[5]*2;
+              //sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
             end;
             colnum = colnum + 1;
             sheetColls[colnum] = 10.5703125;
             if quartCount>1 then begin
-              sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
-            end;
-            colnum = colnum + 1;
-            sheetColls[colnum] = 10.5703125;
-            if quartCount>1 then begin
-              sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
+              //sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
             end;
             colnum = colnum + 1;
           end;
         end;
-        sheetColls[colnum] = 10.5703125;
-        sheetCollsOutLvl[colnum] = RepSpec.flags[5];
-        colnum = colnum + 1;
+        //sheetColls[colnum] = 10.5703125;
+        //sheetCollsOutLvl[colnum] = RepSpec.flags[5];
+        //colnum = colnum + 1;
       end;
-			sheetColls[colnum] = 10.5703125;
+			//sheetColls[colnum] = 10.5703125;
       if quartCount>1 then begin
-        sheetCollsOutLvl[colnum] = RepSpec.flags[5];
+        //sheetCollsOutLvl[colnum] = RepSpec.flags[5];
       end;
-			colnum = colnum + 1;
-			sheetColls[colnum] = 6.140625;
+			//colnum = colnum + 1;
+			//sheetColls[colnum] = 6.140625;
       if quartCount>1 then begin
-        sheetCollsOutLvl[colnum] = RepSpec.flags[5];
+        //sheetCollsOutLvl[colnum] = RepSpec.flags[5];
       end;
-			colnum = colnum + 1;
+			//colnum = colnum + 1;
 			if k != (prjInRow - 1) then begin
 				sheetColls[colnum] = 1.7109371;
         colnum = colnum + 1;
 			end;
 		end;
     colqty = 2;
-    if (RepSpec.flags[29]==1) then begin
-      colqty = CompArray.length*3 + 2;
-    end;
+
 		colnum = 0;
 		numOfUniqueSharedStrings = 0;
 		numOfSharedStrings = 0;
@@ -1181,8 +1167,8 @@ BEGIN
       colnum = 1;
       BeginRow(sheetnum,fileToSave,rownum,0,19.5);
         style = 14;
-        StringCell(sheetnum,fileToSave,colnum,rownum,style,"Project Statistics " & RepSpec.f2,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-        qtyOfEmpStr = ((quartCount + 1)*colqty + 3)*prjInRow + 2;
+        StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donations Statistics " & RepSpec.f2,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+        qtyOfEmpStr = ((quartCount + 1)*colqty + 3)*prjInRow + 3;
         if quartCount<2 then begin
           qtyOfEmpStr = qtyOfEmpStr - colqty*prjInRow;
         end;
@@ -1242,9 +1228,9 @@ BEGIN
             end else begin
               style = 39;
             end;
-            qtyOfEmpStr = (quartCount + 1)*colqty + 1;
+            qtyOfEmpStr = (quartCount + 4)*colqty + CompArray.length * 4 + 1;
             if quartCount<2 then begin
-              qtyOfEmpStr = qtyOfEmpStr - colqty;
+              qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
             end;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
             style = 36;
@@ -1281,9 +1267,9 @@ BEGIN
                 style = 52;
               end;
             end;
-            qtyOfEmpStr = (quartCount + 1)*colqty + 1;
+            qtyOfEmpStr = (quartCount + 4)*colqty + CompArray.length * 4 + 1;
             if quartCount<2 then begin
-              qtyOfEmpStr = qtyOfEmpStr - colqty;
+              qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
             end;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
             mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
@@ -1318,9 +1304,9 @@ BEGIN
                 style = 16;
               end;
             end;
-            qtyOfEmpStr = (quartCount + 1)*colqty + 1;
+            qtyOfEmpStr = (quartCount + 4)*colqty + CompArray.length * 4 + 1;
             if quartCount<2 then begin
-              qtyOfEmpStr = qtyOfEmpStr - colqty;
+              qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
             end;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
             style = 36;
@@ -1344,36 +1330,21 @@ BEGIN
               if nonblank(RepSpec.f4) then begin
                 StringCell(sheetnum,fileToSave,colnum,rownum,style,MonthName(RepSpec.sStartDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
               end else begin
-                StringCell(sheetnum,fileToSave,colnum,rownum,style,QuartalIntToStr(quartToPrint[Qi]),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                StringCell(sheetnum,fileToSave,colnum,rownum,style,QuartalIntToStr(quartToPrint[Qi]) & " Donated",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                StringCell(sheetnum,fileToSave,colnum,rownum,style,QuartalIntToStr(quartToPrint[Qi]) & " Spent",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
               end;
               if left(ProjArray[PAi],2)=="sT" then begin
                 style = 66;
               end else begin
                 style = 62;
               end;
-              if (RepSpec.flags[29]==1) then begin
-                for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                  if left(ProjArray[PAi],2)=="sT" then begin
-										style = 66;
-									end else begin
-										style = 62;
-									end;
-                  
-                  StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-                  style = 83;
-                  StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donated - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-                  style = 84;
-                  StringCell(sheetnum,fileToSave,colnum,rownum,style,"Spent - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-                end;
-                if left(ProjArray[PAi],2)=="sT" then begin
-                  style = 75;
-                end else begin
-                  style = 69;
-                end;
-                StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact -  ALL COMPANIES",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-              end else begin
-                StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-              end;
+							for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
+								style = 83;
+								StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donated - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+								style = 84;
+								StringCell(sheetnum,fileToSave,colnum,rownum,style,"Spent - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+							end;
+
             end;
             if quartCount>1 then begin
               if left(ProjArray[PAi],2)=="sT" then begin
@@ -1381,39 +1352,21 @@ BEGIN
               end else begin
                 style = 65;
               end;
-              StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+              StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT Donated",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+              StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT Spent",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings); 
               if left(ProjArray[PAi],2)=="sT" then begin
                 style = 68;
               end else begin
                 style = 62;
               end;
-              if (RepSpec.flags[29]==1) then begin
-                for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                  if left(ProjArray[PAi],2)=="sT" then begin
-										style = 68;
-									end else begin
-										style = 62;
-									end;
-                  StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT-Fact - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-                  style = 83;
-                  StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT-Donated - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-                  style = 84;
-                  StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT-Spent - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-                end;
-                if left(ProjArray[PAi],2)=="sT" then begin
-                  style = 77;
-                end else begin
-                  style = 69;
-                end;
-                StringCell(sheetnum,fileToSave,colnum,rownum,style,"Tot-Fact - ALL COMPANIES",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-              end else begin
-                StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-              end;
+							for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
+								style = 83;
+								StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT-Donated - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+								style = 84;
+								StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT-Spent - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+							end;
+
             end;
-            style = 63;
-            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Delta,$",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-            style = 64;
-            StringCell(sheetnum,fileToSave,colnum,rownum,style,"%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
             style = 36;
             qtyOfEmpStr = 1;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -1468,7 +1421,9 @@ BEGIN
                       style = 24;
                     end;
                     bud = QuartVect[quartToPrint[Qi] & ";" & group & ";" & ProjArray[PAi]];
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FdnTOT;" & group & ";" & ProjArray[PAi] & ";_"]);
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FspTOT;" & group & ";" & ProjArray[PAi] & ";_"]);
                     totbud = totbud + bud;
                     if left(ProjArray[PAi],2)=="sT" then begin
                       style = 33;
@@ -1480,12 +1435,13 @@ BEGIN
                         fact = QuartVect[quartToPrint[Qi] & "F;" & group & ";" & ProjArray[PAi] & ";" & CompArray[CAi]];
                         donated = QuartVect[quartToPrint[Qi] & "Fdn;" & group & ";" & ProjArray[PAi] & ";" & CompArray[CAi]];
                         spent = QuartVect[quartToPrint[Qi] & "Fsp;" & group & ";" & ProjArray[PAi] & ";" & CompArray[CAi]];
-                        if left(ProjArray[PAi],2)=="sT" then begin
+                        /*if left(ProjArray[PAi],2)=="sT" then begin
 													style = 33;
 												end else begin
 													style = 40;
 												end;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
+                        */
                         style = 85;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 29 May 2020 16:20:57
                         style = 86;
@@ -1493,15 +1449,10 @@ BEGIN
                         totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
                         totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:08:52
                         totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + donated;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:08:54
-                      end;
-                      if left(ProjArray[PAi],2)=="sT" then begin
-                        style = 74;
-                      end else begin
-                        style = 70;
+                      	totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:08:52
+                        totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
                       end;
                     end;
-                    fact = QuartVect[quartToPrint[Qi] & "F;" & group & ";" & ProjArray[PAi]];
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                     totfact = totfact + fact;
                   end;
                   if quartCount>1 then begin
@@ -1511,6 +1462,7 @@ BEGIN
                       style = 24;
                     end;
                     NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
                     if left(ProjArray[PAi],2)=="sT" then begin
                       style = 35;
                     end else begin
@@ -1518,36 +1470,17 @@ BEGIN
                     end;
                     if (RepSpec.flags[29]==1) then begin
                       for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                        if left(ProjArray[PAi],2)=="sT" then begin
-													style = 35;
-												end else begin
-													style = 40;
-												end;
-                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
                         style = 85;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 29 May 2020 16:21:09
                         style = 86;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 29 May 2020 16:21:10
                         totfactv[CompArray[CAi]] = 0;
                         totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
                         totfactv[CompArray[CAi] & ":sp"] = 0;
-                      end;
-                      if left(ProjArray[PAi],2)=="sT" then begin
-                        style = 78;
-                      end else begin
-                        style = 70;
+totfactv[":spTOT"] = 0;
                       end;
                     end;
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-                  end;
-                  style = 28;
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
-                  style = 30;
-                  if (totfact == 0) then begin
-                    qtyOfEmpStr = 1;
-                    EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-                  end else begin
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
                   end;
                   style = 36;
                   qtyOfEmpStr = 1;
@@ -1577,7 +1510,9 @@ BEGIN
                       style = 27;
                     end;
                     bud = QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ";" & ProjArray[PAi]];
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FdnTOT;" & ArtArrayWithGroups[i] & ";" & ProjArray[PAi] & ";_"]);
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FspTOT;" & ArtArrayWithGroups[i] & ";" & ProjArray[PAi] & ";_"]);
+                    
                     totbud = totbud + bud;
                     if left(ProjArray[PAi],2)=="sT" then begin
                       k = prjInRow;
@@ -1590,12 +1525,6 @@ BEGIN
                         fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ";" & ProjArray[PAi] & ";" & CompArray[CAi]];
                         donated = QuartVect[quartToPrint[Qi] & "Fdn;" & ArtArrayWithGroups[i] & ";" & ProjArray[PAi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:11:00
                         spent = QuartVect[quartToPrint[Qi] & "Fsp;" & ArtArrayWithGroups[i] & ";" & ProjArray[PAi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:11:00
-                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
-                        if left(ProjArray[PAi],2)=="sT" then begin
-													style = 34;
-												end else begin
-													style = 41;
-												end;
                         style = 85;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 29 May 2020 16:21:19
                         style = 86;
@@ -1603,16 +1532,11 @@ BEGIN
                         totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
                         totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:11:26
                         totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:11:27
-                      end;
-                      if left(ProjArray[PAi],2)=="sT" then begin
-                        k = prjInRow;
-                        style = 76;
-                      end else begin
-                        style = 71;
+                      	totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:11:26
+                        totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
                       end;
                     end;
                     fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ";" & ProjArray[PAi]];
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                     totfact = totfact + fact;
                   end;
                   if quartCount>1 then begin
@@ -1622,6 +1546,7 @@ BEGIN
                       style = 27;
                     end;
                     NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
                     if left(ProjArray[PAi],2)=="sT" then begin
                       style = 58;
                     end else begin
@@ -1629,36 +1554,17 @@ BEGIN
                     end;
                     if (RepSpec.flags[29]==1) then begin
                       for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                        if left(ProjArray[PAi],2)=="sT" then begin
-													style = 58;
-												end else begin
-													style = 41;
-												end;
-                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
                         style = 85;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 29 May 2020 16:21:32
                         style = 86;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 29 May 2020 16:21:33
                         totfactv[CompArray[CAi]] = 0;
                         totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
                         totfactv[CompArray[CAi] & ":sp"] = 0;
-                      end;
-                      if left(ProjArray[PAi],2)=="sT" then begin
-                        style = 79;
-                      end else begin
-                        style = 71;
+totfactv[":spTOT"] = 0;
                       end;
                     end;
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-                  end;
-                  style = 29;
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
-                  style = 31;
-                  if (totbud == 0) then begin
-                    qtyOfEmpStr = 1;
-                    EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-                  end else begin
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
                   end;
                   style = 36;
                   qtyOfEmpStr = 1;
@@ -1711,45 +1617,27 @@ BEGIN
                             end else begin
                               style = 42;
                             end;
-                            //if(QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray[PAi]]!=0)then begin
-														//	logtext(0,quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray[PAi]);
-														//	logtext(0,QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray[PAi]]);
-														//end;
                             bud = QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray[PAi]];
-                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FdnTOT;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray[PAi] & ";_"]);
+                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FspTOT;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray[PAi] & ";_"]);
                             totbud = totbud + bud;
-                            if left(ProjArray[PAi],2)=="sT" then begin
-                              style = 48;
-                            end else begin
-                              style = 20;
-                            end;
                             if (RepSpec.flags[29]==1) then begin
                               for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
                                 fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray[PAi] & ";" & CompArray[CAi]];
                                 donated = QuartVect[quartToPrint[Qi] & "Fdn;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray[PAi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:31:05
                                 spent = QuartVect[quartToPrint[Qi] & "Fsp;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray[PAi] & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:31:05
-                                if left(ProjArray[PAi],2)=="sT" then begin
-																	style = 48;
-																end else begin
-																	style = 20;
-																end;
-                                NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                                 style = 85;
                                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 29 May 2020 16:21:40
                                 style = 86;
                                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 29 May 2020 16:21:41
                                 totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-                                totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:31:03
-                                totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:31:03
-                              end;
-                              if left(ProjArray[PAi],2)=="sT" then begin
-                                style = 80;
-                              end else begin
-                                style = 72;
+                                totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:31:03
+                                totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:31:03
+                              	totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:31:03
+                                totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
                               end;
                             end;
                             fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray[PAi]];
-                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                             totfact = totfact + fact;
                           end;
                           if quartCount>1 then begin
@@ -1759,43 +1647,20 @@ BEGIN
                               style = 42;
                             end;
                             NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
-                            if left(ProjArray[PAi],2)=="sT" then begin
-                              style = 60;
-                            end else begin
-                              style = 20;
-                            end;
+                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
                             if (RepSpec.flags[29]==1) then begin
                               for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                                if left(ProjArray[PAi],2)=="sT" then begin
-																	style = 60;
-																end else begin
-																	style = 20;
-																end;
-                                NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
                                 style = 85;
                                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);
                                 style = 86;
                                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);
                                 totfactv[CompArray[CAi]] = 0;
                                 totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
 																totfactv[CompArray[CAi] & ":sp"] = 0;
-                              end;
-                              if left(ProjArray[PAi],2)=="sT" then begin
-                                style = 81;
-                              end else begin
-                                style = 72;
+totfactv[":spTOT"] = 0;
                               end;
                             end;
-                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-                          end;
-                          style = 22;
-                          NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
-                          style = 21;
-                          if (totbud == 0) then begin
-                            qtyOfEmpStr = 1;
-                            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-                          end else begin
-                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
                           end;
                           style = 36;
                           qtyOfEmpStr = 1;
@@ -1841,45 +1706,27 @@ BEGIN
 																		end else begin
 																			style = 42;
 																		end;
-																		//if(QuartVect[quartToPrint[Qi] & "S;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray[PAi]]!=0)then begin
-																		//	logtext(0,quartToPrint[Qi] & "S;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray[PAi]);
-																		//	logtext(0,QuartVect[quartToPrint[Qi] & "S;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray[PAi]]);
-																		//end;
 																		bud = QuartVect[quartToPrint[Qi] & "S;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray[PAi]];
-																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FSdnTOT;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray[PAi] & ";_"]);
+																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FSspTOT;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray[PAi] & ";-"]);
 																		totbud = totbud + bud;
-																		if left(ProjArray[PAi],2)=="sT" then begin
-																			style = 48;
-																		end else begin
-																			style = 20;
-																		end;
 																		if (RepSpec.flags[29]==1) then begin
 																			for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
 																				fact = QuartVect[quartToPrint[Qi] & "FS;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray[PAi] & ";" & CompArray[CAi]];
 																				donated = QuartVect[quartToPrint[Qi] & "FSdn;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray[PAi] & ";" & CompArray[CAi]];
 																				spent = QuartVect[quartToPrint[Qi] & "FSsp;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray[PAi] & ";" & CompArray[CAi]];
-																				if left(ProjArray[PAi],2)=="sT" then begin
-																					style = 48;
-																				end else begin
-																					style = 20;
-																				end;
-																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
 																				style = 85;
 																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:14:39
 																				style = 86;
 																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:14:40
 																				totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-																				totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:35:51
-																				totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:35:52
-																			end;
-																			if left(ProjArray[PAi],2)=="sT" then begin
-																				style = 80;
-																			end else begin
-																				style = 72;
+																				totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:35:51
+																				totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:35:52
+																				totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:35:51
+																				totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
 																			end;
 																		end;
 																		fact = QuartVect[quartToPrint[Qi] & "FS;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray[PAi]];
-																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
 																		totfact = totfact + fact;
 																	end;
 																	if quartCount>1 then begin
@@ -1889,43 +1736,20 @@ BEGIN
 																			style = 42;
 																		end;
 																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
-																		if left(ProjArray[PAi],2)=="sT" then begin
-																			style = 60;
-																		end else begin
-																			style = 20;
-																		end;
+																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
 																		if (RepSpec.flags[29]==1) then begin
 																			for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-																				if left(ProjArray[PAi],2)=="sT" then begin
-																					style = 60;
-																				end else begin
-																					style = 20;
-																				end;
-																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
 																				style = 85;
 																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:14:47
 																				style = 86;
 																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:14:48
 																				totfactv[CompArray[CAi]] = 0;
 																				totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
 																				totfactv[CompArray[CAi] & ":sp"] = 0;
-																			end;
-																			if left(ProjArray[PAi],2)=="sT" then begin
-																				style = 81;
-																			end else begin
-																				style = 72;
+totfactv[":spTOT"] = 0;
 																			end;
 																		end;
-																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-																	end;
-																	style = 22;
-																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
-																	style = 21;
-																	if (totbud == 0) then begin
-																		qtyOfEmpStr = 1;
-																		EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-																	end else begin
-																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
 																	end;
 																	style = 36;
 																	qtyOfEmpStr = 1;
@@ -1949,9 +1773,9 @@ BEGIN
                     if left(ProjArray[PAi],2)=="sT" then begin
                       k = prjInRow;
                     end;
-                    qtyOfEmpStr = (quartCount + 1)*colqty + 2;
+                    qtyOfEmpStr = (quartCount + 4)*colqty + CompArray.length * 4 + 1;
                     if quartCount<2 then begin
-                      qtyOfEmpStr = qtyOfEmpStr - colqty;
+                      qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
                     end;
                     EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
                     colnum = colnum + 1;
@@ -1976,42 +1800,26 @@ BEGIN
             for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
               style = 25;
               bud = QuartVect[quartToPrint[Qi] & ";T;" & ProjArray[PAi]];
-              NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FdnTTOT;T;" & ProjArray[PAi] & ";_"]);
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FspTOT;T;" & ProjArray[PAi] & ";_"]);
               totbud = totbud + bud;
-              if left(ProjArray[PAi],2)=="sT" then begin
-                k = prjInRow;
-                style = 33;
-              end else begin
-                style = 44;
-              end;
               if (RepSpec.flags[29]==1) then begin
                 for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
                   fact = QuartVect[quartToPrint[Qi] & "F;T;" & ProjArray[PAi] & ";" & CompArray[CAi]];
-                  donated = QuartVect[quartToPrint[Qi] & "Fdn;T;" & ProjArray[PAi] & ";" & CompArray[CAi]];
+                  donated = QuartVect[quartToPrint[Qi] & "Fdn;T;" & "-" & ";" & CompArray[CAi]];
                   spent = QuartVect[quartToPrint[Qi] & "Fsp;T;" & ProjArray[PAi] & ";" & CompArray[CAi]];
-                  if left(ProjArray[PAi],2)=="sT" then begin
-										style = 33;
-									end else begin
-										style = 44;
-									end;
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                   style = 85;
                   NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:15:18
                   style = 86;
                   NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:15:19
                   totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-                  totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;
-                  totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;
-                end;
-                if left(ProjArray[PAi],2)=="sT" then begin
-                  k = prjInRow;
-                  style = 74;
-                end else begin
-                  style = 73;
+                  totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;
+                  totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                  totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;
+                  totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
                 end;
               end;
               fact = QuartVect[quartToPrint[Qi] & "F;T;" & ProjArray[PAi]];
-              NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
               totfact = totfact + fact;
             end;
             if quartCount>1 then begin
@@ -2021,50 +1829,21 @@ BEGIN
                 style = 25;
               end;
               NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
-              if left(ProjArray[PAi],2)=="sT" then begin
-                style = 35;
-              end else begin
-                style = 33;
-              end;
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
               if (RepSpec.flags[29]==1) then begin
                 for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                	if left(ProjArray[PAi],2)=="sT" then begin
-										style = 35;
-									end else begin
-										style = 33;
-									end;
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
                   style = 85;
                   NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:16:44
                   style = 86;
                   NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:16:45
                   totfactv[CompArray[CAi]] = 0;
                   totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
 									totfactv[CompArray[CAi] & ":sp"] = 0;
-                end;
-                if left(ProjArray[PAi],2)=="sT" then begin
-                  style = 78;
-                end else begin
-                  style = 74;
+totfactv[":spTOT"] = 0;
                 end;
               end;
-              NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
             end;
-            // Edit Start ---------------------------------------------- Edit Start
-	//Thursday, 6 September 2018 08:59:08
-	
-              style = 28;
-              NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact-totbud);
-              style = 30;
-             	if (totbud == 0) then begin
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							end else begin
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,(totfact-totbud)/totbud*100);
-							end;
-              
-	// Edit End ---------------------------------------------- Edit End
-	
             colnum = colnum + 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 6 September 2018 08:53:46
           end;
         EndRow(sheetnum,fileToSave,rownum);
@@ -2078,9 +1857,9 @@ BEGIN
           qtyOfEmpStr = 1;
           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
           style = 11;
-          qtyOfEmpStr = (quartCount + 1)*colqty + 1;
+          qtyOfEmpStr = (quartCount + 4)*colqty + CompArray.length * 4 + 1;
           if quartCount<2 then begin
-            qtyOfEmpStr = qtyOfEmpStr - colqty;
+            qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
           end;
           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
           style = 17;
@@ -2091,11 +1870,11 @@ BEGIN
         BeginRow(sheetnum,fileToSave,rownum,0,blankval);
           mergeCell[qtyMergeCell] = GetStringCellNum(colnum,rownum);
           style = 53;
-          StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL - Budget - " & RepSpec.f2,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+          StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOTAL - " & RepSpec.f2,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
           style = 54;
-          qtyOfEmpStr = (quartCount + 1)*colqty + 1;
+          qtyOfEmpStr = (quartCount + 4)*colqty + CompArray.length * 4 + 1;
           if quartCount<2 then begin
-            qtyOfEmpStr = qtyOfEmpStr - colqty;
+            qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
           end;
           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
           mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
@@ -2110,9 +1889,9 @@ BEGIN
           qtyOfEmpStr = 1;
           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
           style = 13;
-          qtyOfEmpStr = (quartCount + 1)*colqty + 1;
+          qtyOfEmpStr = (quartCount + 4)*colqty + CompArray.length * 4 + 1;
           if quartCount<2 then begin
-            qtyOfEmpStr = qtyOfEmpStr - colqty;
+            qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
           end;
           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
           style = 17;
@@ -2128,47 +1907,33 @@ BEGIN
             if nonblank(RepSpec.f4) then begin
               StringCell(sheetnum,fileToSave,colnum,rownum,style,MonthName(RepSpec.sStartDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
             end else begin
-              StringCell(sheetnum,fileToSave,colnum,rownum,style,QuartalIntToStr(quartToPrint[Qi]),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+              StringCell(sheetnum,fileToSave,colnum,rownum,style,QuartalIntToStr(quartToPrint[Qi]) & " Donated",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+              StringCell(sheetnum,fileToSave,colnum,rownum,style,QuartalIntToStr(quartToPrint[Qi]) & " Spent",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
             end;
             style = 66;
             if (RepSpec.flags[29]==1) then begin
               for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-              	style = 66;
-                StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                 style = 83;
                 StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donated - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                 style = 84;
                 StringCell(sheetnum,fileToSave,colnum,rownum,style,"Spent - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
               end;
-              style = 75;
-              StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact -  ALL COMPANIES",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-            end else begin
-              StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
             end;
           end;
           if quartCount>1 then begin
             style = 67;
-            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Gr.Total",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Gr.Total - Donated",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Gr.Total - Spent",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
             style = 68;
             if (RepSpec.flags[29]==1) then begin
               for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                style = 68;
-                StringCell(sheetnum,fileToSave,colnum,rownum,style,"Gr.Tot-F - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                 style = 83;
                 StringCell(sheetnum,fileToSave,colnum,rownum,style,"Gr.Tot-D - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                 style = 84;
                 StringCell(sheetnum,fileToSave,colnum,rownum,style,"Gr.Tot-S - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
               end;
-              style = 77;
-              StringCell(sheetnum,fileToSave,colnum,rownum,style,"Gr.Tot-F -  ALL COMPANIES",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-            end else begin
-              StringCell(sheetnum,fileToSave,colnum,rownum,style,"Gr.Tot-F",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
             end;
           end;
-          style = 63;
-          StringCell(sheetnum,fileToSave,colnum,rownum,style,"Delta,$",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-          style = 64;
-          StringCell(sheetnum,fileToSave,colnum,rownum,style,"%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
           style = 36;
           qtyOfEmpStr = 1;
           EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -2215,7 +1980,8 @@ BEGIN
                 for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
                   style = 25;
                   bud = QuartVect[quartToPrint[Qi] & ";" & group & ";T"];
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FdnTOT;" & group & ";T" & ";_"]);
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FspTOT;" & group & ";T" & ";_"]);
                   totbud = totbud + bud;
                   style = 33;
                   if (RepSpec.flags[29]==1) then begin
@@ -2223,49 +1989,39 @@ BEGIN
                       fact = QuartVect[quartToPrint[Qi] & "F;" & group & ";T" & ";" & CompArray[CAi]];
                       donated = QuartVect[quartToPrint[Qi] & "Fdn;" & group & ";T" & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:37:56
                       spent = QuartVect[quartToPrint[Qi] & "Fsp;" & group & ";T" & ";" & CompArray[CAi]];// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:37:57
-                      style = 33;
-                      NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                       style = 85;
                       NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:19:38
                       style = 86;
                       NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:19:39
                       totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-                      totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;
-                      totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                      totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;
+                      totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                      totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;
+                      totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
                     end;
                     style = 74;
                   end;
                   fact = QuartVect[quartToPrint[Qi] & "F;" & group & ";T"];
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                   totfact = totfact + fact;
                 end;
                 if quartCount>1 then begin
                   style = 26;
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":dnTOT"]);
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":spTOT"]);
                   style = 35;
                   if (RepSpec.flags[29]==1) then begin
                     for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                      NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
                       style = 85;
                       NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:19:44
                       style = 86;
                       NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:19:45
                       totfactv[CompArray[CAi]] = 0;
                       totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
 											totfactv[CompArray[CAi] & ":sp"] = 0;
+totfactv[":spTOT"] = 0;
                     end;
-                    style = 78;
                   end;
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-                end;
-                style = 28;
-                NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
-                style = 30;
-                if (totbud == 0) then begin
-                  qtyOfEmpStr = 1;
-                  EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-                end else begin
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
                 end;
                 style = 36;
                 qtyOfEmpStr = 1;
@@ -2288,7 +2044,8 @@ BEGIN
                 for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
                   style = 32;
                   bud = QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ";T"];
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FdnTOT;" & ArtArrayWithGroups[i] & ";T" & ";_"]);
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FspTOT;" & ArtArrayWithGroups[i] & ";T" & ";_"]);
                   totbud = totbud + bud;
                   style = 34;
                   if (RepSpec.flags[29]==1) then begin
@@ -2296,50 +2053,38 @@ BEGIN
                       fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ";T" & ";" & CompArray[CAi]];
                       donated = QuartVect[quartToPrint[Qi] & "Fdn;" & ArtArrayWithGroups[i] & ";T" & ";" & CompArray[CAi]];
                       spent = QuartVect[quartToPrint[Qi] & "Fsp;" & ArtArrayWithGroups[i] & ";T" & ";" & CompArray[CAi]];
-                      style = 34;
-                      NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                       style = 85;
                       NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:40:17
                       style = 86;
                       NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:40:18
                       totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-                      totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;
-                      totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                      totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;
+                      totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                      totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;
+                      totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
                     end;
-                    style = 76;
                   end;
                   fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ";T"];
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                   totfact = totfact + fact;
                 end;
                 if quartCount>1 then begin
                   style = 57;
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":dnTOT"]);
+                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":spTOT"]);
                   style = 58;
                   if (RepSpec.flags[29]==1) then begin
                     for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                      style = 58;
-                      NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
                       style = 85;
                       NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:21:03
                       style = 86;
                       NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:21:03
                       totfactv[CompArray[CAi]] = 0;
                       totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
 											totfactv[CompArray[CAi] & ":sp"] = 0;
+totfactv[":spTOT"] = 0;
                     end;
-                    style = 79;
                   end;
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-                end;
-                style = 29;
-                NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
-                style = 31;
-                if (totbud == 0) then begin
-                  qtyOfEmpStr = 1;
-                  EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-                end else begin
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
                 end;
                 style = 36;
                 qtyOfEmpStr = 1;
@@ -2379,58 +2124,45 @@ BEGIN
                         for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
                           style = 47;
                           bud = QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";T"];
-                          NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+                          NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FdnTOT;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";T" & ";_"]);
+                          NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FspTOT;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";T" & ";_"]);
                           totbud = totbud + bud;
-                          style = 48;
                           if (RepSpec.flags[29]==1) then begin
                             for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
                               fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";T" & ";" & CompArray[CAi]];
                               donated = QuartVect[quartToPrint[Qi] & "Fdn;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";T" & ";" & CompArray[CAi]];
                               spent = QuartVect[quartToPrint[Qi] & "Fsp;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";T" & ";" & CompArray[CAi]];
-                              style = 48;
-                              NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                               style = 85;
                               NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:21:00
                               style = 86;
                               NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:21:00
                               totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-                              totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;
-                              totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                              totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;
+                              totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                              totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;
+                              totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
                             end;
-                            style = 80;
                           end;
                           fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";T"];
-                          NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                           totfact = totfact + fact;
                         end;
                         if quartCount>1 then begin
                           style = 59;
-                          NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
-                          style = 60;
+                          NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":dn"]);
+                          NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":sp"]);
                           if (RepSpec.flags[29]==1) then begin
                             for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                              style = 60;
-                              NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
                               style = 85;
                               NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);
                               style = 86;
                               NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);
                               totfactv[CompArray[CAi]] = 0;
                               totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
 															totfactv[CompArray[CAi] & ":sp"] = 0;
+totfactv[":spTOT"] = 0;
                             end;
-                            style = 81;
                           end;
-                          NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-                        end;
-                        style = 22;
-                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
-                        style = 21;
-                        if (totbud == 0) then begin
-                          qtyOfEmpStr = 1;
-                          EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-                        end else begin
-                          NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
                         end;
                         style = 36;
                         qtyOfEmpStr = 1;
@@ -2464,58 +2196,45 @@ BEGIN
 																for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
 																	style = 47;
 																	bud = QuartVect[quartToPrint[Qi] & "S;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T"];
-																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FSdnTOT;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T" & ";_"]);
+																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FSspTOT;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T" & ";_"]);
 																	totbud = totbud + bud;
-																	style = 48;
 																	if (RepSpec.flags[29]==1) then begin
 																		for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
 																			fact = QuartVect[quartToPrint[Qi] & "FS;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T" & ";" & CompArray[CAi]];
 																			donated = QuartVect[quartToPrint[Qi] & "FSdn;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T" & ";" & CompArray[CAi]];
 																			spent = QuartVect[quartToPrint[Qi] & "FSsp;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T" & ";" & CompArray[CAi]];
-																			style = 48;
-																			NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
 																			style = 85;
 																			NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:22:11
 																			style = 86;
 																			NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:22:12
 																			totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-																			totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;
-																			totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;
+																			totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;
+																			totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;
+																			totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;
+																			totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
 																		end;
-																		style = 80;
 																	end;
 																	fact = QuartVect[quartToPrint[Qi] & "FS;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";T"];
-																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
 																	totfact = totfact + fact;
 																end;
 																if quartCount>1 then begin
 																	style = 59;
-																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
-																	style = 60;
+																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":dnTOT"]);
+																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":dnTOT"]);
 																	if (RepSpec.flags[29]==1) then begin
 																		for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-																			style = 60;
-																			NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
 																			style = 85;
 																			NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:22:07
 																			style = 86;
 																			NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:22:08
 																			totfactv[CompArray[CAi]] = 0;
 																			totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
 																			totfactv[CompArray[CAi] & ":sp"] = 0;
+totfactv[":spTOT"] = 0;
 																		end;
-																		style = 81;
 																	end;
-																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-																end;
-																style = 22;
-																NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
-																style = 21;
-																if (totbud == 0) then begin
-																	qtyOfEmpStr = 1;
-																	EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-																end else begin
-																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
 																end;
 																style = 36;
 																qtyOfEmpStr = 1;
@@ -2533,9 +2252,9 @@ BEGIN
                 colnum = 5;
                 BeginRow(sheetnum,fileToSave,rownum,0,blankval);
                   style = 37;
-                  qtyOfEmpStr = (quartCount + 1)*colqty + 2;
+                  qtyOfEmpStr = (quartCount + 4)*colqty + CompArray.length * 4 + 1;
                   if quartCount<2 then begin
-                    qtyOfEmpStr = qtyOfEmpStr - colqty;
+                    qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
                   end;
                   EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
                 EndRow(sheetnum,fileToSave,rownum);
@@ -2556,65 +2275,46 @@ BEGIN
           for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
             style = 25;
             bud = QuartVect[quartToPrint[Qi] & ";T;T"];
-            NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FdnTTOT;T;T" & ";_"]);
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FspTOT;T;T" & ";_"]);
             totbud = totbud + bud;
-            style = 33;
             if (RepSpec.flags[29]==1) then begin
               for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
                 fact = QuartVect[quartToPrint[Qi] & "F;T;T" & ";" & CompArray[CAi]];
-                donated = QuartVect[quartToPrint[Qi] & "Fdn;T;T" & ";" & CompArray[CAi]];
+                donated = QuartVect[quartToPrint[Qi] & "FdnT;T;T" & ";" & CompArray[CAi]];
                 spent = QuartVect[quartToPrint[Qi] & "Fsp;T;T" & ";" & CompArray[CAi]];
-                style = 33;
-                NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                 style = 85;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:22:43
                 style = 86;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:22:44
                 totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-                totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;
-                totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;
+                totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;
+                totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
               end;
-              style = 74;
             end;
             fact = QuartVect[quartToPrint[Qi] & "F;T;T"];
-            NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
             totfact = totfact + fact;
           end;
           if quartCount>1 then begin
             style = 26;
-            NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
-            style = 35;
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":dnTOT"]);
+            NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":spTOT"]);
             if (RepSpec.flags[29]==1) then begin
               for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                style = 33;
-                NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
                 style = 85;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:23:00
                 style = 86;
                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:23:00
                 totfactv[CompArray[CAi]] = 0;
                 totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
 								totfactv[CompArray[CAi] & ":sp"] = 0;
+totfactv[":spTOT"] = 0;
               end;
-              style = 78;
             end;
-            NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
           end;
-          // Edit Start ---------------------------------------------- Edit Start
-	//Thursday, 6 September 2018 08:59:08
-	
-						style = 28;
-						NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact-totbud);
-						style = 30;
-						if (totbud == 0) then begin
-							qtyOfEmpStr = 1;
-							EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-						end else begin
-							NumericCell(sheetnum,fileToSave,colnum,rownum,style,(totfact-totbud)/totbud*100);
-						end;
-              
-	// Edit End ---------------------------------------------- Edit End
-            
         EndRow(sheetnum,fileToSave,rownum);
       end;
     EndSheetData(sheetnum,fileToSave);
@@ -2645,72 +2345,76 @@ BEGIN
       for (i=0;i<quartCount;i=i+1) begin
 				sheetColls[colnum] = 9.7109371;
 				colnum = colnum + 1;
+				sheetColls[colnum] = 9.7109371;
+				colnum = colnum + 1;
         if (RepSpec.flags[29]==1) then begin
           for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
+            /*sheetColls[colnum] = 9.7109371;
+            if quartCount>1 then begin
+              //sheetCollsOutLvl[colnum] = RepSpec.flags[5]*2;
+            end else begin
+            	//sheetCollsOutLvl[colnum] = 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 13 November 2018 11:34:30
+            end;
+            colnum = colnum + 1;*/
             sheetColls[colnum] = 9.7109371;
             if quartCount>1 then begin
-              sheetCollsOutLvl[colnum] = RepSpec.flags[5]*2;
+              //sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
             end else begin
-            	sheetCollsOutLvl[colnum] = 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 13 November 2018 11:34:30
+            	//sheetCollsOutLvl[colnum] = 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 13 November 2018 11:34:30
             end;
             colnum = colnum + 1;
             sheetColls[colnum] = 9.7109371;
             if quartCount>1 then begin
-              sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
+              //sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
             end else begin
-            	sheetCollsOutLvl[colnum] = 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 13 November 2018 11:34:30
-            end;
-            colnum = colnum + 1;
-            sheetColls[colnum] = 9.7109371;
-            if quartCount>1 then begin
-              sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
-            end else begin
-            	sheetCollsOutLvl[colnum] = 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 13 November 2018 11:34:30
+            	//sheetCollsOutLvl[colnum] = 1;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 13 November 2018 11:34:30
             end;
             colnum = colnum + 1;
           end;
         end;
-        sheetColls[colnum] = 9.7109371;
+        /*sheetColls[colnum] = 9.7109371;
         if quartCount>1 then begin
-          sheetCollsOutLvl[colnum] = RepSpec.flags[5];
+          //sheetCollsOutLvl[colnum] = RepSpec.flags[5];
         end;
-        colnum = colnum + 1;
+        colnum = colnum + 1;*/
 			end;
       if quartCount>1 then begin
         sheetColls[colnum] = 10.5703125;
         colnum = colnum + 1;
+        sheetColls[colnum] = 10.5703125;
+        colnum = colnum + 1;
         if (RepSpec.flags[29]==1) then begin
           for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
+            /*sheetColls[colnum] = 10.5703125;
+            if quartCount>1 then begin
+              //sheetCollsOutLvl[colnum] = RepSpec.flags[5]*2;
+            end;
+            colnum = colnum + 1;*/
             sheetColls[colnum] = 10.5703125;
             if quartCount>1 then begin
-              sheetCollsOutLvl[colnum] = RepSpec.flags[5]*2;
+              //sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
             end;
             colnum = colnum + 1;
             sheetColls[colnum] = 10.5703125;
             if quartCount>1 then begin
-              sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
-            end;
-            colnum = colnum + 1;
-            sheetColls[colnum] = 10.5703125;
-            if quartCount>1 then begin
-              sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
+              //sheetCollsOutLvl[colnum] = RepSpec.flags[5]*3;
             end;
             colnum = colnum + 1;
           end;
         end;
-        sheetColls[colnum] = 10.5703125;
-        sheetCollsOutLvl[colnum] = RepSpec.flags[5];
-        colnum = colnum + 1;
+        /*sheetColls[colnum] = 10.5703125;
+        //sheetCollsOutLvl[colnum] = RepSpec.flags[5];
+        colnum = colnum + 1;*/
       end;
-			sheetColls[colnum] = 10.5703125;
+			/*sheetColls[colnum] = 10.5703125;
       if quartCount>1 then begin
-        sheetCollsOutLvl[colnum] = RepSpec.flags[5];
+        //sheetCollsOutLvl[colnum] = RepSpec.flags[5];
       end;
 			colnum = colnum + 1;
 			sheetColls[colnum] = 6.140625;
       if quartCount>1 then begin
-        sheetCollsOutLvl[colnum] = RepSpec.flags[5];
-      end;
+        //sheetCollsOutLvl[colnum] = RepSpec.flags[5];
+      end;*/
 			
       for (PAi=0;PAi<ProjArray2.length;PAi=PAi+1) begin
         sheetnum = sheetnum + 1;
@@ -2722,10 +2426,10 @@ BEGIN
           colnum = 1;
           BeginRow(sheetnum,fileToSave,rownum,0,19.5);
             style = 14;
-            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Project Statistics " & RepSpec.f2,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-            qtyOfEmpStr = (quartCount*colqty + colqty + 3) + 2;
+            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donations Statistics " & RepSpec.f2,SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+            qtyOfEmpStr = (quartCount*colqty + colqty);
             if quartCount<2 then begin
-              qtyOfEmpStr = qtyOfEmpStr - colqty;
+              qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
             end;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
           EndRow(sheetnum,fileToSave,rownum);
@@ -2757,9 +2461,9 @@ BEGIN
             qtyOfEmpStr = 1;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
             style = 39;
-            qtyOfEmpStr = (quartCount + 1)*colqty + 1;
+            qtyOfEmpStr = (quartCount + 4)*colqty + CompArray.length * 4 + 1;
             if quartCount<2 then begin
-              qtyOfEmpStr = qtyOfEmpStr - colqty;
+              qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
             end;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
             style = 36;
@@ -2780,9 +2484,9 @@ BEGIN
             end else begin
               style = 52;
             end;
-            qtyOfEmpStr = (quartCount + 1)*colqty + 1;
+            qtyOfEmpStr = (quartCount + 4)*colqty + CompArray.length * 4 + 1;
             if quartCount<2 then begin
-              qtyOfEmpStr = qtyOfEmpStr - colqty;
+              qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
             end;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
             mergeCell[qtyMergeCell] = mergeCell[qtyMergeCell] & ":" & GetStringCellNum(colnum-1,rownum);
@@ -2805,9 +2509,9 @@ BEGIN
             end else begin
               style = 16;
             end;
-            qtyOfEmpStr = (quartCount + 1)*colqty + 1;
+            qtyOfEmpStr = (quartCount + 4)*colqty + CompArray.length * 4 + 1;
             if quartCount<2 then begin
-              qtyOfEmpStr = qtyOfEmpStr - colqty;
+              qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
             end;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
             style = 36;
@@ -2823,47 +2527,31 @@ BEGIN
               if nonblank(RepSpec.f4) then begin
                 StringCell(sheetnum,fileToSave,colnum,rownum,style,MonthName(RepSpec.sStartDate),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
               end else begin
-                StringCell(sheetnum,fileToSave,colnum,rownum,style,QuartalIntToStr(quartToPrint[Qi]),SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                StringCell(sheetnum,fileToSave,colnum,rownum,style,QuartalIntToStr(quartToPrint[Qi]) & " Donated",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+                StringCell(sheetnum,fileToSave,colnum,rownum,style,QuartalIntToStr(quartToPrint[Qi]) & " Spent",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
               end;
-              style = 62;
               if (RepSpec.flags[29]==1) then begin
                 for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                  style = 62;
-                  StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                   style = 83;
                   StringCell(sheetnum,fileToSave,colnum,rownum,style,"Donated - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:23:47
                   style = 84;
                   StringCell(sheetnum,fileToSave,colnum,rownum,style,"Spent - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:23:48
                 end;
-                style = 69;
-                StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact -  ALL COMPANIES",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-              end else begin
-                StringCell(sheetnum,fileToSave,colnum,rownum,style,"Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
               end;
             end;
             if quartCount>1 then begin
               style = 65;
-              StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-              style = 62;
+              StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT Donated",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
+              StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT Spent",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
               if (RepSpec.flags[29]==1) then begin
                 for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                  style = 62;
-                  StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT-Fact - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                   style = 83;
                   StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT-Donated - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                   style = 84;
                   StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT-Spent - " & CompNamesVect[CompArray[CAi]],SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
                 end;
-                style = 69;
-                StringCell(sheetnum,fileToSave,colnum,rownum,style,"Tot-Fact - ALL COMPANIES",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-              end else begin
-                StringCell(sheetnum,fileToSave,colnum,rownum,style,"TOT-Fact",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
               end;
             end;
-            style = 63;
-            StringCell(sheetnum,fileToSave,colnum,rownum,style,"Delta,$",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
-            style = 64;
-            StringCell(sheetnum,fileToSave,colnum,rownum,style,"%",SharedStrings,numOfUniqueSharedStrings,numOfSharedStrings);
             style = 36;
             qtyOfEmpStr = 1;
             EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
@@ -2910,58 +2598,45 @@ BEGIN
                   for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
                     style = 24;
                     bud = QuartVect[quartToPrint[Qi] & ";" & group & ";" & ProjArray2[PAi]];
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FdnTOT;" & group & ";" & ProjArray2[PAi] & ";_"]);
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FspTOT;" & group & ";" & ProjArray2[PAi] & ";_"]);
                     totbud = totbud + bud;
-                    style = 40;
                     if (RepSpec.flags[29]==1) then begin
                       for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
                         fact = QuartVect[quartToPrint[Qi] & "F;" & group & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
                         donated = QuartVect[quartToPrint[Qi] & "Fdn;" & group & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
                         spent = QuartVect[quartToPrint[Qi] & "Fsp;" & group & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
-                        style = 40;
-                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                         style = 85;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:30:03
                         style = 86;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:30:03
                         totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-                        totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;
-                        totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                        totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;
+                        totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                        totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;
+                        totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
                       end;
-                      style = 70;
                     end;
                     fact = QuartVect[quartToPrint[Qi] & "F;" & group & ";" & ProjArray2[PAi]];
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                     totfact = totfact + fact;
                   end;
                   if quartCount>1 then begin
                     style = 24;
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
-                    style = 40;
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":dn"]);
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":sp"]);
                     if (RepSpec.flags[29]==1) then begin
                       for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                      	style = 40;
-                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
                         style = 85;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:30:22
                         style = 86;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:30:23
                         totfactv[CompArray[CAi]] = 0;
                         totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
                         totfactv[CompArray[CAi] & ":sp"] = 0;
+totfactv[":spTOT"] = 0;
                       end;
-                      style = 70;
                     end;
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-                  end;
-                  style = 28;
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
-                  style = 30;
-                  if (totbud == 0) then begin
-                    qtyOfEmpStr = 1;
-                    EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-                  end else begin
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
                   end;
                   style = 36;
                   qtyOfEmpStr = 1;
@@ -2984,58 +2659,47 @@ BEGIN
                   for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
                     style = 27;
                     bud = QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ";" & ProjArray2[PAi]];
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FdnTOT;" & ArtArrayWithGroups[i] & ";" & ProjArray2[PAi] & ";_"]);
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FspTOT;" & ArtArrayWithGroups[i] & ";" & ProjArray2[PAi] & ";_"]);
                     totbud = totbud + bud;
-                    style = 41;
                     if (RepSpec.flags[29]==1) then begin
                       for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
                         fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
                         donated = QuartVect[quartToPrint[Qi] & "Fdn;" & ArtArrayWithGroups[i] & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
                         spent = QuartVect[quartToPrint[Qi] & "Fsp;" & ArtArrayWithGroups[i] & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
-                        style = 41;
-                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                         style = 85;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:31:08
                         style = 86;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:31:08
                         totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-                        totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;
-                        totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                        totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;
+                        totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                        totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;
+                        totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
+                        
                       end;
-                      style = 71;
                     end;
                     fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ";" & ProjArray2[PAi]];
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                     totfact = totfact + fact;
                   end;
                   if quartCount>1 then begin
                     style = 27;
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
-                    style = 41;
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":dnTOT"]);
+                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":spTOT"]);
+                    
                     if (RepSpec.flags[29]==1) then begin
                       for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                      	style = 41;
-                        NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
                         style = 85;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:57:05
                         style = 86;
                         NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 2 June 2020 11:57:06
                         totfactv[CompArray[CAi]] = 0;
                         totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
                         totfactv[CompArray[CAi] & ":sp"] = 0;
+totfactv[":spTOT"] = 0;
                       end;
-                      style = 71;
                     end;
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-                  end;
-                  style = 29;
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
-                  style = 31;
-                  if (totbud == 0) then begin
-                    qtyOfEmpStr = 1;
-                    EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-                  end else begin
-                    NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
                   end;
                   style = 36;
                   qtyOfEmpStr = 1;
@@ -3075,58 +2739,45 @@ BEGIN
                           for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
                             style = 42;
                             bud = QuartVect[quartToPrint[Qi] & ";" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray2[PAi]];
-                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FdnTOT;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray2[PAi] & ";_"]);
+                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FspTOT;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray2[PAi] & ";_"]);
                             totbud = totbud + bud;
-                            style = 20;
                             if (RepSpec.flags[29]==1) then begin
                               for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
                                 fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
                                 donated = QuartVect[quartToPrint[Qi] & "Fdn;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
                                 spent = QuartVect[quartToPrint[Qi] & "Fsp;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
-                                style = 20;
-                                NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                                 style = 85;
                                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:32:02
                                 style = 86;
                                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:32:02
                                 totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-                                totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;
-                                totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                                totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;
+                                totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                                totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;
+                                totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
                               end;
-                              style = 72;
                             end;
                             fact = QuartVect[quartToPrint[Qi] & "F;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ";" & ProjArray2[PAi]];
-                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                             totfact = totfact + fact;
                           end;
                           if quartCount>1 then begin
                             style = 42;
-                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
-                            style = 20;
+                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":dnTOT"]);
+                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":dnTOT"]);
                             if (RepSpec.flags[29]==1) then begin
                               for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                              	style = 20;
-                                NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
                                 style = 85;
                                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);
                                 style = 86;
                                 NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);
                                 totfactv[CompArray[CAi]] = 0;
                                 totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
 																totfactv[CompArray[CAi] & ":sp"] = 0;
+totfactv[":spTOT"] = 0;
                               end;
-                              style = 72;
                             end;
-                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-                          end;
-                          style = 22;
-                          NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
-                          style = 21;
-                          if (totbud == 0) then begin
-                            qtyOfEmpStr = 1;
-                            EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-                          end else begin
-                            NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
                           end;
                           style = 36;
                           qtyOfEmpStr = 1;
@@ -3161,58 +2812,46 @@ BEGIN
 																	for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
 																		style = 42;
 																		bud = QuartVect[quartToPrint[Qi] & "S;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray2[PAi]];
-																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FSdnTOT;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray2[PAi] & ";_"]);
+																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FSspTOT;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray2[PAi] & ";_"])
 																		totbud = totbud + bud;
-																		style = 20;
 																		if (RepSpec.flags[29]==1) then begin
 																			for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
 																				fact = QuartVect[quartToPrint[Qi] & "FS;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
 																				donated = QuartVect[quartToPrint[Qi] & "FSdn;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
 																				spent = QuartVect[quartToPrint[Qi] & "FSsp;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray2[PAi] & ";" & CompArray[CAi]];
-																				style = 20;
-																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
 																				style = 85;
 																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:32:51
 																				style = 86;
 																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:32:51
 																				totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-																				totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;
-																				totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;
+																				totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;
+																				totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;
+																				totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;
+																				totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
 																			end;
-																			style = 72;
 																		end;
 																		fact = QuartVect[quartToPrint[Qi] & "FS;" & ArtArrayWithGroups[i] & ":" & ExtArr[j] & ":::" & SuppArr[jj] & ";" & ProjArray2[PAi]];
-																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
 																		totfact = totfact + fact;
 																	end;
 																	if quartCount>1 then begin
 																		style = 42;
-																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
-																		style = 20;
+																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":dn"]);
+																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":sp"]);
 																		if (RepSpec.flags[29]==1) then begin
 																			for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-																				style = 20;
-																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
 																				style = 85;
 																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:32:50
 																				style = 86;
 																				NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:32:53
 																				totfactv[CompArray[CAi]] = 0;
 																				totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
 																				totfactv[CompArray[CAi] & ":sp"] = 0;
+totfactv[":spTOT"] = 0;
 																			end;
 																			style = 72;
 																		end;
-																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
-																	end;
-																	style = 22;
-																	NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact - totbud);
-																	style = 21;
-																	if (totbud == 0) then begin
-																		qtyOfEmpStr = 1;
-																		EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-																	end else begin
-																		NumericCell(sheetnum,fileToSave,colnum,rownum,style,100*(totfact - totbud)/totbud);
 																	end;
 																	style = 36;
 																	qtyOfEmpStr = 1;
@@ -3222,9 +2861,6 @@ BEGIN
 														end;
 													end;
                         end;
-                        
-                        
-                        
                       end;
                     end;
                   end;
@@ -3233,9 +2869,9 @@ BEGIN
                   colnum = 5;
                   BeginRow(sheetnum,fileToSave,rownum,0,blankval);
                     style = 37;
-                    qtyOfEmpStr = (quartCount + 1)*colqty + 2;
+                    qtyOfEmpStr = (quartCount + 4)*colqty + CompArray.length * 4 + 1;
                     if quartCount<2 then begin
-                      qtyOfEmpStr = qtyOfEmpStr - colqty;
+                      qtyOfEmpStr = qtyOfEmpStr - colqty - CompArray.length * 4;
                     end;
                     EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
                   EndRow(sheetnum,fileToSave,rownum);
@@ -3256,66 +2892,46 @@ BEGIN
             for (Qi=0;Qi<quartCount;Qi=Qi+1) begin
               style = 25;
               bud = QuartVect[quartToPrint[Qi] & ";T;" & ProjArray2[PAi]];
-              NumericCell(sheetnum,fileToSave,colnum,rownum,style,bud);
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FdnTOT;T;" & ProjArray2[PAi] & ";_"]);
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,QuartVect[quartToPrint[Qi] & "FspTOT;T;" & ProjArray2[PAi] & ";_"]);
               totbud = totbud + bud;
-              style = 44;
               if (RepSpec.flags[29]==1) then begin
                 for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
                   fact = QuartVect[quartToPrint[Qi] & "F;T;" & ProjArray2[PAi] & ";" & CompArray[CAi]];
                   donated = QuartVect[quartToPrint[Qi] & "Fdn;T;" & ProjArray2[PAi] & ";" & CompArray[CAi]];
                   spent = QuartVect[quartToPrint[Qi] & "Fsp;T;" & ProjArray2[PAi] & ";" & CompArray[CAi]];
-                  style = 44;
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
                   style = 85;
                   NumericCell(sheetnum,fileToSave,colnum,rownum,style,donated);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:33:26
                   style = 86;
                   NumericCell(sheetnum,fileToSave,colnum,rownum,style,spent);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:33:28
                   totfactv[CompArray[CAi]] = totfactv[CompArray[CAi]] + fact;
-                  totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":dn"] + donated;
-                  totfactv[CompArray[CAi]] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                  totfactv[CompArray[CAi] & ":dn"] = totfactv[CompArray[CAi] & ":dn"] + donated;
+                  totfactv[CompArray[CAi] & ":sp"] = totfactv[CompArray[CAi] & ":sp"] + spent;
+                  totfactv[":dnTOT"] = totfactv[":dnTOT"] + donated;
+                  totfactv[":spTOT"] = totfactv[":spTOT"] + spent;
                 end;
-                style = 73;
               end;
               fact = QuartVect[quartToPrint[Qi] & "F;T;" & ProjArray2[PAi]];
-              NumericCell(sheetnum,fileToSave,colnum,rownum,style,fact);
               totfact = totfact + fact;
             end;
             if quartCount>1 then begin
               style = 25;
-              NumericCell(sheetnum,fileToSave,colnum,rownum,style,totbud);
-              style = 33;
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":dn"]);
+              NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[":sp"]);
               if (RepSpec.flags[29]==1) then begin
                 for (CAi=0;CAi<CompArray.length;CAi=CAi+1) begin
-                	style = 33;
-                  NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi]]);
                   style = 85;
                   NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":dn"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:33:54
                   style = 86;
                   NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfactv[CompArray[CAi] & ":sp"]);// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 1 June 2020 10:33:55
                   totfactv[CompArray[CAi]] = 0;
                   totfactv[CompArray[CAi] & ":dn"] = 0;
+totfactv[":dnTOT"] = 0;
 									totfactv[CompArray[CAi] & ":sp"] = 0;
+totfactv[":spTOT"] = 0;
                 end;
-                style = 74;
               end;
-              NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact);
             end;
-                          
-              // Edit Start ---------------------------------------------- Edit Start
-	//Thursday, 6 September 2018 08:59:08
-	
-              style = 28;
-              NumericCell(sheetnum,fileToSave,colnum,rownum,style,totfact-totbud);
-              style = 30;
-              if (totbud == 0) then begin
-								qtyOfEmpStr = 1;
-								EmptyCell(sheetnum,fileToSave,colnum,rownum,style,qtyOfEmpStr);
-							end else begin
-								NumericCell(sheetnum,fileToSave,colnum,rownum,style,(totfact-totbud)/totbud*100);
-							end;
-              
-	// Edit End ---------------------------------------------- Edit End
-              
           EndRow(sheetnum,fileToSave,rownum);
 
         EndSheetData(sheetnum,fileToSave);

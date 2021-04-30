@@ -52,6 +52,8 @@ BEGIN
       SetCompany(1,false);
     case "2020":
       SetCompany(1,false);
+    case "2021":
+      SetCompany(1,false);
   end;
 	k = 0;
 	while(loopmain(PRr,1,true)) begin
@@ -65,6 +67,8 @@ BEGIN
       case "2019.998":
         goto L1;
       case "2020.998":
+        goto L1;
+      case "2021.998":
         goto L1;
     end;
     if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
@@ -112,6 +116,8 @@ BEGIN
       SetCompany(1,false);
     case "2020":
       SetCompany(1,false);
+    case "2021":
+      SetCompany(1,false);
   end;
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
 		PRr.Code = ProjArray[PAi];
@@ -153,7 +159,9 @@ BEGIN
                   (RepSpec.f2=="2019" and right(TBBUrw.ArtCode,3)=="_19") or
                   (RepSpec.f2!="2019" and right(TBBUrw.ArtCode,3)!="_19") or
                   (RepSpec.f2=="2020" and right(TBBUrw.ArtCode,3)=="_20") or
-                  (RepSpec.f2!="2020" and right(TBBUrw.ArtCode,3)!="_20")) then begin
+                  (RepSpec.f2!="2020" and right(TBBUrw.ArtCode,3)!="_20") or
+                  (RepSpec.f2=="2021" and right(TBBUrw.ArtCode,3)=="_21") or
+                  (RepSpec.f2!="2021" and right(TBBUrw.ArtCode,3)!="_21")) then begin
                 for (FAi=0;FAi<FoundArray.length;FAi=FAi+1) begin 
                   if (TBBUrw.ExtraObj==FoundArray[FAi]) then begin
                     FPVect[k & ":" & FoundArray[FAi] & ":" & ProjArray[PAi]] = FPVect[k & ":" & FoundArray[FAi] & ":" & ProjArray[PAi]] + TBBUrw.Sum;

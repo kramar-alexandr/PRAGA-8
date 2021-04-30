@@ -51,6 +51,12 @@ external procedure NormalizeObjstr(var string);// Edit *************************
 external procedure NoDupObjs(string,var string);// Edit ************************** Wednesday, 15 July 2015 12:10:47
 external procedure GetSalesGroup(string,var string);// Edit ************************** Friday, 6 November 2015 09:29:04
 remote procedure ClientMessageBox(string);//Edit-------------------Vitalii 16:48 25.05.2017
+external procedure GlobalDataCollect(array string, array string,var array string,var array string, record RcVc,
+					var vector val,var array string,var vector string,array string);
+external procedure DataCollect(array string, array string,var array string,var array string, record RcVc,
+					var vector val,var array string,var vector string,array string);
+external procedure ArraysCollect(record RcVc, var array string, var array string, var vector string, var array string, var boolean, var vector boolean);
+external procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
 
 
 function Boolean CheckPrepaymentAmount(record VIVc VIp,Integer rwcnt)
@@ -280,6 +286,22 @@ BEGIN
 	record ContractsVc Contr;// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 10 April 2019 17:07:39
 	Boolean SuTrHs,Sutestf,foundfcontract;// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 10 April 2019 17:08:06
 	longint contser;// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 10 April 2019 17:18:59
+	record RcVc RepSpec;// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 24 December 2020 13:22:46
+	boolean PrjFoundf,mess;
+	array string 10 ArtArrayWithoutGroups,ArtArrayWithGroups,ProjArray,ProjArray2,ExtArr,CompArray;
+	vector val QuartVect;
+	vector boolean isMotherProjVect;
+	vector string 255 ProjNamesVect,CompNamesVect;
+	array string 100 SuppArr,combarr;// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 25 September 2018 09:52:22
+	integer combcnt,pos,Qi;
+	vector boolean combExist;
+	vector string 100 aprojvec;
+	val bud_item,bud_item_exp,bud_item_exp_supp,bud_item_supp;
+	val fact_item,fact_item_exp,fact_item_exp_supp,fact_item_supp;
+	record CompaniesBlock Cb;
+	row CompaniesBlock Cbrw;
+	record VIBuCheckBlock VIBuCheckb;
+	date d1,d2;
 	
   res = 0;
   curcomp = CurrentCompany;    
@@ -1337,6 +1359,151 @@ LVIVcRecordCheck_GenTrans:;
       end;  
     end;
   end;
+
+  blockload(VIBuCheckb);  
+  if(VIBuCheckb.CheckVI==1)then begin
+		reportdefaults(RepSpec,"TotalProjectStat" & getyear(VIp.InvDate) & "RClass");
+		RepSpec.f2 = getyear(VIp.InvDate);
+		RepSpec.f3 = "5";
+		RepSpec.flags[5] = 1;
+		RepSpec.flags[29] = 1;
+		//RepSpec.flags[7] = 1;
+		RepSpec.long1 = VIp.SerNr;
+	
+		RepSpec.flags[1]=1;
+		Qi = 1;
+		d1.day = 1;
+		d1.month = 1;
+		d1.year = getyear(VIp.InvDate);
+		d2.day = 31;
+		d2.month = 3;
+		d2.year = getyear(VIp.InvDate);
+		if(VIp.InvDate>stringtodate("31/3/" & getyear(VIp.InvDate)))then begin RepSpec.flags[2]=1; Qi = 2;  
+			d1.day = 1;
+			d1.month = 4;
+			d1.year = getyear(VIp.InvDate);
+			d2.day = 31;
+			d2.month = 6;
+			d2.year = getyear(VIp.InvDate);
+		end;
+		if(VIp.InvDate>stringtodate("31/6/" & getyear(VIp.InvDate)))then begin RepSpec.flags[3]=1; Qi = 3;  
+			d1.day = 1;
+			d1.month = 7;
+			d1.year = getyear(VIp.InvDate);
+			d2.day = 31;
+			d2.month = 9;
+			d2.year = getyear(VIp.InvDate);
+		end;
+		if(VIp.InvDate>stringtodate("31/9/" & getyear(VIp.InvDate)))then begin RepSpec.flags[4]=1; Qi = 4;  
+			d1.day = 1;
+			d1.month = 10;
+			d1.year = getyear(VIp.InvDate);
+			d2.day = 31;
+			d2.month = 12;
+			d2.year = getyear(VIp.InvDate);
+		end;
+		RepSpec.sStartDate = d1;
+		RepSpec.sEndDate = d2;
+		PrjFoundf = true;
+		ArraysCollect(RepSpec,ArtArrayWithoutGroups,ProjArray,ProjNamesVect,ArtArrayWithGroups,PrjFoundf,isMotherProjVect);
+		if (PrjFoundf) then begin
+			DataCollect(ArtArrayWithoutGroups,ExtArr,ProjArray,ProjArray2,RepSpec,QuartVect,CompArray,CompNamesVect,SuppArr);
+			SortStringArray(SuppArr);
+			GetVectorTags(QuartVect,combarr);
+			combcnt = combarr.length;
+			for (i=0;i<combcnt;i=i+1) begin
+				pos = 0;
+				ExtractObjWithSeparator(";",combarr[i],false,pos,tstr);
+				ExtractObjWithSeparator(";",combarr[i],false,pos,tstr);
+				combExist[tstr] = true;
+			end;
+		end;
+		PRr.Code = "";
+		while(loopmain(PRr,1,true))begin
+			aprojvec[PRr.Objects] = PRr.Code;
+		end;
+		blockload(Cb);
+		matrowget(Cb,currentcompany-1,Cbrw);
+		
+		for(i=0;i<matrowcnt(VIp);i=i+1)begin
+			matrowget(VIp,i,VIrw);
+			INr.Code = VIrw.Item;
+			readfirstmain(INr,1,true);
+			//1;4020_20;2020.012
+			bud_item = QuartVect[Qi & ";" & INr.Objects & ";" & aprojvec[VIrw.Prj]];
+			logtext(0,"bud_item " & bud_item);
+			//1;4020_20:E0736;2020.012
+			bud_item_exp = QuartVect[Qi & ";" & INr.Objects & ":" & VIrw.Extras & ";" & aprojvec[VIrw.Prj]];
+			logtext(0,"bud_item_exp " & bud_item_exp);
+			//1S;4020_20:E0736:::P1120;2020.012
+			bud_item_exp_supp = QuartVect[Qi & "S;" & INr.Objects & ":" & VIrw.Extras & ":::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj]];
+			logtext(0,"bud_item_exp_supp " & bud_item_exp_supp);
+			//1S;1010_20::::P1120;2020.012
+			bud_item_supp = QuartVect[Qi & "S;" & INr.Objects & "::::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj]];
+			logtext(0,"bud_item_supp " & bud_item_supp);
+			
+			//1F;4020_20;2020.012;HRPM
+			logtext(0,Qi & "F;" & INr.Objects & ";" & aprojvec[VIrw.Prj] & ";" & Cbrw.ShortName);
+			fact_item = QuartVect[Qi & "F;" & INr.Objects & ";" & aprojvec[VIrw.Prj] & ";" & Cbrw.ShortName];
+			logtext(0,"fact_item " & fact_item);
+			
+			fact_item_exp = QuartVect[Qi & "F;" & INr.Objects & ":" & VIrw.Extras & ";" & aprojvec[VIrw.Prj] & ";" & Cbrw.ShortName];
+			logtext(0,"fact_item_exp " & fact_item_exp);
+			
+			fact_item_exp_supp = QuartVect[Qi & "FS;" & INr.Objects & ":" & VIrw.Extras & ":::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj] & ";" & Cbrw.ShortName];
+			logtext(0,"fact_item_exp_supp " & fact_item_exp_supp);
+			
+			fact_item_supp = QuartVect[Qi & "FS;" & INr.Objects & "::::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj] & ";" & Cbrw.ShortName];
+			logtext(0,"fact_item_supp " & fact_item_supp);
+			
+			
+			mess  = false;
+			
+			if(fact_item>bud_item)then begin
+				mess  = true;
+			end;
+			if(fact_item_exp>bud_item_exp)then begin
+				mess  = true;
+			end;
+			if(fact_item_exp_supp>bud_item_exp_supp)then begin
+				mess  = true;
+			end;
+			if(fact_item_supp>bud_item_supp)then begin
+				mess  = true;
+			end;
+			
+			if(mess)then begin
+				messagebox(0,"Budget exceeded " & VIrw.Prj & " " & VIrw.Comment);
+			end;
+			
+			//bud_item_exp_supp = QuartVect[Qi & "S;" & INr.Objects & ":" & VIrw.Extras & ":::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj]];
+			//bud_item_supp = QuartVect[Qi & "S;" & INr.Objects & ":" & VIrw.Extras & ":::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj]];
+			//fact_item = QuartVect[Qi & "S;" & INr.Objects & ":" & VIrw.Extras & ":::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj]];
+			//fact_item_exp = QuartVect[Qi & "S;" & INr.Objects & ":" & VIrw.Extras & ":::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj]];
+			//fact_item_exp_supp = QuartVect[Qi & "S;" & INr.Objects & ":" & VIrw.Extras & ":::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj]];
+			//fact_item_supp = QuartVect[Qi & "S;" & INr.Objects & ":" & VIrw.Extras & ":::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj]];
+			/*bud = blankval;
+			fact = blankval;
+			logtext(0,Qi & "S;" & INr.Objects & ":" & VIrw.Extras & ":::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj]);
+			bud = QuartVect[Qi & "S;" & INr.Objects & ":" & VIrw.Extras & ":::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj]];
+			fact = QuartVect[Qi & "FS;" & INr.Objects & ":" & VIrw.Extras & ":::" & VIrw.Supp & ";" & aprojvec[VIrw.Prj] & ";" & Cbrw.ShortName];
+			if(bud==0)then begin
+				bud = QuartVect[Qi & "S;" & INr.Objects & ":" & VIrw.Extras & ":::" & "" & ";" & aprojvec[VIrw.Prj]];
+				fact = QuartVect[Qi & "FS;" & INr.Objects & ":" & VIrw.Extras & ":::" & "" & ";" & aprojvec[VIrw.Prj] & ";" & Cbrw.ShortName];
+			end;
+			if(bud==0)then begin
+				bud = QuartVect[Qi & ";" & INr.Objects & ":" & "" & ";" & aprojvec[VIrw.Prj]];
+				fact = QuartVect[Qi & "F;" & INr.Objects & ":" & "" & ";" & aprojvec[VIrw.Prj] & ";" & Cbrw.ShortName];
+			end;
+			if(fact==0)then begin
+				fact = QuartVect[Qi & "F;" & INr.Objects & ":" & "" & ";" & aprojvec[VIrw.Prj] & ";" & Cbrw.ShortName];
+			end;
+			if(bud!=0 and fact>bud)then begin
+				messagebox(0,"Budget exceeded " & VIrw.Prj & " " & VIrw.Comment);
+			end;*/
+		end;
+  end;
+  
   /*Conr.VECode = VIp.VECode;// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 24 April 2019 14:02:10
   if (ReadFirstKey("VECode",Conr,1,true)) then begin
     if (Conr.EndDate<CurrentDate) then begin

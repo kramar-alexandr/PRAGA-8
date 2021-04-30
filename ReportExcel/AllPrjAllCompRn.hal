@@ -48,6 +48,8 @@ BEGIN
           goto L1;
         case "2020.998":
           goto L1;
+        case "2021.998":
+          goto L1;
       end;
     end;
     if (RepSpec.flags[8]==0) then begin
@@ -59,6 +61,8 @@ BEGIN
         case "2019.013":
           goto L1;
         case "2020.013":
+          goto L1;
+        case "2021.013":
           goto L1;
       end;
     end;
@@ -72,6 +76,8 @@ BEGIN
           goto L1;
         case "2020.014":
           goto L1;
+        case "2021.014":
+          goto L1;
       end;
     end;
     if (RepSpec.flags[10]==0) then begin
@@ -84,6 +90,8 @@ BEGIN
           goto L1;
         case "2020.015":
           goto L1;
+        case "2021.015":
+          goto L1;
       end;
     end;
     if (RepSpec.flags[11]==0) then begin
@@ -95,6 +103,8 @@ BEGIN
         case "2019.016":
           goto L1;
         case "2020.016":
+          goto L1;
+        case "2021.016":
           goto L1;
       end;
     end;
@@ -176,6 +186,8 @@ BEGIN
     case "2019":
       SetCompany(1,false);
     case "2020":
+      SetCompany(1,false);
+    case "2021":
       SetCompany(1,false);
   end;
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin
@@ -550,6 +562,8 @@ BEGIN
     case "2019":
       SetCompany(1,false);
     case "2020":
+      SetCompany(1,false);
+    case "2021":
       SetCompany(1,false);
   end;
   ArraysCollect(RepSpec,ProjArray,ProjNamesVect,PrjFoundf,isMotherProjVect);
