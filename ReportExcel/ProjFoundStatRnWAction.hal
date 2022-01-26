@@ -110,6 +110,19 @@ begin
 end;
 
 global
+procedure ProjFoundStat2022RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2022";
+	//RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
 function Boolean ProjFoundStat2018RClassOnOpenWindow(Integer wn)
 begin
 	record RcVc RepSpec;
@@ -161,6 +174,18 @@ begin
 	return;
 end;
 
+global
+function Boolean ProjFoundStat2022RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2022";
+	//RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
 
 global
 procedure RunProjFoundStatRn()

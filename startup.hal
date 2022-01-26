@@ -22,30 +22,35 @@ begin
   Report("Budget Total by Foundations 2019",BudTotFound2019RClass,BudTotFoundRn,0,modTS);
   Report("Budget Total by Foundations 2020",BudTotFound2020RClass,BudTotFoundRn,0,modTS);
   Report("Budget Total by Foundations 2021",BudTotFound2021RClass,BudTotFoundRn,0,modTS);
+  Report("Budget Total by Foundations 2022",BudTotFound2022RClass,BudTotFoundRn,0,modTS);
 	Report("Foundation People Statistics 2016",FoundPeopleStatRClass,FoundPeopleStatRn,0,modTS);
   Report("Foundation People Statistics 2017",FoundPeopleStat2017RClass,FoundPeopleStatRn,0,modTS);
   Report("Foundation People Statistics 2018",FoundPeopleStat2018RClass,FoundPeopleStatRn,0,modTS);
   Report("Foundation People Statistics 2019",FoundPeopleStat2019RClass,FoundPeopleStatRn,0,modTS);
   Report("Foundation People Statistics 2020",FoundPeopleStat2020RClass,FoundPeopleStatRn,0,modTS);
   Report("Foundation People Statistics 2021",FoundPeopleStat2021RClass,FoundPeopleStatRn,0,modTS);
+  Report("Foundation People Statistics 2022",FoundPeopleStat2022RClass,FoundPeopleStatRn,0,modTS);
 	Report("Project Foundation Statistics 2016",ProjFoundStatRClass,ProjFoundStatRn,0,modTS);
   Report("Project Foundation Statistics 2017",ProjFoundStat2017RClass,ProjFoundStatRn,0,modTS);
   Report("Project Foundation Statistics 2018",ProjFoundStat2018RClass,ProjFoundStatRn,0,modTS);
   Report("Project Foundation Statistics 2019",ProjFoundStat2019RClass,ProjFoundStatRn,0,modTS);
   Report("Project Foundation Statistics 2020",ProjFoundStat2020RClass,ProjFoundStatRn,0,modTS);
   Report("Project Foundation Statistics 2021",ProjFoundStat2021RClass,ProjFoundStatRn,0,modTS);
+  Report("Project Foundation Statistics 2022",ProjFoundStat2022RClass,ProjFoundStatRn,0,modTS);
 	Report("Project Summary 2016",PrjSumRClass,PrjSumRn,0,modTS);
 	Report("Project Summary 2017",PrjSum2017RClass,PrjSumRn,0,modTS);
   Report("Project Summary 2018",PrjSum2018RClass,PrjSumRn,0,modTS);
   Report("Project Summary 2019",PrjSum2019RClass,PrjSumRn,0,modTS);
   Report("Project Summary 2020",PrjSum2020RClass,PrjSumRn,0,modTS);
   Report("Project Summary 2021",PrjSum2021RClass,PrjSumRn,0,modTS);
+  Report("Project Summary 2022",PrjSum2022RClass,PrjSumRn,0,modTS);
 	Report("Project Statistics 2016",ProjectStatRClass,ProjectStatRn,0,modTS);
   Report("Project Statistics 2017",ProjectStat2017RClass,ProjectStatRn,0,modTS);
   Report("Project Statistics 2018",ProjectStat2018RClass,ProjectStatRn,0,modTS);
   Report("Project Statistics 2019",ProjectStat2019RClass,ProjectStatRn,0,modTS);
   Report("Project Statistics 2020",ProjectStat2020RClass,ProjectStatRn,0,modTS);
   Report("Project Statistics 2021",ProjectStat2021RClass,ProjectStatRn,0,modTS);
+  Report("Project Statistics 2022",ProjectStat2022RClass,ProjectStatRn,0,modTS);
   
   //Report("Donations Statistics 2020",DonationsStat2020RClass,ProjectStatRn,0,modTS);//exeed
   //Report("Donations Statistics 2021",DonationsStat2021RClass,ProjectStatRn,0,modTS);
@@ -54,9 +59,11 @@ begin
   Report("Total Project Statistics 2019",TotalProjectStat2019RClass,ProjectStatRn,0,modTS);
   Report("Total Project Statistics 2020",TotalProjectStat2020RClass,ProjectStatRn,0,modTS);
   Report("Total Project Statistics 2021",TotalProjectStat2021RClass,ProjectStatRn,0,modTS);
+  Report("Total Project Statistics 2022",TotalProjectStat2022RClass,ProjectStatRn,0,modTS);
   
   Report("Total Donations Statistics 2020",TotalDonationsStat2020RClass,ProjectStatRn,0,modTS);
   Report("Total Donations Statistics 2021",TotalDonationsStat2021RClass,ProjectStatRn,0,modTS);
+  Report("Total Donations Statistics 2022",TotalDonationsStat2022RClass,ProjectStatRn,0,modTS);
 
 	Report("Projects Facts",ProjectFactRClass,ProjectFactRn,0,modTS);
   Report("Total Report - All Companies 2017",AllPrjAllComp2017RClass,AllPrjAllCompRn,0,modTS);
@@ -64,10 +71,11 @@ begin
   Report("Total Report - All Companies 2019",AllPrjAllComp2019RClass,AllPrjAllCompRn,0,modTS);
   Report("Total Report - All Companies 2020",AllPrjAllComp2020RClass,AllPrjAllCompRn,0,modTS);
   Report("Total Report - All Companies 2021",AllPrjAllComp2021RClass,AllPrjAllCompRn,0,modTS);
+  Report("Total Report - All Companies 2022",AllPrjAllComp2022RClass,AllPrjAllCompRn,0,modTS);
   Report("Web Statistics DEMO",MyBIRClass,MyBIRn,0,modTS);//Edit-------------------Vitalii 11:30 14:48 19.09.2016
   Report("Remuneration report",ZARPLATARClass,ZARPLATARn,0,modTS);
   
-  Report("Invoices for Excel 2021",FrVIRepRClass,FrVIRepRn,0,modPL);
+  Report("Invoices for Excel 2022",FrVIRepRClass,FrVIRepRn,0,modPL);
   
   Report("Find wrong invoices",WrongInvRClass,FindWrongInvoicesRn,0,modPL);// Edit ************************** BPI Ukraine - KramarAlexandr - Friday, 11 October 2019 11:15:12
   

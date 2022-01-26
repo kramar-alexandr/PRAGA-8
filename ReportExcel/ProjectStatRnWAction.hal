@@ -120,6 +120,19 @@ begin
 	return;
 end;
 
+global
+procedure ProjectStat2022RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2022";
+  RepSpec.f3 = "5";
+	RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
 
 global
 function Boolean ProjectStat2018RClassOnOpenWindow(Integer wn)
@@ -170,6 +183,20 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
 	RepSpec.f2 = "2021";
+  RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+function Boolean ProjectStat2022RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2022";
   RepSpec.f3 = "5";
   RepSpec.flags[5] = 1;
 	PutWindowRecord(wn,RepSpec);
@@ -238,6 +265,21 @@ begin
 end;
 
 global
+procedure TotalProjectStat2022RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2022";
+	RepSpec.f3 = "5";
+	RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
 procedure TotalDonationsStat2020RClassReportDefaults(integer wn)
 begin
 	record RcVc RepSpec;
@@ -259,6 +301,21 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
   RepSpec.f2 = "2021";
+	RepSpec.f3 = "5";
+	RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
+global
+procedure TotalDonationsStat2022RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2022";
 	RepSpec.f3 = "5";
 	RepSpec.flags[5] = 1;
   RepSpec.flags[29] = 1;
@@ -330,6 +387,21 @@ begin
 end;
 
 global
+function Boolean TotalProjectStat2022RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2022";
+	RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
 function Boolean TotalDonationsStat2020RClassOnOpenWindow(Integer wn)
 begin
 	record RcVc RepSpec;
@@ -351,6 +423,21 @@ begin
 	
 	GetWindowRecord(wn,RepSpec);
   RepSpec.f2 = "2021";
+	RepSpec.f3 = "5";
+  RepSpec.flags[5] = 1;
+  RepSpec.flags[29] = 1;
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
+
+global
+function Boolean TotalDonationsStat2022RClassOnOpenWindow(Integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+  RepSpec.f2 = "2022";
 	RepSpec.f3 = "5";
   RepSpec.flags[5] = 1;
   RepSpec.flags[29] = 1;

@@ -34,7 +34,8 @@ BEGIN
         (RepSpec.f2=="2018" and right(ITr.Code,3)!="_18") or
         (RepSpec.f2=="2019" and right(ITr.Code,3)!="_19") or
         (RepSpec.f2=="2020" and right(ITr.Code,3)!="_20") or
-        (RepSpec.f2=="2021" and right(ITr.Code,3)!="_21")) then begin testf = false; end;
+        (RepSpec.f2=="2021" and right(ITr.Code,3)!="_21") or
+        (RepSpec.f2=="2022" and right(ITr.Code,3)!="_22")) then begin testf = false; end;
     if (testf) then begin
       ArtArrayWithGroups[kw] = ITr.Code;
       kw = kw + 1;
@@ -50,7 +51,8 @@ BEGIN
             (RepSpec.f2=="2018" and right(INr.Objects,3)!="_18") or
             (RepSpec.f2=="2019" and right(INr.Objects,3)!="_19") or
             (RepSpec.f2=="2020" and right(INr.Objects,3)!="_20") or
-            (RepSpec.f2=="2021" and right(INr.Objects,3)!="_21")) then begin testf = false; end;
+            (RepSpec.f2=="2021" and right(INr.Objects,3)!="_21") or
+            (RepSpec.f2=="2022" and right(INr.Objects,3)!="_22")) then begin testf = false; end;
         if (testf) then begin
           tstr = INr.Objects;
           foundf = false;
@@ -82,6 +84,8 @@ BEGIN
       SetCompany(1,false);
     case "2021":
       SetCompany(1,false);
+    case "2022":
+      SetCompany(1,false);
   end;
 	k = 0;
 	while(loopmain(PRr,1,true)) begin
@@ -97,6 +101,8 @@ BEGIN
       case "2020.998":
         goto L1; 
       case "2021.998":
+        goto L1; 
+      case "2022.998":
         goto L1; 
     end;
 		if ((GetYear(PRr.StartDate) & "" == RepSpec.f2) or (GetYear(PRr.EndDate) & "" == RepSpec.f2)) then begin
@@ -153,6 +159,8 @@ BEGIN
     case "2020":
       SetCompany(1,false);
     case "2021":
+      SetCompany(1,false);
+    case "2022":
       SetCompany(1,false);
   end;
   for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin 

@@ -44,7 +44,8 @@ BEGIN
         (RepSpec.f2=="2018" and right(ITr.Code,3)!="_18") or
         (RepSpec.f2=="2019" and right(ITr.Code,3)!="_19") or
         (RepSpec.f2=="2020" and right(ITr.Code,3)!="_20") or
-        (RepSpec.f2=="2021" and right(ITr.Code,3)!="_21")) then begin testf = false; end;
+        (RepSpec.f2=="2021" and right(ITr.Code,3)!="_21") or 
+        (RepSpec.f2=="2022" and right(ITr.Code,3)!="_22")) then begin testf = false; end;
     if (testf) then begin
       ArtArrayWithGroups[kw] = ITr.Code;
       kw = kw + 1;
@@ -60,7 +61,8 @@ BEGIN
             (RepSpec.f2=="2018" and right(INr.Objects,3)!="_18") or
             (RepSpec.f2=="2019" and right(INr.Objects,3)!="_19") or
             (RepSpec.f2=="2020" and right(INr.Objects,3)!="_20") or
-            (RepSpec.f2=="2021" and right(INr.Objects,3)!="_21")) then begin testf = false; end;
+            (RepSpec.f2=="2021" and right(INr.Objects,3)!="_21") or
+            (RepSpec.f2=="2022" and right(INr.Objects,3)!="_22")) then begin testf = false; end;
         if (testf) then begin
           tstr = INr.Objects;
           foundf = false;
@@ -91,6 +93,8 @@ BEGIN
       SetCompany(1,false);
     case "2021":
       SetCompany(1,false);
+    case "2022":
+      SetCompany(1,false);
   end;
 	k = 0;
   resetloop(PRr);
@@ -109,6 +113,8 @@ BEGIN
           goto L1;
         case "2021.998":
           goto L1;
+        case "2022.998":
+          goto L1;
       end;
     end;
     if (RepSpec.flags[8]==0) then begin
@@ -124,6 +130,8 @@ BEGIN
         case "2020.013":
           goto L1;
         case "2021.013":
+          goto L1;
+        case "2022.013":
           goto L1;
       end;
     end;
@@ -141,6 +149,8 @@ BEGIN
           goto L1;
         case "2021.014":
           goto L1;
+        case "2022.014":
+          goto L1;
       end;
     end;
     if (RepSpec.flags[10]==0) then begin
@@ -157,6 +167,8 @@ BEGIN
           goto L1;
         case "2021.015":
           goto L1;
+        case "2022.015":
+          goto L1;
       end;
     end;
     if (RepSpec.flags[11]==0) then begin
@@ -172,6 +184,8 @@ BEGIN
         case "2020.016":
           goto L1;
         case "2021.016":
+          goto L1;
+        case "2022.016":
           goto L1;
       end;
     end;
@@ -313,6 +327,19 @@ begin
     vect[kf                  & "T;" & tstr] = vect[kf                  & "T;" & tstr] + v;
   end;
   
+  if (RepSpec.f2=="2022") then begin
+    switch (prj) begin
+      case "2022.998":
+        tstr = "sT1";
+      otherwise
+        tstr = "sT3";
+    end;
+    vect[kf & art & ":" & ext & ";" & tstr] = vect[kf & art & ":" & ext & ";" & tstr] + v;
+    vect[kf & art &             ";" & tstr] = vect[kf & art &             ";" & tstr] + v;
+    vect[kf & group &           ";" & tstr] = vect[kf & group &           ";" & tstr] + v;
+    vect[kf                  & "T;" & tstr] = vect[kf                  & "T;" & tstr] + v;
+  end;
+  
   if nonblank(comp) and (RepSpec.flags[29]==1) then begin
     vect[kf & art & ":" & ext & ";" & prj & ";" & comp] = vect[kf & art & ":" & ext & ";" & prj & ";" & comp] + v;
     vect[kf & art & ":" & ext & ";T" & ";" & comp]      = vect[kf & art & ":" & ext & ";T" & ";" & comp] + v;
@@ -404,6 +431,19 @@ begin
       vect[kf & group &           ";" & tstr & ";" & comp] = vect[kf & group &           ";" & tstr & ";" & comp] + v;
       vect[kf                  & "T;" & tstr & ";" & comp] = vect[kf                  & "T;" & tstr & ";" & comp] + v;
     end;
+    
+    if (RepSpec.f2=="2022") then begin
+      switch (prj) begin
+        case "2022.998":
+          tstr = "sT1";
+        otherwise
+          tstr = "sT3";
+      end;
+      vect[kf & art & ":" & ext & ";" & tstr & ";" & comp] = vect[kf & art & ":" & ext & ";" & tstr & ";" & comp] + v;
+      vect[kf & art &             ";" & tstr & ";" & comp] = vect[kf & art &             ";" & tstr & ";" & comp] + v;
+      vect[kf & group &           ";" & tstr & ";" & comp] = vect[kf & group &           ";" & tstr & ";" & comp] + v;
+      vect[kf                  & "T;" & tstr & ";" & comp] = vect[kf                  & "T;" & tstr & ";" & comp] + v;
+    end;
   end;
   
   return;
@@ -464,6 +504,8 @@ BEGIN
     case "2020":
       SetCompany(1,false);
     case "2021":
+      SetCompany(1,false);
+    case "2022":
       SetCompany(1,false);
   end;
   EAi = 0;
@@ -952,6 +994,28 @@ BEGIN
         testf = true;
         switch (ProjArray2[i]) begin
           case "2021.998":
+            testf = false;
+        end;
+        if (testf) then begin
+          ProjArray[PAi] = ProjArray2[i];
+          PAi = PAi + 1;
+        end;
+      end;
+      ProjArray[PAi] = "sT3";
+    end;
+    
+    if (RepSpec.f2=="2022") then begin
+      PAi = 0;
+      if (RepSpec.flags[6]==1) then begin
+        ProjArray[PAi] = "2022.998";
+        PAi = PAi + 1;
+        ProjArray[PAi] = "sT1";
+        PAi = PAi + 1;
+      end;
+      for (i=0;i<ProjArray2.length;i=i+1) begin
+        testf = true;
+        switch (ProjArray2[i]) begin
+          case "2022.998":
             testf = false;
         end;
         if (testf) then begin

@@ -41,6 +41,18 @@ begin
 	return;
 end;
 
+global
+procedure BudTotFound2022RClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2022";
+	PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;
+
 
 global
 procedure BudTotFound2018RClassReportDefaults(integer wn)
@@ -90,6 +102,17 @@ begin
 	return;
 end;
 
+global
+function Boolean BudTotFound2022RClassOnOpenWindow(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.f2 = "2022";
+	PutWindowRecord(wn,RepSpec);
+
+	return;
+end;
 
 global
 function Boolean BudTotFound2018RClassOnOpenWindow(integer wn)

@@ -81,6 +81,8 @@ BEGIN
       SetCompany(1,false);
     case "2021":
       SetCompany(1,false);
+    case "2022":
+      SetCompany(1,false);
   end;
 	k = 0;
   resetloop(PRr);
@@ -160,6 +162,8 @@ BEGIN
     case "2020":
       SetCompany(1,false);
     case "2021":
+      SetCompany(1,false);
+    case "2022":
       SetCompany(1,false);
   end;
 	for (PAi=0;PAi<ProjArray.length;PAi=PAi+1) begin 
