@@ -5883,6 +5883,7 @@ real h,v,vs,h1;
 	WindowBegin("France Invoices Report 2021",FrVIRepRClass,CGRcW,RcType);
 		SetWRect(20,80,450,250);
 		v = 20; vs = 20; h = 120;
+		CheckBox(100,26,0,"With previous year invoice",flags[1]);
 		//PeriodField(h,v=6,"Period");
 	EndWindow;
 end;

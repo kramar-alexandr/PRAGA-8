@@ -84,6 +84,26 @@ begin
 												outstring(400,0,VIrw.Sum,false);
 												outstring(450,0,VIr.CurncyCode,false);
 											endformat;
+										end else begin
+										  if(RepSpec.flags[1]==1)then begin
+										    startformat(15);
+                          outstring(0,"DblVIVc",VIr.SerNr,false);
+                          outstring(30,0,VIr.InvDate,false);
+                          outstring(30,0,OPrsr.TransDate,false);
+                          outstring(30,0,OPr.SerNr,false);
+                          outstring(75,0,VIrw.Supp,false);
+                          Objr.Code = VIrw.Supp;
+                          readfirstmain(Objr,1,true);
+                          outstring(100,0,Objr.Comment,false);
+                          outstring(150,0,VIrw.Prj,false);
+                          outstring(200,0,VIrw.Exp,false);
+                          outstring(250,0,VIrw.Comment,false);
+                          outstring(300,0,VIrw.Found,false);
+                          outstring(350,0,VIrw.Loc,false);
+                          outstring(400,0,VIrw.Sum,false);
+                          outstring(450,0,VIr.CurncyCode,false);
+                        endformat;
+										  end;
 										end;
 									end;
 								end;
