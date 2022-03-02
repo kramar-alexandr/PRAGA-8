@@ -372,13 +372,13 @@ begin
  EndRecord;
 
  RecordAddBegin(CUVc,"myCUVc");
- RecordField(BeneficiaryBank,M4Str,255,0);
- RecordField(SWIFT,M4Str,255,0);
- RecordField(Beneficiary,M4Str,255,0);
- RecordField(BeneficiaryAccNumber,M4Str,255,0);
- RecordField(CorrespBankOfBenef,M4Str,255,0);
- RecordField(CorrespondentAccNum,M4Str,255,0);
- RecordField(SWIFTCorrespBank,M4Str,255,0);
+   RecordField(BeneficiaryBank,M4Str,255,0);
+   RecordField(SWIFT,M4Str,255,0);
+   RecordField(Beneficiary,M4Str,255,0);
+   RecordField(BeneficiaryAccNumber,M4Str,255,0);
+   RecordField(CorrespBankOfBenef,M4Str,255,0);
+   RecordField(CorrespondentAccNum,M4Str,255,0);
+   RecordField(SWIFTCorrespBank,M4Str,255,0);
   RecordField(RoutNum,M4Str,255,0);
  EndRecordAdd;
  

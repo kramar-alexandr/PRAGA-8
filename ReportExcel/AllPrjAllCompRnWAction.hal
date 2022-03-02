@@ -292,3 +292,19 @@ begin
 	end;
 	return;
 end;
+
+
+global
+procedure FrVIRepRClassReportDefaults(integer wn)
+begin
+	record RcVc RepSpec;
+	
+	GetWindowRecord(wn,RepSpec);
+	RepSpec.d1 = stringtodate("1/1/2021");
+	RepSpec.d2 = stringtodate("31/12/2021");
+	RepSpec.Period2Str = RepSpec.d1 & ":" & RepSpec.d2;
+	RepSpec.f1 = "A2,A3,A4,K1,K2,L1,L2,L3,L4,M3,M4,J1,J2,J3,J4";
+  PutWindowRecord(wn,RepSpec);
+	
+	return;
+end;

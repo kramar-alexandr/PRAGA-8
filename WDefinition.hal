@@ -6056,9 +6056,10 @@ begin
 real h,v,vs,h1;
 	WindowBegin("France Invoices Report 2022",FrVIRepRClass,CGRcW,RcType);
 		SetWRect(20,80,450,250);
-		v = 20; vs = 20; h = 120;
-		CheckBox(100,26,0,"With previous year invoice",flags[1]);
-		//PeriodField(h,v=6,"Period");
+		v = 20; vs = 20; h = 80;
+		CheckBox(100,v=26,0,"With previous year invoice",flags[1]);
+		PeriodField(h,v+=vs,"Period");
+		EditField(h,v+=vs,-20,"Pay Modes",Normal,f1,false,PMSClass);
 	EndWindow;
 end;
 
