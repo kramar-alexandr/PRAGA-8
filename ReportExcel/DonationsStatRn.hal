@@ -62,7 +62,7 @@ BEGIN
             (RepSpec.f2=="2019" and right(INr.Objects,3)!="_19") or
             (RepSpec.f2=="2020" and right(INr.Objects,3)!="_20") or
             (RepSpec.f2=="2021" and right(INr.Objects,3)!="_21") or
-            (RepSpec.f2=="2022" and right(INr.Objects,3)!="_21")) then begin testf = false; end;
+            (RepSpec.f2=="2022" and right(INr.Objects,3)!="_22")) then begin testf = false; end;
         if (testf) then begin
           tstr = INr.Objects;
           foundf = false;
